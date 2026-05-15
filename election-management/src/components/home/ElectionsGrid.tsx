@@ -1,38 +1,79 @@
+import { useEffect, useState } from 'react'
+import { fetchPublishedElections } from '@/services/electionService'
+import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
+import { formatTimeRemaining } from '@/utils/electionTime'
 import { ElectionCard } from './ElectionCard'
 
-const elections = [
-  {
-    variant: 'active' as const,
-    title: '2024 National Policy Referendum',
-    description:
-      'Public vote on proposed environmental legislation and infrastructure development funding for the fiscal year.',
-    timeRemaining: '14h : 22m : 05s',
-    participationRate: 64.2,
-    votesLabel: '4.2M Votes',
-    hoverAccent: 'primary' as const,
-  },
-  {
-    variant: 'upcoming' as const,
-    title: 'Metropolitan Council Elections',
-    description: 'Annual selection of representatives for the metropolitan governance and urban planning committee.',
-    startsIn: 'Starts in 3 Days',
-    eligibleVoters: '1,245,000',
-    idRequirements: 'Biometric + 2FA',
-    hoverAccent: 'tertiary' as const,
-  },
-  {
-    variant: 'active' as const,
-    title: 'Tech Alliance Board Vote',
-    description:
-      'Quarterly election for the board of directors representing the Regional Technology Alliance members.',
-    timeRemaining: '02h : 15m : 45s',
-    participationRate: 88.9,
-    votesLabel: '8.4k Votes',
-    hoverAccent: 'primary' as const,
-  },
-]
+interface ElectionCardData {
+  id: string
+  variant: 'active' | 'upcoming'
+  title: string
+  description: string
+  timeRemaining?: string
+  startsIn?: string
+  participationRate?: number
+  votesLabel?: string
+}
 
 export function ElectionsGrid() {
+  const [elections, setElections] = useState<ElectionCardData[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      try {
+        const published = await fetchPublishedElections()
+        const cards: ElectionCardData[] = []
+
+        for (const election of published) {
+          const now = Date.now()
+          const start = new Date(election.start_date).getTime()
+          const variant: 'active' | 'upcoming' = now < start ? 'upcoming' : 'active'
+
+          let participationRate: number | undefined
+          let votesLabel: string | undefined
+
+          if (variant === 'active') {
+            try {
+              const stats = await fetchElectionRegistrationStats(election.id)
+              participationRate = stats.participation_percent
+              votesLabel = `${stats.registered_count.toLocaleString()} Registered`
+            } catch {
+              participationRate = 0
+              votesLabel = '0 Registered'
+            }
+          }
+
+          const daysUntilStart = Math.ceil((start - now) / (1000 * 60 * 60 * 24))
+
+          cards.push({
+            id: election.id,
+            variant,
+            title: election.title,
+            description: election.description ?? 'No description provided.',
+            timeRemaining: variant === 'active' ? formatTimeRemaining(election.end_date) : undefined,
+            startsIn: variant === 'upcoming' ? `Starts in ${Math.max(0, daysUntilStart)} Days` : undefined,
+            participationRate,
+            votesLabel,
+          })
+        }
+
+        if (!cancelled) setElections(cards)
+      } catch {
+        if (!cancelled) setElections([])
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <section className="px-margin py-2xl">
       <div className="mb-12 flex items-end justify-between">
@@ -46,11 +87,19 @@ export function ElectionsGrid() {
           View All Elections
         </button>
       </div>
-      <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-3">
-        {elections.map((election) => (
-          <ElectionCard key={election.title} {...election} />
-        ))}
-      </div>
+      {loading ? (
+        <p className="font-body-md text-body-md text-on-surface-variant">Loading elections…</p>
+      ) : elections.length === 0 ? (
+        <p className="font-body-md text-body-md text-on-surface-variant">
+          No published elections yet. Check back soon.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-3">
+          {elections.map((election) => (
+            <ElectionCard key={election.id} {...election} detailPath={`/elections/${election.id}`} />
+          ))}
+        </div>
+      )}
     </section>
   )
 }

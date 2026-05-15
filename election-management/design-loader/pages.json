@@ -50,5 +50,11 @@
     "aliases": ["AdminDashboard"],
     "reactPage": "src/pages/dashboards/AdminDashboardPage.tsx",
     "status": "converted"
+  },
+  "election_details_page": {
+    "route": "/elections/:id",
+    "designPath": "design/election_details_page/code.html",
+    "reactPage": "src/pages/ElectionDetailsPage.tsx",
+    "status": "converted"
   }
 }

@@ -5,6 +5,7 @@ import { CreatorSidebar } from '@/components/creator/CreatorSidebar'
 import { CREATOR_PROFILE_AVATAR } from '@/constants/electionAssets'
 import { useAuth } from '@/hooks/useAuth'
 import { fetchCreatorElections } from '@/services/electionService'
+import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import type { Election } from '@/types/election'
 
 /** design/election_creator_dashboard */
@@ -12,6 +13,8 @@ export function CreatorDashboardPage() {
   const { profile } = useAuth()
   const [elections, setElections] = useState<Election[]>([])
   const [loading, setLoading] = useState(true)
+  const [finalizingId, setFinalizingId] = useState<string | null>(null)
+  const [finalizeMessage, setFinalizeMessage] = useState<string | null>(null)
 
   const status = profile?.approval_status
   const isPending = status === 'pending'
@@ -38,6 +41,39 @@ export function CreatorDashboardPage() {
 
   const draftCount = elections.filter((e) => e.status === 'draft').length
   const publishedCount = elections.filter((e) => e.status === 'published' || e.status === 'active').length
+
+  async function reloadElections() {
+    if (!profile?.id) return
+    const data = await fetchCreatorElections(profile.id)
+    setElections(data)
+  }
+
+  async function handleFinalizeVoterRoll(electionId: string) {
+    const election = elections.find((e) => e.id === electionId)
+    if (!election) return
+
+    const confirmed = window.confirm(
+      `Finalize the voter roll for "${election.title}"? This assigns unique Secret Voter IDs (e.g. ${election.secret_voter_id_prefix ?? 'POLL-A'}-0001) to all registered voters and emails each voter their ID. This cannot be undone.`,
+    )
+    if (!confirmed) return
+
+    setFinalizingId(electionId)
+    setFinalizeMessage(null)
+
+    try {
+      const { finalize, email } = await finalizeAndEmailSecretVoterIds(electionId)
+      setFinalizeMessage(
+        `Assigned ${finalize.assigned_count} new ID(s). Emailed ${email.sent} voter(s).${
+          email.dev_mode ? ' (Dev mode: check function logs if RESEND_API_KEY is not set.)' : ''
+        }`,
+      )
+      await reloadElections()
+    } catch (err) {
+      setFinalizeMessage(err instanceof Error ? err.message : 'Finalization failed')
+    } finally {
+      setFinalizingId(null)
+    }
+  }
 
   return (
     <div className="overflow-x-hidden bg-background text-on-background">
@@ -149,7 +185,18 @@ export function CreatorDashboardPage() {
                 {loading ? (
                   <p className="font-body-md text-body-md text-on-surface-variant lg:col-span-2">Loading elections…</p>
                 ) : (
-                  <CreatorElectionsTable elections={elections} />
+                  <>
+                    {finalizeMessage ? (
+                      <p className="mb-4 rounded-xl border border-tertiary/30 bg-tertiary/10 px-md py-sm font-body-sm text-body-sm text-tertiary lg:col-span-3">
+                        {finalizeMessage}
+                      </p>
+                    ) : null}
+                    <CreatorElectionsTable
+                      elections={elections}
+                      finalizingId={finalizingId}
+                      onFinalizeVoterRoll={(id) => void handleFinalizeVoterRoll(id)}
+                    />
+                  </>
                 )}
 
                 <div className="space-y-gutter">

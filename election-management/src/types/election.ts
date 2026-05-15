@@ -16,6 +16,8 @@ export interface Election {
   created_at: string
   updated_at: string
   published_at: string | null
+  secret_voter_id_prefix: string
+  voter_roll_finalized_at: string | null
 }
 
 export interface Candidate {

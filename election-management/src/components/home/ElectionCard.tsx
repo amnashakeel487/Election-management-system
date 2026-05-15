@@ -1,9 +1,12 @@
+import { Link } from 'react-router-dom'
+
 type ElectionCardVariant = 'active' | 'upcoming'
 
 export interface ElectionCardProps {
   variant: ElectionCardVariant
   title: string
   description: string
+  detailPath?: string
   timeRemaining?: string
   startsIn?: string
   participationRate?: number
@@ -17,6 +20,7 @@ export function ElectionCard({
   variant,
   title,
   description,
+  detailPath,
   timeRemaining,
   startsIn,
   participationRate,
@@ -97,7 +101,18 @@ export function ElectionCard({
           </div>
         ) : null}
 
-        {variant === 'active' ? (
+        {detailPath ? (
+          <Link
+            to={detailPath}
+            className={
+              variant === 'active'
+                ? 'block w-full rounded-xl border border-primary/20 bg-primary/5 py-3 text-center font-label-md text-label-md text-primary transition-all hover:bg-primary hover:text-on-primary'
+                : 'block w-full rounded-xl border border-outline/10 bg-surface-container-high py-3 text-center font-label-md text-label-md text-on-surface-variant transition-all hover:border-tertiary/20 hover:bg-tertiary/10 hover:text-tertiary'
+            }
+          >
+            {variant === 'active' ? 'Join Election' : 'View Details'}
+          </Link>
+        ) : variant === 'active' ? (
           <button
             type="button"
             className="w-full rounded-xl border border-primary/20 bg-primary/5 py-3 font-label-md text-label-md text-primary transition-all hover:bg-primary hover:text-on-primary"

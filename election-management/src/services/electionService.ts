@@ -12,7 +12,7 @@ const ELECTIONS = 'elections'
 const CANDIDATES = 'candidates'
 
 const ELECTION_COLUMNS =
-  'id, creator_id, title, description, start_date, end_date, max_voters, status, eligibility_rule, privacy_tier, real_time_results, allow_write_ins, created_at, updated_at, published_at'
+  'id, creator_id, title, description, start_date, end_date, max_voters, status, eligibility_rule, privacy_tier, real_time_results, allow_write_ins, created_at, updated_at, published_at, secret_voter_id_prefix, voter_roll_finalized_at'
 
 function defaultDraftDates() {
   const start = new Date()
@@ -20,6 +20,17 @@ function defaultDraftDates() {
   const end = new Date(start)
   end.setDate(end.getDate() + 7)
   return { start: start.toISOString(), end: end.toISOString() }
+}
+
+export async function fetchPublishedElections(): Promise<Election[]> {
+  const { data, error } = await supabase
+    .from(ELECTIONS)
+    .select(ELECTION_COLUMNS)
+    .in('status', ['published', 'active'])
+    .order('start_date', { ascending: true })
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as Election[]
 }
 
 export async function fetchCreatorElections(creatorId: string): Promise<Election[]> {

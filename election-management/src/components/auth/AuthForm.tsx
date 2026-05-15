@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AUTH_CAPTCHA_LOGO } from '@/constants/authAssets'
 import { useAuth } from '@/hooks/useAuth'
 import type { UserRole } from '@/types/auth'
@@ -13,7 +13,9 @@ interface AuthFormProps {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const navigate = useNavigate()
+  const location = useLocation()
   const { signIn, signUp } = useAuth()
+  const returnTo = (location.state as { from?: string } | null)?.from
 
   const isLogin = mode === 'login'
   const [role, setRole] = useState<UserRole>('election_creator')
@@ -30,7 +32,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     try {
       if (isLogin) {
         const dashboardPath = await signIn({ email, password })
-        navigate(dashboardPath, { replace: true })
+        navigate(returnTo ?? dashboardPath, { replace: true })
       } else {
         await signUp({ email, password, role })
         navigate('/verify-email', { replace: true, state: { email } })

@@ -4,6 +4,8 @@ import { formatSubmissionDate } from '@/utils/formatDate'
 
 interface CreatorElectionsTableProps {
   elections: Election[]
+  finalizingId?: string | null
+  onFinalizeVoterRoll?: (electionId: string) => void
 }
 
 function statusBadge(status: Election['status']) {
@@ -39,7 +41,11 @@ function statusBadge(status: Election['status']) {
   }
 }
 
-export function CreatorElectionsTable({ elections }: CreatorElectionsTableProps) {
+export function CreatorElectionsTable({
+  elections,
+  finalizingId,
+  onFinalizeVoterRoll,
+}: CreatorElectionsTableProps) {
   return (
     <div className="glass-panel flex flex-col overflow-hidden rounded-[32px] lg:col-span-2">
       <div className="flex items-center justify-between border-b border-white/10 p-6">
@@ -123,6 +129,19 @@ export function CreatorElectionsTable({ elections }: CreatorElectionsTableProps)
                       >
                         Edit
                       </Link>
+                    ) : (election.status === 'published' || election.status === 'active') &&
+                      !election.voter_roll_finalized_at &&
+                      onFinalizeVoterRoll ? (
+                      <button
+                        type="button"
+                        disabled={finalizingId === election.id}
+                        onClick={() => onFinalizeVoterRoll(election.id)}
+                        className="rounded-lg border border-tertiary/30 bg-tertiary/10 px-4 py-2 font-label-md text-label-md text-tertiary transition-all hover:bg-tertiary/20 disabled:opacity-60"
+                      >
+                        {finalizingId === election.id ? 'Finalizing…' : 'Finalize & Email IDs'}
+                      </button>
+                    ) : election.voter_roll_finalized_at ? (
+                      <span className="font-label-md text-label-md text-tertiary">IDs issued</span>
                     ) : (
                       <span className="font-label-md text-label-md text-on-surface-variant">—</span>
                     )}
