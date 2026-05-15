@@ -151,7 +151,7 @@ export function AdminDashboardPage() {
                   requests={pendingCreators}
                   actingOnId={actingOnId}
                   onApprove={(id, email) => void approve(id, email)}
-                  onReject={(id, email) => void reject(id, email)}
+                  onReject={(id, email, reason) => void reject(id, email, reason)}
                 />
 
                 <RecentAuditActivity logs={auditLogs} />

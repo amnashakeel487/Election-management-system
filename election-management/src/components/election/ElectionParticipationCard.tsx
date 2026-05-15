@@ -30,10 +30,16 @@ export function ElectionParticipationCard({
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   async function handleParticipate() {
     if (!session) {
       navigate('/login', { state: { from: `/elections/${electionId}` } })
+      return
+    }
+
+    if (!termsAccepted) {
+      setError('You must accept the terms and conditions to participate.')
       return
     }
 
@@ -134,14 +140,27 @@ export function ElectionParticipationCard({
       ) : null}
 
       {!alreadyRegistered && !onWaitlist ? (
-        <button
-          type="button"
-          disabled={submitting}
-          onClick={() => void handleParticipate()}
-          className="mb-4 w-full rounded-xl bg-primary py-4 font-headline-md text-headline-md text-on-primary shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60"
-        >
-          {submitting ? 'Processing…' : 'Join Election'}
-        </button>
+        <>
+          <label className="mb-4 flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 p-4">
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              className="mt-1 h-4 w-4 accent-primary"
+            />
+            <span className="font-body-sm text-body-sm text-on-surface-variant">
+              I accept the terms and conditions and confirm I am eligible to participate in this election.
+            </span>
+          </label>
+          <button
+            type="button"
+            disabled={submitting}
+            onClick={() => void handleParticipate()}
+            className="mb-4 w-full rounded-xl bg-primary py-4 font-headline-md text-headline-md text-on-primary shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-60"
+          >
+            {submitting ? 'Processing…' : 'I Want to Participate'}
+          </button>
+        </>
       ) : null}
 
       {isFull && !alreadyRegistered && !onWaitlist ? (

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-type ElectionCardVariant = 'active' | 'upcoming'
+type ElectionCardVariant = 'active' | 'upcoming' | 'completed'
 
 export interface ElectionCardProps {
   variant: ElectionCardVariant
@@ -43,6 +43,10 @@ export function ElectionCard({
               <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
               <span className="font-label-sm text-label-sm uppercase tracking-wider">Live Now</span>
             </span>
+          ) : variant === 'completed' ? (
+            <span className="flex items-center gap-1.5 rounded-full bg-on-surface-variant/20 px-3 py-1 text-on-surface-variant">
+              <span className="font-label-sm text-label-sm uppercase tracking-wider">Completed</span>
+            </span>
           ) : (
             <span className="flex items-center gap-1.5 rounded-full bg-tertiary/10 px-3 py-1 text-tertiary">
               <span className="font-label-sm text-label-sm uppercase tracking-wider">{startsIn}</span>
@@ -66,7 +70,7 @@ export function ElectionCard({
         </h3>
         <p className="mb-6 line-clamp-2 font-body-sm text-body-sm text-on-surface-variant">{description}</p>
 
-        {variant === 'active' && participationRate !== undefined && votesLabel ? (
+        {(variant === 'active' || variant === 'completed') && participationRate !== undefined && votesLabel ? (
           <div className="mb-8 space-y-4">
             <div className="flex items-center justify-between">
               <span className="font-label-md text-label-md text-on-surface-variant">Participation Rate</span>

@@ -8,7 +8,7 @@ const USERS_TABLE = 'users'
 export async function fetchPendingCreatorRequests(): Promise<PendingCreatorRequest[]> {
   const { data, error } = await supabase
     .from(USERS_TABLE)
-    .select('id, email, full_name, created_at, approval_status')
+    .select('id, email, full_name, phone, organization, election_purpose, created_at, approval_status')
     .eq('role', 'election_creator')
     .eq('approval_status', 'pending')
     .order('created_at', { ascending: false })
@@ -52,11 +52,16 @@ export async function approveCreatorRequest(targetUserId: string, targetEmail: s
   )
 }
 
-export async function rejectCreatorRequest(targetUserId: string, targetEmail: string): Promise<void> {
+export async function rejectCreatorRequest(
+  targetUserId: string,
+  targetEmail: string,
+  rejectionReason: string,
+): Promise<void> {
   const { error: updateError } = await supabase
     .from(USERS_TABLE)
     .update({
       approval_status: 'rejected',
+      rejection_reason: rejectionReason,
       updated_at: new Date().toISOString(),
     })
     .eq('id', targetUserId)
@@ -66,7 +71,7 @@ export async function rejectCreatorRequest(targetUserId: string, targetEmail: st
 
   await logAuditEvent(
     AUDIT_ACTIONS.CREATOR_REJECTED,
-    { approval_status: 'rejected', target_email: targetEmail },
+    { approval_status: 'rejected', target_email: targetEmail, rejection_reason: rejectionReason },
     { targetUserId },
   )
 }

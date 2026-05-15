@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { AuditLogEntry } from '@/types/auth'
 import { formatRelativeTime } from '@/utils/formatDate'
 
@@ -118,12 +119,12 @@ export function RecentAuditActivity({ logs }: RecentAuditActivityProps) {
           })
         )}
       </div>
-      <button
-        type="button"
-        className="mt-8 w-full rounded-xl border border-white/10 py-3 font-label-md text-label-md text-on-surface-variant transition-all hover:bg-surface-container-high"
+      <Link
+        to="/admin/audit-logs"
+        className="mt-8 block w-full rounded-xl border border-white/10 py-3 text-center font-label-md text-label-md text-on-surface-variant transition-all hover:bg-surface-container-high"
       >
         Full Audit Trail
-      </button>
+      </Link>
     </div>
   )
 }

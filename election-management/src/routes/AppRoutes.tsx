@@ -5,7 +5,10 @@ import { VerifyEmailRoute } from '@/components/auth/VerifyEmailRoute'
 import { HomePage } from '@/pages/HomePage'
 import { LoginPage } from '@/pages/LoginPage'
 import { RegisterPage } from '@/pages/RegisterPage'
+import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage'
+import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { VerifyEmailPage } from '@/pages/VerifyEmailPage'
+import { AdminAuditLogsPage } from '@/pages/admin/AdminAuditLogsPage'
 import { AdminDashboardPage } from '@/pages/dashboards/AdminDashboardPage'
 import { CreateElectionPage } from '@/pages/creator/CreateElectionPage'
 import { EditElectionPage } from '@/pages/creator/EditElectionPage'
@@ -63,6 +66,22 @@ export function AppRoutes() {
           </GuestRoute>
         }
       />
+      <Route
+        path="/forgot-password"
+        element={
+          <GuestRoute>
+            <ForgotPasswordPage />
+          </GuestRoute>
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          <GuestRoute>
+            <ResetPasswordPage />
+          </GuestRoute>
+        }
+      />
 
       <Route
         path="/verify-email"
@@ -78,6 +97,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={['admin']}>
             <AdminDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/audit-logs"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminAuditLogsPage />
           </ProtectedRoute>
         }
       />

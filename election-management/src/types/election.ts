@@ -5,8 +5,10 @@ export interface Election {
   creator_id: string
   title: string
   description: string | null
+  category: string | null
   start_date: string
   end_date: string
+  registration_deadline: string | null
   max_voters: number
   status: ElectionStatus
   eligibility_rule: string
@@ -25,6 +27,8 @@ export interface Candidate {
   election_id: string
   name: string
   description: string | null
+  designation: string | null
+  photo_url: string | null
   sort_order: number
   created_at: string
 }
@@ -36,8 +40,10 @@ export interface ElectionWithCandidates extends Election {
 export interface CreateElectionInput {
   title: string
   description?: string
+  category?: string
   start_date: string
   end_date: string
+  registration_deadline?: string
   max_voters: number
   eligibility_rule?: string
   privacy_tier?: string
@@ -50,4 +56,6 @@ export type UpdateElectionInput = Partial<CreateElectionInput>
 export interface CandidateInput {
   name: string
   description?: string
+  designation?: string
+  photo_url?: string
 }

@@ -8,6 +8,10 @@ export interface UserProfile {
   role: UserRole
   approval_status: ApprovalStatus
   full_name: string | null
+  phone: string | null
+  organization: string | null
+  election_purpose: string | null
+  rejection_reason: string | null
   created_at: string
   updated_at: string
 }
@@ -19,6 +23,10 @@ export interface AuthCredentials {
 
 export interface SignUpPayload extends AuthCredentials {
   role: UserRole
+  full_name: string
+  phone: string
+  organization?: string
+  election_purpose?: string
 }
 
 export interface AuditLogEntry {
@@ -38,6 +46,9 @@ export interface PendingCreatorRequest {
   id: string
   email: string
   full_name: string | null
+  phone: string | null
+  organization: string | null
+  election_purpose: string | null
   created_at: string
   approval_status: ApprovalStatus
 }

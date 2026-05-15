@@ -53,12 +53,12 @@ export function useAdminApproval(actorId: string | undefined) {
     }
   }
 
-  async function reject(targetUserId: string, targetEmail: string) {
+  async function reject(targetUserId: string, targetEmail: string, reason: string) {
     if (!actorId) return
     setActingOnId(targetUserId)
     setActionError(null)
     try {
-      await rejectCreatorRequest(targetUserId, targetEmail)
+      await rejectCreatorRequest(targetUserId, targetEmail, reason)
       await refresh()
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Rejection failed')

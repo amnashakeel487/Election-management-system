@@ -18,15 +18,41 @@ export function AuthForm({ mode }: AuthFormProps) {
   const returnTo = (location.state as { from?: string } | null)?.from
 
   const isLogin = mode === 'login'
-  const [role, setRole] = useState<UserRole>('election_creator')
+  const [role, setRole] = useState<UserRole>('voter')
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [organization, setOrganization] = useState('')
+  const [electionPurpose, setElectionPurpose] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [botChecked, setBotChecked] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+
+    if (!botChecked) {
+      setError('Please confirm you are not a bot.')
+      return
+    }
+
+    if (!isLogin) {
+      if (!fullName.trim()) {
+        setError('Full name is required.')
+        return
+      }
+      if (!phone.trim()) {
+        setError('Phone number is required.')
+        return
+      }
+      if (role === 'election_creator' && !electionPurpose.trim()) {
+        setError('Election purpose is required for creator registration.')
+        return
+      }
+    }
+
     setSubmitting(true)
 
     try {
@@ -34,7 +60,15 @@ export function AuthForm({ mode }: AuthFormProps) {
         const dashboardPath = await signIn({ email, password })
         navigate(returnTo ?? dashboardPath, { replace: true })
       } else {
-        await signUp({ email, password, role })
+        await signUp({
+          email,
+          password,
+          role,
+          full_name: fullName.trim(),
+          phone: phone.trim(),
+          organization: organization.trim() || undefined,
+          election_purpose: role === 'election_creator' ? electionPurpose.trim() : undefined,
+        })
         navigate('/verify-email', { replace: true, state: { email } })
       }
     } catch (err) {
@@ -99,7 +133,64 @@ export function AuthForm({ mode }: AuthFormProps) {
 
           <form className="flex flex-col gap-md" onSubmit={handleSubmit}>
             {!isLogin ? (
-              <RoleSelector value={role} onChange={setRole} disabled={submitting} />
+              <>
+                <RoleSelector value={role} onChange={setRole} disabled={submitting} />
+                <div className="space-y-md">
+                  <div className="space-y-sm">
+                    <label className="ml-xs font-label-md text-label-md text-on-surface-variant" htmlFor="fullName">
+                      Full Name
+                    </label>
+                    <input
+                      id="fullName"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full rounded-xl border-outline-variant bg-surface-container-lowest px-md py-md text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="space-y-sm">
+                    <label className="ml-xs font-label-md text-label-md text-on-surface-variant" htmlFor="phone">
+                      Phone Number
+                    </label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full rounded-xl border-outline-variant bg-surface-container-lowest px-md py-md text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  {role === 'election_creator' ? (
+                    <>
+                      <div className="space-y-sm">
+                        <label className="ml-xs font-label-md text-label-md text-on-surface-variant" htmlFor="organization">
+                          Organization
+                        </label>
+                        <input
+                          id="organization"
+                          value={organization}
+                          onChange={(e) => setOrganization(e.target.value)}
+                          className="w-full rounded-xl border-outline-variant bg-surface-container-lowest px-md py-md text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        />
+                      </div>
+                      <div className="space-y-sm">
+                        <label className="ml-xs font-label-md text-label-md text-on-surface-variant" htmlFor="purpose">
+                          Election Purpose
+                        </label>
+                        <textarea
+                          id="purpose"
+                          required
+                          rows={3}
+                          value={electionPurpose}
+                          onChange={(e) => setElectionPurpose(e.target.value)}
+                          className="w-full rounded-xl border-outline-variant bg-surface-container-lowest px-md py-md text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        />
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+              </>
             ) : (
               <p className="rounded-xl border border-outline-variant/50 bg-surface-container-highest/30 px-md py-sm font-body-sm text-body-sm text-on-surface-variant">
                 Sign in with the email and password for your account. Your dashboard (Voter, Creator, or Admin) is
@@ -163,10 +254,15 @@ export function AuthForm({ mode }: AuthFormProps) {
             </div>
 
             <div className="flex items-center justify-between rounded-xl border border-outline-variant/50 bg-surface-container-highest/30 p-md">
-              <div className="flex items-center gap-md">
-                <div className="flex h-6 w-6 cursor-pointer items-center justify-center rounded border-2 border-outline-variant transition-colors hover:border-primary" />
+              <label className="flex cursor-pointer items-center gap-md">
+                <input
+                  type="checkbox"
+                  checked={botChecked}
+                  onChange={(e) => setBotChecked(e.target.checked)}
+                  className="h-5 w-5 accent-primary"
+                />
                 <span className="font-body-sm text-body-sm text-on-surface">I am not a bot</span>
-              </div>
+              </label>
               <div className="flex flex-col items-center">
                 <img className="mb-base h-8 w-8 opacity-70" alt="" src={AUTH_CAPTCHA_LOGO} />
                 <span className="font-label-sm text-[8px] uppercase tracking-tighter text-on-surface-variant">
@@ -232,3 +328,6 @@ export function AuthForm({ mode }: AuthFormProps) {
     </>
   )
 }
+
+
+

@@ -12,7 +12,9 @@ const ELECTIONS = 'elections'
 const CANDIDATES = 'candidates'
 
 const ELECTION_COLUMNS =
-  'id, creator_id, title, description, start_date, end_date, max_voters, status, eligibility_rule, privacy_tier, real_time_results, allow_write_ins, created_at, updated_at, published_at, secret_voter_id_prefix, voter_roll_finalized_at'
+  'id, creator_id, title, description, category, start_date, end_date, registration_deadline, max_voters, status, eligibility_rule, privacy_tier, real_time_results, allow_write_ins, created_at, updated_at, published_at, secret_voter_id_prefix, voter_roll_finalized_at'
+
+const CANDIDATE_COLUMNS = 'id, election_id, name, description, designation, photo_url, sort_order, created_at'
 
 function defaultDraftDates() {
   const start = new Date()
@@ -22,15 +24,42 @@ function defaultDraftDates() {
   return { start: start.toISOString(), end: end.toISOString() }
 }
 
-export async function fetchPublishedElections(): Promise<Election[]> {
-  const { data, error } = await supabase
+export type PublicElectionFilter = 'all' | 'active' | 'upcoming' | 'completed'
+
+export async function fetchPublicElections(filter: PublicElectionFilter = 'all'): Promise<Election[]> {
+  let query = supabase
     .from(ELECTIONS)
     .select(ELECTION_COLUMNS)
-    .in('status', ['published', 'active'])
+    .in('status', ['published', 'active', 'completed'])
     .order('start_date', { ascending: true })
 
+  const { data, error } = await query
   if (error) throw new Error(error.message)
-  return (data ?? []) as Election[]
+
+  const rows = (data ?? []) as Election[]
+  const now = Date.now()
+
+  return rows.filter((e) => {
+    const start = new Date(e.start_date).getTime()
+    const end = new Date(e.end_date).getTime()
+    if (e.status === 'completed' || now > end) return filter === 'all' || filter === 'completed'
+    if (now < start) return filter === 'all' || filter === 'upcoming'
+    return filter === 'all' || filter === 'active'
+  })
+}
+
+/** @deprecated Use fetchPublicElections */
+export async function fetchPublishedElections(): Promise<Election[]> {
+  return fetchPublicElections('all').then((rows) =>
+    rows.filter((e) => {
+      const now = Date.now()
+      const start = new Date(e.start_date).getTime()
+      const end = new Date(e.end_date).getTime()
+      return e.status !== 'completed' && now >= start && now <= end
+        ? true
+        : e.status !== 'completed' && now < start
+    }),
+  )
 }
 
 export async function fetchCreatorElections(creatorId: string): Promise<Election[]> {
@@ -47,7 +76,7 @@ export async function fetchCreatorElections(creatorId: string): Promise<Election
 export async function fetchElectionById(electionId: string): Promise<ElectionWithCandidates | null> {
   const { data, error } = await supabase
     .from(ELECTIONS)
-    .select(`${ELECTION_COLUMNS}, candidates (id, election_id, name, description, sort_order, created_at)`)
+    .select(`${ELECTION_COLUMNS}, candidates (${CANDIDATE_COLUMNS})`)
     .eq('id', electionId)
     .maybeSingle()
 
@@ -143,9 +172,11 @@ export async function addCandidate(electionId: string, input: CandidateInput): P
       election_id: electionId,
       name: input.name,
       description: input.description ?? null,
+      designation: input.designation ?? null,
+      photo_url: input.photo_url ?? null,
       sort_order: count ?? 0,
     })
-    .select('id, election_id, name, description, sort_order, created_at')
+    .select(CANDIDATE_COLUMNS)
     .single()
 
   if (error) throw new Error(error.message)

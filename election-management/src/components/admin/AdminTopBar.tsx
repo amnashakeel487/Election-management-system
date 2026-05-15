@@ -1,13 +1,13 @@
 import { ADMIN_PROFILE_AVATAR } from '@/constants/adminAssets'
 
-export function AdminTopBar() {
+export function AdminTopBar({ title = 'Dashboard' }: { title?: string }) {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-surface-dim px-margin py-sm">
       <div className="flex items-center gap-4">
         <span className="material-symbols-outlined cursor-pointer rounded-full p-2 text-on-surface-variant transition-all hover:bg-surface-container-highest">
           menu
         </span>
-        <h2 className="font-headline-lg text-headline-lg text-primary">Dashboard</h2>
+        <h2 className="font-headline-lg text-headline-lg text-primary">{title}</h2>
       </div>
       <div className="flex items-center gap-6">
         <div className="relative">
