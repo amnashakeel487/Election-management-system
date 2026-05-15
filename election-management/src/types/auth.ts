@@ -25,11 +25,13 @@ export interface AuditLogEntry {
   id: string
   actor_id: string | null
   target_user_id: string | null
+  election_id: string | null
   action: string
   details: Record<string, unknown> | null
   created_at: string
   actor?: { email: string } | null
   target?: { email: string } | null
+  election?: { title: string } | null
 }
 
 export interface PendingCreatorRequest {

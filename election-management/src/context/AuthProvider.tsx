@@ -17,6 +17,8 @@ import {
   resendVerificationEmail,
 } from '@/services/authService'
 import type { AuthCredentials, SignUpPayload, UserProfile } from '@/types/auth'
+import { logAuditEvent } from '@/services/auditService'
+import { AUDIT_ACTIONS } from '@/types/audit'
 import { getDashboardPathForRole } from '@/utils/roleRoutes'
 
 interface AuthContextValue {
@@ -101,6 +103,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(nextSession)
     setUser(nextSession.user)
     setProfile(row)
+
+    void logAuditEvent(AUDIT_ACTIONS.USER_LOGIN, {
+      email: row.email,
+      role: row.role,
+    }).catch(() => {
+      /* audit must not block login */
+    })
 
     if (!isEmailVerified(nextSession.user.email_confirmed_at)) {
       return '/verify-email'

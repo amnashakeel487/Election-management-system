@@ -1,8 +1,9 @@
 import { supabase } from '@/lib/supabase'
-import type { AuditLogEntry, PendingCreatorRequest } from '@/types/auth'
+import { logAuditEvent, fetchRecentAuditLogs as fetchAuditLogs } from '@/services/auditService'
+import { AUDIT_ACTIONS } from '@/types/audit'
+import type { PendingCreatorRequest } from '@/types/auth'
 
 const USERS_TABLE = 'users'
-const AUDIT_TABLE = 'audit_logs'
 
 export async function fetchPendingCreatorRequests(): Promise<PendingCreatorRequest[]> {
   const { data, error } = await supabase
@@ -27,37 +28,11 @@ export async function fetchPendingCreatorCount(): Promise<number> {
   return count ?? 0
 }
 
-export async function fetchRecentAuditLogs(limit = 8): Promise<AuditLogEntry[]> {
-  const { data, error } = await supabase
-    .from(AUDIT_TABLE)
-    .select('id, actor_id, target_user_id, action, details, created_at')
-    .order('created_at', { ascending: false })
-    .limit(limit)
-
-  if (error) throw new Error(error.message)
-  return (data ?? []) as AuditLogEntry[]
+export async function fetchRecentAuditLogs(limit = 12) {
+  return fetchAuditLogs(limit)
 }
 
-async function insertAuditLog(
-  actorId: string,
-  targetUserId: string,
-  action: string,
-  details: Record<string, unknown>,
-) {
-  const { error } = await supabase.from(AUDIT_TABLE).insert({
-    actor_id: actorId,
-    target_user_id: targetUserId,
-    action,
-    details,
-  })
-  if (error) throw new Error(error.message)
-}
-
-export async function approveCreatorRequest(
-  targetUserId: string,
-  actorId: string,
-  targetEmail: string,
-): Promise<void> {
+export async function approveCreatorRequest(targetUserId: string, targetEmail: string): Promise<void> {
   const { error: updateError } = await supabase
     .from(USERS_TABLE)
     .update({
@@ -70,17 +45,14 @@ export async function approveCreatorRequest(
 
   if (updateError) throw new Error(updateError.message)
 
-  await insertAuditLog(actorId, targetUserId, 'creator_approved', {
-    approval_status: 'approved',
-    target_email: targetEmail,
-  })
+  await logAuditEvent(
+    AUDIT_ACTIONS.CREATOR_APPROVED,
+    { approval_status: 'approved', target_email: targetEmail },
+    { targetUserId },
+  )
 }
 
-export async function rejectCreatorRequest(
-  targetUserId: string,
-  actorId: string,
-  targetEmail: string,
-): Promise<void> {
+export async function rejectCreatorRequest(targetUserId: string, targetEmail: string): Promise<void> {
   const { error: updateError } = await supabase
     .from(USERS_TABLE)
     .update({
@@ -92,8 +64,9 @@ export async function rejectCreatorRequest(
 
   if (updateError) throw new Error(updateError.message)
 
-  await insertAuditLog(actorId, targetUserId, 'creator_rejected', {
-    approval_status: 'rejected',
-    target_email: targetEmail,
-  })
+  await logAuditEvent(
+    AUDIT_ACTIONS.CREATOR_REJECTED,
+    { approval_status: 'rejected', target_email: targetEmail },
+    { targetUserId },
+  )
 }

@@ -6,19 +6,71 @@ interface RecentAuditActivityProps {
 }
 
 function getAuditPresentation(log: AuditLogEntry) {
+  const actorEmail = (log.actor as { email?: string } | null)?.email ?? 'System'
   const targetEmail =
     (log.target as { email?: string } | null)?.email ??
-    (log.details?.target_email as string | undefined) ??
-    'Unknown user'
+    (log.details?.target_email as string | undefined)
+  const electionTitle =
+    (log.election as { title?: string } | null)?.title ??
+    (log.details?.title as string | undefined)
+  const details = log.details ?? {}
 
   switch (log.action) {
+    case 'user_login':
+      return {
+        icon: 'login',
+        iconBg: 'bg-primary/20',
+        iconColor: 'text-primary',
+        title: 'User Login',
+        description: `${actorEmail} signed in.`,
+      }
+    case 'vote_cast':
+      return {
+        icon: 'how_to_vote',
+        iconBg: 'bg-tertiary/20',
+        iconColor: 'text-tertiary',
+        title: 'Vote Cast',
+        description: `${actorEmail} voted in ${electionTitle ?? 'an election'}${details.candidate_name ? ` (${details.candidate_name as string})` : ''}.`,
+      }
+    case 'election_created':
+      return {
+        icon: 'add_circle',
+        iconBg: 'bg-primary/20',
+        iconColor: 'text-primary',
+        title: 'Election Created',
+        description: `${actorEmail} created "${electionTitle ?? (details.title as string) ?? 'election'}".`,
+      }
+    case 'election_published':
+      return {
+        icon: 'publish',
+        iconBg: 'bg-tertiary/20',
+        iconColor: 'text-tertiary',
+        title: 'Election Published',
+        description: `${electionTitle ?? (details.title as string) ?? 'Election'} is now open for registration.`,
+      }
+    case 'election_updated':
+      return {
+        icon: 'edit_note',
+        iconBg: 'bg-surface-container-high',
+        iconColor: 'text-on-surface-variant',
+        title: 'Election Updated',
+        description: `${actorEmail} updated ${electionTitle ?? 'an election'} (${(details.old_status as string) ?? '?'} → ${(details.new_status as string) ?? '?'}).`,
+      }
+    case 'election_voter_roll_finalized':
+      return {
+        icon: 'badge',
+        iconBg: 'bg-secondary/20',
+        iconColor: 'text-secondary',
+        title: 'Voter Roll Finalized',
+        description: `Secret IDs issued for ${electionTitle ?? 'election'}.`,
+      }
     case 'creator_approved':
       return {
         icon: 'verified',
         iconBg: 'bg-tertiary',
         iconColor: 'text-tertiary-fixed',
         title: 'Creator Approved',
-        description: `${targetEmail} granted election creator access.`,
+        description: `${targetEmail ?? 'User'} granted election creator access.`,
       }
     case 'creator_rejected':
       return {
@@ -26,15 +78,15 @@ function getAuditPresentation(log: AuditLogEntry) {
         iconBg: 'bg-error',
         iconColor: 'text-on-error',
         title: 'Creator Rejected',
-        description: `${targetEmail} application was rejected.`,
+        description: `${targetEmail ?? 'User'} application was rejected.`,
       }
     default:
       return {
         icon: 'settings',
         iconBg: 'bg-on-surface-variant',
         iconColor: 'text-surface',
-        title: log.action,
-        description: JSON.stringify(log.details ?? {}),
+        title: log.action.replace(/_/g, ' '),
+        description: electionTitle ? `${electionTitle}` : JSON.stringify(details),
       }
   }
 }

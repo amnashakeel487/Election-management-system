@@ -44,7 +44,7 @@ export function useAdminApproval(actorId: string | undefined) {
     setActingOnId(targetUserId)
     setActionError(null)
     try {
-      await approveCreatorRequest(targetUserId, actorId, targetEmail)
+      await approveCreatorRequest(targetUserId, targetEmail)
       await refresh()
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Approval failed')
@@ -58,7 +58,7 @@ export function useAdminApproval(actorId: string | undefined) {
     setActingOnId(targetUserId)
     setActionError(null)
     try {
-      await rejectCreatorRequest(targetUserId, actorId, targetEmail)
+      await rejectCreatorRequest(targetUserId, targetEmail)
       await refresh()
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Rejection failed')
