@@ -12,7 +12,7 @@ import {
   updateElection,
 } from '@/services/electionService'
 import type { Candidate } from '@/types/election'
-import { fromDatetimeLocalValue, toDatetimeLocalValue } from '@/utils/datetime'
+import { fromDatetimeLocalValue, isoFromDatetimeLocal, toDatetimeLocalValue } from '@/utils/datetime'
 import { formatSubmissionDate } from '@/utils/formatDate'
 
 interface CreateElectionWizardProps {
@@ -292,10 +292,13 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
       ? categoryCustom.trim() || '(Custom)'
       : (ELECTION_CATEGORY_OPTIONS.find((o) => o.value === categorySlug)?.label ?? categorySlug)
 
-  const registrationSummary =
-    registrationDeadline.trim().length > 0
-      ? `${formatSubmissionDate(fromDatetimeLocalValue(registrationDeadline))}`
-      : `Same as voting start (${formatSubmissionDate(fromDatetimeLocalValue(startDate))})`
+  const regDeadlineIso = isoFromDatetimeLocal(registrationDeadline)
+  const startIsoForSummary = isoFromDatetimeLocal(startDate)
+  const registrationSummary = regDeadlineIso
+    ? formatSubmissionDate(regDeadlineIso)
+    : startIsoForSummary
+      ? `Same as voting start (${formatSubmissionDate(startIsoForSummary)})`
+      : 'Same as voting start (set in step 2)'
 
   const shellHeadline = initialElectionId ? 'Edit draft election' : undefined
   const shellSub = initialElectionId
@@ -605,9 +608,12 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
                 <div>
                   <dt className="text-on-surface-variant">Voting window</dt>
                   <dd className="font-semibold text-on-surface">
-                    {startDate && endDate
-                      ? `${formatSubmissionDate(fromDatetimeLocalValue(startDate))} → ${formatSubmissionDate(fromDatetimeLocalValue(endDate))}`
-                      : '—'}
+                    {(() => {
+                      const s = isoFromDatetimeLocal(startDate)
+                      const e = isoFromDatetimeLocal(endDate)
+                      if (!s || !e) return '—'
+                      return `${formatSubmissionDate(s)} → ${formatSubmissionDate(e)}`
+                    })()}
                   </dd>
                 </div>
                 <div>
