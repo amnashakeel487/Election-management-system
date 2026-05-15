@@ -9,6 +9,8 @@ import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { VerifyEmailPage } from '@/pages/VerifyEmailPage'
 import { AdminAuditLogsPage } from '@/pages/admin/AdminAuditLogsPage'
+import { AdminElectionsPage } from '@/pages/admin/AdminElectionsPage'
+import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
 import { AdminDashboardPage } from '@/pages/dashboards/AdminDashboardPage'
 import { CreateElectionPage } from '@/pages/creator/CreateElectionPage'
 import { EditElectionPage } from '@/pages/creator/EditElectionPage'
@@ -105,6 +107,22 @@ export function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={['admin']}>
             <AdminAuditLogsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/elections"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminElectionsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminUsersPage />
           </ProtectedRoute>
         }
       />

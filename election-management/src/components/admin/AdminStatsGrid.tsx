@@ -1,8 +1,16 @@
+import type { AdminDashboardStats } from '@/services/adminDashboardService'
+
 interface AdminStatsGridProps {
+  stats: AdminDashboardStats | null
   pendingCount: number
+  loading?: boolean
 }
 
-export function AdminStatsGrid({ pendingCount }: AdminStatsGridProps) {
+export function AdminStatsGrid({ stats, pendingCount, loading }: AdminStatsGridProps) {
+  const totalUsers = loading ? '…' : (stats?.totalUsers ?? 0).toLocaleString()
+  const activeElections = loading ? '…' : (stats?.activeElections ?? 0).toLocaleString()
+  const totalVotes = stats?.totalVotes ?? 0
+
   return (
     <div className="grid grid-cols-1 gap-gutter md:grid-cols-3">
       <div className="group relative overflow-hidden rounded-[24px] border border-white/5 bg-surface-container p-lg">
@@ -14,10 +22,12 @@ export function AdminStatsGrid({ pendingCount }: AdminStatsGridProps) {
           <span className="font-label-md text-label-md text-on-surface-variant">Total Users</span>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="font-headline-xl text-headline-xl">—</span>
-          <span className="flex items-center font-label-sm text-label-sm text-tertiary">
-            <span className="material-symbols-outlined text-[14px]">trending_up</span> —
-          </span>
+          <span className="font-headline-xl text-headline-xl">{totalUsers}</span>
+          {stats ? (
+            <span className="flex items-center font-label-sm text-label-sm text-on-surface-variant">
+              {stats.verifiedVoters} voters
+            </span>
+          ) : null}
         </div>
       </div>
 
@@ -30,10 +40,17 @@ export function AdminStatsGrid({ pendingCount }: AdminStatsGridProps) {
           <span className="font-label-md text-label-md text-on-surface-variant">Active Elections</span>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="font-headline-xl text-headline-xl">—</span>
-          <span className="flex items-center font-label-sm text-label-sm text-tertiary">
-            <span className="material-symbols-outlined text-[14px]">check_circle</span> Live
-          </span>
+          <span className="font-headline-xl text-headline-xl">{activeElections}</span>
+          {totalVotes > 0 ? (
+            <span className="flex items-center font-label-sm text-label-sm text-tertiary">
+              <span className="material-symbols-outlined text-[14px]">how_to_vote</span>
+              {totalVotes.toLocaleString()} votes
+            </span>
+          ) : (
+            <span className="flex items-center font-label-sm text-label-sm text-tertiary">
+              <span className="material-symbols-outlined text-[14px]">check_circle</span> Live
+            </span>
+          )}
         </div>
       </div>
 

@@ -48,9 +48,8 @@ export function SupabaseConnectionHelp() {
         </li>
       </ul>
       <p className="mt-3 font-body-sm text-body-sm text-on-surface-variant">
-        If Vercel shows env vars as <strong className="text-on-surface">Sensitive</strong>, remove that flag
-        for <code className="text-on-surface">VITE_*</code> keys (they must be in the browser bundle). Then
-        redeploy.
+        A green live check means the browser can reach your Supabase project. You can still sign in if this
+        panel shows an old error — try your email and password below.
       </p>
       <button
         type="button"

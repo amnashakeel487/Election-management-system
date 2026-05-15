@@ -1,7 +1,12 @@
-import { useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 
-export function AdminSidebar() {
+const navClass = ({ isActive }: { isActive: boolean }) =>
+  isActive
+    ? 'flex items-center rounded-lg border-r-4 border-primary bg-primary/5 px-4 py-3 font-bold text-primary transition-all'
+    : 'group flex items-center rounded-lg px-4 py-3 text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-on-surface'
+
+export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
   const navigate = useNavigate()
   const { signOut } = useAuth()
 
@@ -19,59 +24,38 @@ export function AdminSidebar() {
         </p>
       </div>
       <nav className="flex-1 space-y-2 px-4">
-        <a
-          className="flex items-center rounded-lg border-r-4 border-primary bg-primary/5 px-4 py-3 font-bold text-primary transition-all"
-          href="#"
-        >
+        <NavLink to="/admin/dashboard" end className={navClass}>
           <span className="material-symbols-outlined mr-3">dashboard</span>
           <span className="font-label-md text-label-md">Dashboard</span>
-        </a>
-        <a
-          className="group flex items-center rounded-lg px-4 py-3 text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-on-surface"
-          href="#"
-        >
+        </NavLink>
+        <NavLink to="/admin/elections" className={navClass}>
           <span className="material-symbols-outlined mr-3">how_to_vote</span>
-          <span className="font-label-md text-label-md">Active Elections</span>
-        </a>
-        <a
-          className="group flex items-center rounded-lg px-4 py-3 text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-on-surface"
-          href="#"
-        >
+          <span className="font-label-md text-label-md">Elections</span>
+        </NavLink>
+        <NavLink to="/admin/audit-logs" className={navClass}>
           <span className="material-symbols-outlined mr-3">receipt_long</span>
           <span className="font-label-md text-label-md">Audit Logs</span>
-        </a>
-        <a
-          className="group flex items-center rounded-lg px-4 py-3 text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-on-surface"
-          href="#"
-        >
+        </NavLink>
+        <NavLink to="/admin/users" className={navClass}>
           <span className="material-symbols-outlined mr-3">group</span>
           <span className="font-label-md text-label-md">Users</span>
-        </a>
-        <a
-          className="group flex items-center rounded-lg px-4 py-3 text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-on-surface"
-          href="#"
-        >
-          <span className="material-symbols-outlined mr-3">verified_user</span>
-          <span className="font-label-md text-label-md">Security Settings</span>
-        </a>
+          {pendingCount > 0 ? (
+            <span className="ml-auto rounded-full bg-error px-2 py-0.5 text-[10px] font-bold text-on-error">
+              {pendingCount}
+            </span>
+          ) : null}
+        </NavLink>
       </nav>
       <div className="mb-8 px-8">
-        <button
-          type="button"
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-bold text-on-primary shadow-lg shadow-primary/20 transition-all hover:opacity-90 active:scale-95"
+        <NavLink
+          to="/"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 font-bold text-primary transition-all hover:bg-primary/20"
         >
-          <span className="material-symbols-outlined">add</span>
-          <span>New Election</span>
-        </button>
+          <span className="material-symbols-outlined">public</span>
+          <span>View public site</span>
+        </NavLink>
       </div>
       <div className="space-y-2 border-t border-white/5 px-4 pt-6">
-        <a
-          className="flex items-center px-4 py-2 text-on-surface-variant transition-colors hover:text-on-surface"
-          href="#"
-        >
-          <span className="material-symbols-outlined mr-3">help</span>
-          <span className="font-label-md text-label-md">Help Center</span>
-        </a>
         <button
           type="button"
           onClick={() => void handleSignOut()}

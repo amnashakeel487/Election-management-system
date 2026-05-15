@@ -65,12 +65,22 @@ export function clearSupabaseAuthStorage(): void {
 }
 
 export async function checkSupabaseHealth(): Promise<{ ok: boolean; message: string }> {
-  if (!isSupabaseConfigured || !supabaseUrl) {
+  if (!isSupabaseConfigured || !supabaseUrl || !supabaseAnonKey) {
     return { ok: false, message: 'Env vars missing in this build (redeploy Vercel after adding them).' }
   }
+  const headers = {
+    apikey: supabaseAnonKey,
+    Authorization: `Bearer ${supabaseAnonKey}`,
+  }
   try {
-    const res = await fetch(`${supabaseUrl}/auth/v1/health`, { method: 'GET' })
+    const res = await fetch(`${supabaseUrl}/auth/v1/health`, { method: 'GET', headers })
     if (res.ok) return { ok: true, message: 'Supabase API reachable' }
+    if (res.status === 401 || res.status === 403) {
+      return {
+        ok: false,
+        message: 'API rejected the anon key — confirm VITE_SUPABASE_ANON_KEY matches Supabase → Settings → API.',
+      }
+    }
     return { ok: false, message: `Health check returned ${res.status}` }
   } catch {
     return { ok: false, message: 'Cannot reach Supabase (network, ad blocker, or wrong URL).' }

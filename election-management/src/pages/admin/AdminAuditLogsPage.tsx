@@ -38,7 +38,7 @@ export function AdminAuditLogsPage() {
 
   return (
     <div className="min-h-screen bg-background text-on-background">
-      <AdminSidebar />
+      <AdminSidebar pendingCount={0} />
       <main className="lg:pl-[280px]">
         <AdminTopBar title="Audit Trail" />
         <div className="p-margin">
