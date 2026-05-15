@@ -41,9 +41,8 @@ export async function signUpWithEmail({ email, password, role }: SignUpPayload) 
 
   if (error) throw new Error(error.message)
 
-  if (data.user) {
-    await upsertUserProfile(data.user.id, email, role)
-  }
+  // Profile is created by DB trigger handle_new_user (migrations 001/002).
+  // Client upsert here fails RLS when email confirmation is on (no session yet).
 
   return data
 }

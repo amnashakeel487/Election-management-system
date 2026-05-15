@@ -100,6 +100,7 @@ Work through this list in order:
 | No email received | Resend **Emails** tab; spam folder; test sender only sends to account email. |
 | Link opens wrong site | Fix **Site URL** and **Redirect URLs** in Supabase. |
 | User exists but not admin | Table Editor → `users` → set `role` to `admin`. |
+| `row-level security policy` on `users` | Redeploy latest app (signup no longer inserts from client). Run migration `009_signup_profile_rls.sql`. Delete half-created auth user and register again. |
 
 ## Related
 
