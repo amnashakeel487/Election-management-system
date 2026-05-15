@@ -44,6 +44,10 @@ export function AuthForm({ mode }: AuthFormProps) {
         setError(
           'Email sending limit reached. Configure Resend SMTP in Supabase (see docs/AUTH_SETUP.md), wait about an hour, then try again once.',
         )
+      } else if (lower.includes('confirmation email') || lower.includes('sending email')) {
+        setError(
+          'Could not send verification email. In Supabase SMTP: sender email must be plain onboarding@resend.dev (name in Sender name field), password = Resend API key. Check resend.com/emails for the failed attempt. See docs/AUTH_SETUP.md §6.',
+        )
       } else {
         setError(message)
       }

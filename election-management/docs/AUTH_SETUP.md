@@ -25,10 +25,12 @@ Open your project: `https://supabase.com/dashboard/project/prxgnpcolmfucunotcil`
 | **Port** | `465` (recommended) or `587` |
 | **Username** | `resend` |
 | **Password** | Your Resend API key (`re_...`) |
-| **Sender email** | `onboarding@resend.dev` (dev) or `FortressVote <noreply@yourdomain.com>` |
-| **Sender name** | `FortressVote` (optional) |
+| **Sender email** | `onboarding@resend.dev` only — **no** display name in this field |
+| **Sender name** | `FortressVote` (separate field in Supabase) |
 
-4. Save.
+**Important:** Do not put `FortressVote <email@...>` in the sender email box. Use plain email only; put the name in **Sender name**.
+
+4. Save. Confirm **Enable custom SMTP** stays on after save.
 
 ## 3. Redirect URLs (required for verify links)
 
@@ -60,10 +62,42 @@ Open your project: `https://supabase.com/dashboard/project/prxgnpcolmfucunotcil`
 
 ## 6. Troubleshooting
 
+### `Error sending confirmation email`
+
+Work through this list in order:
+
+1. **Resend dashboard → [Emails](https://resend.com/emails)**  
+   Try sign-up again and look for a failed send. The error text there (e.g. domain not verified, invalid from address) is the real cause.
+
+2. **Sender email format in Supabase**  
+   - **Sender email:** `onboarding@resend.dev` (nothing else)  
+   - **Sender name:** `FortressVote`  
+   - **Password:** Resend API key (`re_...`), not Supabase anon/service key.
+
+3. **Resend test sender limit**  
+   With `onboarding@resend.dev`, you can usually only send **to the same email as your Resend account**.  
+   Sign up with that address (e.g. `amnashakeel606@gmail.com`) **or** verify your own domain in Resend and use `noreply@yourdomain.com` as sender.
+
+4. **SMTP connection**  
+   - Host: `smtp.resend.com`  
+   - Port: `465` — if it still fails, try `587`  
+   - Username: `resend` (lowercase)
+
+5. **Toggle SMTP off → on**  
+   Save correct credentials again. A previous bad save can leave auth in a broken state ([Supabase issue](https://github.com/supabase/auth/issues/1238)).
+
+6. **Vercel URL in Supabase**  
+   Site URL: `https://election-manager-systm-three.vercel.app`  
+   Redirect: `https://election-manager-systm-three.vercel.app/**`
+
+7. **Unblock testing (temporary)**  
+   **Authentication → Providers → Email** → turn off **Confirm email**, register once, then log in. Turn confirmation back on after SMTP works.
+
 | Problem | Fix |
 |--------|-----|
-| `email rate limit exceeded` | Wait ~1 hour **or** finish SMTP setup above; avoid repeated sign-up clicks. |
-| No email received | Check Resend **Emails** dashboard; confirm sender domain or use `onboarding@resend.dev` + your email only. |
+| `email rate limit exceeded` | Wait ~1 hour **or** finish SMTP above; avoid repeated sign-up clicks. |
+| `Error sending confirmation email` | See checklist above; check Resend **Emails** log first. |
+| No email received | Resend **Emails** tab; spam folder; test sender only sends to account email. |
 | Link opens wrong site | Fix **Site URL** and **Redirect URLs** in Supabase. |
 | User exists but not admin | Table Editor → `users` → set `role` to `admin`. |
 
