@@ -113,3 +113,19 @@ Work through this list in order:
 ## Related
 
 - Secret voter ID emails use the same Resend API key in the edge function (`RESEND_API_KEY` in Supabase **Edge Functions** secrets). One key can power both SMTP (Auth) and the API (edge function).
+
+## Creator approval emails (Admin module)
+
+Deploy the edge function and set secrets in Supabase → **Edge Functions**:
+
+| Secret | Purpose |
+|--------|---------|
+| `RESEND_API_KEY` | Same key as SMTP |
+| `APP_URL` | Your Vercel URL (e.g. `https://your-app.vercel.app`) |
+| `CREATOR_APPROVAL_FROM_EMAIL` | Optional; defaults to `FortressVote <onboarding@resend.dev>` |
+
+```bash
+supabase functions deploy send-creator-approval-notification
+```
+
+Admins approve/reject at `/admin/approvals`. Applicants receive approval or rejection (with reason) by email.

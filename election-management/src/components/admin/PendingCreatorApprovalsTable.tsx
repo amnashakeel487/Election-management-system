@@ -5,6 +5,7 @@ import { formatSubmissionDate } from '@/utils/formatDate'
 interface PendingCreatorApprovalsTableProps {
   requests: PendingCreatorRequest[]
   actingOnId: string | null
+  onReview?: (request: PendingCreatorRequest) => void
   onApprove: (id: string, email: string) => void
   onReject: (id: string, email: string, reason: string) => void
 }
@@ -12,6 +13,7 @@ interface PendingCreatorApprovalsTableProps {
 export function PendingCreatorApprovalsTable({
   requests,
   actingOnId,
+  onReview,
   onApprove,
   onReject,
 }: PendingCreatorApprovalsTableProps) {
@@ -19,7 +21,7 @@ export function PendingCreatorApprovalsTable({
   const [rejectReason, setRejectReason] = useState('')
 
   function submitReject(id: string, email: string) {
-    if (!rejectReason.trim()) return
+    if (rejectReason.trim().length < 10) return
     onReject(id, email, rejectReason.trim())
     setRejectingId(null)
     setRejectReason('')
@@ -93,6 +95,16 @@ export function PendingCreatorApprovalsTable({
                         </div>
                       ) : (
                         <div className="flex justify-end gap-2">
+                          {onReview ? (
+                            <button
+                              type="button"
+                              disabled={busy}
+                              onClick={() => onReview(request)}
+                              className="rounded-lg border border-white/10 px-3 py-1.5 font-label-sm text-on-surface-variant hover:text-on-surface"
+                            >
+                              Review
+                            </button>
+                          ) : null}
                           <button
                             type="button"
                             disabled={busy}

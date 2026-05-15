@@ -9,6 +9,7 @@ import { formatRelativeTime } from '@/utils/formatDate'
 export function AdminAuditLogsPage() {
   const [logs, setLogs] = useState<AuditLogEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [actionFilter, setActionFilter] = useState<'all' | 'approvals'>('all')
 
   useEffect(() => {
     void fetchRecentAuditLogs(200)
@@ -16,9 +17,14 @@ export function AdminAuditLogsPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  const displayed =
+    actionFilter === 'approvals'
+      ? logs.filter((l) => l.action === 'creator_approved' || l.action === 'creator_rejected')
+      : logs
+
   function downloadCsv() {
     const header = ['time', 'action', 'actor', 'target', 'election', 'details']
-    const rows = logs.map((log) => [
+    const rows = displayed.map((log) => [
       log.created_at,
       log.action,
       log.actor?.email ?? '',
@@ -52,10 +58,35 @@ export function AdminAuditLogsPage() {
             <button
               type="button"
               onClick={downloadCsv}
-              disabled={logs.length === 0}
+              disabled={displayed.length === 0}
               className="rounded-xl bg-primary px-4 py-2 font-label-md text-on-primary disabled:opacity-50"
             >
               Download CSV
+            </button>
+          </div>
+
+          <div className="mb-4 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setActionFilter('all')}
+              className={
+                actionFilter === 'all'
+                  ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
+                  : 'rounded-lg border border-white/10 px-4 py-2 font-label-sm text-on-surface-variant'
+              }
+            >
+              All activity
+            </button>
+            <button
+              type="button"
+              onClick={() => setActionFilter('approvals')}
+              className={
+                actionFilter === 'approvals'
+                  ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
+                  : 'rounded-lg border border-white/10 px-4 py-2 font-label-sm text-on-surface-variant'
+              }
+            >
+              Creator approvals
             </button>
           </div>
 
@@ -73,7 +104,7 @@ export function AdminAuditLogsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {logs.map((log) => (
+                  {displayed.map((log) => (
                     <tr key={log.id}>
                       <td className="px-4 py-3 text-on-surface-variant">{formatRelativeTime(log.created_at)}</td>
                       <td className="px-4 py-3 text-on-surface">{log.action}</td>

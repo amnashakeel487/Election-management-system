@@ -20,7 +20,7 @@ export function AdminTopBar({
       <div className="flex items-center gap-6">
         {pendingCount > 0 ? (
           <Link
-            to="/admin/users"
+            to="/admin/approvals"
             className="relative rounded-full p-2 text-on-surface-variant transition-all hover:bg-surface-container-highest"
             title="Pending creator approvals"
           >

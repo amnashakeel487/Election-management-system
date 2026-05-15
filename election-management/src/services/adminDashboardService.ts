@@ -41,14 +41,43 @@ export async function fetchAdminDashboardStats(): Promise<AdminDashboardStats> {
   }
 }
 
-export async function fetchAdminElections(): Promise<Election[]> {
+export interface ElectionWithCreator extends Election {
+  creator?: {
+    email: string
+    full_name: string | null
+    approval_status: string | null
+  } | null
+}
+
+export async function fetchAdminElections(): Promise<ElectionWithCreator[]> {
   const { data, error } = await supabase
     .from('elections')
-    .select('*')
+    .select(
+      `
+      *,
+      creator:creator_id (email, full_name, approval_status)
+    `,
+    )
     .order('created_at', { ascending: false })
 
   if (error) throw new Error(error.message)
-  return (data ?? []) as Election[]
+  return (data ?? []) as ElectionWithCreator[]
+}
+
+export async function fetchPublishedElections(): Promise<ElectionWithCreator[]> {
+  const { data, error } = await supabase
+    .from('elections')
+    .select(
+      `
+      *,
+      creator:creator_id (email, full_name, approval_status)
+    `,
+    )
+    .in('status', ['published', 'active', 'completed'])
+    .order('created_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as ElectionWithCreator[]
 }
 
 export async function fetchAdminUsers(): Promise<AdminUserRow[]> {

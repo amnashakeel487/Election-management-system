@@ -1,31 +1,40 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   approveCreatorRequest,
+  fetchApprovedCreators,
   fetchPendingCreatorCount,
   fetchPendingCreatorRequests,
   fetchRecentAuditLogs,
+  fetchRejectedCreators,
   rejectCreatorRequest,
 } from '@/services/adminApprovalService'
 import type { AuditLogEntry, PendingCreatorRequest } from '@/types/auth'
 
-export function useAdminApproval(actorId: string | undefined) {
+export function useAdminApproval(_actorId: string | undefined) {
   const [pendingCreators, setPendingCreators] = useState<PendingCreatorRequest[]>([])
+  const [approvedCreators, setApprovedCreators] = useState<PendingCreatorRequest[]>([])
+  const [rejectedCreators, setRejectedCreators] = useState<PendingCreatorRequest[]>([])
   const [pendingCount, setPendingCount] = useState(0)
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [actionNotice, setActionNotice] = useState<string | null>(null)
   const [actingOnId, setActingOnId] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     setLoading(true)
     setActionError(null)
     try {
-      const [pending, count, logs] = await Promise.all([
+      const [pending, approved, rejected, count, logs] = await Promise.all([
         fetchPendingCreatorRequests(),
+        fetchApprovedCreators(),
+        fetchRejectedCreators(),
         fetchPendingCreatorCount(),
         fetchRecentAuditLogs(),
       ])
       setPendingCreators(pending)
+      setApprovedCreators(approved)
+      setRejectedCreators(rejected)
       setPendingCount(count)
       setAuditLogs(logs)
     } catch (err) {
@@ -40,11 +49,16 @@ export function useAdminApproval(actorId: string | undefined) {
   }, [refresh])
 
   async function approve(targetUserId: string, targetEmail: string) {
-    if (!actorId) return
     setActingOnId(targetUserId)
     setActionError(null)
+    setActionNotice(null)
     try {
-      await approveCreatorRequest(targetUserId, targetEmail)
+      const result = await approveCreatorRequest(targetUserId, targetEmail)
+      setActionNotice(
+        result.emailSent
+          ? `Approved ${targetEmail}. Notification email sent.`
+          : `Approved ${targetEmail}. ${result.emailWarning ?? 'Email not sent.'}`,
+      )
       await refresh()
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Approval failed')
@@ -54,11 +68,16 @@ export function useAdminApproval(actorId: string | undefined) {
   }
 
   async function reject(targetUserId: string, targetEmail: string, reason: string) {
-    if (!actorId) return
     setActingOnId(targetUserId)
     setActionError(null)
+    setActionNotice(null)
     try {
-      await rejectCreatorRequest(targetUserId, targetEmail, reason)
+      const result = await rejectCreatorRequest(targetUserId, targetEmail, reason)
+      setActionNotice(
+        result.emailSent
+          ? `Rejected ${targetEmail}. Notification email sent.`
+          : `Rejected ${targetEmail}. ${result.emailWarning ?? 'Email not sent.'}`,
+      )
       await refresh()
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Rejection failed')
@@ -69,13 +88,17 @@ export function useAdminApproval(actorId: string | undefined) {
 
   return {
     pendingCreators,
+    approvedCreators,
+    rejectedCreators,
     pendingCount,
     auditLogs,
     loading,
     actionError,
+    actionNotice,
     actingOnId,
     approve,
     reject,
     refresh,
+    clearNotice: () => setActionNotice(null),
   }
 }

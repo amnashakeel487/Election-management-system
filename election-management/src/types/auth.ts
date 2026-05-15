@@ -60,6 +60,7 @@ export interface PendingCreatorRequest {
   phone: string | null
   organization: string | null
   election_purpose: string | null
+  rejection_reason?: string | null
   created_at: string
   approval_status: ApprovalStatus
 }

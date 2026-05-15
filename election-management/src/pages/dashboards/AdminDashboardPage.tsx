@@ -21,6 +21,7 @@ export function AdminDashboardPage() {
     auditLogs,
     loading,
     actionError,
+    actionNotice,
     actingOnId,
     approve,
     reject,
@@ -44,6 +45,11 @@ export function AdminDashboardPage() {
         <AdminTopBar pendingCount={pendingCount} />
 
         <div className="space-y-gutter p-margin">
+          {actionNotice ? (
+            <p className="rounded-xl border border-tertiary/30 bg-tertiary/10 px-lg py-md font-body-sm text-on-surface">
+              {actionNotice}
+            </p>
+          ) : null}
           {actionError || statsError ? (
             <p className="rounded-xl border border-error/30 bg-error-container/20 px-lg py-md font-body-sm text-body-sm text-error">
               {actionError ?? statsError}

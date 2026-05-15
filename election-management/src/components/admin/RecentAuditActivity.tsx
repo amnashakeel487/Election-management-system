@@ -79,7 +79,7 @@ function getAuditPresentation(log: AuditLogEntry) {
         iconBg: 'bg-error',
         iconColor: 'text-on-error',
         title: 'Creator Rejected',
-        description: `${targetEmail ?? 'User'} application was rejected.`,
+        description: `${targetEmail ?? 'User'} rejected${details.rejection_reason ? `: ${details.rejection_reason as string}` : '.'}`,
       }
     default:
       return {

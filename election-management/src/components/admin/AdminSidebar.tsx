@@ -28,6 +28,15 @@ export function AdminSidebar({ pendingCount = 0 }: { pendingCount?: number }) {
           <span className="material-symbols-outlined mr-3">dashboard</span>
           <span className="font-label-md text-label-md">Dashboard</span>
         </NavLink>
+        <NavLink to="/admin/approvals" className={navClass}>
+          <span className="material-symbols-outlined mr-3">person_check</span>
+          <span className="font-label-md text-label-md">Creator Approvals</span>
+          {pendingCount > 0 ? (
+            <span className="ml-auto rounded-full bg-error px-2 py-0.5 text-[10px] font-bold text-on-error">
+              {pendingCount}
+            </span>
+          ) : null}
+        </NavLink>
         <NavLink to="/admin/elections" className={navClass}>
           <span className="material-symbols-outlined mr-3">how_to_vote</span>
           <span className="font-label-md text-label-md">Elections</span>

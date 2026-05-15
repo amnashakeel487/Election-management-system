@@ -12,6 +12,7 @@ import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { VerifyEmailPage } from '@/pages/VerifyEmailPage'
 import { MfaVerifyPage } from '@/pages/MfaVerifyPage'
 import { AccountSecurityPage } from '@/pages/AccountSecurityPage'
+import { AdminApprovalsPage } from '@/pages/admin/AdminApprovalsPage'
 import { AdminAuditLogsPage } from '@/pages/admin/AdminAuditLogsPage'
 import { AdminElectionsPage } from '@/pages/admin/AdminElectionsPage'
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
@@ -121,6 +122,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={['admin']}>
             <AdminDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/approvals"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminApprovalsPage />
           </ProtectedRoute>
         }
       />
