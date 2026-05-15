@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0e131e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #303541;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #424754;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#1b202b",
+                        "tertiary-fixed": "#acedff",
+                        "tertiary": "#4cd7f6",
+                        "tertiary-fixed-dim": "#4cd7f6",
+                        "outline-variant": "#424754",
+                        "surface-bright": "#343945",
+                        "secondary": "#d0bcff",
+                        "on-background": "#dee2f2",
+                        "on-surface": "#dee2f2",
+                        "on-primary-container": "#00285d",
+                        "on-secondary": "#3c0091",
+                        "on-tertiary": "#003640",
+                        "inverse-surface": "#dee2f2",
+                        "inverse-on-surface": "#2b303c",
+                        "surface-tint": "#adc6ff",
+                        "on-primary-fixed": "#001a42",
+                        "tertiary-container": "#009eb9",
+                        "on-secondary-container": "#c4abff",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#001f26",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-primary": "#002e6a",
+                        "secondary-fixed": "#e9ddff",
+                        "surface-container-highest": "#303541",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "primary-container": "#4d8eff",
+                        "surface-dim": "#0e131e",
+                        "surface": "#0e131e",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed": "#d8e2ff",
+                        "on-error": "#690005",
+                        "outline": "#8c909f",
+                        "secondary-container": "#571bc1",
+                        "inverse-primary": "#005ac2",
+                        "surface-container-lowest": "#090e19",
+                        "primary-fixed-dim": "#adc6ff",
+                        "primary": "#adc6ff",
+                        "surface-container-high": "#252a35",
+                        "on-surface-variant": "#c2c6d6",
+                        "on-tertiary-fixed-variant": "#004e5c",
+                        "background": "#0e131e",
+                        "surface-variant": "#303541",
+                        "on-tertiary-container": "#002f38",
+                        "surface-container-low": "#171c27",
+                        "on-secondary-fixed": "#23005c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "1.5rem",
+                        "gutter": "24px",
+                        "xs": "0.25rem",
+                        "base": "4px",
+                        "sm": "0.5rem",
+                        "md": "1rem",
+                        "xl": "2.5rem",
+                        "margin": "32px",
+                        "2xl": "4rem"
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-x-hidden flex">
+<!-- Desktop Sidebar -->
+<aside class="hidden lg:flex w-72 h-screen fixed left-0 top-0 flex-col bg-surface-container border-r border-white/5 z-50">
+<div class="h-16 flex items-center px-8 border-b border-white/5">
+<div class="font-headline-md text-headline-md font-bold text-primary">FortressVote</div>
+</div>
+<nav class="flex-grow py-8 px-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-md">Candidates</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">how_to_vote</span>
+<span class="font-label-md">Elections</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-label-md">Security</span>
+</a>
+</nav>
+<div class="p-6 border-t border-white/5">
+<div class="flex items-center gap-3 p-2 rounded-xl hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-grow min-w-0">
+<div class="font-label-md text-on-surface truncate">Admin User</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-wider">System Admin</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+</div>
+</div>
+</aside>
+<div class="flex-grow flex flex-col lg:ml-72 min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 w-full z-40 flex justify-between items-center px-8 h-16 bg-surface/70 backdrop-blur-xl border-b border-white/10 shadow-sm">
+<div class="lg:hidden font-headline-md text-headline-md font-bold text-primary">FortressVote</div>
+<div class="hidden lg:block text-on-surface-variant font-body-sm">Management / Candidates</div>
+<div class="flex gap-4 items-center">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">search</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 w-64 text-body-sm focus:ring-1 focus:ring-primary transition-all" placeholder="Search candidates..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container-highest rounded-full transition-all">notifications</button>
+<button class="lg:hidden material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container-highest rounded-full transition-all">account_circle</button>
+</div>
+</header>
+<!-- Content Canvas -->
+<main class="p-8 max-w-7xl mx-auto w-full flex-grow">
+<section class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface">Candidate Directory</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage and edit the current pool of election candidates.</p>
+</div>
+<button class="bg-primary text-on-primary-container px-6 py-3 rounded-xl font-label-md text-label-md flex items-center gap-2 shadow-lg shadow-primary/20 transition-transform active:scale-95 hover:bg-primary/90">
+<span class="material-symbols-outlined">person_add</span>
+                Add New Candidate
+            </button>
+</section>
+<!-- Main Desktop Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Left Column: Candidate List -->
+<div class="xl:col-span-1 space-y-4">
+<div class="flex items-center justify-between px-2 mb-2">
+<span class="text-label-md text-on-surface-variant uppercase tracking-widest">Active Candidates (3)</span>
+<button class="text-primary text-label-md hover:underline">View All</button>
+</div>
+<!-- Candidate List Cards -->
+<div class="space-y-3">
+<!-- Active State Candidate -->
+<div class="bg-surface-container-high border-2 border-primary/40 p-4 rounded-[24px] flex items-center gap-4 cursor-pointer shadow-xl">
+<div class="relative w-14 h-14 shrink-0 rounded-full overflow-hidden border-2 border-primary">
+<img alt="Marcus Chen" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvZBO7GolH0V_9ssVS1XgRBX8Isnqnnz2bthbEGrIMNYohWNa6PABJICBGd1J18abBkBDtwH7CXHoxh_u7xZEC2Xv-1vXWsmtrpYYInUHheKcq8G1ndau7B-cMGn4e5kO3hHylcrKq0aKSNLI8IHy1EcgdciTpuOMS6j-afjz1Qda1llH3AfkyWRqp5UChbJHQPtiQdR2grbdb9JkmUwVNkmiGbNkJdCVGz7llO9mqsJYgIfWlgbALtBwq41SYn90fcvoIbNA-OIOc"/>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">Marcus Chen</h3>
+<p class="font-body-sm text-body-sm text-primary">Senior Security Architect</p>
+</div>
+<span class="material-symbols-outlined text-primary">chevron_right</span>
+</div>
+<div class="bg-surface-container-low border border-white/5 p-4 rounded-[24px] flex items-center gap-4 group transition-all hover:bg-surface-container-high cursor-pointer">
+<div class="relative w-14 h-14 shrink-0 rounded-full overflow-hidden border border-white/10 group-hover:border-primary/20">
+<img alt="Elena Rodriquez" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDd6UPtT9bYP0GbGBUMznL-J03UopQXyDL7o6V-fMK-10PB-JZxXfr5lN1VAg9E8pG407ndYs0bJeVpbScsEXl201DaaY9ULoww4e4BcYr_2j09I1GHO6TkUudb2FZLM67bfPzWbxMe2WsA0reaxnhZGweCUsVNwCZhYNXAYVjtm5oD4VUj7sr4LHAurZMG2lLLhIxN1J_L5q-aHN8nK7eEPqxVq-82pQLBUJzc4fMUWnxkvs84aZaeUrCgrqdURafKMk2us5vMSE0h"/>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">Elena Rodriquez</h3>
+<p class="font-body-sm text-body-sm text-tertiary">Compliance Officer</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</div>
+<div class="bg-surface-container-low border border-white/5 p-4 rounded-[24px] flex items-center gap-4 group transition-all hover:bg-surface-container-high cursor-pointer">
+<div class="relative w-14 h-14 shrink-0 rounded-full overflow-hidden border border-white/10 group-hover:border-primary/20">
+<img alt="David Park" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSX_G_QmsjooTmhXh2Vh3cjqTNLPrcegrAcjOuME9cdD-4_yZqifPQY-JSPjs8BN1VyYMSdx9rbE8ZhznuD_lnh78St9t3JmTeHuESOy3d4SKrRJgbkyCWupPcBoQ7bVxukeUNFxWGGZIVakIrLfmx8BXAmqfdd9YTHa0EBcibvBUryq7CirMFwJV3m7nAXXlQvJPOC9tw0p4_EUQPsud8leqc2J8GUSt-HrvikHihf2M-ZXgIJ3wjCYy5Gktx2vvkPsUjjhLLN7eg"/>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">David Park</h3>
+<p class="font-body-sm text-body-sm text-tertiary">Infrastructure Lead</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Full Page Editor (Expanded from Modal) -->
+<div class="xl:col-span-2">
+<div class="bg-surface-container-low border border-white/5 rounded-[32px] p-8 h-full">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Edit Candidate Details</h2>
+<p class="font-body-sm text-on-surface-variant">Update identity information and campaign manifesto.</p>
+</div>
+<div class="flex gap-2">
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-error/10 hover:text-error rounded-xl transition-all" title="Delete Candidate">delete</button>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container-highest rounded-xl transition-all">share</button>
+</div>
+</div>
+<form class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Profile Image Section -->
+<div class="md:col-span-2 flex flex-col md:flex-row items-center gap-8 p-6 bg-surface-dim rounded-2xl border border-white/5">
+<div class="relative w-32 h-32 shrink-0 group">
+<img alt="Marcus Chen" class="w-full h-full object-cover rounded-full border-2 border-primary/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvZBO7GolH0V_9ssVS1XgRBX8Isnqnnz2bthbEGrIMNYohWNa6PABJICBGd1J18abBkBDtwH7CXHoxh_u7xZEC2Xv-1vXWsmtrpYYInUHheKcq8G1ndau7B-cMGn4e5kO3hHylcrKq0aKSNLI8IHy1EcgdciTpuOMS6j-afjz1Qda1llH3AfkyWRqp5UChbJHQPtiQdR2grbdb9JkmUwVNkmiGbNkJdCVGz7llO9mqsJYgIfWlgbALtBwq41SYn90fcvoIbNA-OIOc"/>
+<div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+<span class="material-symbols-outlined text-white text-3xl">photo_camera</span>
+</div>
+</div>
+<div class="text-center md:text-left">
+<h4 class="font-headline-md text-on-surface">Candidate Portrait</h4>
+<p class="font-body-sm text-on-surface-variant mb-4">Upload a high-resolution professional headshot. JPEG or PNG, max 5MB.</p>
+<div class="flex flex-wrap justify-center md:justify-start gap-3">
+<button class="px-4 py-2 bg-surface-container-highest text-on-surface text-label-md rounded-lg hover:bg-outline-variant transition-colors" type="button">Change Photo</button>
+<button class="px-4 py-2 border border-outline-variant text-on-surface-variant text-label-md rounded-lg hover:bg-error/10 hover:text-error hover:border-error/20 transition-colors" type="button">Remove</button>
+</div>
+</div>
+</div>
+<!-- Text Fields -->
+<div class="space-y-6">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 px-1">Full Legal Name</label>
+<input class="w-full bg-surface-dim border border-outline-variant text-on-surface rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" type="text" value="Marcus Chen"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 px-1">Professional Designation</label>
+<input class="w-full bg-surface-dim border border-outline-variant text-on-surface rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" type="text" value="Senior Security Architect"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 px-1">Department / Office</label>
+<select class="w-full bg-surface-dim border border-outline-variant text-on-surface rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none appearance-none">
+<option>Cybersecurity Operations</option>
+<option>Compliance &amp; Legal</option>
+<option>Network Infrastructure</option>
+</select>
+</div>
+</div>
+<div class="space-y-6">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 px-1">Campaign Manifesto</label>
+<textarea class="w-full bg-surface-dim border border-outline-variant text-on-surface rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none resize-none h-[228px]" placeholder="Outline the candidate's goals and vision...">Committed to establishing an immutable audit trail and enhancing voter privacy through advanced cryptographic protocols. Our focus will be on ensuring every vote is counted accurately while maintaining absolute anonymity for the electorate.</textarea>
+</div>
+</div>
+<div class="md:col-span-2 pt-6 border-t border-white/5 flex justify-end gap-4">
+<button class="px-8 py-3 rounded-xl border border-outline-variant text-on-surface font-label-md text-label-md hover:bg-white/5 transition-colors" type="button">Discard Changes</button>
+<button class="px-8 py-3 rounded-xl bg-primary text-on-primary-container font-label-md text-label-md shadow-lg shadow-primary/20 transition-transform active:scale-95 hover:bg-primary/90" type="submit">Update Candidate Profile</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</main>
+<!-- Desktop Footer -->
+<footer class="w-full py-8 px-12 flex flex-col md:flex-row justify-between items-center bg-surface-container-lowest border-t border-white/5 mt-12">
+<div class="font-label-md text-label-md font-bold text-on-surface mb-4 md:mb-0">FortressVote Secure Systems</div>
+<div class="flex flex-wrap justify-center gap-8 font-body-sm text-body-sm text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">Security Audit</a>
+<a class="hover:text-primary transition-colors" href="#">API Documentation</a>
+</div>
+<div class="mt-4 md:mt-0 font-body-sm text-body-sm text-on-surface-variant/60">
+            © 2024 FortressVote Secure Systems. All rights reserved.
+        </div>
+</footer>
+</div>
+<!-- Bottom Navigation Bar (Visible only on Mobile) -->
+<nav class="lg:hidden fixed bottom-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-t border-white/5 h-20 flex items-center justify-around px-4">
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary border-t-2 border-primary pt-2 -mt-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-sm text-label-sm">Users</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">how_to_vote</span>
+<span class="font-label-sm text-label-sm">Elections</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-label-sm text-label-sm">Security</span>
+</div>
+</nav>
+</body></html>

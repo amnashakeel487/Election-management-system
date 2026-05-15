@@ -1,0 +1,7 @@
+/** Image URLs from design/landing_page/code.html — unchanged from source HTML. */
+export const LANDING_ASSETS = {
+  heroBanner:
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuCieIB8_JpxFqAn2gXKQrwVoHRbv84BmgPkH0JPHNWPqHFRqaw9afWc4dLXcBIl7s3kJ8CT73P7Pd1n8fS2f0Hq0OtK8gjFRhmeYq7X8O1LJfoMd57aGta-nvKZT1ShUC1FWRCICE3rjfRMp4HECB4UFkPH7ZYcRJu4i4rXQhInrP2fgCZyf_hdOfkfxSoamI2XpLjRDx3bmSCADHhgKR9gcmSzSlA8SdgBWr2zOUgvFBY-FmvMCE0IvjO9SCtzA2cRlLCcxMEKgczC',
+  trustDashboard:
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuAEvfXklVtRY0ErGuA7_vjll5giSHpPOdtTOT3QBCWqf8tfFTSS3fIAYRn-15G7E8eIzvCw7miSucsu0sNGLWG5TTtIiGXoNJOpV3R1oZebq4_faVun-V0WQnUeb8KwnwVtrIGDMXUoMRmgs7v4MqKNtJEa5rhcqlFqXsf-YKoaT2yRE9238lG5eZW5eoh12MbBYFQnvZOsESEa-Q0OHFHuDBkXzd8j4kv5uv01WhUmlzGrqYkdxCzl0C3OvY6MioxxucDL1rmjoacx',
+} as const

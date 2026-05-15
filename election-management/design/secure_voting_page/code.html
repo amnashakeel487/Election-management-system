@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Secure Voting | FortressVote</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#001f26",
+                        "tertiary-fixed-dim": "#4cd7f6",
+                        "surface-container-low": "#171c27",
+                        "inverse-on-surface": "#2b303c",
+                        "primary-fixed": "#d8e2ff",
+                        "error-container": "#93000a",
+                        "surface-tint": "#adc6ff",
+                        "surface-dim": "#0e131e",
+                        "tertiary-container": "#009eb9",
+                        "surface": "#0e131e",
+                        "surface-variant": "#303541",
+                        "on-tertiary": "#003640",
+                        "surface-container-highest": "#303541",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-primary-fixed": "#001a42",
+                        "tertiary": "#4cd7f6",
+                        "primary": "#adc6ff",
+                        "on-primary": "#002e6a",
+                        "surface-container-lowest": "#090e19",
+                        "background": "#0e131e",
+                        "inverse-surface": "#dee2f2",
+                        "secondary-container": "#571bc1",
+                        "primary-container": "#4d8eff",
+                        "outline-variant": "#424754",
+                        "inverse-primary": "#005ac2",
+                        "on-tertiary-fixed-variant": "#004e5c",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-container": "#00285d",
+                        "error": "#ffb4ab",
+                        "secondary": "#d0bcff",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-tertiary-container": "#002f38",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-secondary-fixed": "#23005c",
+                        "surface-bright": "#343945",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "outline": "#8c909f",
+                        "on-background": "#dee2f2",
+                        "on-surface-variant": "#c2c6d6",
+                        "surface-container": "#1b202b",
+                        "tertiary-fixed": "#acedff",
+                        "on-surface": "#dee2f2",
+                        "secondary-fixed": "#e9ddff",
+                        "on-secondary-container": "#c4abff",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin": "32px",
+                        "base": "4px",
+                        "xs": "0.25rem",
+                        "sm": "0.5rem",
+                        "md": "1rem",
+                        "2xl": "4rem",
+                        "lg": "1.5rem",
+                        "gutter": "24px",
+                        "xl": "2.5rem"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .selection-glow:focus-within {
+            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-16 bg-surface/70 backdrop-blur-xl border-b border-white/10 shadow-sm">
+<div class="font-headline-md text-headline-md font-bold text-primary">FortressVote</div>
+<div class="hidden md:flex space-x-8">
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 transition-colors" href="#">Elections</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Results</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Resources</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-4 py-2 rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container-high transition-all">Login</button>
+<button class="px-6 py-2 rounded-lg font-label-md text-label-md bg-primary text-on-primary font-bold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">Sign Up</button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-16 px-margin max-w-7xl mx-auto">
+<!-- Header Section -->
+<header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm border border-primary/20 mb-4">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+                    OFFICIAL BALLOT #AV-99201
+                </span>
+<h1 class="font-headline-xl text-headline-xl text-on-surface mb-2">2024 General Council Election</h1>
+<p class="text-on-surface-variant font-body-lg text-body-lg">Electronic Voting System • Secure Connection Established</p>
+</div>
+<div class="flex items-center gap-3 px-4 py-2 rounded-xl bg-surface-container-high border border-white/5">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-3 h-3 bg-tertiary rounded-full animate-pulse"></div>
+<div class="w-3 h-3 bg-tertiary rounded-full"></div>
+</div>
+<span class="font-label-md text-label-md text-tertiary uppercase tracking-wider">Securely Encrypted</span>
+</div>
+</header>
+<!-- Step 1: Identity Verification -->
+<section class="mb-12">
+<div class="glass-panel p-8 rounded-[32px] max-w-2xl">
+<div class="flex items-start gap-4 mb-6">
+<div class="p-3 rounded-2xl bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-[28px]">fingerprint</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Identity Verification</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Verify your voter credentials to unlock the ballot. This action is recorded only for eligibility verification.</p>
+</div>
+</div>
+<div class="space-y-4">
+<label class="block font-label-md text-label-md text-on-surface-variant ml-1">Voter Identification Number</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-4 py-3 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" readonly="" type="password" value="••••-••••-••••-4921"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-primary font-label-sm text-label-sm hover:underline">Change ID</button>
+</div>
+<div class="flex items-center gap-2 px-4 py-3 rounded-lg bg-error-container/20 border border-error/20">
+<span class="material-symbols-outlined text-error text-[20px]">info</span>
+<p class="font-body-sm text-body-sm text-on-error-container">Identity verified. Your session will expire in 14:58.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Anonymous Notice -->
+<div class="mb-8 p-4 rounded-2xl bg-surface-container-low border border-white/5 flex items-center gap-4">
+<span class="material-symbols-outlined text-tertiary">visibility_off</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+<strong class="text-on-surface">Anonymous Voting Notice:</strong> Your vote choice is cryptographically decoupled from your identity. FortressVote uses zero-knowledge proofs to ensure that while your eligibility is verified, your selection remains private even from system administrators.
+            </p>
+</div>
+<!-- Step 2: Candidate Selection Grid -->
+<section class="mb-12">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-8">Select Your Representative</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Candidate Card 1 -->
+<div class="group relative bg-surface-container rounded-[24px] border border-white/10 overflow-hidden hover:border-primary/50 transition-all selection-glow cursor-pointer">
+<div class="aspect-square w-full overflow-hidden">
+<img alt="Candidate Elena Vance" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="A professional portrait of a confident middle-aged man in a dark tailored suit standing against a minimalist architectural background with clean lines. The lighting is soft and cinematic, utilizing deep shadows and cool blue highlights to maintain a high-security corporate aesthetic. The overall mood is authoritative yet approachable, fitting for a modern political candidate in a digital environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhkvVFlf1W5X-9b8uJ2P2vaMrIW9sUoTvtx8NC_C5Z1bkBBrl40VreLoUCXSsHB2WPehtlU9GnCRv4mO_pKcnThB4M1AS1V0dAVwTcotLUqXbV2au42agymHKlpuuAU8kqeQyLhHCWtMZEmUdF497B5mEhDdMWORY5Rz363uk_SSC9JIuqGzS9zpcPGWeO7yAIfVMZ4PZJmt_FybMRwQGbFRl9jOkQY7kB_AVkND03qzSz92c1UjdL1T0OFgO7_M0wo1vNdt_qu1-d"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-headline-md text-headline-md text-on-surface">Marcus Thorne</h4>
+<span class="px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">INCUMBENT</span>
+</div>
+<p class="font-label-md text-label-md text-primary mb-4">Innovation &amp; Stability Party</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2">Focusing on infrastructure modernization and digital sovereignty for all citizens through transparent policy making.</p>
+<button class="w-full py-3 rounded-xl border border-primary text-primary font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-all">Select Candidate</button>
+</div>
+</div>
+<!-- Candidate Card 2 (Active/Selected State) -->
+<div class="relative bg-surface-container rounded-[24px] border-2 border-primary overflow-hidden shadow-2xl shadow-primary/10">
+<div class="absolute top-4 right-4 z-10 bg-primary text-on-primary p-2 rounded-full shadow-lg">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="aspect-square w-full overflow-hidden">
+<img alt="Candidate Elena Vance" class="w-full h-full object-cover" data-alt="A striking portrait of a professional woman with a confident expression, wearing a navy blazer in a high-tech office setting with soft bokeh lights. The image has a sophisticated dark-mode aesthetic with deep navy and charcoal tones. The lighting is focused and clean, emphasizing a look of integrity and modern leadership suitable for a secure voting platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAucJH79EYMVzv8LkiKlQQh4toW8QQxE6-TT_6CnogLu4XTkXhnjmxsyaI0X1HEPowHATwyiUMINYquH6XZzZFjQ3H0Q6I0kM7pUra5y1s-m91qB9cjUlpwsBs-bin8iyTwCrocyKhaPk8jstNOovVFaI44pcGcQb8G5hf-VDcPfE97VwLizgdjR1fliuKu_NWa3CANhOmqzQU06KjHRQ8rzLUicddJx7FtDQT_EVJkWuInUOiICtgMs3sRTauwFzyPJijuWn5DZCwk"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-headline-md text-headline-md text-on-surface">Elena Vance</h4>
+<span class="px-2 py-0.5 rounded bg-primary/20 text-primary font-label-sm text-label-sm">SELECTED</span>
+</div>
+<p class="font-label-md text-label-md text-primary mb-4">Progressive Union</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2">Advocating for environmental sustainability and universal access to education through decentralized community funding.</p>
+<div class="bg-primary py-3 rounded-xl text-on-primary font-bold text-center text-label-md shadow-lg">Confirm Selection</div>
+</div>
+</div>
+<!-- Candidate Card 3 -->
+<div class="group relative bg-surface-container rounded-[24px] border border-white/10 overflow-hidden hover:border-primary/50 transition-all selection-glow cursor-pointer">
+<div class="aspect-square w-full overflow-hidden">
+<img alt="Candidate Elena Vance" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="A portrait of a young professional man in a grey sweater, looking thoughtfully toward the camera in a modern, glass-walled office space. The lighting is dramatic and low-key, with a palette of cool grays and deep blues. The style is polished and high-end, representing a modern candidate with a focus on administrative efficiency and digital integrity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS2L-En9KuGChIAF0YAeFOM-psT1e6gcjcJxtz0LR4RZQ5ykViiPnViUao5CcL5gbOl7z9_Oy-2CJR1jRyb-ou41MDal8SYhsZ7J4YkhLucfyiP9Ucsxqrnqus9mj6fr-rD4mlYsr5kbeLMNcpNApfrJi2MhiSsKyK2SWZ1SR62etyhffDxKjmdZ3ZkGgafyMGtGIN0R2LWXDmpJ7arakOcH4tHXRc9EP8o-upCyERMK5lGip1lWon_BabrREiKsgr9c2o_8DLDkXQ"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-headline-md text-headline-md text-on-surface">David Chen</h4>
+<span class="px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">CHALLENGER</span>
+</div>
+<p class="font-label-md text-label-md text-primary mb-4">Liberty Reform</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6 line-clamp-2">Championing fiscal responsibility and the reduction of administrative overhead through blockchain integration.</p>
+<button class="w-full py-3 rounded-xl border border-primary text-primary font-label-md text-label-md hover:bg-primary hover:text-on-primary transition-all">Select Candidate</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Final Submission CTA -->
+<section class="flex flex-col items-center py-12 border-t border-white/5">
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 text-center max-w-md">Once confirmed, your vote will be encrypted and submitted to the ledger. This action cannot be reversed.</p>
+<button class="px-12 py-5 bg-primary text-on-primary rounded-2xl font-headline-md text-headline-md font-bold shadow-[0_0_40px_rgba(173,198,255,0.3)] hover:scale-[1.02] active:scale-95 transition-all">
+                Submit Secure Ballot
+            </button>
+</section>
+</main>
+<!-- Confirm Vote Modal (Overlay) -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-surface-container-lowest/80 backdrop-blur-sm">
+<div class="glass-panel w-full max-w-lg rounded-[32px] p-8 shadow-2xl">
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Confirm Your Vote</h2>
+<button class="p-2 rounded-full hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="mb-8 p-6 rounded-2xl bg-surface-container-high border border-primary/20">
+<p class="font-label-md text-label-md text-primary mb-2 uppercase tracking-widest">Selected Candidate</p>
+<div class="flex items-center gap-4">
+<img alt="Elena Vance Thumbnail" class="w-12 h-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPrCyoPHLm_IKMGqzKZ0c_NWuNuUvAJSAEDNI9oJ9YVUSC0_txVxExw1rsV8Qy9LFKTdA6SiqNLu4X-ZpNDgFjlu-mDNgmTcuNF1od61psP2BGeSG79wRiC0zgIAzn2_Lxy8XPl4PTAnamHbYTGByL3dsH_NMrXvgrufBWR_D29qkyH_dozzwDFD1cvDasqgWaVMaIKryGSxqJ5BAu7JuLgF60CpCOskWHojOdU4l3ROp4eilgqwrYF_B9GmxA4jOFe9mckxNFzHHk"/>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Elena Vance</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Progressive Union</p>
+</div>
+</div>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between text-on-surface-variant font-body-sm text-body-sm">
+<span>Election ID:</span>
+<span class="text-on-surface font-mono">GEN-2024-BALLOT-001</span>
+</div>
+<div class="flex justify-between text-on-surface-variant font-body-sm text-body-sm">
+<span>Voter ID Hash:</span>
+<span class="text-on-surface font-mono">8f2a...c91e</span>
+</div>
+<div class="flex justify-between text-on-surface-variant font-body-sm text-body-sm">
+<span>Encryption Protocol:</span>
+<span class="text-tertiary">AES-256-GCM / RSA-4096</span>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full py-4 bg-primary text-on-primary rounded-xl font-bold text-label-md shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">
+                    Confirm and Encrypt Vote
+                </button>
+<button class="w-full py-4 bg-transparent text-on-surface-variant rounded-xl font-bold text-label-md hover:bg-surface-container-highest transition-all">
+                    Return to Selection
+                </button>
+</div>
+<p class="mt-6 text-center text-label-sm text-on-surface-variant/60">
+                By confirming, you digitally sign this ballot with your private key.
+            </p>
+</div>
+</div>
+<!-- Footer -->
+<footer class="w-full py-xl px-margin flex flex-col md:flex-row justify-between items-center bg-surface-container-lowest border-t border-white/5">
+<div class="font-label-md text-label-md font-bold text-on-surface mb-6 md:mb-0">
+            © 2024 FortressVote Secure Systems. All Rights Reserved.
+        </div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security Audit</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Voter Rights</a>
+</div>
+</footer>
+</body></html>

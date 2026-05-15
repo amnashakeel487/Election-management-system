@@ -1,0 +1,44 @@
+{
+  "home": {
+    "route": "/",
+    "designPath": "design/landing_page/code.html",
+    "aliases": ["Home"],
+    "reactPage": "src/pages/HomePage.tsx",
+    "status": "converted"
+  },
+  "login_signup": {
+    "route": "/login",
+    "designPath": "design/login_signup/code.html",
+    "aliases": ["Login", "Register"],
+    "reactPages": {
+      "login": "src/pages/LoginPage.tsx",
+      "register": "src/pages/RegisterPage.tsx"
+    },
+    "status": "converted"
+  },
+  "email_verification": {
+    "route": "/verify-email",
+    "designPath": "design/email_verification/code.html",
+    "reactPage": "src/pages/VerifyEmailPage.tsx",
+    "status": "converted"
+  },
+  "election_creator_dashboard": {
+    "route": "/dashboard/creator",
+    "designPath": "design/election_creator_dashboard/code.html",
+    "reactPage": null,
+    "status": "pending"
+  },
+  "voter_dashboard": {
+    "route": "/dashboard/voter",
+    "designPath": "design/voter_dashboard/code.html",
+    "reactPage": null,
+    "status": "pending"
+  },
+  "super_admin_dashboard": {
+    "route": "/admin/dashboard",
+    "designPath": "design/super_admin_dashboard/code.html",
+    "aliases": ["AdminDashboard"],
+    "reactPage": "src/pages/dashboards/AdminDashboardPage.tsx",
+    "status": "converted"
+  }
+}

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FortressVote | Notification Center</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container": "#1b202b",
+                      "tertiary-fixed": "#acedff",
+                      "tertiary": "#4cd7f6",
+                      "tertiary-fixed-dim": "#4cd7f6",
+                      "outline-variant": "#424754",
+                      "surface-bright": "#343945",
+                      "secondary": "#d0bcff",
+                      "on-background": "#dee2f2",
+                      "on-surface": "#dee2f2",
+                      "on-primary-container": "#00285d",
+                      "on-secondary": "#3c0091",
+                      "on-tertiary": "#003640",
+                      "inverse-surface": "#dee2f2",
+                      "inverse-on-surface": "#2b303c",
+                      "surface-tint": "#adc6ff",
+                      "on-primary-fixed": "#001a42",
+                      "tertiary-container": "#009eb9",
+                      "on-secondary-container": "#c4abff",
+                      "error-container": "#93000a",
+                      "on-tertiary-fixed": "#001f26",
+                      "on-primary-fixed-variant": "#004395",
+                      "on-primary": "#002e6a",
+                      "secondary-fixed": "#e9ddff",
+                      "surface-container-highest": "#303541",
+                      "secondary-fixed-dim": "#d0bcff",
+                      "on-secondary-fixed-variant": "#5516be",
+                      "primary-container": "#4d8eff",
+                      "surface-dim": "#0e131e",
+                      "surface": "#0e131e",
+                      "error": "#ffb4ab",
+                      "on-error-container": "#ffdad6",
+                      "primary-fixed": "#d8e2ff",
+                      "on-error": "#690005",
+                      "outline": "#8c909f",
+                      "secondary-container": "#571bc1",
+                      "inverse-primary": "#005ac2",
+                      "surface-container-lowest": "#090e19",
+                      "primary-fixed-dim": "#adc6ff",
+                      "primary": "#adc6ff",
+                      "surface-container-high": "#252a35",
+                      "on-surface-variant": "#c2c6d6",
+                      "on-tertiary-fixed-variant": "#004e5c",
+                      "background": "#0e131e",
+                      "surface-variant": "#303541",
+                      "on-tertiary-container": "#002f38",
+                      "surface-container-low": "#171c27",
+                      "on-secondary-fixed": "#23005c"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "1.5rem",
+                      "gutter": "24px",
+                      "xs": "0.25rem",
+                      "base": "4px",
+                      "sm": "0.5rem",
+                      "md": "1rem",
+                      "xl": "2.5rem",
+                      "margin": "32px",
+                      "2xl": "4rem"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Inter"],
+                      "label-md": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-xl": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface-dim text-on-surface min-h-screen flex flex-row overflow-hidden">
+<!-- Sidebar Navigation (Desktop) -->
+<aside class="w-64 border-r border-outline-variant bg-surface-container-low flex flex-col hidden md:flex">
+<div class="p-lg">
+<h1 class="font-headline-lg text-primary">FortressVote</h1>
+</div>
+<nav class="flex-1 px-md space-y-xs">
+<a class="flex items-center gap-md p-md rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">how_to_vote</span>
+<span class="font-label-md">Voting Booth</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl bg-primary/10 text-primary border border-primary/20" href="#">
+<span class="material-symbols-outlined" data-weight="fill">notifications</span>
+<span class="font-label-md font-semibold">Notifications</span>
+<span class="ml-auto bg-error text-white text-[10px] px-1.5 py-0.5 rounded-full">2</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-xl text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md">Results &amp; Data</span>
+</a>
+</nav>
+<div class="p-md border-t border-outline-variant">
+<div class="flex items-center gap-md p-sm">
+<div class="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold">JD</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold truncate">James Doe</p>
+<p class="text-xs text-on-surface-variant truncate">Sector 7 Admin</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Notification Page Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-surface h-screen">
+<!-- Desktop Header -->
+<header class="h-20 border-b border-outline-variant flex items-center justify-between px-xl bg-surface-container-lowest/30 backdrop-blur-md">
+<div class="flex items-center gap-md">
+<h2 class="font-headline-md text-on-surface">Notification Center</h2>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-bold uppercase tracking-wider">2 New</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="flex items-center gap-xs px-md py-sm rounded-lg bg-surface-container-highest text-on-surface font-label-md border border-outline-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-[18px]">done_all</span>
+                Mark all as read
+            </button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container-high text-on-surface-variant transition-all">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</header>
+<!-- Filters & Sort Bar -->
+<div class="px-xl py-md border-b border-outline-variant flex items-center justify-between">
+<div class="flex gap-sm overflow-x-auto no-scrollbar">
+<button class="whitespace-nowrap px-md py-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md shadow-lg shadow-primary/20">
+                All Activity
+            </button>
+<button class="whitespace-nowrap px-md py-sm rounded-lg bg-surface-container-high text-on-surface-variant font-label-md text-label-md border border-outline-variant hover:border-primary/30 transition-all">
+                Election Reminders
+            </button>
+<button class="whitespace-nowrap px-md py-sm rounded-lg bg-surface-container-high text-on-surface-variant font-label-md text-label-md border border-outline-variant hover:border-primary/30 transition-all">
+                Approval Alerts
+            </button>
+<button class="whitespace-nowrap px-md py-sm rounded-lg bg-surface-container-high text-on-surface-variant font-label-md text-label-md border border-outline-variant hover:border-primary/30 transition-all">
+                System Updates
+            </button>
+</div>
+<p class="text-on-surface-variant text-label-sm hidden lg:block">Showing all activity for last 30 days</p>
+</div>
+<!-- Notifications Scroll Area -->
+<div class="flex-1 overflow-y-auto custom-scrollbar bg-surface-container-lowest/20">
+<div class="max-w-5xl mx-auto px-xl py-xl space-y-md">
+<!-- Group Heading -->
+<p class="font-label-sm text-on-surface-variant uppercase tracking-[0.2em] mb-4">Recent Notifications</p>
+<!-- Unread Notification (Election Reminder) -->
+<div class="group relative p-lg rounded-2xl bg-primary/5 border border-primary/20 hover:border-primary/40 transition-all flex gap-lg cursor-pointer">
+<div class="absolute top-lg right-lg w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_12px_rgba(173,198,255,0.8)] group-hover:scale-125 transition-transform"></div>
+<div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-3xl" data-weight="fill">how_to_vote</span>
+</div>
+<div class="flex flex-col gap-xs flex-1">
+<div class="flex justify-between items-start">
+<p class="font-body-md text-body-md text-on-surface font-bold text-lg">2024 Presidential Election</p>
+<p class="font-label-sm text-label-sm text-primary uppercase tracking-wider">2m ago</p>
+</div>
+<p class="font-body-md text-on-surface-variant leading-relaxed max-w-3xl">General voting begins in 48 hours. Ensure your cryptographic key is ready for secure submission. You can perform a test submission in the staging area.</p>
+<div class="mt-md flex gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="px-md py-sm bg-primary/20 text-primary rounded-lg text-label-md font-bold hover:bg-primary/30 transition-colors">Prepare Keys</button>
+<button class="px-md py-sm border border-outline-variant text-on-surface-variant rounded-lg text-label-md hover:bg-surface-container-high transition-colors">Dismiss</button>
+</div>
+</div>
+</div>
+<!-- Unread Notification (Approval Alert) -->
+<div class="group relative p-lg rounded-2xl bg-secondary/5 border border-secondary/20 hover:border-secondary/40 transition-all flex gap-lg cursor-pointer">
+<div class="absolute top-lg right-lg w-2.5 h-2.5 rounded-full bg-secondary shadow-[0_0_12px_rgba(208,188,255,0.8)] group-hover:scale-125 transition-transform"></div>
+<div class="w-14 h-14 rounded-xl bg-secondary/10 flex items-center justify-center shrink-0 border border-secondary/20">
+<span class="material-symbols-outlined text-secondary text-3xl" data-weight="fill">verified_user</span>
+</div>
+<div class="flex flex-col gap-xs flex-1">
+<div class="flex justify-between items-start">
+<p class="font-body-md text-body-md text-on-surface font-bold text-lg">Audit Approval Required</p>
+<p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">45m ago</p>
+</div>
+<p class="font-body-md text-on-surface-variant leading-relaxed max-w-3xl">New system log entry #9902 requires administrative sign-off for the Sector 7 audit node. High priority clearance required.</p>
+<div class="mt-md flex gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="px-md py-sm bg-secondary/20 text-secondary rounded-lg text-label-md font-bold hover:bg-secondary/30 transition-colors">Review Log</button>
+</div>
+</div>
+</div>
+<!-- Group Heading -->
+<p class="font-label-sm text-on-surface-variant uppercase tracking-[0.2em] pt-xl mb-4">Earlier This Week</p>
+<!-- Read Notification (Results) -->
+<div class="group relative p-lg rounded-2xl bg-surface-container border border-outline-variant/30 hover:bg-surface-container-high transition-all flex gap-lg opacity-80 hover:opacity-100 cursor-pointer">
+<div class="w-14 h-14 rounded-xl bg-tertiary/10 flex items-center justify-center shrink-0 border border-tertiary/10">
+<span class="material-symbols-outlined text-tertiary text-3xl">analytics</span>
+</div>
+<div class="flex flex-col gap-xs flex-1">
+<div class="flex justify-between items-start">
+<p class="font-body-md text-on-surface font-semibold text-lg">Municipal Bond Referendum</p>
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider">3h ago</p>
+</div>
+<p class="font-body-md text-on-surface-variant leading-relaxed max-w-3xl">Certified results are now available for viewing. The referendum has passed with a 68% majority across all participating sectors.</p>
+</div>
+</div>
+<!-- Desktop Visual Content (Embedded in feed) -->
+<div class="rounded-3xl overflow-hidden border border-outline-variant bg-surface-container mt-lg group cursor-pointer">
+<div class="grid grid-cols-1 lg:grid-cols-2">
+<div class="h-48 lg:h-auto relative overflow-hidden">
+<img alt="Election Scene" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A highly detailed close-up of a digital election booth interface in a dimly lit, futuristic administrative center. The screen displays glowing data visualizations of voting percentages in a deep blue and cyan color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANKn5pTh9WZurHVcDhm2EH-k70e5djZyY-KgLqXPM_aLaUrSodrZSfVZKq9C_0QlLi7OADUPfaCy56pn-NWPFlHAG8UIiTZFfe0H7M6HtCqrQovKu6ZN8DWHnjzJp8sfQbfyV0TSFzINnT2wF41iv4aVnEo2-41ltrxUvzYeszqQwEIDPNpm68ZUL5RbbZ-G3JVPJ3_j-56-M9carPPjTEBpgaTP3K3TIt_szvw19BJhIFw-_gFXGKGeOyxLnc1Hls6waK0eoSVvcq"/>
+<div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
+</div>
+<div class="p-lg flex flex-col justify-center">
+<span class="bg-primary/20 px-2 py-0.5 rounded text-[10px] font-bold text-primary uppercase tracking-tighter mb-2 w-fit">Featured Stream</span>
+<h3 class="font-headline-md text-on-surface mb-2">Watch: Election Certification Process</h3>
+<p class="text-on-surface-variant text-body-sm mb-md">A deep dive into the cryptographic verification of regional nodes. Required viewing for all tier-2 administrators.</p>
+<button class="flex items-center gap-sm text-primary font-bold text-label-md hover:underline">
+                            Watch Live Stream <span class="material-symbols-outlined text-[18px]">play_circle</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Read Notification (Security) -->
+<div class="group relative p-lg rounded-2xl bg-surface-container border border-outline-variant/30 hover:bg-surface-container-high transition-all flex gap-lg opacity-80 hover:opacity-100 cursor-pointer">
+<div class="w-14 h-14 rounded-xl bg-outline-variant/10 flex items-center justify-center shrink-0 border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl">key</span>
+</div>
+<div class="flex flex-col gap-xs flex-1">
+<div class="flex justify-between items-start">
+<p class="font-body-md text-on-surface font-semibold text-lg">Key Rotation Successful</p>
+<p class="font-label-sm text-on-surface-variant uppercase tracking-wider">1d ago</p>
+</div>
+<p class="font-body-md text-on-surface-variant leading-relaxed max-w-3xl">Your administrative hardware token has been successfully synchronized with the main vault. Next rotation scheduled for 14 days.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Persistent Bottom Bar (Mobile Only fallback) -->
+<nav class="fixed bottom-0 w-full h-16 bg-surface-container-low flex justify-around items-center border-t border-outline-variant z-[80] md:hidden">
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">how_to_vote</span>
+<span class="font-label-sm text-label-sm">Vote</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<div class="relative">
+<span class="material-symbols-outlined" data-weight="fill">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<span class="font-label-sm text-label-sm">Alerts</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</div>
+</nav>
+</body></html>

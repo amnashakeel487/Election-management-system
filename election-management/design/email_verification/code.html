@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FortressVote | Secure Verification</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#1b202b",
+                        "tertiary-fixed": "#acedff",
+                        "tertiary": "#4cd7f6",
+                        "tertiary-fixed-dim": "#4cd7f6",
+                        "outline-variant": "#424754",
+                        "surface-bright": "#343945",
+                        "secondary": "#d0bcff",
+                        "on-background": "#dee2f2",
+                        "on-surface": "#dee2f2",
+                        "on-primary-container": "#00285d",
+                        "on-secondary": "#3c0091",
+                        "on-tertiary": "#003640",
+                        "inverse-surface": "#dee2f2",
+                        "inverse-on-surface": "#2b303c",
+                        "surface-tint": "#adc6ff",
+                        "on-primary-fixed": "#001a42",
+                        "tertiary-container": "#009eb9",
+                        "on-secondary-container": "#c4abff",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#001f26",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-primary": "#002e6a",
+                        "secondary-fixed": "#e9ddff",
+                        "surface-container-highest": "#303541",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "primary-container": "#4d8eff",
+                        "surface-dim": "#0e131e",
+                        "surface": "#0e131e",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed": "#d8e2ff",
+                        "on-error": "#690005",
+                        "outline": "#8c909f",
+                        "secondary-container": "#571bc1",
+                        "inverse-primary": "#005ac2",
+                        "surface-container-lowest": "#090e19",
+                        "primary-fixed-dim": "#adc6ff",
+                        "primary": "#adc6ff",
+                        "surface-container-high": "#252a35",
+                        "on-surface-variant": "#c2c6d6",
+                        "on-tertiary-fixed-variant": "#004e5c",
+                        "background": "#0e131e",
+                        "surface-variant": "#303541",
+                        "on-tertiary-container": "#002f38",
+                        "surface-container-low": "#171c27",
+                        "on-secondary-fixed": "#23005c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "1.5rem",
+                        "gutter": "24px",
+                        "xs": "0.25rem",
+                        "base": "4px",
+                        "sm": "0.5rem",
+                        "md": "1rem",
+                        "xl": "2.5rem",
+                        "margin": "32px",
+                        "2xl": "4rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+        }
+        .success-glow {
+            box-shadow: 0 0 40px rgba(173, 198, 255, 0.2);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background flex flex-col items-center">
+<!-- Transactional Header -->
+<header class="w-full max-w-7xl mx-auto px-margin py-xl flex items-center justify-between">
+<div class="font-headline-md text-headline-md font-bold text-primary tracking-tight">
+            FortressVote
+        </div>
+<div class="flex items-center space-x-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+<span class="font-label-md">Secure Session Active</span>
+</div>
+</header>
+<main class="flex-grow w-full flex flex-col items-center justify-center px-gutter py-2xl">
+<div class="w-full max-w-[560px] flex flex-col items-center space-y-xl">
+<!-- Animated Success Illustration State -->
+<div class="relative w-32 h-32 flex items-center justify-center mb-md">
+<!-- Background Glows -->
+<div class="absolute inset-0 bg-primary/10 rounded-full blur-2xl animate-pulse"></div>
+<div class="absolute inset-4 border-2 border-dashed border-primary/30 rounded-full animate-[spin_10s_linear_infinite]"></div>
+<!-- Success Icon Container -->
+<div class="relative w-24 h-24 glass-panel rounded-full flex items-center justify-center success-glow border-primary/20">
+<span class="material-symbols-outlined text-primary text-[56px]" style="font-variation-settings: 'FILL' 1;">
+                        verified_user
+                    </span>
+</div>
+</div>
+<!-- Verification Success Message -->
+<section class="glass-panel w-full p-2xl rounded-[40px] text-center space-y-xl shadow-2xl">
+<div class="space-y-md">
+<h1 class="font-headline-xl text-headline-xl text-on-surface">
+                        Verification Successful
+                    </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-sm mx-auto">
+                        Your identity has been cryptographically confirmed. You now have full access to the election portal.
+                    </p>
+</div>
+<div class="pt-md">
+<button class="w-full max-w-xs mx-auto bg-primary text-on-primary-container font-semibold py-lg rounded-xl hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/20">
+                        Go to Dashboard
+                    </button>
+</div>
+</section>
+<!-- Pending State / Action Fallback -->
+<section class="w-full space-y-xl">
+<div class="flex items-center justify-center space-x-md">
+<div class="h-[1px] flex-grow max-w-[80px] bg-outline-variant"></div>
+<span class="font-label-md text-label-md uppercase tracking-[0.2em] text-outline">Security Audit</span>
+<div class="h-[1px] flex-grow max-w-[80px] bg-outline-variant"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg items-stretch">
+<div class="bg-surface-container-low p-lg rounded-2xl flex flex-col items-center text-center border border-white/5 space-y-md">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                            Didn't receive the secure link?
+                        </p>
+<button class="w-full font-label-md text-label-md text-primary border border-primary/30 px-lg py-md rounded-xl hover:bg-primary/5 transition-colors">
+                            Resend Verification
+                        </button>
+</div>
+<div class="bg-surface-container-low p-lg rounded-2xl flex items-start space-x-md text-left border border-white/5">
+<span class="material-symbols-outlined text-tertiary text-[24px] mt-1">
+                            shield_lock
+                        </span>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">
+                            Encryption check: AES-256 GCM verified. Connection is secure and end-to-end encrypted for your protection.
+                        </p>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Contextual Footer -->
+<footer class="w-full max-w-7xl mx-auto px-margin py-xl border-t border-white/5">
+<div class="flex flex-col md:flex-row items-center justify-between space-y-md md:space-y-0">
+<p class="font-body-sm text-body-sm text-outline">
+                © 2024 FortressVote Secure Systems. Part of the Federal Election Infrastructure.
+            </p>
+<div class="flex space-x-xl">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Security Protocol</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Voter Rights</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+<!-- Background Decorative Elements -->
+<div class="fixed -bottom-48 -left-48 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -z-10 animate-pulse"></div>
+<div class="fixed top-1/4 -right-48 w-96 h-96 bg-tertiary/5 rounded-full blur-[120px] -z-10"></div>
+<div class="fixed -top-48 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-primary/[0.03] rounded-full blur-[150px] -z-10"></div>
+</body></html>

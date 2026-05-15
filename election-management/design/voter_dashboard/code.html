@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FortressVote | Voter Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#001f26",
+                    "tertiary-fixed-dim": "#4cd7f6",
+                    "surface-container-low": "#171c27",
+                    "inverse-on-surface": "#2b303c",
+                    "primary-fixed": "#d8e2ff",
+                    "error-container": "#93000a",
+                    "surface-tint": "#adc6ff",
+                    "surface-variant": "#303541",
+                    "on-tertiary": "#003640",
+                    "surface-container-highest": "#303541",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-primary-fixed": "#001a42",
+                    "tertiary": "#4cd7f6",
+                    "primary": "#adc6ff",
+                    "on-primary": "#002e6a",
+                    "surface-container-lowest": "#090e19",
+                    "background": "#0e131e",
+                    "inverse-surface": "#dee2f2",
+                    "secondary-container": "#571bc1",
+                    "primary-container": "#4d8eff",
+                    "outline-variant": "#424754",
+                    "inverse-primary": "#005ac2",
+                    "on-tertiary-fixed-variant": "#004e5c",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-container": "#00285d",
+                    "error": "#ffb4ab",
+                    "secondary": "#d0bcff",
+                    "secondary-fixed-dim": "#d0bcff",
+                    "on-tertiary-container": "#002f38",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-secondary-fixed": "#23005c",
+                    "surface-bright": "#343945",
+                    "on-secondary-fixed-variant": "#5516be",
+                    "outline": "#8c909f",
+                    "on-background": "#dee2f2",
+                    "on-surface-variant": "#c2c6d6",
+                    "surface-container": "#1b202b",
+                    "tertiary-fixed": "#acedff",
+                    "on-surface": "#dee2f2",
+                    "secondary-fixed": "#e9ddff",
+                    "on-secondary-container": "#c4abff",
+                    "on-error": "#690005",
+                    "surface-dim": "#0e131e",
+                    "surface": "#0e131e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin": "32px",
+                    "base": "4px",
+                    "xs": "0.25rem",
+                    "sm": "0.5rem",
+                    "md": "1rem",
+                    "2xl": "4rem",
+                    "lg": "1.5rem",
+                    "gutter": "24px",
+                    "xl": "2.5rem"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-active {
+            background: rgba(173, 198, 255, 0.05);
+            border-right: 4px solid #adc6ff;
+            color: #adc6ff;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary/30">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface-container-lowest flex flex-col py-6 shadow-2xl z-50">
+<div class="px-8 mb-10">
+<h1 class="font-headline-sm text-headline-sm font-black text-primary">FortressVote</h1>
+<p class="text-[10px] uppercase tracking-widest text-outline mt-1">Secure Governance</p>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg sidebar-active transition-all group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="how_to_vote">how_to_vote</span>
+<span class="font-label-md text-label-md">Active Elections</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-md text-label-md">Audit Logs</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Users</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="font-label-md text-label-md">Security Settings</span>
+</a>
+</nav>
+<div class="px-6 py-6 border-t border-white/5 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Help Center</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] min-h-screen flex flex-col">
+<!-- TopAppBar (Shared Component) -->
+<header class="flex justify-between items-center px-margin py-sm bg-surface-dim h-20 sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container-highest p-2 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h2 class="font-headline-lg text-headline-lg text-primary">Dashboard</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<button class="text-on-surface-variant hover:bg-surface-container-highest p-2 rounded-full transition-all relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-low py-1.5 px-3 rounded-full border border-white/5">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">
+                        JD
+                    </div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-margin space-y-gutter">
+<!-- Welcome Bento Grid Section -->
+<section class="grid grid-cols-12 gap-gutter">
+<!-- Welcome & ID Card -->
+<div class="col-span-12 lg:col-span-8 p-8 rounded-[24px] glass-card flex flex-col justify-between min-h-[240px] relative overflow-hidden">
+<div class="z-10">
+<p class="text-primary font-label-md text-label-md uppercase tracking-widest mb-2">Authenticated Session</p>
+<h3 class="font-headline-xl text-headline-xl mb-4">Welcome back, Jonathan Doe</h3>
+<div class="inline-flex items-center gap-3 bg-surface-container-lowest/50 px-4 py-2 rounded-full border border-white/10">
+<span class="material-symbols-outlined text-tertiary text-sm" data-icon="fingerprint">fingerprint</span>
+<span class="font-mono text-on-surface-variant tracking-tighter">SEC-ID: •••• •••• 9842</span>
+</div>
+</div>
+<div class="absolute -right-20 -bottom-20 w-80 h-80 bg-primary/10 blur-[100px] rounded-full"></div>
+<div class="z-10 mt-6 flex gap-4">
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-base" data-icon="verified">verified</span>
+                            Verify Identity
+                        </button>
+</div>
+</div>
+<!-- Notification Quick View -->
+<div class="col-span-12 lg:col-span-4 p-8 rounded-[24px] bg-surface-container-low border border-white/5 flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-headline-md text-headline-md">Updates</h4>
+<span class="bg-primary-container/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase">3 New</span>
+</div>
+<div class="space-y-4">
+<div class="flex gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="w-10 h-10 shrink-0 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-xl" data-icon="campaign">campaign</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Registration confirmed for District 7</p>
+<p class="text-on-surface-variant text-[11px] mt-1">2 hours ago</p>
+</div>
+</div>
+<div class="flex gap-4 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="w-10 h-10 shrink-0 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-xl" data-icon="update">update</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">New audit report available</p>
+<p class="text-on-surface-variant text-[11px] mt-1">Yesterday</p>
+</div>
+</div>
+</div>
+<button class="mt-auto text-primary font-label-md text-label-md flex items-center justify-center gap-2 pt-4 border-t border-white/5">
+                        View All Activity
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- Active Polls Section -->
+<section>
+<div class="flex justify-between items-end mb-6">
+<div>
+<h3 class="font-headline-lg text-headline-lg">Active Polls</h3>
+<p class="text-on-surface-variant">Cast your encrypted vote in ongoing sessions.</p>
+</div>
+<a class="text-primary font-label-md text-label-md flex items-center gap-2 hover:underline" href="#">
+                        Explore all polls
+                        <span class="material-symbols-outlined text-sm" data-icon="open_in_new">open_in_new</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Poll Card 1 -->
+<div class="bg-surface-container border border-white/5 rounded-[24px] overflow-hidden flex flex-col">
+<div class="h-48 bg-surface-container-highest relative">
+<img class="w-full h-full object-cover opacity-60" data-alt="A cinematic, high-contrast photograph of a modern city hall architecture at dusk with dramatic blue and purple lighting. The atmosphere is professional and secure, emphasizing a sense of civic duty and technological advancement. Soft lens flares and a shallow depth of field create a premium, corporate aesthetic that aligns with a high-stakes digital voting environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkKJ0HzfUgWq_stJN15q2hihFI0UXW0SR4Wrv_3nFifwFGUgEmXvyCqckebso5OLq9ThJ4iY2YnOoRZdus9SN_m8PCSCHQD_xdqyfeT2c8gQwbJocK1CnJgC93jU43qODdfSzJKqtwuc7Qq1rV5Xffqs7TdNCdbE1X-wSOiz-zK8SCwHSF1zodrwho5UCl3DNlKAag-qXNxn82vHToZ3gJfCayjoj42u-G-LtNmYQZ3L9eNxFVzt63R0bqH7hFNz2-u0iXU7mzkudi"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-error-container/80 backdrop-blur-md text-error px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>
+                                    CLOSING SOON
+                                </span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1">
+<h4 class="font-headline-md text-headline-md mb-2">2024 Municipal Infrastructure Bond</h4>
+<p class="text-on-surface-variant text-body-sm line-clamp-2 mb-6">Decision on the allocation of $450M for sustainable urban development and transport upgrades in District 4.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-outline uppercase font-bold">Ends in</span>
+<span class="text-tertiary font-mono">04h 22m 15s</span>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:shadow-[0_0_20px_rgba(173,198,255,0.3)] transition-all">
+                                    Vote Now
+                                    <span class="material-symbols-outlined text-lg" data-icon="how_to_vote">how_to_vote</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Poll Card 2 -->
+<div class="bg-surface-container border border-white/5 rounded-[24px] overflow-hidden flex flex-col">
+<div class="h-48 bg-surface-container-highest relative">
+<img class="w-full h-full object-cover opacity-60" data-alt="A close-up, high-detail macro shot of a secure hardware security module and circuit board with glowing blue indicators. The lighting is moody and low-key, emphasizing the complex engineering and impenetrable nature of the technology. The color palette is dominated by deep cyans and dark charcoals, conveying a futuristic, high-security vibe suitable for a state-level encryption platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkP1vw47kGBaZkHtlU6aWMFUnPOwJOvY0AEOudsuEj7PIW2V6W3CVqdTJn6NCEa2yleHfqW6uNhyMU9AxeJP0yE7RkAj_Hspz_5pb7XsDkN3srn-qeKDMQRM5IxRYkU409niDfGMkdT61q4Lo3VIPItax-uTSXTM3NZFBZsQaLEj84J4RrOuplvTsS1NvOeF-KsiDMGOEM3VL6uCo88Ff_GYKRxQiXA8xKSEfXkbIZa4csMABJG_2PdByXQnB21N7bFeH2RLlWr9-d"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-primary-container/80 backdrop-blur-md text-on-primary-container px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5">
+                                    ACTIVE
+                                </span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1">
+<h4 class="font-headline-md text-headline-md mb-2">School Board Policy Revision #42</h4>
+<p class="text-on-surface-variant text-body-sm line-clamp-2 mb-6">Vote on proposed changes to the digital literacy curriculum and community access programs for the upcoming academic year.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-outline uppercase font-bold">Ends in</span>
+<span class="text-on-surface-variant font-mono">2 Days</span>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:shadow-[0_0_20px_rgba(173,198,255,0.3)] transition-all">
+                                    Vote Now
+                                    <span class="material-symbols-outlined text-lg" data-icon="how_to_vote">how_to_vote</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Results & History Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Results Access Card -->
+<div class="lg:col-span-2 bg-surface-container-highest/30 border border-white/10 p-8 rounded-[32px] glass-card flex flex-col md:flex-row gap-8 items-center">
+<div class="shrink-0 w-32 h-32 bg-primary/20 rounded-3xl flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-6xl" data-icon="analytics">analytics</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md mb-2">Recent Results Available</h4>
+<p class="text-on-surface-variant text-body-md mb-6">The "Clean Water Initiative 2023" final results have been audited and released. Access the cryptographic proof now.</p>
+<div class="flex flex-wrap gap-3">
+<a class="bg-surface-container-highest text-on-surface px-5 py-2.5 rounded-full font-label-md text-label-md border border-white/10 hover:bg-white/10 transition-colors flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span>
+                                Download Report
+                            </a>
+<a class="bg-tertiary text-on-tertiary px-5 py-2.5 rounded-full font-label-md text-label-md hover:opacity-90 transition-opacity flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="verified">verified</span>
+                                Verify Chain
+                            </a>
+</div>
+</div>
+</div>
+<!-- Quick Stats -->
+<div class="bg-surface-container-low border border-white/5 p-8 rounded-[32px] flex flex-col justify-center">
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant font-label-md text-label-md">Joined Elections</span>
+<span class="text-2xl font-bold text-primary">12</span>
+</div>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-4/5"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant font-label-md text-label-md">Total Votes Cast</span>
+<span class="text-2xl font-bold text-tertiary">48</span>
+</div>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full w-2/3"></div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-on-surface-variant font-label-md text-label-md">Voter Credibility Score</span>
+<span class="text-2xl font-bold text-secondary">99.8%</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer (Shared Component) -->
+<footer class="mt-auto w-full py-xl px-margin flex flex-col md:flex-row justify-between items-center bg-surface-container-lowest border-t border-white/5">
+<div class="mb-6 md:mb-0">
+<span class="font-label-md text-label-md font-bold text-on-surface">FortressVote Secure Systems</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">© 2024 FortressVote Secure Systems. All Rights Reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security Audit</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Voter Rights</a>
+</div>
+</footer>
+</main>
+</body></html>

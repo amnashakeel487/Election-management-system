@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FortressVote - Secure Access</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#001f26",
+                        "tertiary-fixed-dim": "#4cd7f6",
+                        "surface-container-low": "#171c27",
+                        "inverse-on-surface": "#2b303c",
+                        "primary-fixed": "#d8e2ff",
+                        "error-container": "#93000a",
+                        "surface-tint": "#adc6ff",
+                        "surface-container-high": "#252a35",
+                        "on-secondary": "#3c0091",
+                        "surface-dim": "#0e131e",
+                        "tertiary-container": "#009eb9",
+                        "surface": "#0e131e",
+                        "surface-variant": "#303541",
+                        "on-tertiary": "#003640",
+                        "surface-container-highest": "#303541",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-primary-fixed": "#001a42",
+                        "tertiary": "#4cd7f6",
+                        "primary": "#adc6ff",
+                        "on-primary": "#002e6a",
+                        "surface-container-lowest": "#090e19",
+                        "background": "#0e131e",
+                        "inverse-surface": "#dee2f2",
+                        "secondary-container": "#571bc1",
+                        "primary-container": "#4d8eff",
+                        "outline-variant": "#424754",
+                        "inverse-primary": "#005ac2",
+                        "on-tertiary-fixed-variant": "#004e5c",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-container": "#00285d",
+                        "error": "#ffb4ab",
+                        "secondary": "#d0bcff",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-tertiary-container": "#002f38",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-secondary-fixed": "#23005c",
+                        "surface-bright": "#343945",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "outline": "#8c909f",
+                        "on-background": "#dee2f2",
+                        "on-surface-variant": "#c2c6d6",
+                        "surface-container": "#1b202b",
+                        "tertiary-fixed": "#acedff",
+                        "on-surface": "#dee2f2",
+                        "secondary-fixed": "#e9ddff",
+                        "on-secondary-container": "#c4abff",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin": "32px",
+                        "base": "4px",
+                        "xs": "0.25rem",
+                        "sm": "0.5rem",
+                        "md": "1rem",
+                        "2xl": "4rem",
+                        "lg": "1.5rem",
+                        "gutter": "24px",
+                        "xl": "2.5rem"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- Navigation suppressed for auth flow per hierarchy rules -->
+<main class="flex-grow flex items-center justify-center relative overflow-hidden py-xl px-md">
+<!-- Abstract Background Element -->
+<div class="absolute inset-0 z-0">
+<div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[100px]"></div>
+</div>
+<div class="w-full max-w-[540px] z-10">
+<!-- Brand Identity -->
+<div class="text-center mb-lg">
+<h1 class="font-headline-xl text-headline-xl text-primary tracking-tighter mb-base">FortressVote</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Secure Democracy Through Cryptographic Integrity</p>
+</div>
+<!-- Auth Card -->
+<div class="glass-card rounded-[32px] p-lg md:p-xl">
+<div class="flex flex-col gap-lg">
+<!-- Header & Badge -->
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Welcome Back</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Please enter your credentials to access the terminal.</p>
+</div>
+<div class="flex items-center gap-xs px-sm py-[4px] bg-primary/10 border border-primary/20 rounded-full">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Secure Authentication</span>
+</div>
+</div>
+<form class="flex flex-col gap-md">
+<!-- Role Selection -->
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant ml-xs">Select Your Role</label>
+<div class="grid grid-cols-3 gap-sm">
+<button class="flex flex-col items-center justify-center gap-xs p-md rounded-xl border border-outline-variant bg-surface-container-low hover:bg-surface-container-high transition-all text-on-surface-variant hover:text-primary hover:border-primary/50 group" type="button">
+<span class="material-symbols-outlined text-md">person</span>
+<span class="font-label-sm text-label-sm">Voter</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-xs p-md rounded-xl border border-primary bg-primary/5 text-primary transition-all shadow-[0_0_15px_rgba(173,198,255,0.1)]" type="button">
+<span class="material-symbols-outlined text-md" style="font-variation-settings: 'FILL' 1;">edit_square</span>
+<span class="font-label-sm text-label-sm">Creator</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-xs p-md rounded-xl border border-outline-variant bg-surface-container-low hover:bg-surface-container-high transition-all text-on-surface-variant hover:text-primary hover:border-primary/50 group" type="button">
+<span class="material-symbols-outlined text-md">shield_person</span>
+<span class="font-label-sm text-label-sm">Admin</span>
+</button>
+</div>
+</div>
+<!-- Inputs -->
+<div class="space-y-md">
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant ml-xs" for="email">Email Address</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">mail</span>
+<input class="w-full bg-surface-container-lowest border-outline-variant rounded-xl py-md pl-[48px] pr-md text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" id="email" placeholder="admin@fortressvote.gov" type="email"/>
+</div>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between items-center ml-xs">
+<label class="font-label-md text-label-md text-on-surface-variant" for="password">Password</label>
+<a class="font-label-sm text-label-sm text-primary hover:underline" href="#">Forgot Access?</a>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">lock</span>
+<input class="w-full bg-surface-container-lowest border-outline-variant rounded-xl py-md pl-[48px] pr-md text-on-surface focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" id="password" placeholder="••••••••••••" type="password"/>
+</div>
+</div>
+</div>
+<!-- CAPTCHA Section -->
+<div class="p-md rounded-xl bg-surface-container-highest/30 border border-outline-variant/50 flex items-center justify-between">
+<div class="flex items-center gap-md">
+<div class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
+<!-- Checkmark would appear on click -->
+</div>
+<span class="font-body-sm text-body-sm text-on-surface">I am not a bot</span>
+</div>
+<div class="flex flex-col items-center">
+<img class="h-8 w-8 mb-base opacity-70" data-alt="A stylized, professional cryptographic security shield logo with intricate digital circuitry patterns, glowing subtly in shades of cyan and deep blue. The image is clean and minimalist, set against a dark transparent background to emphasize technical sophistication and security infrastructure." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4SPgJlcz_kKIvxUStek6qQax3El7G2IHhOpLLivbTK5CAwlSjFKFiGrUT3N-v_m3q7yCf3BzCM7E7eTTOiqZrQWdHeWE053UKVlGANWObnd2PiE0K3yrsPAJWIiBq8NxBELbZqj9N6TjqF05MU9LGR5i39Us_AeU6y44AWAwyLOrk9ACYEO1RTABrRR2RIE87fo3wLRIiJHSszXt_VoiMS6VBLR8Xs0ui3CExEPiMmggk7PEkm3DNG6KaRVM0UJgWY_SMgc456XX6"/>
+<span class="font-label-sm text-[8px] text-on-surface-variant uppercase tracking-tighter">Powered by FortressGuard</span>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-sm mt-md">
+<button class="w-full py-md px-lg bg-primary text-on-primary font-headline-md text-headline-md rounded-xl hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-sm" type="submit">
+                                Access Terminal
+                                <span class="material-symbols-outlined text-md">login</span>
+</button>
+<div class="flex items-center gap-md py-sm">
+<div class="h-[1px] flex-grow bg-outline-variant"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">New to the platform?</span>
+<div class="h-[1px] flex-grow bg-outline-variant"></div>
+</div>
+<button class="w-full py-md px-lg bg-transparent border border-outline text-on-surface font-headline-md text-headline-md rounded-xl hover:bg-surface-variant transition-all" type="button">
+                                Create Secure Account
+                            </button>
+</div>
+</form>
+</div>
+</div>
+<!-- Footer Meta -->
+<div class="mt-lg flex flex-col md:flex-row justify-between items-center gap-md px-md">
+<div class="flex gap-lg">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security Audit</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Voter Rights</a>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant opacity-50">© 2024 FortressVote Secure Systems</p>
+</div>
+</div>
+</main>
+<!-- Global Footer from JSON (Reduced for Auth Flow) -->
+<footer class="w-full py-lg px-margin flex flex-col md:flex-row justify-between items-center bg-surface-container-lowest border-t border-white/5">
+<span class="font-label-md text-label-md font-bold text-on-surface mb-md md:mb-0">FortressVote</span>
+<div class="flex flex-wrap justify-center gap-lg">
+<span class="font-body-sm text-body-sm text-on-surface-variant">System Status: <span class="text-tertiary-fixed-dim">Operational</span></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Encryption: <span class="text-tertiary-fixed-dim">AES-256-GCM</span></span>
+</div>
+</footer>
+</body></html>

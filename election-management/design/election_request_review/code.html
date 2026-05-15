@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Review Election Request | FortressVote Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container": "#1b202b",
+                      "tertiary-fixed": "#acedff",
+                      "tertiary": "#4cd7f6",
+                      "tertiary-fixed-dim": "#4cd7f6",
+                      "outline-variant": "#424754",
+                      "surface-bright": "#343945",
+                      "secondary": "#d0bcff",
+                      "on-background": "#dee2f2",
+                      "on-surface": "#dee2f2",
+                      "on-primary-container": "#00285d",
+                      "on-secondary": "#3c0091",
+                      "on-tertiary": "#003640",
+                      "inverse-surface": "#dee2f2",
+                      "inverse-on-surface": "#2b303c",
+                      "surface-tint": "#adc6ff",
+                      "on-primary-fixed": "#001a42",
+                      "tertiary-container": "#009eb9",
+                      "on-secondary-container": "#c4abff",
+                      "error-container": "#93000a",
+                      "on-tertiary-fixed": "#001f26",
+                      "on-primary-fixed-variant": "#004395",
+                      "on-primary": "#002e6a",
+                      "secondary-fixed": "#e9ddff",
+                      "surface-container-highest": "#303541",
+                      "secondary-fixed-dim": "#d0bcff",
+                      "on-secondary-fixed-variant": "#5516be",
+                      "primary-container": "#4d8eff",
+                      "surface-dim": "#0e131e",
+                      "surface": "#0e131e",
+                      "error": "#ffb4ab",
+                      "on-error-container": "#ffdad6",
+                      "primary-fixed": "#d8e2ff",
+                      "on-error": "#690005",
+                      "outline": "#8c909f",
+                      "secondary-container": "#571bc1",
+                      "inverse-primary": "#005ac2",
+                      "surface-container-lowest": "#090e19",
+                      "primary-fixed-dim": "#adc6ff",
+                      "primary": "#adc6ff",
+                      "surface-container-high": "#252a35",
+                      "on-surface-variant": "#c2c6d6",
+                      "on-tertiary-fixed-variant": "#004e5c",
+                      "background": "#0e131e",
+                      "surface-variant": "#303541",
+                      "on-tertiary-container": "#002f38",
+                      "surface-container-low": "#171c27",
+                      "on-secondary-fixed": "#23005c"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "1.5rem",
+                      "gutter": "24px",
+                      "xs": "0.25rem",
+                      "base": "4px",
+                      "sm": "0.5rem",
+                      "md": "1rem",
+                      "xl": "2.5rem",
+                      "margin": "32px",
+                      "2xl": "4rem"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Inter"],
+                      "label-md": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-xl": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+<!-- SideNavBar (Desktop Layout) -->
+<nav class="hidden lg:flex flex-col h-full py-6 fixed left-0 top-0 w-[280px] bg-surface-container-lowest shadow-2xl shadow-black/40 border-r border-white/5 z-50">
+<div class="px-6 mb-8">
+<span class="font-headline-lg text-headline-lg font-black text-primary">FortressVote</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">System Control</p>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</div>
+<div class="flex items-center px-6 py-3 text-primary font-bold border-r-4 border-primary bg-primary/5 transition-colors cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="how_to_vote">how_to_vote</span>
+<span class="font-label-md text-label-md">Active Elections</span>
+</div>
+<div class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-md text-label-md">Audit Logs</span>
+</div>
+<div class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Users</span>
+</div>
+<div class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="verified_user">verified_user</span>
+<span class="font-label-md text-label-md">Security Settings</span>
+</div>
+</div>
+<div class="px-6 pt-6 border-t border-white/5">
+<div class="flex items-center py-3 text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Help Center</span>
+</div>
+<div class="flex items-center py-3 text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Sign Out</span>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="lg:pl-[280px]">
+<!-- Top AppBar -->
+<header class="flex justify-between items-center px-6 py-4 bg-surface-dim/80 backdrop-blur-md sticky top-0 z-40 border-b border-white/5">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary lg:hidden" data-icon="menu">menu</span>
+<h1 class="font-headline-lg text-headline-lg text-primary">Review Election Request</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex flex-col items-end mr-2">
+<span class="font-label-md text-label-md text-on-surface">Admin System</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Level 5 Access</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container-highest rounded-full transition-all cursor-pointer" data-icon="notifications">notifications</span>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Admin User Profile" data-alt="A professional headshot of a senior system administrator in a high-tech environment. The lighting is crisp and cool-toned, echoing a secure corporate facility. The man has a calm, confident expression, wearing a dark professional shirt. The background is a soft-focus office with subtle blue accent lights, maintaining a high-integrity, administrative visual style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-lYzc4l8JNRDJZfs-0Yfs9xhHAtwWI_RU1KQKnBHKmQttLFGz8HIiWl8cyRa0qAipTp7xg-Wr63EN9X4FlAtAo03HNIhGjFxiPYpX4SG54A9PfnrAxjhaMlptpryQa5oL-XNH_OQIvCCTRtO2ssP5FzTDa21si_zlbaN0KG1hceMV_gD37WfWfGNdvMEynbGMOr3UHpZCnhD8bC1_rAbWgHUIvvmi51N0YJScje7i0jRUF8i3auFth39xuUNPRHFoXZdN2IA1u2rO"/>
+</div>
+</div>
+</header>
+<main class="p-6 max-w-7xl mx-auto space-y-8">
+<!-- Header Status & ID -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 px-4 py-1.5 bg-secondary-container/10 border border-secondary/20 rounded-full">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></div>
+<span class="font-label-sm text-label-sm text-secondary tracking-widest font-bold">PENDING REVIEW</span>
+</div>
+<span class="text-on-surface-variant font-mono">ID: REQ-8829-X</span>
+</div>
+<!-- Prominent Actions in Header for Desktop -->
+<div class="hidden lg:flex items-center gap-4">
+<button class="py-2.5 px-6 border border-error text-error rounded-lg font-label-md text-label-md hover:bg-error/10 transition-all active:scale-95 uppercase tracking-wider">
+                        Reject Request
+                    </button>
+<button class="py-2.5 px-8 bg-primary text-on-primary rounded-lg font-label-md text-label-md font-bold shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-all uppercase tracking-wider">
+                        Approve Election
+                    </button>
+</div>
+</div>
+<!-- Dashboard Split Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Primary Details (8 Cols) -->
+<div class="lg:col-span-8 space-y-6">
+<!-- Creator Profile Card -->
+<section class="glass-card rounded-2xl p-6">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+<div class="flex items-center gap-6">
+<img alt="Creator Portrait" class="w-20 h-20 rounded-2xl object-cover border border-outline-variant shadow-lg" data-alt="A high-quality portrait of a professional woman with a friendly yet serious demeanor, set against a clean, modern architectural background. The lighting is bright and natural, reinforcing an atmosphere of transparency and trust. Her attire is business casual, fitting for a civic leader or organization head, with a palette of soft grays and muted blues." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFnXWh1q9uHTlz-Wx5PC0RM9_LiOQm2SlQdBsbIwWwW0PnqRSnvaJUtoBQlkpWu0OtNY8PoKIs7TOXm2-dSlzaGtqAtyox1Z9mlWhHcWbiUghVRHS8On6ktAgfD1sBj66-nWUFcQ9wWSsVlvHv34ZXUJjwKUE6BhknZQEMLO-srK0RkpFZ2Vox7ZmFRhhURz8FRV1Pu2gHYFC-W1XqFUe2HAbt7MF8duBXWIZBxovPcGRga858l2Bo9RWBRkYLfTIZe5M5O8XeDm_Y"/>
+<div>
+<h2 class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-1">Request Creator</h2>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Sarah J. Miller</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Executive Director</p>
+</div>
+</div>
+<div class="flex gap-8 pt-4 md:pt-0">
+<div class="text-center md:text-left">
+<p class="font-label-sm text-label-sm text-outline uppercase">Verified Identity</p>
+<div class="flex items-center justify-center md:justify-start gap-1 text-tertiary mt-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="verified" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-md text-label-md font-bold">Biometric ID</span>
+</div>
+</div>
+<div class="text-center md:text-left">
+<p class="font-label-sm text-label-sm text-outline uppercase">Trust Score</p>
+<div class="mt-1 flex items-baseline gap-1">
+<span class="font-headline-md text-headline-md text-on-surface">98</span>
+<span class="text-on-surface-variant font-label-sm">/100</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Details Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Organization -->
+<div class="bg-surface-container rounded-2xl p-6 border border-outline-variant/30 flex flex-col">
+<h2 class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-4">Organization Details</h2>
+<div class="space-y-4 flex-1">
+<div>
+<p class="font-label-sm text-label-sm text-outline mb-1 uppercase">Entity Name</p>
+<p class="font-headline-md text-headline-md text-on-surface">Global Alliance for Transparency</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-outline mb-1 uppercase">Election Purpose</p>
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                                        Annual Board of Directors selection for fiscal year 2024. Includes 14 global regions and 25,000 eligible voting members. Requiring zero-knowledge proof verification.
+                                    </p>
+</div>
+</div>
+</div>
+<!-- Logistics -->
+<div class="bg-surface-container rounded-2xl p-6 border border-outline-variant/30 space-y-6">
+<h2 class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Logistics &amp; Contact</h2>
+<div class="space-y-5">
+<div class="flex items-start gap-4">
+<div class="bg-surface-variant p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="calendar_today">calendar_today</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-outline uppercase mb-0.5">Proposed Date</p>
+<p class="font-body-md text-body-md">Oct 12, 2024 - Oct 14, 2024</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="bg-surface-variant p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="mail">mail</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-outline uppercase mb-0.5">Contact Email</p>
+<p class="font-body-md text-body-md">s.miller@global-transparency.org</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="bg-surface-variant p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="location_on">location_on</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-outline uppercase mb-0.5">Jurisdiction</p>
+<p class="font-body-md text-body-md">International / Decentralized</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Timeline & Side Actions (4 Cols) -->
+<aside class="lg:col-span-4 space-y-6">
+<!-- Timeline Card -->
+<section class="bg-surface-container rounded-2xl p-6 border border-outline-variant/30">
+<h2 class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-8">Security Audit Trail</h2>
+<div class="relative pl-8 space-y-10 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-outline-variant/30">
+<!-- Step 1 -->
+<div class="relative">
+<div class="absolute -left-[30px] top-1.5 w-4 h-4 rounded-full bg-tertiary border-4 border-surface-container"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold">Request Initiated</p>
+<p class="font-label-sm text-label-sm text-outline">Sept 24, 14:20 UTC</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Digital signature validated by automated gateway.</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="relative">
+<div class="absolute -left-[30px] top-1.5 w-4 h-4 rounded-full bg-tertiary border-4 border-surface-container"></div>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold">KYC Documentation Verified</p>
+<p class="font-label-sm text-label-sm text-outline">Sept 24, 16:45 UTC</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">All organizational credentials match global registries.</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="relative">
+<div class="absolute -left-[30px] top-1.5 w-4 h-4 rounded-full bg-primary border-4 border-surface-container"></div>
+<div>
+<p class="font-label-md text-label-md text-primary font-bold">Pending Admin Final Review</p>
+<p class="font-label-sm text-label-sm text-outline">Active Now</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Manual oversight required for high-volume election.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Mobile/Sticky Action Bar (visible on smaller screens if needed, otherwise redundant) -->
+<div class="lg:hidden p-6 bg-surface-container rounded-2xl border border-outline-variant/30 space-y-4">
+<button class="w-full py-4 px-6 bg-primary text-on-primary rounded-xl font-label-md text-label-md font-bold shadow-lg">
+                            APPROVE ELECTION
+                        </button>
+<button class="w-full py-4 px-6 border border-error text-error rounded-xl font-label-md text-label-md">
+                            REJECT REQUEST
+                        </button>
+</div>
+</aside>
+</div>
+</main>
+<footer class="w-full py-12 px-6 flex flex-col items-center border-t border-white/5 bg-surface-container-lowest mt-12">
+<span class="font-label-md text-label-md font-bold text-on-surface mb-4">FortressVote</span>
+<div class="flex flex-wrap justify-center gap-8 mb-6">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security Audit</a>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-center opacity-60">© 2024 FortressVote Secure Systems. All Rights Reserved.</p>
+</footer>
+</div>
+</body></html>

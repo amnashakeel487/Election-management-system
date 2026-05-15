@@ -1,0 +1,3 @@
+/** From design/super_admin_dashboard/code.html */
+export const ADMIN_PROFILE_AVATAR =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuA2SajZXnQszwg-QEe_yJijeEqovJomPDqLUaRJ8ygLAkse-sOhXQnQkSPwbgVQFJ6-gtT9do5IVEpJZop4oCS6-ztbQPHVE1WfUq-B4HLEUOtu8ENEUhn5mFHZZTuJPU3v1IUt_cuOJvKmq-cJ-6bLHBSZpuC8631ipKxv82Gs4Mpq0FyQh8GgPH3xt_My006rxCz5wLRUmb10TJobHIeB49dmW2-zavgF6M2EWrouVJlcpt-ZOY1G65JZqhj-fcimghp-ZTWumdcp'

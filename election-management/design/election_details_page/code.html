@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Election Details - FortressVote</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#001f26",
+                        "tertiary-fixed-dim": "#4cd7f6",
+                        "surface-container-low": "#171c27",
+                        "inverse-on-surface": "#2b303c",
+                        "primary-fixed": "#d8e2ff",
+                        "error-container": "#93000a",
+                        "surface-tint": "#adc6ff",
+                        "surface-container-high": "#252a35",
+                        "on-secondary": "#3c0091",
+                        "surface-dim": "#0e131e",
+                        "tertiary-container": "#009eb9",
+                        "surface": "#0e131e",
+                        "surface-variant": "#303541",
+                        "on-tertiary": "#003640",
+                        "surface-container-highest": "#303541",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-primary-fixed": "#001a42",
+                        "tertiary": "#4cd7f6",
+                        "primary": "#adc6ff",
+                        "on-primary": "#002e6a",
+                        "surface-container-lowest": "#090e19",
+                        "background": "#0e131e",
+                        "inverse-surface": "#dee2f2",
+                        "secondary-container": "#571bc1",
+                        "primary-container": "#4d8eff",
+                        "outline-variant": "#424754",
+                        "inverse-primary": "#005ac2",
+                        "on-tertiary-fixed-variant": "#004e5c",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-container": "#00285d",
+                        "error": "#ffb4ab",
+                        "secondary": "#d0bcff",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-tertiary-container": "#002f38",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-secondary-fixed": "#23005c",
+                        "surface-bright": "#343945",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "outline": "#8c909f",
+                        "on-background": "#dee2f2",
+                        "on-surface-variant": "#c2c6d6",
+                        "surface-container": "#1b202b",
+                        "tertiary-fixed": "#acedff",
+                        "on-surface": "#dee2f2",
+                        "secondary-fixed": "#e9ddff",
+                        "on-secondary-container": "#c4abff",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin": "32px",
+                        "base": "4px",
+                        "xs": "0.25rem",
+                        "sm": "0.5rem",
+                        "md": "1rem",
+                        "2xl": "4rem",
+                        "lg": "1.5rem",
+                        "gutter": "24px",
+                        "xl": "2.5rem"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(22, 27, 38, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary/30">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-16 bg-surface/70 backdrop-blur-xl border-b border-white/10 shadow-sm">
+<div class="font-headline-md text-headline-md font-bold text-primary">FortressVote</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 transition-colors" href="#">Elections</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Results</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Resources</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors">Login</button>
+<button class="px-6 py-2 bg-primary text-on-primary rounded-full font-label-md text-label-md hover:opacity-80 transition-opacity">Sign Up</button>
+</div>
+</nav>
+<!-- SideNavBar (Hidden on this specific view as per Relevance Check - Details Page) -->
+<main class="pt-16 pb-24 min-h-screen">
+<!-- Hero Banner Section -->
+<section class="relative w-full h-[400px] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A wide cinematic shot of a high-tech digital voting command center with glowing blue holographic interfaces and world maps. The lighting is low-key with vibrant primary blue accents reflecting off sleek glass surfaces. The atmosphere is professional, secure, and futuristic, representing a global democratic process in a digital fortress." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5YyN2_iKtB7R7fvnuNzzpN7VyHcO-ZIhfP6wnctL4n95R6dbazqHXYyojgD8aPO3aYR-tV9K4YZPrlG0HG50KqoYTI7rspNWL_PmmyR3OoZF8w6IvERjMZ0Ig0mcqQ_nbFVuUnNnJRCkYqrWvdS2ja77Z08j-E1jeE2chwaReAKqPAEWoNY9ic5qNx3dALrwINDTKW6Fqx80Whn1DYCxMf1N2j5PK4WISSjNpRK2dKLdoDRyU-88QLrqDK-5zqFUZrJjLMVAnZIKE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full p-margin md:px-2xl pb-xl">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<div class="flex items-center gap-2 mb-4">
+<span class="px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-label-sm font-label-sm">Active Election</span>
+<span class="px-3 py-1 rounded-full bg-tertiary/10 text-tertiary border border-tertiary/20 text-label-sm font-label-sm">ID: FV-2024-081</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface mb-2">2024 Global Governance Consensus</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Shape the future of decentralized infrastructure. Your vote is secured by multi-layered cryptographic verification.</p>
+</div>
+<!-- Participation Progress -->
+<div class="glass p-6 rounded-2xl min-w-[320px]">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-md text-label-md text-on-surface-variant">Voter Participation</span>
+<span class="font-label-md text-label-md text-primary">68.4%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 68.4%"></div>
+</div>
+<div class="mt-4 flex justify-between items-center">
+<div class="text-center">
+<p class="text-headline-md font-headline-md text-on-surface">1.2M</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Verified Votes</p>
+</div>
+<div class="w-[1px] h-8 bg-white/10"></div>
+<div class="text-center">
+<p class="text-headline-md font-headline-md text-on-surface">12h 45m</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Remaining</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Content Grid -->
+<section class="max-w-7xl mx-auto px-margin mt-12 grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left: Candidates & Details -->
+<div class="lg:col-span-8 space-y-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-6 flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="group">group</span>
+                        Leading Candidates
+                    </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Candidate Card 1 -->
+<div class="bg-surface-container rounded-[24px] border border-white/10 p-6 flex flex-col gap-4 hover:border-primary/40 transition-all group">
+<div class="flex items-start gap-4">
+<div class="relative">
+<img class="w-20 h-20 rounded-2xl object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Professional headshot of a female leader in a modern charcoal business suit, set against a dark architectural background with subtle cyan lighting. She has a confident, visionary expression. The image is crisp, high-resolution, and adheres to a corporate modern aesthetic with high-key accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7OtKcGZXDy4F4DbFYykgralewWLYDrljdtg0B7-Wvzxm8GaHKwjp62Po3P_7dJ0vdJB_lGUiPCpusgTDgrOoYK_wveK_cS3vPTMmle0V7c8L_JKfS8qNV2lJxBCdn1xeJfjoCuwsJ7YTi5sWWsOyjlTEii_ptDZQ_S7BQWfLixoVZRrUEoneQtN9FDX_daWSLGiYGb5NsgZE9cGHPlMQqYTDOnZI5cED32f4hCQeDyhjxm1pd7QT2yd6hqooc95LqxSvk9myqVC9Q"/>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-4 border-surface-container">
+<span class="material-symbols-outlined text-[14px] text-on-primary" data-icon="verified" data-weight="fill">verified</span>
+</div>
+</div>
+<div class="flex-1">
+<p class="font-label-sm text-label-sm text-primary mb-1">Infrastructure Focus</p>
+<h3 class="font-headline-md text-headline-md text-on-surface">Dr. Elena Vance</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Advocate for sustainable digital ecosystems and distributed ledger integrity.</p>
+</div>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-between">
+<a class="font-label-md text-label-md text-primary flex items-center gap-1 hover:underline" href="#">
+                                    View Manifesto
+                                    <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high border-2 border-surface-container"></div>
+<div class="w-6 h-6 rounded-full bg-primary/20 border-2 border-surface-container flex items-center justify-center">
+<span class="text-[8px] font-bold text-primary">+4k</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Candidate Card 2 -->
+<div class="bg-surface-container rounded-[24px] border border-white/10 p-6 flex flex-col gap-4 hover:border-primary/40 transition-all group">
+<div class="flex items-start gap-4">
+<div class="relative">
+<img class="w-20 h-20 rounded-2xl object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Professional portrait of a male tech executive with a minimalist style. He is wearing a dark navy knit sweater, looking directly at the camera with a calm, analytical presence. The background is a blurred office environment with cool-toned lighting and bokeh effects from server room lights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8-Jpq0sNSpbNpv72e389s6gAUrCeHaeGbEekkG9hIKuuxeXuwBHEHT-3qe5kISJ0D_TXzIBYzCBnBTDoJvtojXb0MzMWIudbYPjRqda7lGSzU2Dl3l1S_0RXlg47N0PLAsQqH0aeiQsTHMWgt7dmuCQKCDaIqpQ7oPlbkSfj-LaRaid1RxqduayxDZMDPf6AzrXSlJOXeXUODhN-mQvQHtp_k-UJgARW2sGpw7n-4uqnyBBoueIJDMQ4RIEGxbDwztbXIjeLQNtYZ"/>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center border-4 border-surface-container">
+<span class="material-symbols-outlined text-[14px] text-on-primary" data-icon="verified" data-weight="fill">verified</span>
+</div>
+</div>
+<div class="flex-1">
+<p class="font-label-sm text-label-sm text-primary mb-1">Global Policy</p>
+<h3 class="font-headline-md text-headline-md text-on-surface">Marcus Thorne</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Expert in international cryptographic compliance and cross-border digital trade.</p>
+</div>
+</div>
+<div class="pt-4 border-t border-white/5 flex items-center justify-between">
+<a class="font-label-md text-label-md text-primary flex items-center gap-1 hover:underline" href="#">
+                                    View Manifesto
+                                    <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-high border-2 border-surface-container"></div>
+<div class="w-6 h-6 rounded-full bg-primary/20 border-2 border-surface-container flex items-center justify-center">
+<span class="text-[8px] font-bold text-primary">+2k</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Election Description -->
+<div class="bg-surface-container-low rounded-3xl p-8 border border-white/5">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-4">Election Overview</h2>
+<div class="space-y-4 text-on-surface-variant font-body-md">
+<p>The 2024 Global Governance Consensus serves as the primary mechanism for determining the strategic roadmap of the Fortress Network. This election cycle focuses on the implementation of Layer-3 privacy protocols and the expansion of the Decentralized Identity (DID) framework.</p>
+<p>Eligible voters must hold a verified Citizen Identity Token (CIT) and have completed the Level 2 Security Attestation. All ballots are cast using zero-knowledge proofs to ensure total anonymity while maintaining public auditability of the final results.</p>
+</div>
+</div>
+</div>
+<!-- Right: Actions & Timeline -->
+<div class="lg:col-span-4 space-y-gutter">
+<!-- Action Card -->
+<div class="glass rounded-[32px] p-8 border-primary/20">
+<div class="mb-8 text-center">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Ready to Vote?</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ensure your biometric key is connected before proceeding.</p>
+</div>
+<button class="w-full py-4 bg-primary text-on-primary rounded-xl font-headline-md text-headline-md shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all mb-4">
+                        Join Election
+                    </button>
+<button class="w-full py-4 bg-transparent border border-white/10 text-on-surface rounded-xl font-label-md text-label-md hover:bg-white/5 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+                        Terms &amp; Conditions
+                    </button>
+<div class="mt-8 pt-8 border-t border-white/10">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" data-icon="timer">timer</span>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Closes In</p>
+<p class="text-headline-md font-headline-md text-on-surface tabular-nums">12:45:03</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="check_circle" data-weight="fill">check_circle</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Security Audit Passed</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="check_circle" data-weight="fill">check_circle</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Zero-Knowledge Enabled</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="lock" data-weight="fill">lock</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Immutable Chain Records</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Timeline Widget -->
+<div class="bg-surface-container rounded-[24px] p-6 border border-white/5">
+<h3 class="font-label-md text-label-md font-bold text-on-surface mb-6 uppercase tracking-widest">Key Milestones</h3>
+<div class="space-y-6">
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-on-surface-variant"></div>
+<div class="w-[2px] h-full bg-white/10"></div>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">August 01</p>
+<p class="text-body-sm font-body-sm text-on-surface">Candidacy Registration</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-on-surface-variant"></div>
+<div class="w-[2px] h-full bg-white/10"></div>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">August 10</p>
+<p class="text-body-sm font-body-sm text-on-surface">Voter Eligibility Window</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="w-5 h-5 rounded-full bg-primary flex items-center justify-center ring-4 ring-primary/20">
+<span class="material-symbols-outlined text-[12px] text-on-primary" data-icon="play_arrow" data-weight="fill">play_arrow</span>
+</div>
+<div class="w-[2px] h-full bg-white/10"></div>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-primary font-bold">Today</p>
+<p class="text-body-sm font-body-sm text-on-surface font-bold">Active Polling Period</p>
+</div>
+</div>
+<div class="flex gap-4 opacity-40">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-on-surface-variant"></div>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">August 25</p>
+<p class="text-body-sm font-body-sm text-on-surface">Audited Result Release</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl px-margin flex flex-col md:flex-row justify-between items-center bg-surface-container-lowest border-t border-white/5 gap-8">
+<div class="flex flex-col gap-2">
+<div class="font-label-md text-label-md font-bold text-on-surface">FortressVote</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 FortressVote Secure Systems. All Rights Reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security Audit</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Voter Rights</a>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer transition-colors" data-icon="public">public</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer transition-colors" data-icon="shield">shield</span>
+</div>
+</footer>
+</body></html>

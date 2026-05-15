@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reset Access | FortressVote</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#1b202b",
+                        "tertiary-fixed": "#acedff",
+                        "tertiary": "#4cd7f6",
+                        "tertiary-fixed-dim": "#4cd7f6",
+                        "outline-variant": "#424754",
+                        "surface-bright": "#343945",
+                        "secondary": "#d0bcff",
+                        "on-background": "#dee2f2",
+                        "on-surface": "#dee2f2",
+                        "on-primary-container": "#00285d",
+                        "on-secondary": "#3c0091",
+                        "on-tertiary": "#003640",
+                        "inverse-surface": "#dee2f2",
+                        "inverse-on-surface": "#2b303c",
+                        "surface-tint": "#adc6ff",
+                        "on-primary-fixed": "#001a42",
+                        "tertiary-container": "#009eb9",
+                        "on-secondary-container": "#c4abff",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#001f26",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-primary": "#002e6a",
+                        "secondary-fixed": "#e9ddff",
+                        "surface-container-highest": "#303541",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "primary-container": "#4d8eff",
+                        "surface-dim": "#0e131e",
+                        "surface": "#0e131e",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed": "#d8e2ff",
+                        "on-error": "#690005",
+                        "outline": "#8c909f",
+                        "secondary-container": "#571bc1",
+                        "inverse-primary": "#005ac2",
+                        "surface-container-lowest": "#090e19",
+                        "primary-fixed-dim": "#adc6ff",
+                        "primary": "#adc6ff",
+                        "surface-container-high": "#252a35",
+                        "on-surface-variant": "#c2c6d6",
+                        "on-tertiary-fixed-variant": "#004e5c",
+                        "background": "#0e131e",
+                        "surface-variant": "#303541",
+                        "on-tertiary-container": "#002f38",
+                        "surface-container-low": "#171c27",
+                        "on-secondary-fixed": "#23005c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "1.5rem",
+                        "gutter": "24px",
+                        "xs": "0.25rem",
+                        "base": "4px",
+                        "sm": "0.5rem",
+                        "md": "1rem",
+                        "xl": "2.5rem",
+                        "margin": "32px",
+                        "2xl": "4rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(22, 27, 38, 0.6);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-mesh {
+            background-color: #0e131e;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(59, 130, 246, 0.1) 0px, transparent 40%),
+                radial-gradient(at 90% 90%, rgba(168, 85, 247, 0.08) 0px, transparent 40%),
+                radial-gradient(at 50% 50%, rgba(14, 19, 30, 1) 0px, rgba(14, 19, 30, 1) 100%);
+        }
+        body {
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-mesh flex flex-col font-body-md text-on-surface overflow-x-hidden selection:bg-primary selection:text-on-primary">
+<!-- Transactional Header -->
+<header class="w-full py-8 px-margin flex justify-between items-center fixed top-0 z-20">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-headline-md" data-icon="shield">shield</span>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">FortressVote</span>
+</div>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors flex items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1" data-icon="arrow_back">arrow_back</span>
+            Back to Login
+        </a>
+</header>
+<main class="flex-grow flex items-center justify-center px-gutter py-2xl relative z-10">
+<!-- Decorative abstract background elements -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[160px] -z-10"></div>
+<!-- Auth Card Container -->
+<div class="w-full max-w-[520px] animate-in fade-in zoom-in duration-700">
+<div class="glass-card rounded-[40px] p-xl relative overflow-hidden">
+<!-- Form State -->
+<div class="space-y-10" id="forgot-password-form">
+<div class="space-y-4">
+<div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="lock_reset">lock_reset</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Reset Password</h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                            Enter the secure email address associated with your account to receive recovery instructions.
+                        </p>
+</div>
+<div class="space-y-8">
+<div class="space-y-3">
+<label class="block font-label-md text-label-md text-on-surface-variant ml-1" for="email">Email Address</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="mail">mail</span>
+</div>
+<input class="w-full bg-surface-container-low/50 border border-outline-variant text-on-surface text-body-md rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none placeholder:text-outline/50" id="email" placeholder="name@agency.gov" type="email"/>
+</div>
+<p class="text-[11px] font-label-sm text-outline px-1">Verification is required via multi-factor authentication following link access.</p>
+</div>
+<button class="w-full bg-primary text-on-primary font-headline-md text-headline-md py-4.5 rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-[1.01] active:scale-[0.98] transition-all flex justify-center items-center gap-2 group">
+                            Send Reset Link
+                            <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" data-icon="send">send</span>
+</button>
+</div>
+<div class="flex flex-col items-center gap-6 pt-2">
+<div class="flex items-center gap-2 py-2 px-4 bg-surface-container-high/60 rounded-full border border-white/5">
+<span class="material-symbols-outlined text-tertiary text-[18px]" data-icon="verified_user">verified_user</span>
+<span class="text-[11px] font-label-sm text-on-surface-variant uppercase tracking-widest">Encrypted Transmission</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-center">
+                            Need help? <a class="text-primary hover:underline underline-offset-4 font-medium" href="#">Contact System Administrator</a>
+</p>
+</div>
+</div>
+<!-- Success State (Hidden by default) -->
+<div class="hidden space-y-10 py-4 text-center" id="success-state">
+<div class="relative mx-auto w-24 h-24 flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-25"></div>
+<div class="bg-primary/20 w-20 h-20 rounded-full flex items-center justify-center border border-primary/50 relative">
+<span class="material-symbols-outlined text-primary text-[48px]" data-icon="check_circle" data-weight="fill">check_circle</span>
+</div>
+</div>
+<div class="space-y-3">
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Email Sent</h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                            Check your inbox. We've sent a secure recovery link to <span class="text-on-surface font-semibold">a.voter@example.com</span>. The link will expire in 15 minutes.
+                        </p>
+</div>
+<div class="bg-surface-container-low/40 p-6 rounded-[24px] border border-white/5 space-y-4">
+<p class="text-label-sm font-label-sm text-outline uppercase tracking-widest text-center">Next Steps</p>
+<ul class="text-left space-y-3">
+<li class="flex items-start gap-4 text-body-sm">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" data-icon="mail_lock">mail_lock</span>
+<span class="text-on-surface-variant">Click the link in the email to open the reset portal.</span>
+</li>
+<li class="flex items-start gap-4 text-body-sm">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" data-icon="key">key</span>
+<span class="text-on-surface-variant">Create a new 16-character alphanumeric password.</span>
+</li>
+</ul>
+</div>
+<div class="space-y-4">
+<button class="w-full border border-outline-variant text-on-surface font-headline-md text-headline-md py-4 rounded-2xl hover:bg-white/5 transition-all">
+                            Return to Login
+                        </button>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                            Didn't receive the email? <button class="text-primary hover:underline underline-offset-4 font-medium">Resend Link</button>
+</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative background imagery for desktop -->
+<div class="hidden xl:block absolute bottom-0 right-0 w-1/4 h-full opacity-10 pointer-events-none">
+<img alt="Secure server data flow" class="w-full h-full object-cover mix-blend-screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZvTLok7zi-ZN48voXvO_ofezNMjctfBAu9GFRRUs-D68KvAzV6NUc7PE1KZ1kG0RyfBDH6-ddL6Fzd75O8z9G6dIFKEyLjHJXQMSLTdZED06N_LKfrWYBxb0VOpu9WQtTMqKbTT6Q7vtiLencqbZf-SJXXUEusOZeqEobLkD5w7-NuVTTVrXuusp96yHHEzW7FuwMEB2Accsy-syPUIbaViq3l7U18Qfi8hgqk2yAZw-ijjM4_FR8XuIJDuTkR9BeLJ4oc6h3ShiL"/>
+</div>
+</main>
+<!-- Desktop Footer -->
+<footer class="w-full py-8 px-margin flex flex-col md:flex-row justify-between items-center gap-6 z-20 bg-surface/50 backdrop-blur-sm border-t border-white/5">
+<div class="flex flex-col items-center md:items-start gap-1">
+<span class="font-label-md text-label-md font-bold text-on-surface uppercase tracking-widest">FortressVote Secure Systems</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant opacity-60">© 2024 FortressVote. Government-Grade Security Infrastructure.</span>
+</div>
+<nav class="flex gap-lg">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security Audit</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Support</a>
+</nav>
+<div class="flex items-center gap-4 bg-surface-container-low px-4 py-2 rounded-full border border-white/5">
+<div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)]"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-tighter">Systems Operational</span>
+</div>
+</footer>
+<!-- Demo Toggle -->
+<div class="fixed bottom-margin right-margin z-50">
+<button class="bg-surface-container-highest/60 backdrop-blur-md p-4 rounded-full border border-white/10 hover:bg-primary/20 transition-all text-on-surface-variant hover:text-primary group shadow-xl" onclick="document.getElementById('forgot-password-form').classList.toggle('hidden'); document.getElementById('success-state').classList.toggle('hidden');" title="Toggle Demo State">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</body></html>

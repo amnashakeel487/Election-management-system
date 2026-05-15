@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#1b202b",
+                        "tertiary-fixed": "#acedff",
+                        "tertiary": "#4cd7f6",
+                        "tertiary-fixed-dim": "#4cd7f6",
+                        "outline-variant": "#424754",
+                        "surface-bright": "#343945",
+                        "secondary": "#d0bcff",
+                        "on-background": "#dee2f2",
+                        "on-surface": "#dee2f2",
+                        "on-primary-container": "#00285d",
+                        "on-secondary": "#3c0091",
+                        "on-tertiary": "#003640",
+                        "inverse-surface": "#dee2f2",
+                        "inverse-on-surface": "#2b303c",
+                        "surface-tint": "#adc6ff",
+                        "on-primary-fixed": "#001a42",
+                        "tertiary-container": "#009eb9",
+                        "on-secondary-container": "#c4abff",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#001f26",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-primary": "#002e6a",
+                        "secondary-fixed": "#e9ddff",
+                        "surface-container-highest": "#303541",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "primary-container": "#4d8eff",
+                        "surface-dim": "#0e131e",
+                        "surface": "#0e131e",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed": "#d8e2ff",
+                        "on-error": "#690005",
+                        "outline": "#8c909f",
+                        "secondary-container": "#571bc1",
+                        "inverse-primary": "#005ac2",
+                        "surface-container-lowest": "#090e19",
+                        "primary-fixed-dim": "#adc6ff",
+                        "primary": "#adc6ff",
+                        "surface-container-high": "#252a35",
+                        "on-surface-variant": "#c2c6d6",
+                        "on-tertiary-fixed-variant": "#004e5c",
+                        "background": "#0e131e",
+                        "surface-variant": "#303541",
+                        "on-tertiary-container": "#002f38",
+                        "surface-container-low": "#171c27",
+                        "on-secondary-fixed": "#23005c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "1.5rem",
+                        "gutter": "24px",
+                        "xs": "0.25rem",
+                        "base": "4px",
+                        "sm": "0.5rem",
+                        "md": "1rem",
+                        "xl": "2.5rem",
+                        "margin": "32px",
+                        "2xl": "4rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(27, 32, 43, 0.7);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0e131e;
+            color: #dee2f2;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col overflow-x-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-surface-container-high/40 via-surface to-surface">
+<!-- Desktop Navigation Shell -->
+<header class="fixed top-0 w-full z-50 flex items-center justify-between px-8 h-20 bg-surface/80 backdrop-blur-md border-b border-white/5">
+<div class="flex items-center gap-6">
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">FortressVote</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">Election Participation Portal</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+<span class="text-label-md">Support</span>
+</button>
+<div class="h-6 w-px bg-white/10 mx-2"></div>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-highest rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+</header>
+<main class="mt-20 flex-1 flex items-center justify-center p-6 lg:p-12">
+<div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Context & Branding -->
+<div class="lg:col-span-5 space-y-8 lg:sticky lg:top-32">
+<div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+<img alt="National Election Overview" class="w-full h-full object-cover" data-alt="A professional high-angle shot of a sophisticated digital polling center with soft blue ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuYnR2ylPHeFcMc7dUVwtOlJ_s1yuhrShjPoyePcS8RFtRgrfqIQ0os1B6th4YZS7BVvooCiWtkQoT0AklkkzsTUsCyt8K35kuMbnvYTmi5F7EWlr6IuZrzsR8GmCbRVVQ5WLg-XbPUxJUMC-km8fKxiRVb1c8ecr1015jhclN7j8G3FcL1nrI_wmChoMvKR_8AOZZf421oDrajraAJ8VBxnObEEYU3JDsW4KYj3-FitL_XUNEKHZ5uXXUsO-CkS6seExCyLsScNkP"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim/90 via-surface-dim/20 to-transparent"></div>
+<div class="absolute bottom-6 left-6">
+<span class="bg-primary/20 backdrop-blur-md text-primary font-label-md text-label-md px-4 py-1.5 rounded-full border border-primary/30">Active Registration</span>
+</div>
+</div>
+<div class="space-y-4">
+<h1 class="font-headline-xl text-headline-xl text-on-surface leading-tight">Join 2024 General Assembly</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                        Your participation is the cornerstone of democratic integrity. Join thousands of verified citizens in shaping our collective future through secure, blockchain-verified voting.
+                    </p>
+</div>
+<div class="p-6 bg-surface-container/50 border border-white/5 rounded-2xl space-y-4">
+<div class="flex items-start">
+<span class="material-symbols-outlined text-primary mr-4 mt-1" data-icon="event_available">event_available</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Registration Period</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Closing Oct 15, 2024 • 11:59 PM EST</p>
+</div>
+</div>
+<div class="flex items-start">
+<span class="material-symbols-outlined text-tertiary mr-4 mt-1" data-icon="verified_user">verified_user</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Security Level</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Class 4 Cryptographic Protection</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Interactive Card -->
+<div class="lg:col-span-7">
+<div class="glass-card rounded-3xl overflow-hidden shadow-2xl flex flex-col min-h-[600px]">
+<!-- Terms Header -->
+<div class="p-8 border-b border-white/10 bg-white/2">
+<div class="flex justify-between items-center mb-1">
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Terms &amp; Conditions</h3>
+<span class="text-xs font-mono text-on-surface-variant bg-white/5 px-2 py-1 rounded">v2.4.0</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Please review the participation agreement carefully</p>
+</div>
+<!-- Scrollable Content -->
+<div class="p-8 flex-1 overflow-y-auto custom-scrollbar space-y-8 bg-black/10">
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<span class="w-8 h-px bg-primary/40"></span>
+<p class="font-label-md text-label-md text-primary uppercase tracking-widest font-bold">01. Data Security &amp; Sovereignty</p>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed pl-11">
+                                FortressVote employs end-to-end zero-knowledge proofs (ZKP) to ensure your identity remains private while verifying your eligibility. By proceeding, you authorize the temporary access of your state identification records for the sole purpose of validating voter status. No personal data is stored centrally.
+                            </p>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<span class="w-8 h-px bg-primary/40"></span>
+<p class="font-label-md text-label-md text-primary uppercase tracking-widest font-bold">02. Immutable Record Keeping</p>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed pl-11">
+                                Once registered, your intent to vote is recorded on a private, permissioned ledger. This record is cryptographically signed and cannot be altered, spoofed, or removed after the audit window closes. Your privacy is maintained through hashed identifiers.
+                            </p>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<span class="w-8 h-px bg-primary/40"></span>
+<p class="font-label-md text-label-md text-primary uppercase tracking-widest font-bold">03. Voter Responsibility</p>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed pl-11">
+                                You attest that the information provided is accurate and that you are the sole operator of this authenticated session. Any attempt to use duplicate identities or circumvent residency checks will result in immediate disqualification and a security flag on your citizen profile.
+                            </p>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<span class="w-8 h-px bg-primary/40"></span>
+<p class="font-label-md text-label-md text-primary uppercase tracking-widest font-bold">04. Audit &amp; Verification</p>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed pl-11">
+                                You will receive a unique, anonymous cryptographic receipt upon completion. This receipt allows you to verify that your registration was correctly counted in the public audit without revealing your vote or identity.
+                            </p>
+</div>
+</div>
+<!-- Sticky Actions -->
+<div class="p-8 border-t border-white/10 bg-surface-container-highest/40 flex flex-col sm:flex-row gap-4 items-center">
+<button class="w-full sm:flex-1 bg-primary text-on-primary font-headline-md text-headline-md py-5 rounded-2xl shadow-xl shadow-primary/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                            Accept and Continue
+                            <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="w-full sm:w-auto px-10 border border-outline-variant text-on-surface font-label-md text-label-md py-5 rounded-2xl hover:bg-white/5 active:opacity-70 transition-all">
+                            Decline
+                        </button>
+</div>
+</div>
+<!-- Secondary Progress/Info (Desktop context) -->
+<div class="mt-6 flex justify-between items-center px-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary animate-pulse"></span>
+<span class="text-label-md text-on-surface-variant">Secure Connection Verified</span>
+</div>
+<div class="text-label-md text-on-surface-variant">Step 1 of 3: Eligibility &amp; Agreement</div>
+</div>
+</div>
+</div>
+</main>
+<!-- SUCCESS STATE OVERLAY (Maintained as hidden reference) -->
+<div class="hidden fixed inset-0 z-[70] bg-surface-dim flex flex-col items-center justify-center p-8 text-center">
+<div class="relative mb-8">
+<div class="absolute inset-0 bg-primary/20 blur-3xl rounded-full"></div>
+<div class="relative w-24 h-24 bg-primary rounded-full flex items-center justify-center shadow-2xl shadow-primary/40">
+<span class="material-symbols-outlined text-on-primary text-5xl" data-icon="verified_user" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+</div>
+<h2 class="font-headline-xl text-headline-xl text-on-surface mb-2">Registration Success</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-12 max-w-md">You have been successfully added to the voter registry for the 2024 General Assembly.</p>
+<div class="w-full max-w-md glass-card p-6 rounded-2xl mb-12 space-y-4">
+<div class="flex justify-between items-center text-left">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Voter ID Hash</span>
+<span class="font-mono text-label-md text-on-primary-fixed bg-primary-fixed px-3 py-1 rounded">f82k...92ma</span>
+</div>
+<div class="flex justify-between items-center text-left">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Status</span>
+<div class="flex items-center gap-2 text-green-400">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md">Ready to Vote</span>
+</div>
+</div>
+</div>
+<button class="w-full max-w-md bg-surface-container-highest text-on-surface font-headline-md text-headline-md py-4 rounded-xl">
+            Return to Dashboard
+        </button>
+</div>
+<footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6 mt-auto border-t border-white/5 bg-surface-container-lowest">
+<div class="flex flex-col items-center md:items-start gap-1">
+<div class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">FortressVote</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-60">© 2024 FortressVote Secure Systems. All Rights Reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">Privacy Policy</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">Security Audit</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">Technical Specs</a>
+</div>
+</footer>
+</body></html>

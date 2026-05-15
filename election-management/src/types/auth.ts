@@ -1,0 +1,41 @@
+export type UserRole = 'admin' | 'election_creator' | 'voter'
+
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected'
+
+export interface UserProfile {
+  id: string
+  email: string
+  role: UserRole
+  approval_status: ApprovalStatus
+  full_name: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AuthCredentials {
+  email: string
+  password: string
+}
+
+export interface SignUpPayload extends AuthCredentials {
+  role: UserRole
+}
+
+export interface AuditLogEntry {
+  id: string
+  actor_id: string | null
+  target_user_id: string | null
+  action: string
+  details: Record<string, unknown> | null
+  created_at: string
+  actor?: { email: string } | null
+  target?: { email: string } | null
+}
+
+export interface PendingCreatorRequest {
+  id: string
+  email: string
+  full_name: string | null
+  created_at: string
+  approval_status: ApprovalStatus
+}

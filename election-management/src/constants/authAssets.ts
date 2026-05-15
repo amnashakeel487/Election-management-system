@@ -1,0 +1,3 @@
+/** From design/login_signup/code.html */
+export const AUTH_CAPTCHA_LOGO =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuD4SPgJlcz_kKIvxUStek6qQax3El7G2IHhOpLLivbTK5CAwlSjFKFiGrUT3N-v_m3q7yCf3BzCM7E7eTTOiqZrQWdHeWE053UKVlGANWObnd2PiE0K3yrsPAJWIiBq8NxBELbZqj9N6TjqF05MU9LGR5i39Us_AeU6y44AWAwyLOrk9ACYEO1RTABrRR2RIE87fo3wLRIiJHSszXt_VoiMS6VBLR8Xs0ui3CExEPiMmggk7PEkm3DNG6KaRVM0UJgWY_SMgc456XX6'
