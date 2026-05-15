@@ -13,10 +13,10 @@ export function ProtectedRoute({
   allowedRoles,
   requireVerifiedEmail = true,
 }: ProtectedRouteProps) {
-  const { session, profile, loading, initError, emailVerified, getDashboardPath } = useAuth()
+  const { session, profile, authReady, initError, emailVerified, getDashboardPath } = useAuth()
   const location = useLocation()
 
-  if (loading) {
+  if (!authReady) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-surface text-on-surface">
         <span className="font-body-md text-body-md text-on-surface-variant">Loading secure session…</span>

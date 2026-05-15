@@ -31,3 +31,48 @@ export const supabase = createClient(supabaseUrl ?? '', supabaseAnonKey ?? '', {
     detectSessionInUrl: true,
   },
 })
+
+/** Safe to show in UI (confirms Vercel build received env vars). */
+export function getSupabaseHostLabel(): string {
+  if (!supabaseUrl) return 'not set at build time'
+  try {
+    return new URL(supabaseUrl).hostname
+  } catch {
+    return 'invalid URL'
+  }
+}
+
+export function getSupabaseProjectRef(): string | null {
+  if (!supabaseUrl) return null
+  try {
+    return new URL(supabaseUrl).hostname.split('.')[0] ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Clears stuck auth tokens (fixes hanging getSession on some browsers). */
+export function clearSupabaseAuthStorage(): void {
+  const ref = getSupabaseProjectRef()
+  if (ref) {
+    localStorage.removeItem(`sb-${ref}-auth-token`)
+  }
+  for (const key of Object.keys(localStorage)) {
+    if (key.startsWith('sb-') && key.includes('auth')) {
+      localStorage.removeItem(key)
+    }
+  }
+}
+
+export async function checkSupabaseHealth(): Promise<{ ok: boolean; message: string }> {
+  if (!isSupabaseConfigured || !supabaseUrl) {
+    return { ok: false, message: 'Env vars missing in this build (redeploy Vercel after adding them).' }
+  }
+  try {
+    const res = await fetch(`${supabaseUrl}/auth/v1/health`, { method: 'GET' })
+    if (res.ok) return { ok: true, message: 'Supabase API reachable' }
+    return { ok: false, message: `Health check returned ${res.status}` }
+  } catch {
+    return { ok: false, message: 'Cannot reach Supabase (network, ad blocker, or wrong URL).' }
+  }
+}

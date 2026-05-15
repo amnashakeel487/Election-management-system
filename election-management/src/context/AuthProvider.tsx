@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
-import { isSupabaseConfigured, supabase } from '@/lib/supabase'
+import { clearSupabaseAuthStorage, isSupabaseConfigured, supabase } from '@/lib/supabase'
 import {
   fetchUserProfile,
   isEmailVerified,
@@ -25,7 +25,9 @@ interface AuthContextValue {
   session: Session | null
   user: User | null
   profile: UserProfile | null
+  /** @deprecated Use authReady for route guards; stays false so login/register never block. */
   loading: boolean
+  authReady: boolean
   initError: string | null
   emailVerified: boolean
   signIn: (credentials: AuthCredentials) => Promise<string>
@@ -42,7 +44,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading] = useState(false)
+  const [authReady, setAuthReady] = useState(false)
   const [initError, setInitError] = useState<string | null>(null)
 
   const emailVerified = isEmailVerified(user?.email_confirmed_at)
@@ -68,66 +71,71 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true
 
-    async function init() {
-      if (!isSupabaseConfigured) {
-        if (mounted) {
-          setInitError(
-            'Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY on Vercel, then redeploy.',
-          )
-          setLoading(false)
-        }
-        return
-      }
-
-      try {
-        const sessionResult = await Promise.race([
-          supabase.auth.getSession(),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('Session check timed out')), 12_000),
-          ),
-        ])
-
-        if (!mounted) return
-
-        setInitError(null)
-        setSession(sessionResult.data.session)
-        setUser(sessionResult.data.session?.user ?? null)
-        await loadProfile(sessionResult.data.session?.user ?? null)
-      } catch (err) {
-        if (!mounted) return
-        setInitError(
-          err instanceof Error
-            ? err.message
-            : 'Could not connect to Supabase. Check env vars and that the project is not paused.',
-        )
-        setSession(null)
-        setUser(null)
-        setProfile(null)
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    void init()
-
     if (!isSupabaseConfigured) {
+      setInitError(
+        'Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY on Vercel, then redeploy.',
+      )
+      setAuthReady(true)
       return () => {
         mounted = false
       }
     }
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+    let sessionResolved = false
+
+    const markReady = () => {
+      if (mounted) setAuthReady(true)
+    }
+
+    // Dashboards wait at most 3s for session probe; login/register never block.
+    const unlockTimer = window.setTimeout(markReady, 3000)
+
+    const applySession = (nextSession: Session | null) => {
       if (!mounted) return
+      sessionResolved = true
       setSession(nextSession)
       setUser(nextSession?.user ?? null)
-      await loadProfile(nextSession?.user ?? null)
-      setLoading(false)
+      setInitError(null)
+      markReady()
+      void loadProfile(nextSession?.user ?? null)
+    }
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      void applySession(nextSession)
     })
+
+    const loadSession = () =>
+      supabase.auth.getSession().then(({ data, error }) => {
+        if (!mounted) return
+        if (error) {
+          console.warn('getSession:', error.message)
+          setInitError(
+            'Slow or failed connection to Supabase. Try “Clear cached login” below, then sign in again.',
+          )
+          return
+        }
+        void applySession(data.session)
+      })
+
+    void loadSession().catch((err) => {
+      if (!mounted) return
+      console.warn('getSession failed:', err)
+      setInitError('Cannot reach Supabase. Check diagnostics below, then clear cache or redeploy Vercel.')
+    })
+
+    // If getSession hangs, retry once after clearing stale tokens.
+    const retryTimer = window.setTimeout(() => {
+      if (!mounted || sessionResolved) return
+      clearSupabaseAuthStorage()
+      void loadSession()
+    }, 2500)
 
     return () => {
       mounted = false
+      window.clearTimeout(unlockTimer)
+      window.clearTimeout(retryTimer)
       subscription.unsubscribe()
     }
   }, [loadProfile])
@@ -184,6 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       profile,
       loading,
+      authReady,
       initError,
       emailVerified,
       signIn,
@@ -198,6 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       profile,
       loading,
+      authReady,
       initError,
       emailVerified,
       signIn,

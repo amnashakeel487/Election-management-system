@@ -11,11 +11,15 @@ type VerifyEmailLocationState = {
 
 /** Allows pending signup (no session) or authenticated unverified users. */
 export function VerifyEmailRoute({ children }: VerifyEmailRouteProps) {
-  const { session, profile, loading, emailVerified, getDashboardPath } = useAuth()
+  const { session, profile, authReady, emailVerified, getDashboardPath } = useAuth()
   const location = useLocation()
   const pendingEmail = (location.state as VerifyEmailLocationState | null)?.email
 
-  if (loading) {
+  if (pendingEmail) {
+    return <>{children}</>
+  }
+
+  if (!authReady) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-on-background">
         <span className="font-body-md text-body-md text-on-surface-variant">Loading…</span>

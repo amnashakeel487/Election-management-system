@@ -26,6 +26,8 @@ Deploy the frontend first, then configure Supabase URLs and Resend SMTP (see [AU
 
 ## 2. Environment variables (Vercel)
 
+**Important:** Do **not** mark `VITE_SUPABASE_URL` or `VITE_SUPABASE_ANON_KEY` as **Sensitive**. Sensitive variables are omitted from the browser bundle, so login/register cannot connect even when the dashboard looks correct.
+
 **Project → Settings → Environment Variables** — add for **Production**, **Preview**, and **Development**:
 
 | Name | Value |

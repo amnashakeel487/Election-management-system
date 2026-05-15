@@ -4,6 +4,7 @@ import { AUTH_CAPTCHA_LOGO } from '@/constants/authAssets'
 import { useAuth } from '@/hooks/useAuth'
 import type { UserRole } from '@/types/auth'
 import { RoleSelector } from './RoleSelector'
+import { SupabaseConnectionHelp } from './SupabaseConnectionHelp'
 
 export type AuthFormMode = 'login' | 'register'
 
@@ -14,7 +15,7 @@ interface AuthFormProps {
 export function AuthForm({ mode }: AuthFormProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, initError } = useAuth()
   const returnTo = (location.state as { from?: string } | null)?.from
 
   const isLogin = mode === 'login'
@@ -130,6 +131,8 @@ export function AuthForm({ mode }: AuthFormProps) {
               {error}
             </p>
           ) : null}
+
+          {initError || import.meta.env.PROD ? <SupabaseConnectionHelp /> : null}
 
           <form className="flex flex-col gap-md" onSubmit={handleSubmit}>
             {!isLogin ? (
