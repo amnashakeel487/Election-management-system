@@ -98,7 +98,14 @@ export function AuthForm({ mode }: AuthFormProps) {
           ) : null}
 
           <form className="flex flex-col gap-md" onSubmit={handleSubmit}>
-            <RoleSelector value={role} onChange={setRole} disabled={isLogin || submitting} />
+            {!isLogin ? (
+              <RoleSelector value={role} onChange={setRole} disabled={submitting} />
+            ) : (
+              <p className="rounded-xl border border-outline-variant/50 bg-surface-container-highest/30 px-md py-sm font-body-sm text-body-sm text-on-surface-variant">
+                Sign in with the email and password for your account. Your dashboard (Voter, Creator, or Admin) is
+                set when you register.
+              </p>
+            )}
 
             <div className="space-y-md">
               <div className="space-y-sm">
