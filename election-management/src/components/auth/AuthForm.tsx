@@ -38,7 +38,15 @@ export function AuthForm({ mode }: AuthFormProps) {
         navigate('/verify-email', { replace: true, state: { email } })
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Authentication failed')
+      const message = err instanceof Error ? err.message : 'Authentication failed'
+      const lower = message.toLowerCase()
+      if (lower.includes('rate limit') || lower.includes('email rate')) {
+        setError(
+          'Email sending limit reached. Configure Resend SMTP in Supabase (see docs/AUTH_SETUP.md), wait about an hour, then try again once.',
+        )
+      } else {
+        setError(message)
+      }
     } finally {
       setSubmitting(false)
     }
