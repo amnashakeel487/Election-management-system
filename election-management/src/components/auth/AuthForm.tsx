@@ -81,7 +81,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         )
       } else if (lower.includes('confirmation email') || lower.includes('sending email')) {
         setError(
-          'Could not send verification email. In Supabase SMTP: sender email must be plain onboarding@resend.dev (name in Sender name field), password = Resend API key. Check resend.com/emails for the failed attempt. See docs/AUTH_SETUP.md §6.',
+          'Could not send verification email. Fix Supabase → Authentication → SMTP: Host smtp.resend.com, Port 465, Username resend, Password = your Resend API key (re_…), Sender email = onboarding@resend.dev only (put FortressVote in Sender name). Important: with the test sender you can only register using the same email as your Resend account — or verify a domain at resend.com and use noreply@yourdomain.com. Check resend.com/emails for the exact failure. See docs/AUTH_SETUP.md.',
         )
       } else {
         setError(message)
