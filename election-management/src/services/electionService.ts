@@ -92,7 +92,7 @@ export async function fetchElectionById(electionId: string): Promise<ElectionWit
 
 export async function createElectionDraft(
   creatorId: string,
-  input: Pick<CreateElectionInput, 'title' | 'description'>,
+  input: Pick<CreateElectionInput, 'title' | 'description'> & { category?: string | null },
 ): Promise<Election> {
   const { start, end } = defaultDraftDates()
 
@@ -102,8 +102,10 @@ export async function createElectionDraft(
       creator_id: creatorId,
       title: input.title,
       description: input.description ?? null,
+      category: input.category?.trim() || null,
       start_date: start,
       end_date: end,
+      registration_deadline: null,
       max_voters: 1000,
       status: 'draft',
     })
@@ -133,12 +135,27 @@ export async function updateElection(
   return data as Election
 }
 
+function effectiveRegistrationDeadline(election: Election): Date {
+  if (election.registration_deadline) return new Date(election.registration_deadline)
+  return new Date(election.start_date)
+}
+
 export async function publishElection(electionId: string): Promise<Election> {
   const election = await fetchElectionById(electionId)
   if (!election) throw new Error('Election not found')
   if (election.status !== 'draft') throw new Error('Only draft elections can be published')
+  if (!election.title.trim()) throw new Error('Election title is required')
   if (election.candidates.length < 2) {
     throw new Error('Add at least two candidates before publishing')
+  }
+
+  const start = new Date(election.start_date).getTime()
+  const end = new Date(election.end_date).getTime()
+  const regEnd = effectiveRegistrationDeadline(election).getTime()
+
+  if (end <= start) throw new Error('Voting end must be after voting start')
+  if (regEnd > start) {
+    throw new Error('Registration deadline must be on or before the voting start time')
   }
 
   const now = new Date().toISOString()

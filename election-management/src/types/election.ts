@@ -43,7 +43,7 @@ export interface CreateElectionInput {
   category?: string
   start_date: string
   end_date: string
-  registration_deadline?: string
+  registration_deadline?: string | null
   max_voters: number
   eligibility_rule?: string
   privacy_tier?: string

@@ -4,10 +4,10 @@ import { ELECTION_SECURITY_GRAPHIC } from '@/constants/electionAssets'
 import { CreatorSidebar } from './CreatorSidebar'
 
 const STEPS = [
-  { id: 1, label: 'Identity Setup' },
-  { id: 2, label: 'Timing & Duration' },
-  { id: 3, label: 'Governance & Rules' },
-  { id: 4, label: 'Final Verification' },
+  { id: 1, label: 'Poll identity' },
+  { id: 2, label: 'Timing & registration' },
+  { id: 3, label: 'Limits & rules' },
+  { id: 4, label: 'Candidates & publish' },
 ] as const
 
 interface CreatorWizardShellProps {
@@ -15,6 +15,10 @@ interface CreatorWizardShellProps {
   children: ReactNode
   sidebar?: ReactNode
   footerActions?: ReactNode
+  /** Override default headline (e.g. edit vs create) */
+  headline?: string
+  /** Supplemental line below headline */
+  subhead?: string
 }
 
 export function CreatorWizardShell({
@@ -22,6 +26,8 @@ export function CreatorWizardShell({
   children,
   sidebar,
   footerActions,
+  headline,
+  subhead,
 }: CreatorWizardShellProps) {
   const mobileProgress = ((currentStep - 1) / 3) * 100
 
@@ -64,11 +70,11 @@ export function CreatorWizardShell({
         <div className="mx-auto max-w-6xl px-4 md:px-margin">
           <div className="mb-10">
             <h1 className="mb-2 font-headline-lg text-headline-lg font-bold text-on-surface md:text-headline-xl">
-              Initialize Secure Election
+              {headline ?? 'Initialize Secure Election'}
             </h1>
             <p className="max-w-2xl font-body-md text-body-md text-on-surface-variant">
-              Configure the cryptographic parameters and jurisdictional rules for your high-integrity digital
-              ballot.
+              {subhead ??
+                'Each election is one poll—create as many drafts as you need. Publish when candidates and timings are finalized.'}
             </p>
           </div>
 

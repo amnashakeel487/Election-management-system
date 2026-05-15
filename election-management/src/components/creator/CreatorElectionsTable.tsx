@@ -1,6 +1,13 @@
 import { Link } from 'react-router-dom'
+import { ELECTION_CATEGORY_OPTIONS } from '@/constants/electionWizard'
 import type { Election } from '@/types/election'
 import { formatSubmissionDate } from '@/utils/formatDate'
+
+function categoryDisplay(cat: string | null | undefined): string | null {
+  if (!cat?.trim()) return null
+  const o = ELECTION_CATEGORY_OPTIONS.find((x) => x.value === cat)
+  return o?.label ?? cat
+}
 
 interface CreatorElectionsTableProps {
   elections: Election[]
@@ -90,7 +97,9 @@ export function CreatorElectionsTable({
                 </td>
               </tr>
             ) : (
-              elections.map((election) => (
+              elections.map((election) => {
+                const catLabel = categoryDisplay(election.category)
+                return (
                 <tr key={election.id} className="group transition-colors hover:bg-white/5">
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
@@ -107,6 +116,7 @@ export function CreatorElectionsTable({
                       </div>
                       <div>
                         <p className="font-body-md text-body-md font-semibold text-on-surface">{election.title}</p>
+                        {catLabel ? <p className="text-[11px] text-primary/90">{catLabel}</p> : null}
                         <p className="text-[11px] text-on-surface-variant">
                           {election.status === 'draft'
                             ? `Created: ${formatSubmissionDate(election.created_at)}`
@@ -154,7 +164,8 @@ export function CreatorElectionsTable({
                     </div>
                   </td>
                 </tr>
-              ))
+                )
+              })
             )}
           </tbody>
         </table>

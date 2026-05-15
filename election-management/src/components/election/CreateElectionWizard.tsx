@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CreatorWizardShell } from '@/components/creator/CreatorWizardShell'
+import { ELECTION_CATEGORY_OPTIONS } from '@/constants/electionWizard'
 import { useAuth } from '@/hooks/useAuth'
 import {
   addCandidate,
@@ -12,10 +13,13 @@ import {
 } from '@/services/electionService'
 import type { Candidate } from '@/types/election'
 import { fromDatetimeLocalValue, toDatetimeLocalValue } from '@/utils/datetime'
+import { formatSubmissionDate } from '@/utils/formatDate'
 
 interface CreateElectionWizardProps {
   electionId?: string
 }
+
+const CATEGORY_CUSTOM = '__custom__'
 
 const ELIGIBILITY_OPTIONS = [
   { value: 'verified_voters', label: 'Verified Registered Voters Only (Default)' },
@@ -23,6 +27,11 @@ const ELIGIBILITY_OPTIONS = [
   { value: 'whitelist', label: 'Whitelist-Only Access (Invite Required)' },
   { value: 'public', label: 'Public Open Access (Community Poll)' },
 ]
+
+function persistedCategory(slug: string, customDetail: string): string {
+  if (slug === CATEGORY_CUSTOM) return customDetail.trim()
+  return slug
+}
 
 export function CreateElectionWizard({ electionId: initialElectionId }: CreateElectionWizardProps) {
   const navigate = useNavigate()
@@ -35,8 +44,13 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [categorySlug, setCategorySlug] = useState<string>(ELECTION_CATEGORY_OPTIONS[1].value)
+  const [categoryCustom, setCategoryCustom] = useState('')
+
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [registrationDeadline, setRegistrationDeadline] = useState('')
+
   const [maxVoters, setMaxVoters] = useState(1000)
   const [eligibilityRule, setEligibilityRule] = useState('verified_voters')
   const [privacyTier, setPrivacyTier] = useState('zero_knowledge')
@@ -58,8 +72,22 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
         setElectionId(data.id)
         setTitle(data.title)
         setDescription(data.description ?? '')
+
+        const cat = data.category?.trim()
+        if (cat && ELECTION_CATEGORY_OPTIONS.some((o) => o.value === cat)) {
+          setCategorySlug(cat)
+          setCategoryCustom('')
+        } else if (cat) {
+          setCategorySlug(CATEGORY_CUSTOM)
+          setCategoryCustom(cat)
+        }
+
         setStartDate(toDatetimeLocalValue(data.start_date))
         setEndDate(toDatetimeLocalValue(data.end_date))
+        setRegistrationDeadline(
+          data.registration_deadline ? toDatetimeLocalValue(data.registration_deadline) : '',
+        )
+
         setMaxVoters(data.max_voters)
         setEligibilityRule(data.eligibility_rule)
         setPrivacyTier(data.privacy_tier)
@@ -105,7 +133,13 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
     if (electionId) return electionId
     if (!profile?.id) throw new Error('Not authenticated')
 
-    const created = await createElectionDraft(profile.id, { title, description })
+    const category = persistedCategory(categorySlug, categoryCustom)
+
+    const created = await createElectionDraft(profile.id, {
+      title: title.trim(),
+      description: description.trim(),
+      category: category || undefined,
+    })
     setElectionId(created.id)
     return created.id
   }
@@ -115,11 +149,20 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
       setError('Election title is required')
       return
     }
+    if (categorySlug === CATEGORY_CUSTOM && !categoryCustom.trim()) {
+      setError('Enter a category name when using Custom.')
+      return
+    }
+
     setError(null)
     setSaving(true)
     try {
       const id = await ensureElectionId()
-      await updateElection(id, { title: title.trim(), description: description.trim() || undefined })
+      await updateElection(id, {
+        title: title.trim(),
+        description: description.trim() || undefined,
+        category: persistedCategory(categorySlug, categoryCustom),
+      })
       setStep(2)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save')
@@ -133,10 +176,24 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
       setError('Start and end dates are required')
       return
     }
-    if (new Date(endDate) <= new Date(startDate)) {
+    const startMs = new Date(fromDatetimeLocalValue(startDate)).getTime()
+    const endMs = new Date(fromDatetimeLocalValue(endDate)).getTime()
+    if (endMs <= startMs) {
       setError('End date must be after start date')
       return
     }
+    if (registrationDeadline.trim()) {
+      const regMs = new Date(fromDatetimeLocalValue(registrationDeadline.trim())).getTime()
+      if (regMs > startMs) {
+        setError('Registration deadline must be on or before voting start.')
+        return
+      }
+      if (regMs >= endMs) {
+        setError('Registration deadline must be before voting ends.')
+        return
+      }
+    }
+
     setError(null)
     setSaving(true)
     try {
@@ -144,6 +201,9 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
       await updateElection(id, {
         start_date: fromDatetimeLocalValue(startDate),
         end_date: fromDatetimeLocalValue(endDate),
+        registration_deadline: registrationDeadline.trim()
+          ? fromDatetimeLocalValue(registrationDeadline.trim())
+          : null,
       })
       setStep(3)
     } catch (err) {
@@ -221,22 +281,39 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
 
   if (loading) {
     return (
-      <CreatorWizardShell currentStep={step}>
+      <CreatorWizardShell currentStep={step} headline={initialElectionId ? 'Edit draft election' : undefined}>
         <p className="font-body-md text-body-md text-on-surface-variant">Loading election…</p>
       </CreatorWizardShell>
     )
   }
 
+  const categoryLabel =
+    categorySlug === CATEGORY_CUSTOM
+      ? categoryCustom.trim() || '(Custom)'
+      : (ELECTION_CATEGORY_OPTIONS.find((o) => o.value === categorySlug)?.label ?? categorySlug)
+
+  const registrationSummary =
+    registrationDeadline.trim().length > 0
+      ? `${formatSubmissionDate(fromDatetimeLocalValue(registrationDeadline))}`
+      : `Same as voting start (${formatSubmissionDate(fromDatetimeLocalValue(startDate))})`
+
+  const shellHeadline = initialElectionId ? 'Edit draft election' : undefined
+  const shellSub = initialElectionId
+    ? 'Edits save as you continue each step. Drafts stay private until you publish.'
+    : undefined
+
   return (
     <CreatorWizardShell
       currentStep={step}
+      headline={shellHeadline}
+      subhead={shellSub}
       footerActions={
         step === 1
           ? footerNav('Back', 'Continue to Timing', () => navigate('/creator/dashboard'), () => void handleStep1Next())
           : step === 2
             ? footerNav('Back to Identity', 'Continue to Rules', () => setStep(1), () => void handleStep2Next())
             : step === 3
-              ? footerNav('Back to Timing', 'Review Configuration', () => setStep(2), () => void handleStep3Next())
+              ? footerNav('Back to Timing', 'Candidates & Publish', () => setStep(2), () => void handleStep3Next())
               : null
       }
     >
@@ -250,19 +327,19 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
         <div className="glass-card rounded-[32px] p-6 md:p-10">
           <h2 className="mb-8 flex items-center gap-3 font-headline-md text-headline-md text-on-surface">
             <span className="material-symbols-outlined rounded-lg bg-primary/10 p-2 text-primary">badge</span>
-            Election Identity Setup
+            Poll identity
           </h2>
           <div className="space-y-6">
             <div className="flex flex-col gap-2">
               <label className="ml-1 font-label-md text-label-md text-on-surface-variant" htmlFor="title">
-                Election Title
+                Election title
               </label>
               <input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full rounded-xl border border-outline-variant bg-surface-container-low p-4 text-on-surface outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-primary"
-                placeholder="2024 Municipal Council Election"
+                placeholder="e.g. 2026 Student Senate Election"
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -275,8 +352,40 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
                 className="w-full rounded-xl border border-outline-variant bg-surface-container-low p-4 text-on-surface outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-primary"
-                placeholder="Describe the purpose and scope of this election…"
+                placeholder="Purpose, eligibility context, and what this vote decides…"
               />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="ml-1 font-label-md text-label-md text-on-surface-variant" htmlFor="category">
+                Category
+              </label>
+              <div className="relative">
+                <select
+                  id="category"
+                  value={categorySlug}
+                  onChange={(e) => setCategorySlug(e.target.value)}
+                  className="w-full cursor-pointer appearance-none rounded-xl border border-outline-variant bg-surface-container-low p-4 pr-10 text-on-surface outline-none transition-all focus:ring-2 focus:ring-primary"
+                >
+                  {ELECTION_CATEGORY_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                  <option value={CATEGORY_CUSTOM}>Custom…</option>
+                </select>
+                <span className="material-symbols-outlined pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
+                  expand_more
+                </span>
+              </div>
+              {categorySlug === CATEGORY_CUSTOM ? (
+                <input
+                  type="text"
+                  value={categoryCustom}
+                  onChange={(e) => setCategoryCustom(e.target.value)}
+                  placeholder="Your category label"
+                  className="mt-2 w-full rounded-xl border border-outline-variant bg-surface-container-low p-4 text-on-surface outline-none focus:ring-2 focus:ring-primary"
+                />
+              ) : null}
             </div>
           </div>
         </div>
@@ -286,12 +395,12 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
         <div className="glass-card rounded-[32px] p-6 md:p-10">
           <h2 className="mb-8 flex items-center gap-3 font-headline-md text-headline-md text-on-surface">
             <span className="material-symbols-outlined rounded-lg bg-primary/10 p-2 text-primary">schedule</span>
-            Timing &amp; Duration
+            Timing &amp; registration window
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="flex flex-col gap-2">
               <label className="ml-1 font-label-md text-label-md text-on-surface-variant" htmlFor="start">
-                Start Date &amp; Time
+                Voting starts
               </label>
               <input
                 id="start"
@@ -303,7 +412,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
             </div>
             <div className="flex flex-col gap-2">
               <label className="ml-1 font-label-md text-label-md text-on-surface-variant" htmlFor="end">
-                End Date &amp; Time
+                Voting ends
               </label>
               <input
                 id="end"
@@ -314,6 +423,22 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
               />
             </div>
           </div>
+          <div className="mt-6 flex flex-col gap-2">
+            <label className="ml-1 font-label-md text-label-md text-on-surface-variant" htmlFor="regdeadline">
+              Registration / opt-in deadline
+            </label>
+            <input
+              id="regdeadline"
+              type="datetime-local"
+              value={registrationDeadline}
+              onChange={(e) => setRegistrationDeadline(e.target.value)}
+              className="w-full max-w-md rounded-xl border border-outline-variant bg-surface-container-low p-4 text-on-surface outline-none focus:ring-2 focus:ring-primary"
+            />
+            <p className="ml-1 max-w-xl font-body-sm text-body-sm text-on-surface-variant">
+              Voters must join before this time (and before the cap fills). Leave empty to use the voting start time
+              automatically.
+            </p>
+          </div>
         </div>
       ) : null}
 
@@ -321,12 +446,12 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
         <div className="glass-card rounded-[32px] p-6 md:p-10">
           <h2 className="mb-8 flex items-center gap-3 font-headline-md text-headline-md text-on-surface">
             <span className="material-symbols-outlined rounded-lg bg-primary/10 p-2 text-primary">gavel</span>
-            Election Governance &amp; Rules
+            Participation limits &amp; rules
           </h2>
           <div className="space-y-8">
             <div className="flex flex-col gap-2">
               <label className="ml-1 font-label-md text-label-md text-on-surface-variant" htmlFor="max-voters">
-                Maximum Voters
+                Maximum voters (pool cap before lock)
               </label>
               <input
                 id="max-voters"
@@ -334,12 +459,12 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
                 min={1}
                 value={maxVoters}
                 onChange={(e) => setMaxVoters(Number(e.target.value))}
-                className="w-full rounded-xl border border-outline-variant bg-surface-container-low p-4 text-on-surface outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-primary"
+                className="w-full max-w-md rounded-xl border border-outline-variant bg-surface-container-low p-4 text-on-surface outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-primary"
               />
             </div>
             <div className="flex flex-col gap-2">
               <label className="ml-1 font-label-md text-label-md text-on-surface-variant">
-                Voting Eligibility Rule
+                Voting eligibility rule
               </label>
               <div className="relative">
                 <select
@@ -360,7 +485,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="flex flex-col gap-2">
-                <label className="ml-1 font-label-md text-label-md text-on-surface-variant">Privacy Tier</label>
+                <label className="ml-1 font-label-md text-label-md text-on-surface-variant">Privacy tier</label>
                 <button
                   type="button"
                   onClick={() => setPrivacyTier('zero_knowledge')}
@@ -380,17 +505,9 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
                     >
                       Zero-Knowledge
                     </span>
-                    {privacyTier === 'zero_knowledge' ? (
-                      <span
-                        className="material-symbols-outlined text-[20px] text-primary"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        verified
-                      </span>
-                    ) : null}
                   </div>
                   <p className="text-label-sm text-on-surface-variant">
-                    Maximum anonymity via fully encrypted cryptographic proofs.
+                    Strong voter anonymity posture for ballots.
                   </p>
                 </button>
               </div>
@@ -409,7 +526,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
                     <span className="font-body-md font-bold text-on-surface">Pseudonymous</span>
                   </div>
                   <p className="text-label-sm text-on-surface-variant">
-                    Enhanced audit-trail focused with unique voter tokenization.
+                    Audit-focused with pseudonymous identifiers.
                   </p>
                 </button>
               </div>
@@ -421,7 +538,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
                     visibility_off
                   </span>
                   <div>
-                    <p className="font-label-md text-label-md font-bold text-on-surface">Real-time Results</p>
+                    <p className="font-label-md text-label-md font-bold text-on-surface">Live results</p>
                     <p className="text-[11px] text-on-surface-variant">Show tallies during voting.</p>
                   </div>
                 </div>
@@ -440,7 +557,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
                   <span className="material-symbols-outlined rounded-lg bg-tertiary/10 p-2 text-tertiary">history_edu</span>
                   <div>
                     <p className="font-label-md text-label-md font-bold text-on-surface">Write-ins</p>
-                    <p className="text-[11px] text-on-surface-variant">Allow suggested candidates.</p>
+                    <p className="text-[11px] text-on-surface-variant">Allow provisional write-in nominees.</p>
                   </div>
                 </div>
                 <label className="relative inline-flex cursor-pointer items-center">
@@ -461,12 +578,48 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
       {step === 4 ? (
         <>
           <div className="glass-card rounded-[32px] p-6 md:p-10">
-            <h2 className="mb-8 flex items-center gap-3 font-headline-md text-headline-md text-on-surface">
+            <h2 className="mb-4 flex items-center gap-3 font-headline-md text-headline-md text-on-surface">
               <span className="material-symbols-outlined rounded-lg bg-primary/10 p-2 text-primary">verified</span>
-              Final Verification
+              Candidates &amp; publish
             </h2>
             <p className="mb-6 font-body-md text-body-md text-on-surface-variant">
-              Add at least two candidates, then publish your election.
+              Each election is <strong className="text-on-surface">one poll</strong>. Create additional polls anytime from
+              your dashboard—each stays a separate draft until you publish.
+            </p>
+
+            <div className="mb-8 rounded-2xl border border-primary/20 bg-primary/5 p-6">
+              <h3 className="mb-3 font-label-md font-bold uppercase tracking-wider text-primary">Publication summary</h3>
+              <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="text-on-surface-variant">Title</dt>
+                  <dd className="font-semibold text-on-surface">{title.trim() || '—'}</dd>
+                </div>
+                <div>
+                  <dt className="text-on-surface-variant">Category</dt>
+                  <dd className="font-semibold text-on-surface">{categoryLabel}</dd>
+                </div>
+                <div>
+                  <dt className="text-on-surface-variant">Registration closes</dt>
+                  <dd className="font-semibold text-on-surface">{registrationSummary}</dd>
+                </div>
+                <div>
+                  <dt className="text-on-surface-variant">Voting window</dt>
+                  <dd className="font-semibold text-on-surface">
+                    {startDate && endDate
+                      ? `${formatSubmissionDate(fromDatetimeLocalValue(startDate))} → ${formatSubmissionDate(fromDatetimeLocalValue(endDate))}`
+                      : '—'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-on-surface-variant">Max voters</dt>
+                  <dd className="font-semibold text-on-surface">{maxVoters.toLocaleString()}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <p className="mb-4 font-body-sm text-body-sm text-on-surface-variant">
+              Add at least <strong className="text-on-surface">two candidates</strong> (poll options). You can publish
+              when ready—draft stays editable until publish.
             </p>
             <form
               className="mb-6 flex gap-3"
@@ -522,7 +675,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
                 onClick={() => navigate('/creator/dashboard')}
                 className="rounded-full border border-outline px-8 py-4 font-bold text-on-surface transition-all hover:bg-surface-variant"
               >
-                Save Draft
+                Save draft &amp; exit
               </button>
               <button
                 type="button"
@@ -530,7 +683,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
                 onClick={() => void handlePublish()}
                 className="rounded-full bg-primary px-10 py-4 font-bold text-on-primary shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
               >
-                Publish Election
+                Publish election
               </button>
             </div>
           </div>
