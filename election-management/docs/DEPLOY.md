@@ -75,6 +75,7 @@ Follow [AUTH_SETUP.md](./AUTH_SETUP.md) to enable Resend SMTP, then register use
 | “Supabase env vars missing” in console | Set `VITE_*` in Vercel and **redeploy**. |
 | Auth works locally, not on Vercel | Add Vercel URL to Supabase **Redirect URLs**. |
 | Build fails on Vercel | Confirm **Root Directory** is `election-management`. |
+| **`Failed to fetch` on register/login** | Vercel env vars missing/wrong or Supabase project **paused**. Set `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY`, **redeploy**. Unpause project in Supabase dashboard. Disable ad-blockers for `*.supabase.co`. |
 
 ## Custom domain (optional)
 
