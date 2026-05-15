@@ -22,11 +22,21 @@
     "reactPage": "src/pages/VerifyEmailPage.tsx",
     "status": "converted"
   },
+  "create_election_wizard": {
+    "route": "/creator/elections/new",
+    "designPath": "design/create_election_wizard/code.html",
+    "aliases": ["CreateElection"],
+    "reactPages": {
+      "create": "src/pages/creator/CreateElectionPage.tsx",
+      "edit": "src/pages/creator/EditElectionPage.tsx"
+    },
+    "status": "converted"
+  },
   "election_creator_dashboard": {
-    "route": "/dashboard/creator",
+    "route": "/creator/dashboard",
     "designPath": "design/election_creator_dashboard/code.html",
-    "reactPage": null,
-    "status": "pending"
+    "reactPage": "src/pages/dashboards/CreatorDashboardPage.tsx",
+    "status": "converted"
   },
   "voter_dashboard": {
     "route": "/dashboard/voter",

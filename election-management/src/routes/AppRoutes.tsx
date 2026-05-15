@@ -7,8 +7,11 @@ import { LoginPage } from '@/pages/LoginPage'
 import { RegisterPage } from '@/pages/RegisterPage'
 import { VerifyEmailPage } from '@/pages/VerifyEmailPage'
 import { AdminDashboardPage } from '@/pages/dashboards/AdminDashboardPage'
+import { CreateElectionPage } from '@/pages/creator/CreateElectionPage'
+import { EditElectionPage } from '@/pages/creator/EditElectionPage'
 import { CreatorDashboardPage } from '@/pages/dashboards/CreatorDashboardPage'
 import { VoterDashboardPage } from '@/pages/dashboards/VoterDashboardPage'
+import { CreatorApprovedRoute } from '@/components/creator/CreatorApprovedRoute'
 
 export function AppRoutes() {
   return (
@@ -54,6 +57,26 @@ export function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={['election_creator']}>
             <CreatorDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/creator/elections/new"
+        element={
+          <ProtectedRoute allowedRoles={['election_creator']}>
+            <CreatorApprovedRoute>
+              <CreateElectionPage />
+            </CreatorApprovedRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/creator/elections/:id/edit"
+        element={
+          <ProtectedRoute allowedRoles={['election_creator']}>
+            <CreatorApprovedRoute>
+              <EditElectionPage />
+            </CreatorApprovedRoute>
           </ProtectedRoute>
         }
       />
