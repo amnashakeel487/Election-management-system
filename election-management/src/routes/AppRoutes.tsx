@@ -13,6 +13,8 @@ import { CreatorDashboardPage } from '@/pages/dashboards/CreatorDashboardPage'
 import { VoterDashboardPage } from '@/pages/dashboards/VoterDashboardPage'
 import { ElectionDetailsPage } from '@/pages/ElectionDetailsPage'
 import { VotingPage } from '@/pages/VotingPage'
+import { ElectionResultsPage } from '@/pages/ElectionResultsPage'
+import { ResultsIndexPage } from '@/pages/ResultsIndexPage'
 import { CreatorApprovedRoute } from '@/components/creator/CreatorApprovedRoute'
 
 export function AppRoutes() {
@@ -20,6 +22,22 @@ export function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/elections/:id" element={<ElectionDetailsPage />} />
+      <Route
+        path="/results"
+        element={
+          <ProtectedRoute>
+            <ResultsIndexPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/elections/:id/results"
+        element={
+          <ProtectedRoute>
+            <ElectionResultsPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/elections/:id/vote"
         element={

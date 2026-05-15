@@ -23,12 +23,12 @@ export function TopNavBar() {
           >
             Elections
           </a>
-          <a
+          <Link
+            to="/results"
             className="font-body-md text-body-md text-on-surface-variant transition-colors hover:text-primary"
-            href="#"
           >
             Results
-          </a>
+          </Link>
           <a
             className="font-body-md text-body-md text-on-surface-variant transition-colors hover:text-primary"
             href="#"

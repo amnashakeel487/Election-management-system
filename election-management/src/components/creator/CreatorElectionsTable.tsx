@@ -122,29 +122,36 @@ export function CreatorElectionsTable({
                     </span>
                   </td>
                   <td className="px-6 py-5 text-right">
-                    {election.status === 'draft' ? (
-                      <Link
-                        to={`/creator/elections/${election.id}/edit`}
-                        className="rounded-lg bg-primary px-4 py-2 font-label-md text-label-md text-on-primary transition-all hover:opacity-90 active:scale-95"
-                      >
-                        Edit
-                      </Link>
-                    ) : (election.status === 'published' || election.status === 'active') &&
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      {election.status === 'draft' ? (
+                        <Link
+                          to={`/creator/elections/${election.id}/edit`}
+                          className="rounded-lg bg-primary px-4 py-2 font-label-md text-label-md text-on-primary transition-all hover:opacity-90 active:scale-95"
+                        >
+                          Edit
+                        </Link>
+                      ) : null}
+                      {(election.status === 'published' || election.status === 'active') &&
                       !election.voter_roll_finalized_at &&
                       onFinalizeVoterRoll ? (
-                      <button
-                        type="button"
-                        disabled={finalizingId === election.id}
-                        onClick={() => onFinalizeVoterRoll(election.id)}
-                        className="rounded-lg border border-tertiary/30 bg-tertiary/10 px-4 py-2 font-label-md text-label-md text-tertiary transition-all hover:bg-tertiary/20 disabled:opacity-60"
-                      >
-                        {finalizingId === election.id ? 'Finalizing…' : 'Finalize & Email IDs'}
-                      </button>
-                    ) : election.voter_roll_finalized_at ? (
-                      <span className="font-label-md text-label-md text-tertiary">IDs issued</span>
-                    ) : (
-                      <span className="font-label-md text-label-md text-on-surface-variant">—</span>
-                    )}
+                        <button
+                          type="button"
+                          disabled={finalizingId === election.id}
+                          onClick={() => onFinalizeVoterRoll(election.id)}
+                          className="rounded-lg border border-tertiary/30 bg-tertiary/10 px-4 py-2 font-label-md text-label-md text-tertiary transition-all hover:bg-tertiary/20 disabled:opacity-60"
+                        >
+                          {finalizingId === election.id ? 'Finalizing…' : 'Finalize & Email IDs'}
+                        </button>
+                      ) : null}
+                      {election.status !== 'draft' ? (
+                        <Link
+                          to={`/elections/${election.id}/results`}
+                          className="rounded-lg border border-white/10 px-4 py-2 font-label-md text-label-md text-on-surface hover:bg-white/10"
+                        >
+                          Results
+                        </Link>
+                      ) : null}
+                    </div>
                   </td>
                 </tr>
               ))

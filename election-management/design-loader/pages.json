@@ -62,5 +62,15 @@
     "designPath": "design/secure_voting_page/code.html",
     "reactPage": "src/pages/VotingPage.tsx",
     "status": "converted"
+  },
+  "Results": {
+    "route": "/elections/:id/results",
+    "designPath": "design/election_creator_dashboard/code.html",
+    "note": "Results UI derived from creator dashboard results row + voter analytics card",
+    "reactPages": {
+      "index": "src/pages/ResultsIndexPage.tsx",
+      "election": "src/pages/ElectionResultsPage.tsx"
+    },
+    "status": "converted"
   }
 }
