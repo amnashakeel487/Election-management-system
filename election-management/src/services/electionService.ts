@@ -5,6 +5,7 @@ import type {
   CreateElectionInput,
   Election,
   ElectionWithCandidates,
+  UpdateCandidateInput,
   UpdateElectionInput,
 } from '@/types/election'
 
@@ -205,6 +206,27 @@ export async function removeCandidate(candidateId: string): Promise<void> {
   if (error) throw new Error(error.message)
 }
 
+export async function updateCandidate(
+  candidateId: string,
+  patch: UpdateCandidateInput,
+): Promise<Candidate> {
+  const updateRow: Record<string, unknown> = {}
+  if (patch.name !== undefined) updateRow.name = patch.name
+  if (patch.description !== undefined) updateRow.description = patch.description
+  if (patch.designation !== undefined) updateRow.designation = patch.designation
+  if (patch.photo_url !== undefined) updateRow.photo_url = patch.photo_url
+
+  const { data, error } = await supabase
+    .from(CANDIDATES)
+    .update(updateRow)
+    .eq('id', candidateId)
+    .select(CANDIDATE_COLUMNS)
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data as Candidate
+}
+
 export async function replaceCandidates(
   electionId: string,
   candidates: CandidateInput[],
@@ -218,13 +240,15 @@ export async function replaceCandidates(
     election_id: electionId,
     name: c.name,
     description: c.description ?? null,
+    designation: c.designation ?? null,
+    photo_url: c.photo_url ?? null,
     sort_order: index,
   }))
 
   const { data, error } = await supabase
     .from(CANDIDATES)
     .insert(rows)
-    .select('id, election_id, name, description, sort_order, created_at')
+    .select(CANDIDATE_COLUMNS)
 
   if (error) throw new Error(error.message)
   return (data ?? []) as Candidate[]

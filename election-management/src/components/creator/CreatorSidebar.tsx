@@ -7,6 +7,7 @@ export function CreatorSidebar() {
   const { signOut } = useAuth()
 
   const isDashboard = location.pathname === '/creator/dashboard'
+  const isCandidates = location.pathname === '/creator/candidates'
   const isElectionFlow = location.pathname.includes('/creator/elections')
 
   async function handleSignOut() {
@@ -51,13 +52,17 @@ export function CreatorSidebar() {
           <span className="material-symbols-outlined">how_to_vote</span>
           <span className="font-label-md text-label-md">My Elections</span>
         </Link>
-        <a
-          className="flex items-center gap-3 rounded-lg px-4 py-3 text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-on-surface"
-          href="#"
+        <Link
+          to="/creator/candidates"
+          className={
+            isCandidates
+              ? 'flex items-center gap-3 rounded-lg border-r-4 border-primary bg-primary/5 px-4 py-3 font-bold text-primary transition-all'
+              : 'flex items-center gap-3 rounded-lg px-4 py-3 text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-on-surface'
+          }
         >
           <span className="material-symbols-outlined">group</span>
           <span className="font-label-md text-label-md">Candidates</span>
-        </a>
+        </Link>
         <a
           className="flex items-center gap-3 rounded-lg px-4 py-3 text-on-surface-variant transition-all hover:bg-surface-container-high hover:text-on-surface"
           href="#"

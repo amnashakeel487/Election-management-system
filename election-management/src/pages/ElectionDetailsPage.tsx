@@ -15,6 +15,7 @@ import {
 } from '@/services/voterRegistrationService'
 import type { ElectionWithCandidates } from '@/types/election'
 import type { ElectionRegistrationStats, VoterRegistration } from '@/types/voterRegistration'
+import { candidatePortraitOrPlaceholder } from '@/utils/candidateDisplay'
 import { formatElectionCode, formatTimeRemaining } from '@/utils/electionTime'
 import { isPollingOpen } from '@/utils/electionPolling'
 
@@ -187,15 +188,15 @@ export function ElectionDetailsPage() {
                 Leading Candidates
               </h2>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {election.candidates.map((candidate, index) => (
+                {election.candidates.map((candidate) => (
                   <div
                     key={candidate.id}
                     className="group flex flex-col gap-4 rounded-[24px] border border-white/10 bg-surface-container p-6 transition-all hover:border-primary/40"
                   >
-                    <div className="flex items-start gap-4">
+                      <div className="flex items-start gap-4">
                       <div className="relative">
                         <img
-                          src={CANDIDATE_PLACEHOLDER_IMAGES[index % CANDIDATE_PLACEHOLDER_IMAGES.length]}
+                          src={candidatePortraitOrPlaceholder(candidate, CANDIDATE_PLACEHOLDER_IMAGES)}
                           alt=""
                           className="h-20 w-20 rounded-2xl object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
                         />
@@ -209,7 +210,9 @@ export function ElectionDetailsPage() {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <p className="mb-1 font-label-sm text-label-sm text-primary">Candidate</p>
+                        <p className="mb-1 font-label-sm text-label-sm text-primary">
+                          {candidate.designation?.trim() || 'Candidate'}
+                        </p>
                         <h3 className="font-headline-md text-headline-md text-on-surface">{candidate.name}</h3>
                         <p className="font-body-sm text-body-sm text-on-surface-variant">
                           {candidate.description ?? 'No manifesto provided.'}

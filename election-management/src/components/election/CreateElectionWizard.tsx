@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { CreatorWizardShell } from '@/components/creator/CreatorWizardShell'
 import { ELECTION_CATEGORY_OPTIONS } from '@/constants/electionWizard'
 import { useAuth } from '@/hooks/useAuth'
@@ -627,6 +627,20 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
               Add at least <strong className="text-on-surface">two candidates</strong> (poll options). You can publish
               when ready—draft stays editable until publish.
             </p>
+            {electionId ? (
+              <p className="mb-4 font-body-sm text-body-sm">
+                <Link
+                  to={`/creator/candidates?election=${electionId}`}
+                  className="font-bold text-primary hover:underline"
+                >
+                  Candidate manager
+                </Link>
+                <span className="text-on-surface-variant">
+                  {' '}
+                  — upload portraits, designations, and full manifestos before you publish.
+                </span>
+              </p>
+            ) : null}
             <form
               className="mb-6 flex gap-3"
               onSubmit={(e: FormEvent) => {

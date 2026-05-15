@@ -59,3 +59,9 @@ export interface CandidateInput {
   designation?: string
   photo_url?: string
 }
+
+export type UpdateCandidateInput = Partial<Omit<CandidateInput, 'description' | 'designation' | 'photo_url'>> & {
+  description?: string | null
+  designation?: string | null
+  photo_url?: string | null
+}

@@ -3,6 +3,7 @@ import { Footer } from '@/components/layout/Footer'
 import { TopNavBar } from '@/components/layout/TopNavBar'
 import { VOTING_CANDIDATE_IMAGES } from '@/constants/votingAssets'
 import type { Candidate, ElectionWithCandidates } from '@/types/election'
+import { candidatePortraitOrPlaceholder } from '@/utils/candidateDisplay'
 import { formatElectionCode } from '@/utils/electionTime'
 import { formatCountdownMs } from '@/utils/electionPolling'
 import { ConfirmVoteModal } from './ConfirmVoteModal'
@@ -182,7 +183,7 @@ export function VotingBallotLayout({
             <section className="mb-12">
               <h3 className="mb-8 font-headline-md text-headline-md text-on-surface">Select Your Representative</h3>
               <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-3">
-                {election.candidates.map((candidate, index) => {
+                {election.candidates.map((candidate) => {
                   const selected = selectedCandidate?.id === candidate.id
                   return (
                     <div
@@ -202,12 +203,15 @@ export function VotingBallotLayout({
                       ) : null}
                       <div className="aspect-square w-full overflow-hidden">
                         <img
-                          src={VOTING_CANDIDATE_IMAGES[index % VOTING_CANDIDATE_IMAGES.length]}
+                          src={candidatePortraitOrPlaceholder(candidate, VOTING_CANDIDATE_IMAGES)}
                           alt=""
                           className={`h-full w-full object-cover ${selected ? '' : 'grayscale group-hover:grayscale-0'} transition-all duration-500`}
                         />
                       </div>
                       <div className="p-6">
+                        <p className="mb-1 font-label-sm text-label-sm text-primary">
+                          {candidate.designation?.trim() || 'Candidate'}
+                        </p>
                         <h4 className="mb-2 font-headline-md text-headline-md text-on-surface">{candidate.name}</h4>
                         <p className="mb-6 line-clamp-2 font-body-sm text-body-sm text-on-surface-variant">
                           {candidate.description ?? 'No platform summary provided.'}

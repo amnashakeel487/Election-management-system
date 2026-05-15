@@ -1,5 +1,6 @@
-import { VOTING_CONFIRM_AVATAR } from '@/constants/votingAssets'
+import { VOTING_CANDIDATE_IMAGES } from '@/constants/votingAssets'
 import type { Candidate } from '@/types/election'
+import { candidatePortraitOrPlaceholder } from '@/utils/candidateDisplay'
 import { formatElectionCode } from '@/utils/electionTime'
 
 interface ConfirmVoteModalProps {
@@ -39,9 +40,16 @@ export function ConfirmVoteModal({
         <div className="mb-8 rounded-2xl border border-primary/20 bg-surface-container-high p-6">
           <p className="mb-2 font-label-md text-label-md uppercase tracking-widest text-primary">Selected Candidate</p>
           <div className="flex items-center gap-4">
-            <img src={VOTING_CONFIRM_AVATAR} alt="" className="h-12 w-12 rounded-full object-cover" />
+            <img
+              src={candidatePortraitOrPlaceholder(candidate, VOTING_CANDIDATE_IMAGES)}
+              alt=""
+              className="h-12 w-12 rounded-full object-cover"
+            />
             <div>
               <h4 className="font-headline-md text-headline-md text-on-surface">{candidate.name}</h4>
+              <p className="font-label-sm text-label-sm text-primary">
+                {candidate.designation?.trim() || 'Nominee'}
+              </p>
               <p className="font-body-sm text-body-sm text-on-surface-variant">{candidate.description ?? 'Official candidate'}</p>
             </div>
           </div>
