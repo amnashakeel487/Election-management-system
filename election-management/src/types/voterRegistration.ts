@@ -9,6 +9,7 @@ export interface VoterRegistration {
   secret_voter_id: string | null
   secret_voter_id_assigned_at: string | null
   secret_voter_id_emailed_at: string | null
+  voted_at: string | null
   created_at: string
 }
 

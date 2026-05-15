@@ -1,0 +1,113 @@
+import { supabase } from '@/lib/supabase'
+import type { CastVoteResult, VerifySecretVoterResult, VotingEligibility } from '@/types/voting'
+import { isPollingEnded, isPollingNotStarted, isPollingOpen } from '@/utils/electionPolling'
+import type { ElectionWithCandidates } from '@/types/election'
+import type { VoterRegistration } from '@/types/voterRegistration'
+
+const VERIFIED_SESSION_KEY = 'fv_vote_verified'
+
+interface VerifiedSession {
+  electionId: string
+  maskedSecretId: string
+  expiresAt: number
+}
+
+export function getVerifiedSession(electionId: string): VerifiedSession | null {
+  try {
+    const raw = sessionStorage.getItem(`${VERIFIED_SESSION_KEY}_${electionId}`)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as VerifiedSession
+    if (parsed.expiresAt < Date.now()) {
+      sessionStorage.removeItem(`${VERIFIED_SESSION_KEY}_${electionId}`)
+      return null
+    }
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+export function setVerifiedSession(electionId: string, maskedSecretId: string, ttlMinutes = 15): void {
+  const session: VerifiedSession = {
+    electionId,
+    maskedSecretId,
+    expiresAt: Date.now() + ttlMinutes * 60 * 1000,
+  }
+  sessionStorage.setItem(`${VERIFIED_SESSION_KEY}_${electionId}`, JSON.stringify(session))
+}
+
+export function clearVerifiedSession(electionId: string): void {
+  sessionStorage.removeItem(`${VERIFIED_SESSION_KEY}_${electionId}`)
+}
+
+export function buildVotingEligibility(
+  election: ElectionWithCandidates,
+  registration: VoterRegistration | null,
+): VotingEligibility {
+  const pollingOpen = isPollingOpen(election)
+  const hasVoted = Boolean(registration?.voted_at)
+  const hasSecretId = Boolean(registration?.secret_voter_id)
+  const isRegistered = registration?.status === 'registered'
+
+  if (!registration) {
+    return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'Not registered for this election' }
+  }
+
+  if (!isRegistered) {
+    return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'Waitlisted voters cannot vote' }
+  }
+
+  if (!hasSecretId) {
+    return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'Secret voter ID not issued yet' }
+  }
+
+  if (!election.voter_roll_finalized_at) {
+    return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'Voter roll not finalized' }
+  }
+
+  if (hasVoted) {
+    return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'You have already voted' }
+  }
+
+  if (isPollingNotStarted(election)) {
+    return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'Voting has not opened yet' }
+  }
+
+  if (isPollingEnded(election)) {
+    return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'Voting period has ended' }
+  }
+
+  if (!pollingOpen) {
+    return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'Voting is closed' }
+  }
+
+  return { canVote: true, pollingOpen, hasVoted, hasSecretId, isRegistered }
+}
+
+export async function verifySecretVoterForVoting(
+  electionId: string,
+  secretVoterId: string,
+): Promise<VerifySecretVoterResult> {
+  const { data, error } = await supabase.rpc('verify_secret_voter_for_voting', {
+    p_election_id: electionId,
+    p_secret_voter_id: secretVoterId.trim(),
+  })
+
+  if (error) throw new Error(error.message)
+  return data as VerifySecretVoterResult
+}
+
+export async function castAnonymousVote(
+  electionId: string,
+  secretVoterId: string,
+  candidateId: string,
+): Promise<CastVoteResult> {
+  const { data, error } = await supabase.rpc('cast_anonymous_vote', {
+    p_election_id: electionId,
+    p_secret_voter_id: secretVoterId.trim(),
+    p_candidate_id: candidateId,
+  })
+
+  if (error) throw new Error(error.message)
+  return data as CastVoteResult
+}

@@ -48,7 +48,7 @@ export async function fetchUserRegistrationForElection(
   const { data, error } = await supabase
     .from(TABLE)
     .select(
-      'id, election_id, user_id, status, waitlist_position, secret_voter_id, secret_voter_id_assigned_at, secret_voter_id_emailed_at, created_at',
+      'id, election_id, user_id, status, waitlist_position, secret_voter_id, secret_voter_id_assigned_at, secret_voter_id_emailed_at, voted_at, created_at',
     )
     .eq('election_id', electionId)
     .eq('user_id', userId)
@@ -80,6 +80,7 @@ export async function fetchUserRegistrations(userId: string): Promise<VoterRegis
       secret_voter_id,
       secret_voter_id_assigned_at,
       secret_voter_id_emailed_at,
+      voted_at,
       created_at,
       election:election_id (id, title, status, start_date, end_date, voter_roll_finalized_at)
     `,
@@ -103,6 +104,7 @@ export async function fetchUserRegistrations(userId: string): Promise<VoterRegis
       secret_voter_id: row.secret_voter_id,
       secret_voter_id_assigned_at: row.secret_voter_id_assigned_at,
       secret_voter_id_emailed_at: row.secret_voter_id_emailed_at,
+      voted_at: row.voted_at,
       created_at: row.created_at,
       election: normalized ?? undefined,
     }

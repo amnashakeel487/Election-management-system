@@ -12,6 +12,7 @@ interface ElectionParticipationCardProps {
   stats: ElectionRegistrationStats
   userRegistration: VoterRegistration | null
   voterRollFinalized?: boolean
+  canCastVote?: boolean
   onRegistrationChange: () => void
 }
 
@@ -21,6 +22,7 @@ export function ElectionParticipationCard({
   stats,
   userRegistration,
   voterRollFinalized,
+  canCastVote,
   onRegistrationChange,
 }: ElectionParticipationCardProps) {
   const navigate = useNavigate()
@@ -106,6 +108,17 @@ export function ElectionParticipationCard({
               Your Secret Voter ID will be issued after the organizer finalizes the voter roll.
             </p>
           )}
+          {canCastVote && userRegistration?.secret_voter_id && !userRegistration.voted_at ? (
+            <Link
+              to={`/elections/${electionId}/vote`}
+              className="mt-4 inline-block w-full rounded-xl bg-primary py-3 font-label-md text-label-md text-on-primary"
+            >
+              Cast Secure Ballot
+            </Link>
+          ) : null}
+          {userRegistration?.voted_at ? (
+            <p className="mt-2 font-body-sm text-body-sm text-tertiary">You have already voted in this election.</p>
+          ) : null}
         </div>
       ) : null}
 

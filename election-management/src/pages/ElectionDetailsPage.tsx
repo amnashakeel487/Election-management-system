@@ -16,6 +16,7 @@ import {
 import type { ElectionWithCandidates } from '@/types/election'
 import type { ElectionRegistrationStats, VoterRegistration } from '@/types/voterRegistration'
 import { formatElectionCode, formatTimeRemaining } from '@/utils/electionTime'
+import { isPollingOpen } from '@/utils/electionPolling'
 
 function formatMilestoneDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
@@ -242,6 +243,11 @@ export function ElectionDetailsPage() {
               stats={stats}
               userRegistration={userRegistration}
               voterRollFinalized={Boolean(election.voter_roll_finalized_at)}
+              canCastVote={
+                isPollingOpen(election) &&
+                Boolean(userRegistration?.secret_voter_id) &&
+                !userRegistration?.voted_at
+              }
               onRegistrationChange={() => void loadRegistrationData()}
             />
 

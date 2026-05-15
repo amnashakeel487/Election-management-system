@@ -56,5 +56,11 @@
     "designPath": "design/election_details_page/code.html",
     "reactPage": "src/pages/ElectionDetailsPage.tsx",
     "status": "converted"
+  },
+  "secure_voting_page": {
+    "route": "/elections/:id/vote",
+    "designPath": "design/secure_voting_page/code.html",
+    "reactPage": "src/pages/VotingPage.tsx",
+    "status": "converted"
   }
 }

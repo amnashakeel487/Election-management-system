@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { SecretVoterIdDisplay } from '@/components/voter/SecretVoterIdDisplay'
 import { fetchUserRegistrations } from '@/services/voterRegistrationService'
 import type { VoterRegistrationWithElection } from '@/types/voterRegistration'
+import { isPollingOpen } from '@/utils/electionPolling'
 
 export function VoterDashboardPage() {
   const { profile, session, signOut } = useAuth()
@@ -91,12 +92,36 @@ export function VoterDashboardPage() {
                       ) : null}
                     </div>
                     {reg.election?.id ? (
-                      <Link
-                        to={`/elections/${reg.election.id}`}
-                        className="rounded-lg border border-primary/20 px-4 py-2 font-label-md text-label-md text-primary hover:bg-primary/10"
-                      >
-                        View Election
-                      </Link>
+                      <div className="flex flex-wrap gap-2">
+                        <Link
+                          to={`/elections/${reg.election.id}`}
+                          className="rounded-lg border border-primary/20 px-4 py-2 font-label-md text-label-md text-primary hover:bg-primary/10"
+                        >
+                          View Election
+                        </Link>
+                        {reg.status === 'registered' &&
+                        reg.secret_voter_id &&
+                        !reg.voted_at &&
+                        reg.election &&
+                        isPollingOpen({
+                          start_date: reg.election.start_date,
+                          end_date: reg.election.end_date,
+                          status: reg.election.status as 'published' | 'active',
+                          voter_roll_finalized_at: reg.election.voter_roll_finalized_at ?? null,
+                        }) ? (
+                          <Link
+                            to={`/elections/${reg.election.id}/vote`}
+                            className="rounded-lg bg-primary px-4 py-2 font-label-md text-label-md text-on-primary hover:opacity-90"
+                          >
+                            Cast Vote
+                          </Link>
+                        ) : null}
+                        {reg.voted_at ? (
+                          <span className="rounded-lg border border-tertiary/30 px-4 py-2 font-label-md text-label-md text-tertiary">
+                            Voted
+                          </span>
+                        ) : null}
+                      </div>
                     ) : null}
                   </div>
                 </li>
