@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabase'
+import { isSupabaseConfigured, supabase } from '@/lib/supabase'
 import {
   fetchUserProfile,
   isEmailVerified,
@@ -26,6 +26,7 @@ interface AuthContextValue {
   user: User | null
   profile: UserProfile | null
   loading: boolean
+  initError: string | null
   emailVerified: boolean
   signIn: (credentials: AuthCredentials) => Promise<string>
   signUp: (payload: SignUpPayload) => Promise<void>
@@ -42,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [initError, setInitError] = useState<string | null>(null)
 
   const emailVerified = isEmailVerified(user?.email_confirmed_at)
 
@@ -67,20 +69,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true
 
     async function init() {
-      const { data } = await supabase.auth.getSession()
-      if (!mounted) return
+      if (!isSupabaseConfigured) {
+        if (mounted) {
+          setInitError(
+            'Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY on Vercel, then redeploy.',
+          )
+          setLoading(false)
+        }
+        return
+      }
 
-      setSession(data.session)
-      setUser(data.session?.user ?? null)
-      await loadProfile(data.session?.user ?? null)
-      setLoading(false)
+      try {
+        const sessionResult = await Promise.race([
+          supabase.auth.getSession(),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Session check timed out')), 12_000),
+          ),
+        ])
+
+        if (!mounted) return
+
+        setInitError(null)
+        setSession(sessionResult.data.session)
+        setUser(sessionResult.data.session?.user ?? null)
+        await loadProfile(sessionResult.data.session?.user ?? null)
+      } catch (err) {
+        if (!mounted) return
+        setInitError(
+          err instanceof Error
+            ? err.message
+            : 'Could not connect to Supabase. Check env vars and that the project is not paused.',
+        )
+        setSession(null)
+        setUser(null)
+        setProfile(null)
+      } finally {
+        if (mounted) setLoading(false)
+      }
     }
 
-    init()
+    void init()
+
+    if (!isSupabaseConfigured) {
+      return () => {
+        mounted = false
+      }
+    }
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+      if (!mounted) return
       setSession(nextSession)
       setUser(nextSession?.user ?? null)
       await loadProfile(nextSession?.user ?? null)
@@ -145,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       profile,
       loading,
+      initError,
       emailVerified,
       signIn,
       signUp,
@@ -158,6 +198,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       profile,
       loading,
+      initError,
       emailVerified,
       signIn,
       signUp,
