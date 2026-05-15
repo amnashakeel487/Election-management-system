@@ -1,9 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
+import { ROLE_LABELS } from '@/types/auth'
 
 export function TopNavBar() {
   const navigate = useNavigate()
-  const { session, profile, signOut } = useAuth()
+  const { session, profile, signOut, getDashboardPath, mfaRequired } = useAuth()
 
   async function handleLogout() {
     await signOut()
@@ -38,11 +39,23 @@ export function TopNavBar() {
         </div>
       </div>
       <div className="flex items-center gap-4">
-        {session && profile ? (
+        {session && profile && !mfaRequired ? (
           <>
-            <span className="hidden font-body-sm text-body-sm text-on-surface-variant md:inline">
-              {profile.email}
+            <span className="hidden rounded-full border border-primary/20 bg-primary/10 px-3 py-1 font-label-sm text-label-sm text-primary md:inline">
+              {ROLE_LABELS[profile.role]}
             </span>
+            <Link
+              to={getDashboardPath() ?? '/'}
+              className="hidden font-body-sm text-body-sm text-on-surface-variant hover:text-primary md:inline"
+            >
+              Dashboard
+            </Link>
+            <Link
+              to="/account/security"
+              className="hidden font-body-sm text-body-sm text-on-surface-variant hover:text-primary md:inline"
+            >
+              Security
+            </Link>
             <button
               type="button"
               onClick={() => void handleLogout()}

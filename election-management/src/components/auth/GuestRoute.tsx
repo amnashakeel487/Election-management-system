@@ -7,11 +7,15 @@ interface GuestRouteProps {
 
 /** Login/register: always show the form; redirect only when session is known. */
 export function GuestRoute({ children }: GuestRouteProps) {
-  const { session, profile, authReady, initError, emailVerified, getDashboardPath } = useAuth()
+  const { session, profile, authReady, initError, emailVerified, mfaRequired, isRecoverySession, getDashboardPath } =
+    useAuth()
 
   const showConnectionBanner = Boolean(initError)
 
-  if (authReady && session && profile) {
+  if (authReady && session && profile && !isRecoverySession) {
+    if (mfaRequired) {
+      return <Navigate to="/mfa-verify" replace />
+    }
     if (!emailVerified) {
       return <Navigate to="/verify-email" replace />
     }

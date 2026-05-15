@@ -1,6 +1,8 @@
 import { Route, Routes } from 'react-router-dom'
 import { GuestRoute } from '@/components/auth/GuestRoute'
+import { MfaRoute } from '@/components/auth/MfaRoute'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+import { RecoveryRoute } from '@/components/auth/RecoveryRoute'
 import { VerifyEmailRoute } from '@/components/auth/VerifyEmailRoute'
 import { HomePage } from '@/pages/HomePage'
 import { LoginPage } from '@/pages/LoginPage'
@@ -8,6 +10,8 @@ import { RegisterPage } from '@/pages/RegisterPage'
 import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { VerifyEmailPage } from '@/pages/VerifyEmailPage'
+import { MfaVerifyPage } from '@/pages/MfaVerifyPage'
+import { AccountSecurityPage } from '@/pages/AccountSecurityPage'
 import { AdminAuditLogsPage } from '@/pages/admin/AdminAuditLogsPage'
 import { AdminElectionsPage } from '@/pages/admin/AdminElectionsPage'
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
@@ -79,9 +83,27 @@ export function AppRoutes() {
       <Route
         path="/reset-password"
         element={
-          <GuestRoute>
+          <RecoveryRoute>
             <ResetPasswordPage />
-          </GuestRoute>
+          </RecoveryRoute>
+        }
+      />
+
+      <Route
+        path="/mfa-verify"
+        element={
+          <MfaRoute>
+            <MfaVerifyPage />
+          </MfaRoute>
+        }
+      />
+
+      <Route
+        path="/account/security"
+        element={
+          <ProtectedRoute>
+            <AccountSecurityPage />
+          </ProtectedRoute>
         }
       />
 

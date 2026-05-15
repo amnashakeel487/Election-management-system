@@ -1,5 +1,7 @@
 import { assertSupabaseConfigured, supabase } from '@/lib/supabase'
-import type { AuthCredentials, SignUpPayload, UserProfile } from '@/types/auth'
+import { establishRecoverySession } from '@/utils/recoverySession'
+import type { AuthCredentials, RegisterableRole, SignUpPayload, UserProfile } from '@/types/auth'
+import { REGISTERABLE_ROLES } from '@/types/auth'
 
 const USERS_TABLE = 'users'
 
@@ -45,8 +47,15 @@ export async function signInWithEmail({ email, password }: AuthCredentials) {
   }
 }
 
+function assertRegisterableRole(role: string): asserts role is RegisterableRole {
+  if (!REGISTERABLE_ROLES.includes(role as RegisterableRole)) {
+    throw new Error('Invalid account type. Super Admin accounts must be provisioned by the platform.')
+  }
+}
+
 export async function signUpWithEmail(payload: SignUpPayload) {
   assertSupabaseConfigured()
+  assertRegisterableRole(payload.role)
   const redirectTo = `${window.location.origin}/verify-email`
   const { email, password, role, full_name, phone, organization, election_purpose } = payload
 
@@ -83,6 +92,16 @@ export async function requestPasswordReset(email: string) {
 
 export async function updatePassword(newPassword: string) {
   assertSupabaseConfigured()
+
+  const { data: current } = await supabase.auth.getSession()
+  let session = current.session
+  if (!session) {
+    session = await establishRecoverySession()
+  }
+  if (!session) {
+    throw new Error('Your reset link has expired or was already used. Request a new password reset email.')
+  }
+
   const { error } = await supabase.auth.updateUser({ password: newPassword })
   if (error) throw new Error(error.message)
 }
@@ -101,4 +120,20 @@ export async function resendVerificationEmail(email: string) {
     },
   })
   if (error) throw new Error(error.message)
+}
+
+export async function refreshAuthSession() {
+  const { data, error } = await supabase.auth.refreshSession()
+  if (error) throw new Error(error.message)
+  return data.session
+}
+
+/** Waits for profile row after signup trigger (handles brief replication delay). */
+export async function waitForUserProfile(userId: string, attempts = 5): Promise<UserProfile | null> {
+  for (let i = 0; i < attempts; i += 1) {
+    const row = await fetchUserProfile(userId)
+    if (row) return row
+    await new Promise((resolve) => window.setTimeout(resolve, 400 * (i + 1)))
+  }
+  return null
 }

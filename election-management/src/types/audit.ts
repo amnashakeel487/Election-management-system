@@ -1,5 +1,7 @@
 export const AUDIT_ACTIONS = {
   USER_LOGIN: 'user_login',
+  USER_LOGOUT: 'user_logout',
+  USER_SIGNUP: 'user_signup',
   VOTE_CAST: 'vote_cast',
   ELECTION_CREATED: 'election_created',
   ELECTION_UPDATED: 'election_updated',

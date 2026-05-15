@@ -13,7 +13,7 @@ export function ProtectedRoute({
   allowedRoles,
   requireVerifiedEmail = true,
 }: ProtectedRouteProps) {
-  const { session, profile, authReady, initError, emailVerified, getDashboardPath } = useAuth()
+  const { session, profile, authReady, initError, emailVerified, mfaRequired, getDashboardPath } = useAuth()
   const location = useLocation()
 
   if (!authReady) {
@@ -33,7 +33,11 @@ export function ProtectedRoute({
   }
 
   if (!session || !profile) {
-    return <Navigate to="/login" replace state={{ from: location }} />
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />
+  }
+
+  if (mfaRequired) {
+    return <Navigate to="/mfa-verify" replace />
   }
 
   if (requireVerifiedEmail && !emailVerified) {

@@ -1,6 +1,8 @@
 export { AuthForm } from './AuthForm'
 export { AuthLayout } from './AuthLayout'
 export { GuestRoute } from './GuestRoute'
+export { MfaRoute } from './MfaRoute'
 export { ProtectedRoute } from './ProtectedRoute'
+export { RecoveryRoute } from './RecoveryRoute'
 export { RoleSelector } from './RoleSelector'
 export { VerifyEmailRoute } from './VerifyEmailRoute'

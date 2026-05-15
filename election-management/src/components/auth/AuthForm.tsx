@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AUTH_CAPTCHA_LOGO } from '@/constants/authAssets'
 import { useAuth } from '@/hooks/useAuth'
-import type { UserRole } from '@/types/auth'
+import type { RegisterableRole } from '@/types/auth'
 import { RoleSelector } from './RoleSelector'
 import { SupabaseConnectionHelp } from './SupabaseConnectionHelp'
 
@@ -16,16 +16,18 @@ export function AuthForm({ mode }: AuthFormProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const { signIn, signUp, initError } = useAuth()
-  const returnTo = (location.state as { from?: string } | null)?.from
+  const returnTo = (location.state as { from?: string; message?: string } | null)?.from
+  const flashMessage = (location.state as { message?: string } | null)?.message
 
   const isLogin = mode === 'login'
-  const [role, setRole] = useState<UserRole>('voter')
+  const [role, setRole] = useState<RegisterableRole>('voter')
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
   const [organization, setOrganization] = useState('')
   const [electionPurpose, setElectionPurpose] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [botChecked, setBotChecked] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -50,6 +52,10 @@ export function AuthForm({ mode }: AuthFormProps) {
       }
       if (role === 'election_creator' && !electionPurpose.trim()) {
         setError('Election purpose is required for creator registration.')
+        return
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match.')
         return
       }
     }
@@ -125,6 +131,12 @@ export function AuthForm({ mode }: AuthFormProps) {
               </span>
             </div>
           </div>
+
+          {flashMessage && isLogin ? (
+            <p className="rounded-xl border border-tertiary/30 bg-tertiary/10 px-md py-sm font-body-sm text-body-sm text-on-surface">
+              {flashMessage}
+            </p>
+          ) : null}
 
           {error ? (
             <p className="rounded-xl border border-error/30 bg-error-container/20 px-md py-sm font-body-sm text-body-sm text-error">
@@ -254,6 +266,28 @@ export function AuthForm({ mode }: AuthFormProps) {
                   />
                 </div>
               </div>
+
+              {!isLogin ? (
+                <div className="space-y-sm">
+                  <label
+                    className="ml-xs font-label-md text-label-md text-on-surface-variant"
+                    htmlFor="confirmPassword"
+                  >
+                    Confirm Password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full rounded-xl border-outline-variant bg-surface-container-lowest px-md py-md text-on-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+              ) : null}
             </div>
 
             <div className="flex items-center justify-between rounded-xl border border-outline-variant/50 bg-surface-container-highest/30 p-md">

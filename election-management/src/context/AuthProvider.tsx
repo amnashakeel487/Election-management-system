@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { Session, User } from '@supabase/supabase-js'
+import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js'
 import { clearSupabaseAuthStorage, isSupabaseConfigured, supabase } from '@/lib/supabase'
 import {
   fetchUserProfile,
@@ -15,7 +15,9 @@ import {
   signOut as authSignOut,
   signUpWithEmail,
   resendVerificationEmail,
+  waitForUserProfile,
 } from '@/services/authService'
+import { getVerifiedTotpFactor } from '@/services/mfaService'
 import type { AuthCredentials, SignUpPayload, UserProfile } from '@/types/auth'
 import { logAuditEvent } from '@/services/auditService'
 import { AUDIT_ACTIONS } from '@/types/audit'
@@ -25,29 +27,46 @@ interface AuthContextValue {
   session: Session | null
   user: User | null
   profile: UserProfile | null
-  /** @deprecated Use authReady for route guards; stays false so login/register never block. */
   loading: boolean
   authReady: boolean
   initError: string | null
   emailVerified: boolean
+  isRecoverySession: boolean
+  mfaRequired: boolean
   signIn: (credentials: AuthCredentials) => Promise<string>
   signUp: (payload: SignUpPayload) => Promise<void>
   signOut: () => Promise<void>
   resendVerification: () => Promise<void>
   refreshProfile: () => Promise<void>
+  refreshSession: () => Promise<void>
+  clearRecoverySession: () => void
   getDashboardPath: () => string | null
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
+async function checkMfaRequired(): Promise<boolean> {
+  try {
+    const factor = await getVerifiedTotpFactor()
+    if (!factor) return false
+    const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    if (error) return false
+    return data.currentLevel === 'aal1' && data.nextLevel === 'aal2'
+  } catch {
+    return false
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading] = useState(false)
   const [authReady, setAuthReady] = useState(false)
   const [initError, setInitError] = useState<string | null>(null)
+  const [isRecoverySession, setIsRecoverySession] = useState(false)
+  const [mfaRequired, setMfaRequired] = useState(false)
 
+  const loading = !authReady
   const emailVerified = isEmailVerified(user?.email_confirmed_at)
 
   const loadProfile = useCallback(async (authUser: User | null) => {
@@ -64,9 +83,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const refreshSession = useCallback(async () => {
+    const { data, error } = await supabase.auth.getSession()
+    if (error) throw new Error(error.message)
+    setSession(data.session)
+    setUser(data.session?.user ?? null)
+    await loadProfile(data.session?.user ?? null)
+    const needsMfa = await checkMfaRequired()
+    setMfaRequired(needsMfa)
+  }, [loadProfile])
+
   const refreshProfile = useCallback(async () => {
     if (user) await loadProfile(user)
   }, [loadProfile, user])
+
+  const clearRecoverySession = useCallback(() => {
+    setIsRecoverySession(false)
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -87,23 +120,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (mounted) setAuthReady(true)
     }
 
-    // Dashboards wait at most 3s for session probe; login/register never block.
     const unlockTimer = window.setTimeout(markReady, 3000)
 
-    const applySession = (nextSession: Session | null) => {
+    const applySession = async (nextSession: Session | null, event?: AuthChangeEvent) => {
       if (!mounted) return
       sessionResolved = true
       setSession(nextSession)
       setUser(nextSession?.user ?? null)
       setInitError(null)
+
+      if (event === 'PASSWORD_RECOVERY' && nextSession) {
+        setIsRecoverySession(true)
+      } else if (event === 'SIGNED_OUT') {
+        setIsRecoverySession(false)
+        setMfaRequired(false)
+      }
+
+      if (nextSession?.user) {
+        const needsMfa = await checkMfaRequired()
+        if (mounted) setMfaRequired(needsMfa)
+      } else if (mounted) {
+        setMfaRequired(false)
+      }
+
       markReady()
       void loadProfile(nextSession?.user ?? null)
     }
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      void applySession(nextSession)
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      void applySession(nextSession, event)
     })
 
     const loadSession = () =>
@@ -114,7 +161,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setInitError(
             'Slow or failed connection to Supabase. Try “Clear cached login” below, then sign in again.',
           )
+          markReady()
           return
+        }
+        if (data.session) {
+          const hash = window.location.hash
+          const search = window.location.search
+          if (
+            hash.includes('type=recovery') ||
+            search.includes('code=') ||
+            (search.includes('token_hash=') && search.includes('type=recovery'))
+          ) {
+            setIsRecoverySession(true)
+          }
         }
         void applySession(data.session)
       })
@@ -123,11 +182,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!mounted) return
       console.warn('getSession failed:', err)
       setInitError('Cannot reach Supabase. Check diagnostics below, then clear cache or redeploy Vercel.')
+      markReady()
     })
 
-    // If getSession hangs, retry once after clearing stale tokens.
     const retryTimer = window.setTimeout(() => {
       if (!mounted || sessionResolved) return
+      if (window.location.pathname.includes('reset-password')) return
       clearSupabaseAuthStorage()
       void loadSession()
     }, 2500)
@@ -144,7 +204,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { session: nextSession } = await signInWithEmail(credentials)
     if (!nextSession?.user) throw new Error('Sign in failed')
 
-    const row = await fetchUserProfile(nextSession.user.id)
+    const row = (await waitForUserProfile(nextSession.user.id)) ?? (await fetchUserProfile(nextSession.user.id))
     if (!row) throw new Error('User profile not found. Contact support.')
 
     setSession(nextSession)
@@ -158,6 +218,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       /* audit must not block login */
     })
 
+    const needsMfa = await checkMfaRequired()
+    setMfaRequired(needsMfa)
+    if (needsMfa) {
+      return '/mfa-verify'
+    }
+
     if (!isEmailVerified(nextSession.user.email_confirmed_at)) {
       return '/verify-email'
     }
@@ -166,15 +232,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signUp = useCallback(async (payload: SignUpPayload) => {
-    await signUpWithEmail(payload)
+    const { user: newUser } = await signUpWithEmail(payload)
+    void logAuditEvent(AUDIT_ACTIONS.USER_SIGNUP, {
+      email: payload.email,
+      role: payload.role,
+    }).catch(() => {
+      /* audit must not block signup */
+    })
+    if (newUser) {
+      await waitForUserProfile(newUser.id)
+    }
   }, [])
 
   const signOut = useCallback(async () => {
+    const email = profile?.email
+    const role = profile?.role
     await authSignOut()
     setSession(null)
     setUser(null)
     setProfile(null)
-  }, [])
+    setMfaRequired(false)
+    setIsRecoverySession(false)
+    if (email) {
+      void logAuditEvent(AUDIT_ACTIONS.USER_LOGOUT, { email, role }).catch(() => {
+        /* non-blocking */
+      })
+    }
+  }, [profile?.email, profile?.role])
 
   const resendVerification = useCallback(async () => {
     if (!user?.email) throw new Error('No email on file')
@@ -195,11 +279,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authReady,
       initError,
       emailVerified,
+      isRecoverySession,
+      mfaRequired,
       signIn,
       signUp,
       signOut,
       resendVerification,
       refreshProfile,
+      refreshSession,
+      clearRecoverySession,
       getDashboardPath,
     }),
     [
@@ -210,11 +298,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       authReady,
       initError,
       emailVerified,
+      isRecoverySession,
+      mfaRequired,
       signIn,
       signUp,
       signOut,
       resendVerification,
       refreshProfile,
+      refreshSession,
+      clearRecoverySession,
       getDashboardPath,
     ],
   )

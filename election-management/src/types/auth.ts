@@ -1,5 +1,16 @@
 export type UserRole = 'admin' | 'election_creator' | 'voter'
 
+/** Roles available on the public registration form (Super Admin is provisioned separately). */
+export type RegisterableRole = Exclude<UserRole, 'admin'>
+
+export const REGISTERABLE_ROLES: RegisterableRole[] = ['voter', 'election_creator']
+
+export const ROLE_LABELS: Record<UserRole, string> = {
+  admin: 'Super Admin',
+  election_creator: 'Election Creator',
+  voter: 'Voter',
+}
+
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected'
 
 export interface UserProfile {
@@ -22,7 +33,7 @@ export interface AuthCredentials {
 }
 
 export interface SignUpPayload extends AuthCredentials {
-  role: UserRole
+  role: RegisterableRole
   full_name: string
   phone: string
   organization?: string

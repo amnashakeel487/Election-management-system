@@ -12,7 +12,7 @@ export function VerifyEmailPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const pendingEmail = (location.state as VerifyEmailLocationState | null)?.email
-  const { user, emailVerified, loading, getDashboardPath, refreshProfile } = useAuth()
+  const { user, emailVerified, authReady, getDashboardPath, refreshProfile, refreshSession } = useAuth()
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [resending, setResending] = useState(false)
@@ -20,10 +20,16 @@ export function VerifyEmailPage() {
   const displayEmail = user?.email ?? pendingEmail ?? ''
 
   useEffect(() => {
-    if (!loading && !user && !pendingEmail) {
+    void refreshSession().catch(() => {
+      /* session refresh from email link */
+    })
+  }, [refreshSession])
+
+  useEffect(() => {
+    if (authReady && !user && !pendingEmail) {
       navigate('/login', { replace: true })
     }
-  }, [loading, user, pendingEmail, navigate])
+  }, [authReady, user, pendingEmail, navigate])
 
   async function handleResend() {
     if (!displayEmail) return
@@ -41,12 +47,13 @@ export function VerifyEmailPage() {
   }
 
   async function handleGoToDashboard() {
+    await refreshSession()
     await refreshProfile()
     const path = getDashboardPath()
     if (path) navigate(path, { replace: true })
   }
 
-  if (loading || (!user && !pendingEmail)) {
+  if (!authReady || (!user && !pendingEmail)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-on-background">
         <span className="font-body-md text-body-md text-on-surface-variant">Verifying session…</span>

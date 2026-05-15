@@ -1,14 +1,65 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AuthLayout } from '@/components/auth/AuthLayout'
 import { updatePassword } from '@/services/authService'
+import { useAuth } from '@/hooks/useAuth'
+import { establishRecoverySession, hasRecoveryParamsInUrl } from '@/utils/recoverySession'
 
 export function ResetPasswordPage() {
   const navigate = useNavigate()
+  const { authReady, session, clearRecoverySession, signOut, refreshSession } = useAuth()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [sessionReady, setSessionReady] = useState(false)
+  const [establishing, setEstablishing] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function initRecovery() {
+      if (!authReady) return
+
+      try {
+        if (!hasRecoveryParamsInUrl()) {
+          if (session) {
+            if (!cancelled) {
+              setSessionReady(true)
+              setEstablishing(false)
+            }
+            return
+          }
+          if (!cancelled) {
+            setError('Open the password reset link from your email, or request a new one.')
+            setEstablishing(false)
+          }
+          return
+        }
+
+        const recoverySession = await establishRecoverySession()
+        if (cancelled) return
+
+        if (recoverySession) {
+          await refreshSession()
+          setSessionReady(true)
+        } else {
+          setError('Reset link expired or invalid. Request a new password reset email.')
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Could not verify reset link')
+        }
+      } finally {
+        if (!cancelled) setEstablishing(false)
+      }
+    }
+
+    void initRecovery()
+    return () => {
+      cancelled = true
+    }
+  }, [authReady, session, refreshSession])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -20,12 +71,44 @@ export function ResetPasswordPage() {
     setSubmitting(true)
     try {
       await updatePassword(password)
-      navigate('/login', { replace: true, state: { message: 'Password updated. Please sign in.' } })
+      clearRecoverySession()
+      await signOut()
+      navigate('/login', {
+        replace: true,
+        state: { message: 'Password updated. Please sign in with your new password.' },
+      })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update password')
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (!authReady || establishing) {
+    return (
+      <AuthLayout>
+        <div className="glass-card mx-auto max-w-md rounded-[32px] p-lg text-center md:p-xl">
+          <p className="font-body-md text-on-surface-variant">Verifying your secure reset link…</p>
+        </div>
+      </AuthLayout>
+    )
+  }
+
+  if (!sessionReady) {
+    return (
+      <AuthLayout>
+        <div className="glass-card mx-auto max-w-md rounded-[32px] p-lg md:p-xl">
+          {error ? (
+            <p className="mb-md rounded-xl border border-error/30 bg-error-container/20 px-md py-sm font-body-sm text-error">
+              {error}
+            </p>
+          ) : null}
+          <Link to="/forgot-password" className="block text-center font-label-md text-primary hover:underline">
+            Request a new reset link
+          </Link>
+        </div>
+      </AuthLayout>
+    )
   }
 
   return (

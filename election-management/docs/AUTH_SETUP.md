@@ -40,6 +40,7 @@ Open your project: `https://supabase.com/dashboard/project/prxgnpcolmfucunotcil`
 |--------|--------|
 | **Site URL** | `https://YOUR-APP.vercel.app` |
 | **Redirect URLs** | `https://YOUR-APP.vercel.app/verify-email` |
+| | `https://YOUR-APP.vercel.app/reset-password` |
 | | `https://YOUR-APP.vercel.app/**` |
 | | `http://localhost:5174/**` (local dev) |
 
@@ -50,15 +51,22 @@ Open your project: `https://supabase.com/dashboard/project/prxgnpcolmfucunotcil`
 - Keep **Confirm email** **enabled** if your requirements need verification.
 - For quick local testing only, you may disable it temporarily (users can log in immediately after sign-up).
 
-## 5. Register an admin
+## 5. Create a Super Admin
 
-1. Open `https://YOUR-APP.vercel.app/register` (or `http://localhost:5174/register` locally)
-3. Role: **Admin**
-4. Email + password → **Create Secure Account**
-5. Check inbox (and spam) for the Supabase confirmation email.
-6. Click the link → sign in at `/login`
+Super Admin accounts are **not** available on the public registration form. After a user registers (any role), promote them in Supabase:
 
-`public.users` should get `role = admin` automatically from signup metadata (migration `001_users.sql`).
+1. **Table Editor** → `users` → find the row by email.
+2. Set `role` = `admin` and `approval_status` = `approved`.
+
+Or run in the SQL editor (replace the email):
+
+```sql
+update public.users
+set role = 'admin', approval_status = 'approved'
+where email = 'you@example.com';
+```
+
+Then sign in at `/login`. Run migration `011_auth_hardening.sql` if self-service admin signup should be blocked at the database layer.
 
 ## 6. Troubleshooting
 
