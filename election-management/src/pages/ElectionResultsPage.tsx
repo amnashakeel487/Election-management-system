@@ -10,6 +10,7 @@ import { ResultsTurnoutPanel } from '@/components/results/ResultsTurnoutPanel'
 import { ResultsVoteBarChart } from '@/components/results/ResultsVoteBarChart'
 import { ResultsVotePieChart } from '@/components/results/ResultsVotePieChart'
 import { ResultsVoteTrendChart } from '@/components/results/ResultsVoteTrendChart'
+import { ResultsExportToolbar } from '@/components/results/ResultsExportToolbar'
 import { WinnerCard } from '@/components/results/WinnerCard'
 import { useAuth } from '@/hooks/useAuth'
 import { useElectionResults } from '@/hooks/useElectionResults'
@@ -74,7 +75,10 @@ export function ElectionResultsPage() {
                 : 'Certified tallies from verified anonymous ballots.'}
             </p>
           </div>
-          <ResultsLiveStatusBadge results={display} lastUpdated={lastUpdated} />
+          <div className="flex flex-col items-stretch gap-4 sm:items-end">
+            <ResultsLiveStatusBadge results={display} lastUpdated={lastUpdated} />
+            <ResultsExportToolbar results={display} />
+          </div>
         </header>
 
         <ResultsLockPanel

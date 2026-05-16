@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader'
 import { ADMIN_PAGE_META } from '@/config/adminNav'
+import { AdminElectionResultsExport } from '@/components/admin/AdminElectionResultsExport'
 import { downloadAuditCsv, fetchFilteredAuditLogs } from '@/services/auditService'
 import { fetchAdminElections, fetchAdminUsers } from '@/services/adminDashboardService'
 
@@ -92,7 +93,9 @@ export function AdminReportsPage() {
 
       {message ? <div className="alert alert-info">{message}</div> : null}
 
-      <div className="grid-3">
+      <AdminElectionResultsExport />
+
+      <div className="grid-3" style={{ marginTop: 16 }}>
         <div className="card-elevated">
           <div className="card-header">
             <div className="card-title">Users CSV</div>

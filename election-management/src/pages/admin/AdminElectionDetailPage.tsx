@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { VoterRollLockPanel } from '@/components/election/VoterRollLockPanel'
+import { ResultsExportToolbar } from '@/components/results/ResultsExportToolbar'
 import { fetchElectionById } from '@/services/electionService'
 import { fetchElectionResults } from '@/services/resultsService'
 import type { ElectionWithCandidates } from '@/types/election'
@@ -90,6 +91,17 @@ export function AdminElectionDetailPage() {
         <p style={{ color: 'var(--subtle)', fontSize: 13 }}>Loading election…</p>
       ) : election ? (
         <>
+          {results ? (
+            <div className="card-elevated" style={{ marginBottom: 16 }}>
+              <div className="card-header">
+                <div className="card-title">Download results</div>
+              </div>
+              <div className="card-body">
+                <ResultsExportToolbar results={results} variant="admin" />
+              </div>
+            </div>
+          ) : null}
+
           <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
             <div className="stat-card">
               <div className="stat-num">{formatDashboardNumber(results?.registered_voters ?? 0)}</div>
