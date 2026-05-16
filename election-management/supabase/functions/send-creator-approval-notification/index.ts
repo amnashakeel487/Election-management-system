@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
-import { getBrevoApiKey, sendBrevoEmail } from '../_shared/brevo.ts'
+import { getBrevoApiKey, sendBrevoEmail } from './brevo.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

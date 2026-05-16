@@ -82,6 +82,8 @@ Open your project in the [Supabase dashboard](https://supabase.com/dashboard).
 
 ## Part 3 — Edge function secrets (Brevo API)
 
+> **Step-by-step only for secret voter ID emails:** see [SECRET_VOTER_ID_EMAIL_SETUP.md](./SECRET_VOTER_ID_EMAIL_SETUP.md)
+
 Secret voter IDs and creator approval emails use the **Brevo REST API**.
 
 1. Supabase dashboard → **Edge Functions** → **Secrets** (or Project Settings → Edge Functions).
@@ -102,6 +104,17 @@ supabase functions deploy send-creator-approval-notification
 ```
 
 Without `BREVO_API_KEY`, functions run in **dev mode** (IDs logged in function logs, no real email).
+
+### Deploy without CLI (Supabase Dashboard)
+
+1. Open [Supabase Dashboard](https://supabase.com/dashboard/project/prxgnpcolmfucunotcil/functions).
+2. **Create a new function** named exactly `send-secret-voter-ids`.
+3. Paste the code from `supabase/functions/send-secret-voter-ids/index.ts` and `brevo.ts` (combine or upload both files if the editor supports imports).
+4. **Deploy** the function.
+5. **Edge Functions** → **Secrets** → add `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `BREVO_SENDER_NAME`.
+6. Repeat for `send-creator-approval-notification` if you use creator approval emails.
+
+Or from the `election-management` folder use `npx supabase@latest login`, `npx supabase@latest link --project-ref prxgnpcolmfucunotcil`, and `npx supabase@latest functions deploy send-secret-voter-ids` (do **not** use `npm install -g supabase` — not supported). See [SECRET_VOTER_ID_EMAIL_SETUP.md](./SECRET_VOTER_ID_EMAIL_SETUP.md).
 
 ---
 
@@ -130,6 +143,7 @@ Without `BREVO_API_KEY`, functions run in **dev mode** (IDs logged in function l
 
 | Problem | What to check |
 |--------|----------------|
+| **`Failed to send a request to the Edge Function`** | Function `send-secret-voter-ids` is **not deployed**. Deploy it (Part 3) and set secrets. If finalize already ran, IDs exist but emails did not send — redeploy, set Brevo secrets, then voters use **Email again**. |
 | `Error sending confirmation email` (sign-up) | Supabase SMTP: host `smtp-relay.brevo.com`, SMTP **key** as password, sender **verified** in Brevo |
 | Edge function `dev_mode: true` | Set `BREVO_API_KEY` and redeploy the function |
 | `Sender not found` / invalid sender | `BREVO_SENDER_EMAIL` must be a **verified** sender in Brevo |

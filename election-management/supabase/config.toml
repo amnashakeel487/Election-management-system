@@ -1,0 +1,8 @@
+# Supabase local / deploy config (project ref from dashboard URL)
+project_id = "prxgnpcolmfucunotcil"
+
+[functions.send-secret-voter-ids]
+verify_jwt = true
+
+[functions.send-creator-approval-notification]
+verify_jwt = true
