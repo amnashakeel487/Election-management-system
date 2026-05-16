@@ -9,6 +9,7 @@ const VERIFIED_SESSION_KEY = 'fv_vote_verified'
 interface VerifiedSession {
   electionId: string
   maskedSecretId: string
+  secretVoterId: string
   expiresAt: number
 }
 
@@ -27,10 +28,16 @@ export function getVerifiedSession(electionId: string): VerifiedSession | null {
   }
 }
 
-export function setVerifiedSession(electionId: string, maskedSecretId: string, ttlMinutes = 15): void {
+export function setVerifiedSession(
+  electionId: string,
+  maskedSecretId: string,
+  secretVoterId: string,
+  ttlMinutes = 15,
+): void {
   const session: VerifiedSession = {
     electionId,
     maskedSecretId,
+    secretVoterId: secretVoterId.trim(),
     expiresAt: Date.now() + ttlMinutes * 60 * 1000,
   }
   sessionStorage.setItem(`${VERIFIED_SESSION_KEY}_${electionId}`, JSON.stringify(session))
@@ -95,6 +102,25 @@ export async function verifySecretVoterForVoting(
 
   if (error) throw new Error(error.message)
   return data as VerifySecretVoterResult
+}
+
+export interface ElectionVotingStatus {
+  election_id: string
+  status: string
+  voter_roll_finalized_at: string | null
+  start_date: string
+  end_date: string
+  polling_open: boolean
+  phase: 'not_finalized' | 'not_started' | 'open' | 'ended' | 'closed'
+}
+
+export async function fetchElectionVotingStatus(electionId: string): Promise<ElectionVotingStatus> {
+  const { data, error } = await supabase.rpc('get_election_voting_status', {
+    p_election_id: electionId,
+  })
+
+  if (error) throw new Error(error.message)
+  return data as ElectionVotingStatus
 }
 
 export async function castAnonymousVote(

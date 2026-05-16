@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { CandidateAvatar } from '@/components/election/CandidateAvatar'
+import { VotingEligibilityPanel } from '@/components/voting/VotingEligibilityPanel'
 import { VoterRegistrationPanel } from '@/components/voter/VoterRegistrationPanel'
 import { Footer } from '@/components/layout/Footer'
 import { TopNavBar } from '@/components/layout/TopNavBar'
@@ -247,6 +248,12 @@ export function ElectionDetailsPage() {
                   !userRegistration?.voted_at
                 }
                 onRegistrationChange={() => void loadRegistrationData()}
+              />
+
+              <VotingEligibilityPanel
+                election={election}
+                registration={userRegistration}
+                sessionUserId={session?.user.id}
               />
 
               <div className="ed-panel">

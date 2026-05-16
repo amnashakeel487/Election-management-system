@@ -6,11 +6,8 @@ import type { Candidate, ElectionWithCandidates } from '@/types/election'
 import { candidatePortraitOrPlaceholder } from '@/utils/candidateDisplay'
 import { formatElectionCode } from '@/utils/electionTime'
 import { formatCountdownMs } from '@/utils/electionPolling'
-import { ConfirmVoteModal } from './ConfirmVoteModal'
-
 interface VotingBallotLayoutProps {
   election: ElectionWithCandidates
-  electionId: string
   step: 'verify' | 'ballot'
   secretInput: string
   onSecretInputChange: (value: string) => void
@@ -23,17 +20,13 @@ interface VotingBallotLayoutProps {
   sessionLeftMs: number
   selectedCandidate: Candidate | null
   onSelectCandidate: (candidate: Candidate) => void
-  showConfirm: boolean
-  onCloseConfirm: () => void
-  onOpenConfirm: () => void
   submitting: boolean
   submitError: string | null
-  onCastVote: () => void
+  onOpenConfirm: () => void
 }
 
 export function VotingBallotLayout({
   election,
-  electionId,
   step,
   secretInput,
   onSecretInputChange,
@@ -46,12 +39,9 @@ export function VotingBallotLayout({
   sessionLeftMs,
   selectedCandidate,
   onSelectCandidate,
-  showConfirm,
-  onCloseConfirm,
   onOpenConfirm,
   submitting,
   submitError,
-  onCastVote,
 }: VotingBallotLayoutProps) {
   const ballotCode = formatElectionCode(election.id)
 
@@ -244,9 +234,14 @@ export function VotingBallotLayout({
               <p className="mb-6 max-w-md text-center font-body-md text-body-md text-on-surface-variant">
                 Once confirmed, your vote will be encrypted and submitted. This action cannot be reversed.
               </p>
+              {submitError ? (
+                <p className="mb-4 max-w-md rounded-lg border border-error/20 bg-error-container/20 px-4 py-3 text-center font-body-sm text-error">
+                  {submitError}
+                </p>
+              ) : null}
               <button
                 type="button"
-                disabled={!selectedCandidate}
+                disabled={!selectedCandidate || submitting}
                 onClick={onOpenConfirm}
                 className="rounded-2xl bg-primary px-12 py-5 font-headline-md text-headline-md font-bold text-on-primary shadow-[0_0_40px_rgba(173,198,255,0.3)] transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
               >
@@ -257,19 +252,6 @@ export function VotingBallotLayout({
         )}
       </main>
       <Footer />
-
-      {selectedCandidate ? (
-        <ConfirmVoteModal
-          open={showConfirm}
-          electionId={electionId}
-          candidate={selectedCandidate}
-          maskedId={maskedId}
-          submitting={submitting}
-          error={submitError}
-          onClose={onCloseConfirm}
-          onConfirm={onCastVote}
-        />
-      ) : null}
     </div>
   )
 }

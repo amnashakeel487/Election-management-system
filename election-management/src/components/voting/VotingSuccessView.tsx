@@ -3,9 +3,10 @@ import { TopNavBar } from '@/components/layout/TopNavBar'
 
 interface VotingSuccessViewProps {
   receiptHash: string | null
+  electionId?: string
 }
 
-export function VotingSuccessView({ receiptHash }: VotingSuccessViewProps) {
+export function VotingSuccessView({ receiptHash, electionId }: VotingSuccessViewProps) {
   return (
     <div className="min-h-screen bg-background text-on-background">
       <TopNavBar />
@@ -20,9 +21,19 @@ export function VotingSuccessView({ receiptHash }: VotingSuccessViewProps) {
             Receipt: <span className="text-tertiary">{receiptHash}</span>
           </p>
         ) : null}
-        <Link to="/voter/dashboard" className="rounded-xl bg-primary px-lg py-md font-body-md text-on-primary">
-          Return to dashboard
-        </Link>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {electionId ? (
+            <Link
+              to={`/elections/${electionId}`}
+              className="rounded-xl border border-outline-variant px-lg py-md font-body-md text-on-surface"
+            >
+              Election details
+            </Link>
+          ) : null}
+          <Link to="/voter/dashboard" className="rounded-xl bg-primary px-lg py-md font-body-md text-on-primary">
+            Return to dashboard
+          </Link>
+        </div>
       </main>
     </div>
   )
