@@ -121,8 +121,8 @@ export function SignupPageView() {
 
   return (
     <AuthSplitChrome variant="register">
-      <div className="sp-form-card">
-            <div className="relative overflow-hidden bg-gradient-to-br from-[#0F2347] via-[#1B3A6B] to-[#2D1B69] px-8 pb-6 pt-7">
+      <div className="sp-form-card sp-form-card--register">
+        <div className="sp-form-card-header sp-form-card-header--compact relative overflow-hidden bg-gradient-to-br from-[#0F2347] via-[#1B3A6B] to-[#2D1B69]">
               <div className="pointer-events-none absolute -right-10 -top-16 h-[180px] w-[180px] rounded-full bg-purple-500/30 blur-[30px]" />
               <div className="pointer-events-none absolute bottom-[-40px] left-5 h-[120px] w-[120px] rounded-full bg-cyan-400/20 blur-[30px]" />
               <div className="relative z-[1]">
@@ -139,7 +139,7 @@ export function SignupPageView() {
                 </div>
                 <h2 className="mb-1 text-[22px] font-extrabold tracking-tight text-white">Create your account</h2>
                 <p className="text-[13px] text-white/50">Join FortressVote — verify your email after signup.</p>
-                <div className="mt-5">
+                <div className="sp-form-stepper mt-2.5">
                   <div className="flex gap-1">
                     <div className="h-0.5 flex-1 overflow-hidden rounded-sm bg-white/15">
                       <div className="h-full w-full rounded-sm bg-cyan-400" />
@@ -160,7 +160,8 @@ export function SignupPageView() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="px-8 pb-6 pt-7">
+        <div className="sp-form-card-scroll">
+            <form onSubmit={handleSubmit}>
               {flashMessage ? (
                 <p className="mb-4 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-center text-[13px] text-slate-700">
                   {flashMessage}
@@ -172,7 +173,7 @@ export function SignupPageView() {
                 </p>
               ) : null}
 
-              <div className="mb-5 grid grid-cols-2 gap-2.5">
+              <div className="sp-form-social sp-mb-section grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   className="flex items-center justify-center gap-2 rounded-[11px] border-[1.5px] border-[#E2E8F0] bg-white py-2.5 text-[12px] font-semibold text-slate-500 transition-all hover:-translate-y-px hover:border-[#2451A3] hover:bg-[#F0F4F9] hover:text-[#1B3A6B]"
@@ -195,9 +196,9 @@ export function SignupPageView() {
                 </button>
               </div>
 
-              <div className="mb-5 flex items-center gap-2.5">
+              <div className="sp-form-divider sp-mb-section flex items-center gap-2">
                 <div className="h-px flex-1 bg-[#E2E8F0]" />
-                <span className="text-[11px] font-medium text-slate-400">or continue with email</span>
+                <span className="text-[10px] font-medium text-slate-400">or email</span>
                 <div className="h-px flex-1 bg-[#E2E8F0]" />
               </div>
 
@@ -364,7 +365,7 @@ export function SignupPageView() {
                     <label className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.07em] text-slate-500">Election purpose</label>
                     <textarea
                       required
-                      rows={3}
+                      rows={2}
                       value={electionPurpose}
                       onChange={(e) => setElectionPurpose(e.target.value)}
                       placeholder="Describe how you plan to use FortressVote"
@@ -454,8 +455,9 @@ export function SignupPageView() {
                 </Link>
               </p>
             </form>
+        </div>
 
-            <div className="flex flex-wrap justify-center gap-3.5 border-t border-[#E2E8F0] px-8 py-3">
+        <div className="sp-form-card-footer flex flex-wrap justify-center gap-3">
               {[
                 { icon: 'lock', label: 'SSL secured' },
                 { icon: 'shield', label: 'Role-based access' },
