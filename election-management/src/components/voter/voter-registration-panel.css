@@ -124,6 +124,12 @@
   color: #b45309;
 }
 
+.vr-status-box--closed {
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  background: #f5f3ff;
+  color: #5b21b6;
+}
+
 .vr-modal::backdrop {
   background: rgba(15, 23, 42, 0.55);
 }

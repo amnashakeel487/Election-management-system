@@ -54,6 +54,9 @@ export function VoterRegistrationPanel({
   const alreadyRegistered = userRegistration?.status === 'registered'
   const onWaitlist = userRegistration?.status === 'waitlisted'
   const rollStatus = registrationStatusLabel(election)
+  const canJoin = eligibility.canRegister
+  const showParticipateForm = !alreadyRegistered && !onWaitlist && canJoin
+  const showRegistrationClosed = !alreadyRegistered && !onWaitlist && !canJoin
 
   function openConfirm() {
     if (!session) {
@@ -106,7 +109,7 @@ export function VoterRegistrationPanel({
     }
   }
 
-  const joinDisabled = submitting || !termsAccepted || !eligibility.canRegister
+  const joinDisabled = submitting || !termsAccepted
 
   return (
     <>
@@ -162,7 +165,7 @@ export function VoterRegistrationPanel({
           {eligibilityRuleDescription(election.eligibility_rule)}
         </p>
 
-        {!alreadyRegistered && !onWaitlist ? (
+        {!alreadyRegistered && !onWaitlist && (showParticipateForm || showRegistrationClosed) ? (
           <ul className="mb-4 space-y-2" aria-label="Eligibility checklist">
             {eligibility.checks.map((check) => (
               <li
@@ -225,7 +228,28 @@ export function VoterRegistrationPanel({
           </div>
         ) : null}
 
-        {!alreadyRegistered && !onWaitlist ? (
+        {showRegistrationClosed ? (
+          <div className="vr-status-box vr-status-box--closed mb-4 text-left">
+            <p className="font-bold text-violet-900">Registration is closed</p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-600">
+              {eligibility.blockReason ??
+                'You cannot join this election right now.'}
+            </p>
+            {election.voter_roll_finalized_at ? (
+              <p className="mt-2 text-xs text-slate-500">
+                The organizer finalized the voter roll with {stats.registered_count.toLocaleString()} registered
+                voter{stats.registered_count === 1 ? '' : 's'}. New participants cannot be added after finalization.
+                Contact the election organizer if you believe this was done in error.
+              </p>
+            ) : election.registration_locked_at ? (
+              <p className="mt-2 text-xs text-slate-500">
+                Registration was locked before you could join. The organizer or an administrator must reopen it.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
+        {showParticipateForm ? (
           <>
             {eligibility.willWaitlist ? (
               <p className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-900">
@@ -258,22 +282,24 @@ export function VoterRegistrationPanel({
               disabled={joinDisabled}
               onClick={openConfirm}
               className="vr-btn-primary"
+              title={!termsAccepted ? 'Accept the terms to continue' : undefined}
             >
               {submitting ? 'Processing…' : eligibility.willWaitlist ? 'Join waitlist' : 'I want to participate'}
             </button>
-
-            {!session ? (
-              <p className="mt-3 text-center text-[11px] text-slate-500">
-                <Link to="/login" state={{ from: `/elections/${election.id}` }} className="font-bold text-[#2451A3]">
-                  Sign in
-                </Link>{' '}
-                or{' '}
-                <Link to="/register" className="font-bold text-[#2451A3]">
-                  create a voter account
-                </Link>
-              </p>
-            ) : null}
           </>
+        ) : null}
+
+        {!session && !alreadyRegistered && !onWaitlist ? (
+          <p className="mt-3 text-center text-[11px] text-slate-500">
+            <Link to="/login" state={{ from: `/elections/${election.id}` }} className="font-bold text-[#2451A3]">
+              Sign in
+            </Link>{' '}
+            or{' '}
+            <Link to="/register" className="font-bold text-[#2451A3]">
+              create a voter account
+            </Link>{' '}
+            to join this election.
+          </p>
         ) : null}
 
         <Link

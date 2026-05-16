@@ -109,7 +109,7 @@ export function buildRegistrationEligibility(params: {
     },
     {
       id: 'registration_open',
-      label: 'Registration not locked',
+      label: 'Registration open',
       passed: registrationOpen,
       detail: registrationOpen
         ? undefined

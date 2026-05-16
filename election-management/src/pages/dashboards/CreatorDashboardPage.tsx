@@ -5,6 +5,7 @@ import { CreatorSidebar } from '@/components/creator/CreatorSidebar'
 import { CREATOR_PROFILE_AVATAR } from '@/constants/electionAssets'
 import { useAuth } from '@/hooks/useAuth'
 import { fetchCreatorElections } from '@/services/electionService'
+import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
 import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import type { Election } from '@/types/election'
 
@@ -52,10 +53,19 @@ export function CreatorDashboardPage() {
     const election = elections.find((e) => e.id === electionId)
     if (!election) return
 
-    const confirmed = window.confirm(
-      `Finalize the voter roll for "${election.title}"? This assigns unique Secret Voter IDs (e.g. ${election.secret_voter_id_prefix ?? 'POLL-A'}-0001) to all registered voters and emails each voter their ID. This cannot be undone.`,
-    )
-    if (!confirmed) return
+    const regStats = await fetchElectionRegistrationStats(electionId)
+
+    if (regStats.registered_count === 0) {
+      const proceedEmpty = window.confirm(
+        `No voters have registered for "${election.title}" yet (0 / ${regStats.max_voters}).\n\nFinalizing now will close registration permanently and no one will be able to join.\n\nAre you sure you want to finalize an empty voter roll?`,
+      )
+      if (!proceedEmpty) return
+    } else {
+      const confirmed = window.confirm(
+        `Finalize the voter roll for "${election.title}"? This assigns Secret Voter IDs (e.g. ${election.secret_voter_id_prefix ?? 'POLL-A'}-0001) to ${regStats.registered_count} registered voter(s), emails each voter, and closes registration. This cannot be undone.`,
+      )
+      if (!confirmed) return
+    }
 
     setFinalizingId(electionId)
     setFinalizeMessage(null)
