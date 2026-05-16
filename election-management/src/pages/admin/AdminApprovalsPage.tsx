@@ -40,7 +40,7 @@ export function AdminApprovalsPage() {
   return (
     <div className="text-on-surface">
       <AdminSidebar pendingCount={pendingCount} />
-      <main className="ml-[280px] min-h-screen">
+      <main className="ml-[252px] min-h-screen">
         <AdminTopBar title="Creator Approvals" pendingCount={pendingCount} />
 
         <div className="space-y-gutter p-margin">

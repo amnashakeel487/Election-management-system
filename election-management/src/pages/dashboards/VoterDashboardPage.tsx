@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { TopNavBar } from '@/components/layout/TopNavBar'
-import { Footer } from '@/components/layout/Footer'
-import { useAuth } from '@/hooks/useAuth'
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { VoteSecureDashboardShell } from '@/components/dashboard/VoteSecureDashboardShell'
 import { SecretVoterIdDisplay } from '@/components/voter/SecretVoterIdDisplay'
+import { useAuth } from '@/hooks/useAuth'
 import { fetchUserRegistrations } from '@/services/voterRegistrationService'
 import type { VoterRegistrationWithElection } from '@/types/voterRegistration'
+import { electionDisplayStatus, userInitials } from '@/utils/dashboardDisplay'
 import { isPollingOpen } from '@/utils/electionPolling'
-import '@/components/voter/voter-registration-panel.css'
+import { formatTimeRemaining } from '@/utils/electionTime'
+import { maskSecretVoterId } from '@/utils/maskSecretVoterId'
 
 export function VoterDashboardPage() {
-  const { profile, session, signOut } = useAuth()
-  const navigate = useNavigate()
+  const { profile, session } = useAuth()
   const [registrations, setRegistrations] = useState<VoterRegistrationWithElection[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -32,63 +32,151 @@ export function VoterDashboardPage() {
     void reloadRegistrations()
   }, [session?.user.id])
 
-  async function handleLogout() {
-    await signOut()
-    navigate('/login', { replace: true })
-  }
+  const registered = registrations.filter((r) => r.status === 'registered')
+  const votedCount = registered.filter((r) => r.voted_at).length
+  const liveCount = registered.filter(
+    (r) =>
+      r.election &&
+      !r.voted_at &&
+      r.secret_voter_id &&
+      isPollingOpen({
+        start_date: r.election.start_date,
+        end_date: r.election.end_date,
+        status: r.election.status as 'published' | 'active',
+        voter_roll_finalized_at: r.election.voter_roll_finalized_at ?? null,
+      }),
+  ).length
 
-  const registeredCount = registrations.filter((r) => r.status === 'registered').length
-  const waitlistCount = registrations.filter((r) => r.status === 'waitlisted').length
+  const votedHistory = useMemo(
+    () => registered.filter((r) => r.voted_at).slice(0, 6),
+    [registered],
+  )
+
+  const displayName = profile?.full_name?.trim() || 'Voter'
+  const primarySecret = registered.find((r) => r.secret_voter_id)?.secret_voter_id
+
+  const topbarExtra = (
+    <>
+      <button type="button" className="vs-tb-btn" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" aria-hidden>
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+        </svg>
+        {liveCount > 0 ? <span className="vs-tb-notif">{liveCount}</span> : null}
+      </button>
+      <Link to="/" className="vs-tb-btn" aria-label="Profile">
+        <svg viewBox="0 0 24 24" aria-hidden>
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      </Link>
+    </>
+  )
 
   return (
-    <div className="min-h-screen bg-[#f0f4f9]">
-      <TopNavBar />
-      <main className="mx-auto max-w-4xl px-4 pb-16 pt-24 sm:px-6">
-        <div className="mb-8">
-          <h1 className="text-2xl font-extrabold tracking-tight text-[#0f172a]">Voter dashboard</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Welcome, {profile?.full_name?.trim() || profile?.email}. Manage elections you have joined.
-          </p>
+    <VoteSecureDashboardShell
+      role="voter"
+      pageTitle="Home"
+      pageCrumb={
+        liveCount > 0
+          ? `Your civic dashboard · ${liveCount} election${liveCount === 1 ? '' : 's'} live now`
+          : 'Your civic dashboard'
+      }
+      electionCount={registered.length}
+      liveVoteCount={liveCount}
+      showSearch={false}
+      topbarExtra={topbarExtra}
+    >
+      <div className="vs-voter-id">
+        <div className="vs-voter-avatar-big">{userInitials(profile?.full_name, profile?.email)}</div>
+        <div className="vs-voter-info">
+          <div className="vs-voter-greeting">Welcome back,</div>
+          <div className="vs-voter-name">{displayName}</div>
+          <div className="vs-voter-chips">
+            <div className="vs-voter-chip">Identity verified</div>
+            <div className="vs-voter-chip">{registered.length} joined election(s)</div>
+            {votedCount > 0 ? <div className="vs-voter-chip">{votedCount} vote(s) cast</div> : null}
+          </div>
         </div>
-
-        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <div className="vr-meta-cell">
-            <p className="vr-meta-label">Registered</p>
-            <p className="vr-meta-value">{registeredCount}</p>
+        <div className="vs-voter-right">
+          <div className="vs-voter-id-label">Secret voter ID</div>
+          <div className="vs-voter-id-num">
+            {primarySecret ? maskSecretVoterId(primarySecret) : 'Issued per election'}
           </div>
-          <div className="vr-meta-cell">
-            <p className="vr-meta-label">Waitlisted</p>
-            <p className="vr-meta-value">{waitlistCount}</p>
-          </div>
-          <div className="vr-meta-cell col-span-2 sm:col-span-1">
-            <p className="vr-meta-label">Account</p>
-            <p className="vr-meta-value capitalize">{profile?.approval_status ?? '—'}</p>
-          </div>
+          <div className="vs-voter-verified">Eligible to vote</div>
         </div>
+      </div>
 
-        <section className="vr-panel">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="vr-panel-title">My election registrations</h2>
-            <Link
-              to="/#elections-catalog"
-              className="rounded-lg bg-gradient-to-br from-[#1B3A6B] to-[#6C3FC5] px-4 py-2 text-xs font-bold text-white no-underline"
-            >
-              Browse elections
+      <div className="vs-stat-grid">
+        <div className="vs-stat-card vs-stat-card--blue">
+          <div className="vs-stat-icon vs-stat-icon--blue">
+            <svg viewBox="0 0 24 24" aria-hidden>
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+            </svg>
+          </div>
+          <div className="vs-stat-num">{registered.length}</div>
+          <div className="vs-stat-label">Joined Elections</div>
+        </div>
+        <div className="vs-stat-card vs-stat-card--green">
+          <div className="vs-stat-icon vs-stat-icon--green">
+            <svg viewBox="0 0 24 24" aria-hidden>
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <div className="vs-stat-num">{votedCount}</div>
+          <div className="vs-stat-label">Votes Cast</div>
+        </div>
+        <div className="vs-stat-card vs-stat-card--purple">
+          <div className="vs-stat-icon vs-stat-icon--purple">
+            <svg viewBox="0 0 24 24" aria-hidden>
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+            </svg>
+          </div>
+          <div className="vs-stat-num">{liveCount}</div>
+          <div className="vs-stat-label">Open Ballots</div>
+        </div>
+        <div className="vs-stat-card vs-stat-card--cyan">
+          <div className="vs-stat-icon vs-stat-icon--cyan">
+            <svg viewBox="0 0 24 24" aria-hidden>
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+          </div>
+          <div className="vs-stat-num">100%</div>
+          <div className="vs-stat-label">Vote Anonymity</div>
+        </div>
+      </div>
+
+      <div className="vs-dash-grid">
+        <div className="vs-panel">
+          <div className="vs-panel-head">
+            <div>
+              <div className="vs-panel-title">My Elections</div>
+              <div className="vs-panel-sub">Elections you are enrolled in</div>
+            </div>
+            <Link to="/#elections-catalog" className="vs-panel-action">
+              Browse All
             </Link>
           </div>
-
-          {loading ? (
-            <p className="text-sm text-slate-500">Loading registrations…</p>
-          ) : registrations.length === 0 ? (
-            <p className="text-sm text-slate-600">
-              You have not joined any elections yet. Browse the catalog and use{' '}
-              <strong>I want to participate</strong> on an election page to register.
-            </p>
-          ) : (
-            <ul className="space-y-3">
-              {registrations.map((reg) => {
-                const electionOpen =
-                  reg.election &&
+          <div className="vs-panel-body">
+            {loading ? (
+              <p className="vs-empty">Loading your elections…</p>
+            ) : registrations.length === 0 ? (
+              <p className="vs-empty">
+                You have not joined any elections yet.{' '}
+                <Link to="/#elections-catalog">Browse the catalog</Link> to participate.
+              </p>
+            ) : (
+              registrations.map((reg) => {
+                if (!reg.election) return null
+                const phase = electionDisplayStatus(
+                  reg.election.status,
+                  reg.election.start_date,
+                  reg.election.end_date,
+                )
+                const canVote =
+                  reg.status === 'registered' &&
+                  Boolean(reg.secret_voter_id) &&
+                  !reg.voted_at &&
                   isPollingOpen({
                     start_date: reg.election.start_date,
                     end_date: reg.election.end_date,
@@ -96,89 +184,138 @@ export function VoterDashboardPage() {
                     voter_roll_finalized_at: reg.election.voter_roll_finalized_at ?? null,
                   })
 
+                const cardClass =
+                  reg.voted_at
+                    ? 'vs-election-card vs-election-card--voted'
+                    : phase === 'active'
+                      ? 'vs-election-card vs-election-card--active'
+                      : 'vs-election-card vs-election-card--upcoming'
+
                 return (
-                  <li
-                    key={reg.id}
-                    className="rounded-xl border border-[#e2e8f0] bg-white p-4 transition-shadow hover:shadow-md"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-bold text-slate-900">{reg.election?.title ?? 'Election'}</p>
-                        <p className="mt-1 text-xs text-slate-500">
-                          Joined {new Date(reg.created_at).toLocaleDateString()} ·{' '}
-                          <span
-                            className={
-                              reg.status === 'registered' ? 'font-semibold text-emerald-700' : 'font-semibold text-amber-700'
-                            }
-                          >
-                            {reg.status === 'registered'
-                              ? 'Registered voter'
-                              : `Waitlist #${reg.waitlist_position}`}
-                          </span>
-                        </p>
-                        {reg.status === 'registered' && reg.secret_voter_id ? (
-                          <div className="mt-2">
-                            <SecretVoterIdDisplay
-                              secretVoterId={reg.secret_voter_id}
-                              electionId={reg.election_id}
-                              pollPrefix={reg.election?.secret_voter_id_prefix}
-                              emailed={Boolean(reg.secret_voter_id_emailed_at)}
-                              compact
-                              onEmailed={() => void reloadRegistrations()}
-                            />
-                          </div>
-                        ) : null}
-                        {reg.voted_at ? (
-                          <p className="mt-2 text-xs font-semibold text-[#2451A3]">Ballot cast</p>
-                        ) : null}
-                      </div>
-                      {reg.election?.id ? (
-                        <div className="flex flex-col gap-2 sm:flex-row">
-                          <Link
-                            to={`/elections/${reg.election.id}`}
-                            className="rounded-lg border border-[#2451A3]/30 px-3 py-2 text-center text-xs font-bold text-[#2451A3] no-underline hover:bg-[#2451A3]/5"
-                          >
-                            View election
-                          </Link>
-                          {reg.status === 'registered' &&
-                          reg.secret_voter_id &&
-                          !reg.voted_at &&
-                          reg.election &&
-                          electionOpen ? (
-                            <Link
-                              to={`/elections/${reg.election.id}/vote`}
-                              className="rounded-lg bg-gradient-to-br from-[#1B3A6B] to-[#6C3FC5] px-3 py-2 text-center text-xs font-bold text-white no-underline"
-                            >
-                              Vote
-                            </Link>
-                          ) : null}
-                        </div>
+                  <div key={reg.id} className={cardClass}>
+                    <div className="vs-ec-top">
+                      <div className="vs-ec-title">{reg.election.title}</div>
+                      <span
+                        className={`vs-ec-badge ${
+                          reg.voted_at
+                            ? 'vs-ec-badge--voted'
+                            : phase === 'active'
+                              ? 'vs-ec-badge--active'
+                              : 'vs-ec-badge--upcoming'
+                        }`}
+                      >
+                        {reg.voted_at ? '✓ Voted' : phase === 'active' ? 'Live' : phase}
+                      </span>
+                    </div>
+                    <div className="vs-ec-meta">
+                      <span>Joined {new Date(reg.created_at).toLocaleDateString()}</span>
+                      {phase === 'active' && !reg.voted_at ? (
+                        <span>Ends in {formatTimeRemaining(reg.election.end_date)}</span>
                       ) : null}
                     </div>
-                  </li>
+                    {reg.secret_voter_id ? (
+                      <div style={{ marginBottom: 12 }}>
+                        <SecretVoterIdDisplay
+                          secretVoterId={reg.secret_voter_id}
+                          electionId={reg.election_id}
+                          pollPrefix={reg.election.secret_voter_id_prefix}
+                          emailed={Boolean(reg.secret_voter_id_emailed_at)}
+                          compact
+                          onEmailed={() => void reloadRegistrations()}
+                        />
+                      </div>
+                    ) : null}
+                    <div className="vs-ec-footer">
+                      {canVote ? (
+                        <Link to={`/elections/${reg.election.id}/vote`} className="vs-btn-vote-now">
+                          Cast My Vote →
+                        </Link>
+                      ) : reg.voted_at ? (
+                        <Link
+                          to={`/elections/${reg.election.id}/results`}
+                          className="vs-btn-voted"
+                        >
+                          View Results
+                        </Link>
+                      ) : (
+                        <Link to={`/elections/${reg.election.id}`} className="vs-btn-voted">
+                          View Election
+                        </Link>
+                      )}
+                    </div>
+                  </div>
                 )
-              })}
-            </ul>
-          )}
-        </section>
-
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            to="/"
-            className="rounded-xl border border-[#e2e8f0] bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 no-underline hover:bg-slate-50"
-          >
-            Home
-          </Link>
-          <button
-            type="button"
-            onClick={() => void handleLogout()}
-            className="rounded-xl bg-gradient-to-br from-[#1B3A6B] to-[#6C3FC5] px-5 py-2.5 text-sm font-bold text-white"
-          >
-            Log out
-          </button>
+              })
+            )}
+          </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+
+        <div className="vs-dash-col">
+          <div className="vs-panel">
+            <div className="vs-panel-head">
+              <div>
+                <div className="vs-panel-title">Quick actions</div>
+                <div className="vs-panel-sub">Stay ready for the next ballot</div>
+              </div>
+            </div>
+            <div className="vs-panel-body">
+              <div className="vs-notif-item">
+                <div className="vs-notif-dot vs-notif-dot--blue" />
+                <div>
+                  <div className="vs-notif-text">
+                    {liveCount > 0
+                      ? `You have ${liveCount} live ballot(s). Cast your vote before polling closes.`
+                      : 'No live ballots right now. Browse elections to join the next poll.'}
+                  </div>
+                </div>
+              </div>
+              {liveCount > 0 ? (
+                <div className="vs-notif-item">
+                  <div className="vs-notif-dot vs-notif-dot--green" />
+                  <div>
+                    <div className="vs-notif-text">
+                      Use your <strong>Secret Voter ID</strong> on the ballot page — it is never shown in full
+                      after email delivery.
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {votedHistory.length > 0 ? (
+        <div className="vs-panel">
+          <div className="vs-panel-head">
+            <div>
+              <div className="vs-panel-title">Voting History</div>
+              <div className="vs-panel-sub">Your participation record</div>
+            </div>
+          </div>
+          <div className="vs-panel-body">
+            <div className="vs-history-grid">
+              {votedHistory.map((reg) => (
+                <div key={reg.id} className="vs-history-item">
+                  <div className="vs-history-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden>
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="vs-history-title">{reg.election?.title ?? 'Election'}</div>
+                    <div className="vs-history-meta">
+                      {reg.voted_at
+                        ? new Date(reg.voted_at).toLocaleDateString()
+                        : 'Completed'}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </VoteSecureDashboardShell>
   )
 }

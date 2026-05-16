@@ -85,7 +85,7 @@ export function AdminElectionsPage() {
   return (
     <div className="text-on-surface">
       <AdminSidebar pendingCount={pendingCount} />
-      <main className="ml-[280px] min-h-screen">
+      <main className="ml-[252px] min-h-screen">
         <AdminTopBar title="Elections" />
         <div className="p-margin">
           <div className="flex flex-wrap items-center justify-between gap-md">

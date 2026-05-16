@@ -66,7 +66,7 @@ export function CreatorWizardShell({
 
       <CreatorSidebar />
 
-      <main className="min-h-screen pb-20 pt-24 lg:ml-[280px] lg:pb-0">
+      <main className="min-h-screen pb-20 pt-24 lg:ml-[252px] lg:pb-0">
         <div className="mx-auto max-w-6xl px-4 md:px-margin">
           <div className="mb-10">
             <h1 className="mb-2 font-headline-lg text-headline-lg font-bold text-on-surface md:text-headline-xl">
@@ -217,7 +217,7 @@ export function CreatorWizardShell({
         </div>
       </main>
 
-      <footer className="flex w-full flex-col items-center justify-between border-t border-line bg-surface-container-lowest px-margin py-xl lg:ml-[280px] md:flex-row">
+      <footer className="flex w-full flex-col items-center justify-between border-t border-line bg-surface-container-lowest px-margin py-xl lg:ml-[252px] md:flex-row">
         <div className="mb-6 text-center md:mb-0 md:text-left">
           <p className="font-label-md text-label-md font-bold text-on-surface">© 2024 FortressVote Secure Systems.</p>
           <p className="mt-1 text-[10px] uppercase tracking-widest text-on-surface-variant">

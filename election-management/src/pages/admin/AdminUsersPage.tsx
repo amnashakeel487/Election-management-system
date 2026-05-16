@@ -41,7 +41,7 @@ export function AdminUsersPage() {
   return (
     <div className="text-on-surface">
       <AdminSidebar pendingCount={pendingCount} />
-      <main className="ml-[280px] min-h-screen">
+      <main className="ml-[252px] min-h-screen">
         <AdminTopBar title="Users" />
         <div className="p-margin">
           <Link to="/admin/dashboard" className="font-label-sm text-primary hover:underline">

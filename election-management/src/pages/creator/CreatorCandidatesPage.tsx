@@ -10,7 +10,7 @@ export function CreatorCandidatesPage() {
     <div className="overflow-x-hidden bg-background text-on-background">
       <CreatorSidebar />
 
-      <main className="ml-[280px] flex min-h-screen flex-col">
+      <main className="ml-[252px] flex min-h-screen flex-col">
         <header className="sticky top-0 z-40 flex h-20 items-center justify-between bg-surface-dim px-margin py-sm">
           <div className="flex items-center gap-4">
             <h2 className="font-headline-lg text-headline-lg text-primary">Candidate Management</h2>
