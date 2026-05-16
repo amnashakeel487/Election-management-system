@@ -1,5 +1,7 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import '@/styles/admin-dashboard.css'
+import '@/styles/admin-dashboard-dark.css'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { ADMIN_PAGE_META } from '@/config/adminNav'
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar'
 import { useAuth } from '@/hooks/useAuth'
@@ -46,6 +48,7 @@ export function AdminLayout() {
                 </svg>
                 <input type="search" placeholder="Search anything…" aria-label="Search admin" />
               </div>
+              <ThemeToggle variant="icon-btn" />
               <button
                 type="button"
                 className="icon-btn"

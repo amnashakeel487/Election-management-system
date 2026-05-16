@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader'
 import { ADMIN_PAGE_META } from '@/config/adminNav'
+import { AppearanceSettings } from '@/components/theme/AppearanceSettings'
 
 const meta = ADMIN_PAGE_META.settings
 
@@ -45,7 +46,9 @@ export function AdminSettingsPage() {
     <>
       <AdminPageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
 
-      <div className="grid-2">
+      <AppearanceSettings variant="admin" />
+
+      <div className="grid-2" style={{ marginTop: 16 }}>
         <div className="card-elevated">
           <div className="card-header">
             <div className="card-title">Account</div>

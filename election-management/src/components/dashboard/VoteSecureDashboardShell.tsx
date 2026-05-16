@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 import '@/styles/dashboard-votesecure.css'
+import '@/styles/dashboard-votesecure-dark.css'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { VoteSecureSidebar, type DashboardRole } from './VoteSecureSidebar'
 
 interface VoteSecureDashboardShellProps {
@@ -45,10 +47,13 @@ export function VoteSecureDashboardShell({
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
-              <input type="search" placeholder="Search elections, users, logs…" aria-label="Search dashboard" />
+              <input type="search" placeholder="Search elections, users, logs?" aria-label="Search dashboard" />
             </div>
           ) : null}
-          <div className="vs-topbar-right">{topbarExtra}</div>
+          <div className="vs-topbar-right">
+            <ThemeToggle variant="minimal" />
+            {topbarExtra}
+          </div>
         </header>
         <div className="vs-content">{children}</div>
       </main>

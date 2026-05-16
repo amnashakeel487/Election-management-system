@@ -23,6 +23,7 @@ export interface UserProfile {
   organization: string | null
   election_purpose: string | null
   rejection_reason: string | null
+  theme_preference?: string | null
   created_at: string
   updated_at: string
 }

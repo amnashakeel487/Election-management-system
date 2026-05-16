@@ -1,0 +1,81 @@
+/* Admin dashboard — dark mode overrides (class strategy on html.dark) */
+
+.dark .admin-app {
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --subtle: #64748b;
+  --border: #334155;
+  --bg: #0f172a;
+  --card: #1e293b;
+  --sidebar: #0a1628;
+  --sidebar2: #0f2347;
+}
+
+.dark .admin-app .topbar {
+  background: var(--card);
+  border-bottom-color: var(--border);
+}
+
+.dark .admin-app .topbar-search {
+  background: var(--bg);
+  border-color: var(--border);
+}
+
+.dark .admin-app .topbar-search input {
+  color: var(--text);
+}
+
+.dark .admin-app .icon-btn {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.dark .admin-app .stat-card,
+.dark .admin-app .card,
+.dark .admin-app .card-elevated {
+  background: var(--card);
+  border-color: var(--border);
+}
+
+.dark .admin-app .table-wrap,
+.dark .admin-app table {
+  background: var(--card);
+}
+
+.dark .admin-app tbody tr:hover {
+  background: #1e293b;
+}
+
+.dark .admin-app .tabs {
+  background: var(--bg);
+}
+
+.dark .admin-app .tab-btn.active {
+  background: var(--card);
+  color: #e2e8f0;
+}
+
+.dark .admin-app .form-input {
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.dark .admin-app .alert-info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
+}
+
+.dark .admin-app .alert-warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fcd34d;
+}
+
+.dark .admin-app .alert-danger {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}

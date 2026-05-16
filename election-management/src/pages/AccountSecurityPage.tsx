@@ -9,6 +9,7 @@ import {
   verifyTotpEnrollment,
 } from '@/services/mfaService'
 import type { Factor } from '@supabase/supabase-js'
+import { AppearanceSettings } from '@/components/theme/AppearanceSettings'
 
 export function AccountSecurityPage() {
   const { refreshSession, getDashboardPath } = useAuth()
@@ -105,6 +106,10 @@ export function AccountSecurityPage() {
             {error}
           </p>
         ) : null}
+
+        <div className="mb-lg">
+          <AppearanceSettings />
+        </div>
 
         {factor ? (
           <div className="space-y-md">

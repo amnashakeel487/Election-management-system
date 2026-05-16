@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useTheme } from '@/context/ThemeContext'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { useAuth } from '@/hooks/useAuth'
 import { ROLE_LABELS } from '@/types/auth'
 
@@ -7,7 +7,6 @@ export function TopNavBar() {
   const navigate = useNavigate()
   const location = useLocation()
   const { session, profile, signOut, getDashboardPath, mfaRequired } = useAuth()
-  const { theme, toggleTheme } = useTheme()
 
   async function handleLogout() {
     await signOut()
@@ -48,16 +47,7 @@ export function TopNavBar() {
         </div>
       </div>
       <div className="flex items-center gap-2 sm:gap-3">
-        <button
-          type="button"
-          onClick={() => toggleTheme()}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-on-nav/20 text-on-nav/80 transition-colors hover:border-on-nav/40 hover:bg-on-nav/10 hover:text-on-nav"
-          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-        >
-          <span className="material-symbols-outlined text-[22px]">
-            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-          </span>
-        </button>
+        <ThemeToggle variant="nav" />
         {session && profile && !mfaRequired ? (
           <>
             <span className="hidden items-center gap-2 rounded-full border border-on-nav/20 bg-on-nav/10 px-3 py-1 font-label-sm text-label-sm text-on-nav md:inline-flex">
