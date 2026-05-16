@@ -14,6 +14,12 @@ import {
 import type { Candidate } from '@/types/election'
 import { fromDatetimeLocalValue, isoFromDatetimeLocal, toDatetimeLocalValue } from '@/utils/datetime'
 import { formatSubmissionDate } from '@/utils/formatDate'
+import {
+  DEFAULT_SECRET_VOTER_ID_PREFIX,
+  exampleSecretVoterIds,
+  normalizeSecretVoterIdPrefix,
+  validateSecretVoterIdPrefix,
+} from '@/utils/secretVoterId'
 
 interface CreateElectionWizardProps {
   electionId?: string
@@ -52,6 +58,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
   const [registrationDeadline, setRegistrationDeadline] = useState('')
 
   const [maxVoters, setMaxVoters] = useState(1000)
+  const [secretIdPrefix, setSecretIdPrefix] = useState(DEFAULT_SECRET_VOTER_ID_PREFIX)
   const [eligibilityRule, setEligibilityRule] = useState('verified_voters')
   const [privacyTier, setPrivacyTier] = useState('zero_knowledge')
   const [realTimeResults, setRealTimeResults] = useState(false)
@@ -89,6 +96,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
         )
 
         setMaxVoters(data.max_voters)
+        setSecretIdPrefix(data.secret_voter_id_prefix || DEFAULT_SECRET_VOTER_ID_PREFIX)
         setEligibilityRule(data.eligibility_rule)
         setPrivacyTier(data.privacy_tier)
         setRealTimeResults(data.real_time_results)
@@ -218,12 +226,18 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
       setError('Max voters must be at least 1')
       return
     }
+    const prefixError = validateSecretVoterIdPrefix(secretIdPrefix)
+    if (prefixError) {
+      setError(prefixError)
+      return
+    }
     setError(null)
     setSaving(true)
     try {
       const id = await ensureElectionId()
       await updateElection(id, {
         max_voters: maxVoters,
+        secret_voter_id_prefix: normalizeSecretVoterIdPrefix(secretIdPrefix),
         eligibility_rule: eligibilityRule,
         privacy_tier: privacyTier,
         real_time_results: realTimeResults,
@@ -452,6 +466,28 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
             Participation limits &amp; rules
           </h2>
           <div className="space-y-8">
+            <div className="flex flex-col gap-2">
+              <label className="ml-1 font-label-md text-label-md text-on-surface-variant" htmlFor="secret-prefix">
+                Secret voter ID prefix (this poll only)
+              </label>
+              <input
+                id="secret-prefix"
+                type="text"
+                value={secretIdPrefix}
+                onChange={(e) => setSecretIdPrefix(e.target.value.toUpperCase())}
+                maxLength={20}
+                placeholder="POLL-A"
+                className="w-full max-w-md rounded-xl border border-outline-variant bg-surface-container-low p-4 font-mono text-on-surface outline-none focus:ring-2 focus:ring-primary"
+              />
+              <p className="ml-1 max-w-xl font-body-sm text-body-sm text-on-surface-variant">
+                Each poll gets its own sequence. Example:{' '}
+                <span className="font-mono font-semibold text-primary">
+                  {exampleSecretVoterIds(secretIdPrefix).first}
+                </span>{' '}
+                (masked as <span className="font-mono">{exampleSecretVoterIds(secretIdPrefix).masked}</span>). A new ID
+                is issued for every election.
+              </p>
+            </div>
             <div className="flex flex-col gap-2">
               <label className="ml-1 font-label-md text-label-md text-on-surface-variant" htmlFor="max-voters">
                 Maximum voters (pool cap before lock)

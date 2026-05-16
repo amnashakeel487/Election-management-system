@@ -38,5 +38,6 @@ export interface VoterRegistrationWithElection extends VoterRegistration {
     start_date: string
     end_date: string
     voter_roll_finalized_at?: string | null
+    secret_voter_id_prefix?: string
   }
 }

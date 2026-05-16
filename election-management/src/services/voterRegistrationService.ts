@@ -82,7 +82,7 @@ export async function fetchUserRegistrations(userId: string): Promise<VoterRegis
       secret_voter_id_emailed_at,
       voted_at,
       created_at,
-      election:election_id (id, title, status, start_date, end_date, voter_roll_finalized_at)
+      election:election_id (id, title, status, start_date, end_date, voter_roll_finalized_at, secret_voter_id_prefix)
     `,
     )
     .eq('user_id', userId)

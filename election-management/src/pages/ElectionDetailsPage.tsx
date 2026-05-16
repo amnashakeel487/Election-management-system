@@ -250,6 +250,18 @@ export function ElectionDetailsPage() {
               />
 
               <div className="ed-panel">
+                <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-500">Secret voter IDs</h3>
+                <p className="text-xs leading-relaxed text-slate-600">
+                  This poll issues unique IDs such as{' '}
+                  <span className="font-mono font-semibold text-[#2451A3]">
+                    {election.secret_voter_id_prefix}-0001
+                  </span>
+                  . IDs are emailed after roll finalization and masked in the app (e.g. ****0001). Joining another
+                  election gives you a different ID.
+                </p>
+              </div>
+
+              <div className="ed-panel">
                 <h3 className="mb-5 text-xs font-bold uppercase tracking-widest text-slate-500">Key milestones</h3>
                 <div className="space-y-5">
                   <div className="flex gap-3">

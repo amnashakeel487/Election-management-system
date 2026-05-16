@@ -53,6 +53,7 @@ export interface CreateElectionInput {
   privacy_tier?: string
   real_time_results?: boolean
   allow_write_ins?: boolean
+  secret_voter_id_prefix?: string
 }
 
 export type UpdateElectionInput = Partial<CreateElectionInput>

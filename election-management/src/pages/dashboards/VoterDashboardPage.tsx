@@ -15,27 +15,21 @@ export function VoterDashboardPage() {
   const [registrations, setRegistrations] = useState<VoterRegistrationWithElection[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  async function reloadRegistrations() {
     const userId = session?.user.id
     if (!userId) return
-
-    let cancelled = false
-
-    async function load(uid: string) {
-      try {
-        const data = await fetchUserRegistrations(uid)
-        if (!cancelled) setRegistrations(data)
-      } catch {
-        if (!cancelled) setRegistrations([])
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
+    try {
+      const data = await fetchUserRegistrations(userId)
+      setRegistrations(data)
+    } catch {
+      setRegistrations([])
+    } finally {
+      setLoading(false)
     }
+  }
 
-    void load(userId)
-    return () => {
-      cancelled = true
-    }
+  useEffect(() => {
+    void reloadRegistrations()
   }, [session?.user.id])
 
   async function handleLogout() {
@@ -126,8 +120,11 @@ export function VoterDashboardPage() {
                           <div className="mt-2">
                             <SecretVoterIdDisplay
                               secretVoterId={reg.secret_voter_id}
+                              electionId={reg.election_id}
+                              pollPrefix={reg.election?.secret_voter_id_prefix}
                               emailed={Boolean(reg.secret_voter_id_emailed_at)}
                               compact
+                              onEmailed={() => void reloadRegistrations()}
                             />
                           </div>
                         ) : null}

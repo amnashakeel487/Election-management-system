@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
+import { getBrevoApiKey, sendBrevoEmail } from '../_shared/brevo.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,9 +20,8 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const resendApiKey = Deno.env.get('RESEND_API_KEY')
     const appUrl = Deno.env.get('APP_URL') ?? 'https://election-manager-systm-three.vercel.app'
-    const fromEmail = Deno.env.get('CREATOR_APPROVAL_FROM_EMAIL') ?? 'FortressVote <onboarding@resend.dev>'
+    const brevoConfigured = Boolean(getBrevoApiKey())
 
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
@@ -109,31 +109,23 @@ Deno.serve(async (req) => {
         <p>— FortressVote Platform Administration</p>
       `
 
-    if (!resendApiKey) {
+    if (!brevoConfigured) {
       console.log(`[dev] Creator ${body.decision} email for ${target.email}`)
       return new Response(
-        JSON.stringify({ sent: false, dev_mode: true, message: 'RESEND_API_KEY not set; logged to console' }),
+        JSON.stringify({ sent: false, dev_mode: true, message: 'BREVO_API_KEY not set; logged to console' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       )
     }
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: [target.email],
-        subject,
-        html,
-      }),
+    const result = await sendBrevoEmail({
+      to: { email: target.email, name: displayName },
+      subject,
+      htmlContent: html,
+      fallbackFrom: Deno.env.get('CREATOR_APPROVAL_FROM_EMAIL') ?? undefined,
     })
 
-    if (!res.ok) {
-      const errText = await res.text()
-      return new Response(JSON.stringify({ error: `Email failed: ${errText}` }), {
+    if (!result.ok) {
+      return new Response(JSON.stringify({ error: `Email failed: ${result.error}` }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })

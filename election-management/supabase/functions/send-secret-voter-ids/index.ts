@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1'
+import { getBrevoApiKey, sendBrevoEmail } from '../_shared/brevo.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -7,6 +8,8 @@ const corsHeaders = {
 
 interface RequestBody {
   election_id: string
+  /** all_pending: creator batch (default). self: current voter only. */
+  scope?: 'all_pending' | 'self'
 }
 
 Deno.serve(async (req) => {
@@ -17,7 +20,7 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const resendApiKey = Deno.env.get('RESEND_API_KEY')
+    const brevoConfigured = Boolean(getBrevoApiKey())
 
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
@@ -67,7 +70,9 @@ Deno.serve(async (req) => {
       })
     }
 
-    if (election.creator_id !== user.id) {
+    const scope = body.scope ?? 'all_pending'
+
+    if (scope !== 'self' && election.creator_id !== user.id) {
       const { data: profile } = await admin
         .from('users')
         .select('role')
@@ -89,34 +94,71 @@ Deno.serve(async (req) => {
       })
     }
 
-    const { data: registrations, error: regError } = await admin
-      .from('voter_registrations')
-      .select('id, user_id, secret_voter_id, secret_voter_id_emailed_at')
-      .eq('election_id', body.election_id)
-      .eq('status', 'registered')
-      .not('secret_voter_id', 'is', null)
-      .is('secret_voter_id_emailed_at', null)
+    type RegRow = {
+      id: string
+      user_id: string
+      secret_voter_id: string | null
+      secret_voter_id_emailed_at: string | null
+    }
 
-    if (regError) {
-      return new Response(JSON.stringify({ error: regError.message }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+    let registrations: RegRow[] = []
+
+    if (scope === 'self') {
+      const { data: selfReg, error: selfRegError } = await admin
+        .from('voter_registrations')
+        .select('id, user_id, secret_voter_id, secret_voter_id_emailed_at')
+        .eq('election_id', body.election_id)
+        .eq('user_id', user.id)
+        .eq('status', 'registered')
+        .not('secret_voter_id', 'is', null)
+        .maybeSingle()
+
+      if (selfRegError) {
+        return new Response(JSON.stringify({ error: selfRegError.message }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      if (!selfReg?.secret_voter_id) {
+        return new Response(
+          JSON.stringify({ error: 'No secret voter ID issued for your registration yet' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        )
+      }
+
+      registrations = [selfReg as RegRow]
+    } else {
+      const { data: batchRegs, error: regError } = await admin
+        .from('voter_registrations')
+        .select('id, user_id, secret_voter_id, secret_voter_id_emailed_at')
+        .eq('election_id', body.election_id)
+        .eq('status', 'registered')
+        .not('secret_voter_id', 'is', null)
+        .is('secret_voter_id_emailed_at', null)
+
+      if (regError) {
+        return new Response(JSON.stringify({ error: regError.message }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      registrations = (batchRegs ?? []) as RegRow[]
     }
 
     const userIds = [...new Set((registrations ?? []).map((r) => r.user_id))]
-    const { data: users } = await admin.from('users').select('id, email').in('id', userIds)
-    const emailByUserId = new Map((users ?? []).map((u) => [u.id, u.email]))
+    const { data: users } = await admin.from('users').select('id, email, full_name').in('id', userIds)
+    const userById = new Map((users ?? []).map((u) => [u.id, u]))
 
-    const fromEmail = Deno.env.get('SECRET_VOTER_ID_FROM_EMAIL') ?? 'FortressVote <onboarding@resend.dev>'
     let sent = 0
     const errors: string[] = []
 
     for (const reg of registrations ?? []) {
-      const email = emailByUserId.get(reg.user_id)
+      const recipient = userById.get(reg.user_id)
+      const email = recipient?.email
       if (!email || !reg.secret_voter_id) continue
 
-      if (!resendApiKey) {
+      if (!brevoConfigured) {
         console.log(`[dev] Secret voter ID for ${email}: ${reg.secret_voter_id}`)
         await admin
           .from('voter_registrations')
@@ -126,29 +168,24 @@ Deno.serve(async (req) => {
         continue
       }
 
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: fromEmail,
-          to: [email],
-          subject: `Your Secret Voter ID — ${election.title}`,
-          html: `
-            <p>You are registered for <strong>${election.title}</strong>.</p>
-            <p>Your unique Secret Voter ID is:</p>
-            <p style="font-family: monospace; font-size: 20px; letter-spacing: 2px;"><strong>${reg.secret_voter_id}</strong></p>
-            <p>Keep this ID private. You will need it to cast your vote. Do not share it with anyone.</p>
-            <p>— FortressVote</p>
-          `,
-        }),
+      const htmlContent = `
+        <p>You are registered for <strong>${election.title}</strong>.</p>
+        <p>Your unique Secret Voter ID is:</p>
+        <p style="font-family: monospace; font-size: 20px; letter-spacing: 2px;"><strong>${reg.secret_voter_id}</strong></p>
+        <p>Keep this ID private. You will need it to cast your vote. Do not share it with anyone.</p>
+        <p>In the app your ID is masked (e.g. ****${reg.secret_voter_id.slice(-4)}) until you reveal it.</p>
+        <p>Each election uses a different secret ID — this ID applies only to this poll.</p>
+        <p>— FortressVote</p>
+      `
+
+      const result = await sendBrevoEmail({
+        to: { email, name: recipient?.full_name?.trim() || email },
+        subject: `Your Secret Voter ID — ${election.title}`,
+        htmlContent,
       })
 
-      if (!res.ok) {
-        const errText = await res.text()
-        errors.push(`${email}: ${errText}`)
+      if (!result.ok) {
+        errors.push(`${email}: ${result.error}`)
         continue
       }
 
@@ -165,7 +202,7 @@ Deno.serve(async (req) => {
         sent,
         pending: (registrations ?? []).length - sent,
         errors,
-        dev_mode: !resendApiKey,
+        dev_mode: !brevoConfigured,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     )

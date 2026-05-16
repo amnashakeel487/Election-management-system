@@ -19,6 +19,13 @@ export interface SendSecretVoterIdsResult {
   dev_mode?: boolean
 }
 
+export interface SecretVoterIdFormatPreview {
+  prefix: string
+  example_first: string
+  example_last: string
+  mask_example: string
+}
+
 export async function finalizeElectionVoterRoll(electionId: string): Promise<FinalizeVoterRollResult> {
   const { data, error } = await supabase.rpc('finalize_election_voter_roll', {
     p_election_id: electionId,
@@ -28,9 +35,12 @@ export async function finalizeElectionVoterRoll(electionId: string): Promise<Fin
   return data as FinalizeVoterRollResult
 }
 
-export async function sendSecretVoterIdEmails(electionId: string): Promise<SendSecretVoterIdsResult> {
+export async function sendSecretVoterIdEmails(
+  electionId: string,
+  options?: { scope?: 'all_pending' | 'self' },
+): Promise<SendSecretVoterIdsResult> {
   const { data, error } = await supabase.functions.invoke('send-secret-voter-ids', {
-    body: { election_id: electionId },
+    body: { election_id: electionId, scope: options?.scope ?? 'all_pending' },
   })
 
   if (error) throw new Error(error.message)
@@ -40,6 +50,20 @@ export async function sendSecretVoterIdEmails(electionId: string): Promise<SendS
   }
 
   return data as SendSecretVoterIdsResult
+}
+
+/** Email the signed-in voter their secret ID for one poll (resend). */
+export async function emailMySecretVoterId(electionId: string): Promise<SendSecretVoterIdsResult> {
+  return sendSecretVoterIdEmails(electionId, { scope: 'self' })
+}
+
+export async function previewSecretVoterIdFormat(electionId: string): Promise<SecretVoterIdFormatPreview> {
+  const { data, error } = await supabase.rpc('preview_secret_voter_id_format', {
+    p_election_id: electionId,
+  })
+
+  if (error) throw new Error(error.message)
+  return data as SecretVoterIdFormatPreview
 }
 
 export async function finalizeAndEmailSecretVoterIds(

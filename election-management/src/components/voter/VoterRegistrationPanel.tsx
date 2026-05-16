@@ -188,8 +188,11 @@ export function VoterRegistrationPanel({
               <div className="mt-3 text-left">
                 <SecretVoterIdDisplay
                   secretVoterId={userRegistration.secret_voter_id}
+                  electionId={election.id}
+                  pollPrefix={election.secret_voter_id_prefix}
                   emailed={Boolean(userRegistration.secret_voter_id_emailed_at)}
                   compact
+                  onEmailed={onRegistrationChange}
                 />
               </div>
             ) : voterRollFinalized ? (

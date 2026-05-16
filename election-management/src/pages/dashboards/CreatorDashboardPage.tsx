@@ -64,7 +64,7 @@ export function CreatorDashboardPage() {
       const { finalize, email } = await finalizeAndEmailSecretVoterIds(electionId)
       setFinalizeMessage(
         `Assigned ${finalize.assigned_count} new ID(s). Emailed ${email.sent} voter(s).${
-          email.dev_mode ? ' (Dev mode: check function logs if RESEND_API_KEY is not set.)' : ''
+          email.dev_mode ? ' (Dev mode: set BREVO_API_KEY in Supabase — see docs/AUTH_SETUP.md.)' : ''
         }`,
       )
       await reloadElections()
