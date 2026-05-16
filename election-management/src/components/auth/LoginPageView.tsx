@@ -1,8 +1,11 @@
 import { useCallback, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { AUTH_CAPTCHA_LOGO } from '@/constants/authAssets'
 import { useAuth } from '@/hooks/useAuth'
+import { parseOrThrow, signInSchema } from '@/lib/validation/schemas'
+import { TurnstileCaptcha } from '@/components/security/TurnstileCaptcha'
+import { turnstileConfigured, verifyCaptchaToken } from '@/services/securityService'
 import { AuthSplitChrome } from './AuthSplitChrome'
+import { AUTH_CAPTCHA_LOGO } from '@/constants/authAssets'
 
 const inputClass =
   'sp-input w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-white pl-9 pr-3 text-[13px] text-slate-900 outline-none transition-all placeholder:text-slate-300 focus:border-[#2451A3] focus:shadow-[0_0_0_3px_rgba(36,81,163,0.1)]'
@@ -18,6 +21,7 @@ export function LoginPageView() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [botChecked, setBotChecked] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -26,14 +30,24 @@ export function LoginPageView() {
       e.preventDefault()
       setError(null)
 
-      if (!botChecked) {
-        setError('Please confirm you are not a bot.')
-        return
-      }
-
-      setSubmitting(true)
       try {
-        const dashboardPath = await signIn({ email: email.trim(), password })
+        const credentials = parseOrThrow(signInSchema, { email, password })
+        const captchaOk = turnstileConfigured
+          ? Boolean(captchaToken) &&
+            (await verifyCaptchaToken(captchaToken!, 'login')).ok
+          : botChecked
+        if (!captchaOk) {
+          setError(
+            turnstileConfigured ? 'Complete the CAPTCHA verification.' : 'Please confirm you are not a bot.',
+          )
+          return
+        }
+        if (!turnstileConfigured) {
+          await verifyCaptchaToken('checkbox-fallback', 'login')
+        }
+
+        setSubmitting(true)
+        const dashboardPath = await signIn(credentials)
         navigate(returnTo ?? dashboardPath, { replace: true })
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Sign in failed'
@@ -53,7 +67,7 @@ export function LoginPageView() {
         setSubmitting(false)
       }
     },
-    [botChecked, email, password, signIn, navigate, returnTo],
+    [botChecked, captchaToken, email, password, signIn, navigate, returnTo],
   )
 
   return (
@@ -190,18 +204,24 @@ export function LoginPageView() {
               </div>
             </div>
 
-            <label className="sp-mb-section flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-[#E2E8F0] bg-slate-50/80 px-2.5 py-2">
-              <span className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={botChecked}
-                  onChange={(e) => setBotChecked(e.target.checked)}
-                  className="h-3.5 w-3.5 accent-[#2451A3]"
-                />
-                <span className="text-[11px] font-medium text-slate-600">I am not a bot</span>
-              </span>
-              <img className="h-6 w-6 opacity-70" alt="" src={AUTH_CAPTCHA_LOGO} />
-            </label>
+            {turnstileConfigured ? (
+              <div className="sp-mb-section flex justify-center rounded-lg border border-[#E2E8F0] bg-slate-50/80 px-2.5 py-3">
+                <TurnstileCaptcha onToken={setCaptchaToken} theme="light" />
+              </div>
+            ) : (
+              <label className="sp-mb-section flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-[#E2E8F0] bg-slate-50/80 px-2.5 py-2">
+                <span className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={botChecked}
+                    onChange={(e) => setBotChecked(e.target.checked)}
+                    className="h-3.5 w-3.5 accent-[#2451A3]"
+                  />
+                  <span className="text-[11px] font-medium text-slate-600">I am not a bot</span>
+                </span>
+                <img className="h-6 w-6 opacity-70" alt="" src={AUTH_CAPTCHA_LOGO} />
+              </label>
+            )}
 
             <button
               type="submit"

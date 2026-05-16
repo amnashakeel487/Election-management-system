@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { triggerWinnerNotification } from '@/services/notificationService'
 import type { ElectionResultsPayload } from '@/types/electionResults'
 import { isPollingEnded } from '@/utils/electionPolling'
 
@@ -61,7 +62,12 @@ export async function lockElectionResults(electionId: string): Promise<ElectionR
   })
 
   if (error) throw new Error(error.message)
-  return normalizeResultsPayload(data as ElectionResultsPayload)
+
+  const payload = normalizeResultsPayload(data as ElectionResultsPayload)
+  void triggerWinnerNotification(electionId).catch(() => {
+    /* winner emails are best-effort; admin can retry from Notifications */
+  })
+  return payload
 }
 
 export interface ResultsElectionListItem {

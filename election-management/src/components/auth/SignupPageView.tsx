@@ -1,6 +1,9 @@
 import { useCallback, useMemo, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
+import { parseOrThrow, signUpSchema } from '@/lib/validation/schemas'
+import { TurnstileCaptcha } from '@/components/security/TurnstileCaptcha'
+import { turnstileConfigured, verifyCaptchaToken } from '@/services/securityService'
 import type { RegisterableRole } from '@/types/auth'
 import { AuthSplitChrome } from './AuthSplitChrome'
 
@@ -33,6 +36,7 @@ export function SignupPageView() {
   const [role, setRole] = useState<RegisterableRole>('voter')
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [botChecked, setBotChecked] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -47,9 +51,17 @@ export function SignupPageView() {
         setError('Please accept the Terms of Service and Privacy Policy.')
         return
       }
-      if (!botChecked) {
-        setError('Please confirm you are not a bot.')
+      const captchaOk = turnstileConfigured
+        ? Boolean(captchaToken) && (await verifyCaptchaToken(captchaToken!, 'signup')).ok
+        : botChecked
+      if (!captchaOk) {
+        setError(
+          turnstileConfigured ? 'Complete the CAPTCHA verification.' : 'Please confirm you are not a bot.',
+        )
         return
+      }
+      if (!turnstileConfigured) {
+        await verifyCaptchaToken('checkbox-fallback', 'signup')
       }
       if (!firstName.trim() || !lastName.trim()) {
         setError('First and last name are required.')
@@ -69,6 +81,14 @@ export function SignupPageView() {
       }
 
       const full_name = `${firstName.trim()} ${lastName.trim()}`.trim()
+      parseOrThrow(signUpSchema, {
+        email,
+        password,
+        full_name,
+        phone,
+        organization: organization.trim() || undefined,
+        election_purpose: role === 'election_creator' ? electionPurpose.trim() : undefined,
+      })
 
       setSubmitting(true)
       try {
@@ -103,6 +123,7 @@ export function SignupPageView() {
     [
       termsAccepted,
       botChecked,
+      captchaToken,
       firstName,
       lastName,
       phone,
@@ -432,10 +453,16 @@ export function SignupPageView() {
                 </span>
               </label>
 
-              <label className="mb-5 flex cursor-pointer items-center gap-2.5 rounded-xl border border-[#E2E8F0] bg-slate-50/80 px-3 py-2.5">
-                <input type="checkbox" checked={botChecked} onChange={(e) => setBotChecked(e.target.checked)} className="h-4 w-4 accent-[#2451A3]" />
-                <span className="text-[12px] font-medium text-slate-600">I am not a bot</span>
-              </label>
+              {turnstileConfigured ? (
+                <div className="mb-5 flex justify-center rounded-xl border border-[#E2E8F0] bg-slate-50/80 px-3 py-3">
+                  <TurnstileCaptcha onToken={setCaptchaToken} theme="light" />
+                </div>
+              ) : (
+                <label className="mb-5 flex cursor-pointer items-center gap-2.5 rounded-xl border border-[#E2E8F0] bg-slate-50/80 px-3 py-2.5">
+                  <input type="checkbox" checked={botChecked} onChange={(e) => setBotChecked(e.target.checked)} className="h-4 w-4 accent-[#2451A3]" />
+                  <span className="text-[12px] font-medium text-slate-600">I am not a bot</span>
+                </label>
+              )}
 
               <button
                 type="submit"

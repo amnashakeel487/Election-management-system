@@ -109,8 +109,18 @@ Deno.serve(async (req) => {
         <p>— FortressVote Platform Administration</p>
       `
 
+    const notifType = isApproved ? 'creator_approval' : 'creator_rejection'
+
     if (!brevoConfigured) {
       console.log(`[dev] Creator ${body.decision} email for ${target.email}`)
+      await admin.rpc('log_notification', {
+        p_type: notifType,
+        p_recipient_email: target.email,
+        p_status: 'sent',
+        p_recipient_user_id: target.id,
+        p_subject: subject,
+        p_metadata: { dev_mode: true },
+      })
       return new Response(
         JSON.stringify({ sent: false, dev_mode: true, message: 'BREVO_API_KEY not set; logged to console' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
@@ -125,11 +135,27 @@ Deno.serve(async (req) => {
     })
 
     if (!result.ok) {
+      await admin.rpc('log_notification', {
+        p_type: notifType,
+        p_recipient_email: target.email,
+        p_status: 'failed',
+        p_recipient_user_id: target.id,
+        p_subject: subject,
+        p_error_message: result.error,
+      })
       return new Response(JSON.stringify({ error: `Email failed: ${result.error}` }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
+
+    await admin.rpc('log_notification', {
+      p_type: notifType,
+      p_recipient_email: target.email,
+      p_status: 'sent',
+      p_recipient_user_id: target.id,
+      p_subject: subject,
+    })
 
     return new Response(JSON.stringify({ sent: true, email: target.email }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

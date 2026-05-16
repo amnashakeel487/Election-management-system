@@ -1,4 +1,4 @@
-/* Admin dashboard — dark mode overrides (class strategy on html.dark) */
+/* Admin dashboard — dark page chrome, white elevated cards */
 
 .dark .admin-app {
   --text: #f1f5f9;
@@ -9,11 +9,25 @@
   --card: #1e293b;
   --sidebar: #0a1628;
   --sidebar2: #0f2347;
+  /* Tokens for content on white surfaces */
+  --card-fg: #0f172a;
+  --card-muted: #475569;
+  --card-subtle: #64748b;
+  --card-border: #e2e8f0;
+  --card-hover: #f8fafc;
 }
 
 .dark .admin-app .topbar {
-  background: var(--card);
+  background: #1e293b;
   border-bottom-color: var(--border);
+}
+
+.dark .admin-app .topbar-title {
+  color: var(--text);
+}
+
+.dark .admin-app .topbar-subtitle {
+  color: var(--subtle);
 }
 
 .dark .admin-app .topbar-search {
@@ -26,56 +40,175 @@
 }
 
 .dark .admin-app .icon-btn {
-  background: var(--card);
+  background: #1e293b;
   border-color: var(--border);
   color: var(--muted);
 }
 
-.dark .admin-app .stat-card,
-.dark .admin-app .card,
-.dark .admin-app .card-elevated {
-  background: var(--card);
-  border-color: var(--border);
+/* Page headers sit on dark background */
+.dark .admin-app .page-eyebrow {
+  color: #60a5fa;
 }
 
-.dark .admin-app .table-wrap,
-.dark .admin-app table {
-  background: var(--card);
-}
-
-.dark .admin-app tbody tr:hover {
-  background: #1e293b;
-}
-
-.dark .admin-app .tabs {
-  background: var(--bg);
-}
-
-.dark .admin-app .tab-btn.active {
-  background: var(--card);
-  color: #e2e8f0;
-}
-
-.dark .admin-app .form-input {
-  background: var(--bg);
-  border-color: var(--border);
+.dark .admin-app .page-title {
   color: var(--text);
 }
 
-.dark .admin-app .alert-info {
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.35);
-  color: #93c5fd;
+.dark .admin-app .page-subtitle {
+  color: var(--subtle);
 }
 
-.dark .admin-app .alert-warning {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.35);
-  color: #fcd34d;
+/* White cards & panels */
+.dark .admin-app :is(
+    .stat-card,
+    .card,
+    .card-elevated,
+    .table-wrap,
+    .modal,
+    .security-metric
+  ) {
+  background: #ffffff !important;
+  border-color: var(--card-border) !important;
+  color: var(--card-fg);
 }
 
-.dark .admin-app .alert-danger {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.35);
-  color: #fca5a5;
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .card-header {
+  border-bottom-color: var(--card-border);
+}
+
+.dark .admin-app .stat-card .stat-num,
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .card-title,
+.dark .admin-app .modal-title {
+  color: var(--card-fg);
+}
+
+.dark .admin-app .stat-card .stat-label,
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .card-subtitle,
+.dark .admin-app .modal .form-label {
+  color: var(--card-subtle);
+}
+
+.dark .admin-app .table-wrap table {
+  background: #ffffff;
+}
+
+.dark .admin-app .table-wrap th {
+  color: var(--card-subtle);
+}
+
+.dark .admin-app .table-wrap td {
+  color: var(--card-fg);
+}
+
+.dark .admin-app .table-wrap td.muted,
+.dark .admin-app .user-email {
+  color: var(--card-muted) !important;
+}
+
+.dark .admin-app .table-wrap tbody tr:hover,
+.dark .admin-app .table-wrap tbody tr:hover td {
+  background: var(--card-hover) !important;
+}
+
+.dark .admin-app .tabs {
+  background: #1e293b;
+}
+
+.dark .admin-app .tab-btn {
+  color: var(--subtle);
+}
+
+.dark .admin-app .tab-btn.active {
+  background: #ffffff;
+  color: var(--card-fg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated, .modal) .form-input {
+  background: #ffffff;
+  border-color: var(--card-border);
+  color: var(--card-fg);
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .form-input::placeholder {
+  color: #94a3b8;
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .toggle-label {
+  color: var(--card-fg);
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .toggle-sub {
+  color: var(--card-subtle);
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .appearance-option--admin {
+  background: #f8fafc;
+  border-color: var(--card-border);
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .appearance-option__label {
+  color: var(--card-fg);
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .appearance-option__desc,
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .appearance-settings__hint {
+  color: var(--card-muted);
+}
+
+/* Timeline / chart labels inside white cards */
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .chart-label,
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .tl-title {
+  color: var(--card-fg);
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .tl-sub,
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .tl-time,
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .legend-label {
+  color: var(--card-muted);
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .legend-val {
+  color: var(--card-fg);
+}
+
+/* Tailwind utility cards inside admin content (audit table, etc.) */
+.dark .admin-app .content :is(.bg-surface-container, .bg-surface-container-high) {
+  background-color: #ffffff !important;
+  border-color: var(--card-border) !important;
+}
+
+.dark .admin-app .content .text-on-surface {
+  color: var(--card-fg) !important;
+}
+
+.dark .admin-app .content .text-on-surface-variant {
+  color: var(--card-muted) !important;
+}
+
+.dark .admin-app .content .border-line {
+  border-color: var(--card-border) !important;
+}
+
+.dark .admin-app .content .divide-white\/5 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--card-border) !important;
+}
+
+/* Alerts stay tinted but readable on white cards */
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .alert-info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .alert-warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.dark .admin-app :is(.stat-card, .card, .card-elevated) .alert-danger {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
 }

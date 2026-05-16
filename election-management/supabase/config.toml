@@ -6,3 +6,15 @@ verify_jwt = true
 
 [functions.send-creator-approval-notification]
 verify_jwt = true
+
+[functions.send-verification-reminder]
+verify_jwt = true
+
+[functions.send-election-notifications]
+verify_jwt = true
+
+[functions.process-notification-milestones]
+verify_jwt = true
+
+[functions.verify-turnstile]
+verify_jwt = false

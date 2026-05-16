@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { castVoteSchema, parseOrThrow, secretVoterIdSchema } from '@/lib/validation/schemas'
 import type { CastVoteResult, VerifySecretVoterResult, VotingEligibility } from '@/types/voting'
 import { isPollingEnded, isPollingNotStarted, isPollingOpen } from '@/utils/electionPolling'
 import type { ElectionWithCandidates } from '@/types/election'
@@ -95,9 +96,10 @@ export async function verifySecretVoterForVoting(
   electionId: string,
   secretVoterId: string,
 ): Promise<VerifySecretVoterResult> {
+  const normalizedId = parseOrThrow(secretVoterIdSchema, secretVoterId)
   const { data, error } = await supabase.rpc('verify_secret_voter_for_voting', {
     p_election_id: electionId,
-    p_secret_voter_id: secretVoterId.trim(),
+    p_secret_voter_id: normalizedId,
   })
 
   if (error) throw new Error(error.message)
@@ -128,10 +130,15 @@ export async function castAnonymousVote(
   secretVoterId: string,
   candidateId: string,
 ): Promise<CastVoteResult> {
+  const validated = parseOrThrow(castVoteSchema, {
+    electionId,
+    secretVoterId,
+    candidateId,
+  })
   const { data, error } = await supabase.rpc('cast_anonymous_vote', {
-    p_election_id: electionId,
-    p_secret_voter_id: secretVoterId.trim(),
-    p_candidate_id: candidateId,
+    p_election_id: validated.electionId,
+    p_secret_voter_id: validated.secretVoterId,
+    p_candidate_id: validated.candidateId,
   })
 
   if (error) throw new Error(error.message)

@@ -20,7 +20,7 @@ Run migrations **001 → 010** in Supabase SQL Editor before testing.
 | 10. Live results | Done | Recharts, realtime, winner, turnout |
 | 11. Audit | Done | Login/vote/election/approval logs, admin CSV download |
 | 12. Notifications | Partial | Email verify (Supabase), secret IDs (Resend); approval email = audit only |
-| 13. Security | Done | RLS, definer RPCs, email verify gate, bot checkbox, password min length |
+| 13. Security | Done | RLS (022), ballot seals, rate limits, Turnstile CAPTCHA, Zod validation, `docs/SECURITY_SETUP.md` |
 | 14. Dashboards | Done | Admin, creator, voter dashboards |
 | 15. Deployment | Done | Vercel + `docs/DEPLOY.md` + env vars |
 

@@ -158,8 +158,19 @@ Deno.serve(async (req) => {
       const email = recipient?.email
       if (!email || !reg.secret_voter_id) continue
 
+      const subject = `Your Secret Voter ID — ${election.title}`
+
       if (!brevoConfigured) {
         console.log(`[dev] Secret voter ID for ${email}: ${reg.secret_voter_id}`)
+        await admin.rpc('log_notification', {
+          p_type: 'secret_voter_id',
+          p_recipient_email: email,
+          p_status: 'sent',
+          p_recipient_user_id: reg.user_id,
+          p_election_id: body.election_id,
+          p_subject: subject,
+          p_metadata: { dev_mode: true },
+        })
         await admin
           .from('voter_registrations')
           .update({ secret_voter_id_emailed_at: new Date().toISOString() })
@@ -180,14 +191,32 @@ Deno.serve(async (req) => {
 
       const result = await sendBrevoEmail({
         to: { email, name: recipient?.full_name?.trim() || email },
-        subject: `Your Secret Voter ID — ${election.title}`,
+        subject,
         htmlContent,
       })
 
       if (!result.ok) {
         errors.push(`${email}: ${result.error}`)
+        await admin.rpc('log_notification', {
+          p_type: 'secret_voter_id',
+          p_recipient_email: email,
+          p_status: 'failed',
+          p_recipient_user_id: reg.user_id,
+          p_election_id: body.election_id,
+          p_subject: subject,
+          p_error_message: result.error,
+        })
         continue
       }
+
+      await admin.rpc('log_notification', {
+        p_type: 'secret_voter_id',
+        p_recipient_email: email,
+        p_status: 'sent',
+        p_recipient_user_id: reg.user_id,
+        p_election_id: body.election_id,
+        p_subject: subject,
+      })
 
       await admin
         .from('voter_registrations')

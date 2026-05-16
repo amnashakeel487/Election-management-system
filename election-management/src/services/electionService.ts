@@ -1,3 +1,5 @@
+import { sanitizeText } from '@/lib/security/sanitize'
+import { electionDescriptionSchema, electionTitleSchema, parseOrThrow } from '@/lib/validation/schemas'
 import { supabase } from '@/lib/supabase'
 import type {
   Candidate,
@@ -96,14 +98,18 @@ export async function createElectionDraft(
   input: Pick<CreateElectionInput, 'title' | 'description'> & { category?: string | null },
 ): Promise<Election> {
   const { start, end } = defaultDraftDates()
+  const title = parseOrThrow(electionTitleSchema, sanitizeText(input.title, 200))
+  const description = input.description
+    ? parseOrThrow(electionDescriptionSchema, sanitizeText(input.description, 5000))
+    : null
 
   const { data, error } = await supabase
     .from(ELECTIONS)
     .insert({
       creator_id: creatorId,
-      title: input.title,
-      description: input.description ?? null,
-      category: input.category?.trim() || null,
+      title,
+      description,
+      category: input.category ? sanitizeText(input.category, 80) : null,
       start_date: start,
       end_date: end,
       registration_deadline: null,

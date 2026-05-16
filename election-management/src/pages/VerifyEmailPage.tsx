@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { resendVerificationEmail } from '@/services/authService'
+import { sendVerificationReminder } from '@/services/notificationService'
 import { useAuth } from '@/hooks/useAuth'
 
 type VerifyEmailLocationState = {
@@ -38,6 +39,9 @@ export function VerifyEmailPage() {
     setResending(true)
     try {
       await resendVerificationEmail(displayEmail)
+      void sendVerificationReminder(displayEmail).catch(() => {
+        /* branded reminder is optional; Auth email is primary */
+      })
       setMessage('Verification email sent. Check your inbox.')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to resend email')

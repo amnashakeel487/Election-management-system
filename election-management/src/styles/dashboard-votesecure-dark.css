@@ -1,4 +1,4 @@
-/* Creator / voter VoteSecure dashboard — dark mode */
+/* Creator / voter dashboard — dark page, white cards */
 
 .dark .vs-dashboard {
   --vs-text: #f1f5f9;
@@ -6,20 +6,26 @@
   --vs-subtle: #64748b;
   --vs-border: #334155;
   --vs-bg: #0f172a;
-  --vs-card: #1e293b;
+  --vs-card-fg: #0f172a;
+  --vs-card-muted: #475569;
+  --vs-card-subtle: #64748b;
+  --vs-card-border: #e2e8f0;
+  --vs-card-hover: #f8fafc;
   background: var(--vs-bg);
   color: var(--vs-text);
 }
 
-.dark .vs-dashboard .vs-panel,
-.dark .vs-dashboard .vs-stat-card {
-  background: var(--vs-card);
-  border-color: var(--vs-border);
+.dark .vs-dashboard .vs-topbar {
+  background: #1e293b;
+  border-bottom-color: var(--vs-border);
 }
 
-.dark .vs-dashboard .vs-topbar {
-  background: var(--vs-card);
-  border-bottom-color: var(--vs-border);
+.dark .vs-dashboard .vs-page-title {
+  color: var(--vs-text);
+}
+
+.dark .vs-dashboard .vs-page-crumb {
+  color: var(--vs-subtle);
 }
 
 .dark .vs-dashboard .vs-topbar-search {
@@ -31,21 +37,77 @@
   color: var(--vs-text);
 }
 
-.dark .vs-dashboard .vs-tb-btn,
-.dark .vs-dashboard .vs-topbar-right .theme-toggle--minimal {
-  background: var(--vs-card);
+.dark .vs-dashboard .vs-topbar-right .theme-toggle--minimal,
+.dark .vs-dashboard .vs-tb-btn {
+  background: #1e293b;
   border-color: var(--vs-border);
+  color: var(--vs-muted);
+}
+
+/* White panels & stat cards */
+.dark .vs-dashboard :is(.vs-panel, .vs-stat-card) {
+  background: #ffffff !important;
+  border-color: var(--vs-card-border) !important;
+  color: var(--vs-card-fg);
+}
+
+.dark .vs-dashboard .vs-panel-head {
+  border-bottom-color: var(--vs-card-border);
+}
+
+.dark .vs-dashboard .vs-panel-title,
+.dark .vs-dashboard .vs-stat-num {
+  color: var(--vs-card-fg);
+}
+
+.dark .vs-dashboard .vs-panel-sub,
+.dark .vs-dashboard .vs-stat-label {
+  color: var(--vs-card-subtle);
+}
+
+.dark .vs-dashboard .vs-panel-action {
+  color: #2451a3;
+  background: rgba(36, 81, 163, 0.08);
+}
+
+.dark .vs-dashboard table {
+  background: #ffffff;
 }
 
 .dark .vs-dashboard th {
-  color: var(--vs-subtle);
+  color: var(--vs-card-subtle) !important;
 }
 
 .dark .vs-dashboard td {
-  color: var(--vs-text);
-  border-bottom-color: rgba(51, 65, 85, 0.5);
+  color: var(--vs-card-fg) !important;
+  border-bottom-color: #f1f5f9 !important;
 }
 
 .dark .vs-dashboard tr:hover td {
-  background: rgba(30, 41, 59, 0.7);
+  background: var(--vs-card-hover) !important;
+}
+
+.dark .vs-dashboard .vs-log-text {
+  color: var(--vs-card-fg);
+}
+
+.dark .vs-dashboard .vs-log-time {
+  color: var(--vs-card-subtle);
+}
+
+.dark .vs-dashboard .vs-empty {
+  color: var(--vs-card-muted);
+}
+
+.dark .vs-dashboard .vs-content :is(.bg-surface-container, .bg-surface-container-high) {
+  background-color: #ffffff !important;
+  border-color: var(--vs-card-border) !important;
+}
+
+.dark .vs-dashboard .vs-content .text-on-surface {
+  color: var(--vs-card-fg) !important;
+}
+
+.dark .vs-dashboard .vs-content .text-on-surface-variant {
+  color: var(--vs-card-muted) !important;
 }

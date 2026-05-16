@@ -208,8 +208,27 @@
 }
 
 .dark .appearance-option--admin {
-  background: var(--card, #1e293b);
-  border-color: var(--border, #334155);
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+/* Dark theme: elevated cards stay white with dark text (account, landing sections) */
+.dark .glass-card,
+.dark .glass-panel {
+  background: rgb(255 255 255 / 0.98) !important;
+  border-color: rgb(226 232 240) !important;
+  color: rgb(15 23 42);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+.dark .glass-card .text-on-surface,
+.dark .glass-panel .text-on-surface {
+  color: rgb(15 23 42) !important;
+}
+
+.dark .glass-card .text-on-surface-variant,
+.dark .glass-panel .text-on-surface-variant {
+  color: rgb(71 85 105) !important;
 }
 
 .appearance-option__input {
