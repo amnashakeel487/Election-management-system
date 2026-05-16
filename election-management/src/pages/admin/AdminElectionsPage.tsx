@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { AdminTopBar } from '@/components/admin/AdminTopBar'
+import { VoterRollLockPanel } from '@/components/election/VoterRollLockPanel'
 import { useAdminApproval } from '@/hooks/useAdminApproval'
 import { useAuth } from '@/hooks/useAuth'
 import {
@@ -9,7 +10,9 @@ import {
   fetchPublishedElections,
   type ElectionWithCreator,
 } from '@/services/adminDashboardService'
+import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import { formatSubmissionDate } from '@/utils/formatDate'
+import { registrationStatusLabel } from '@/utils/registrationLock'
 
 const STATUS_STYLES: Record<string, string> = {
   draft: 'bg-on-surface-variant/20 text-on-surface-variant',
@@ -28,8 +31,11 @@ export function AdminElectionsPage() {
   const [filter, setFilter] = useState<ElectionFilter>('published')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [finalizingId, setFinalizingId] = useState<string | null>(null)
+  const [actionMessage, setActionMessage] = useState<string | null>(null)
 
-  useEffect(() => {
+  function reload() {
     setLoading(true)
     setError(null)
     const load = filter === 'published' ? fetchPublishedElections : fetchAdminElections
@@ -37,7 +43,34 @@ export function AdminElectionsPage() {
       .then(setElections)
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load elections'))
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    reload()
   }, [filter])
+
+  async function handleFinalize(electionId: string) {
+    const election = elections.find((e) => e.id === electionId)
+    if (!election) return
+    const ok = window.confirm(
+      `Finalize voter roll for "${election.title}"? This freezes the list, locks registration, assigns secret IDs, and emails voters.`,
+    )
+    if (!ok) return
+
+    setFinalizingId(electionId)
+    setActionMessage(null)
+    try {
+      const { finalize, email } = await finalizeAndEmailSecretVoterIds(electionId)
+      setActionMessage(
+        `Finalized ${finalize.registered_count ?? finalize.assigned_count} voter(s). Emailed ${email.sent}.`,
+      )
+      reload()
+    } catch (err) {
+      setActionMessage(err instanceof Error ? err.message : 'Finalization failed')
+    } finally {
+      setFinalizingId(null)
+    }
+  }
 
   const approvedCreatorElections = useMemo(
     () =>
@@ -99,6 +132,12 @@ export function AdminElectionsPage() {
             </p>
           ) : null}
 
+          {actionMessage ? (
+            <p className="mt-4 rounded-xl border border-tertiary/30 bg-tertiary/10 px-lg py-md text-sm text-tertiary">
+              {actionMessage}
+            </p>
+          ) : null}
+
           {loading ? (
             <p className="mt-6 text-on-surface-variant">Loading elections…</p>
           ) : (
@@ -121,13 +160,18 @@ export function AdminElectionsPage() {
                       </td>
                     </tr>
                   ) : (
-                    displayed.map((election) => (
-                      <tr key={election.id} className="hover:bg-elevated/40">
+                    displayed.map((election) => {
+                      const rollStatus = registrationStatusLabel(election)
+                      const expanded = expandedId === election.id
+                      return (
+                      <Fragment key={election.id}>
+                      <tr className="hover:bg-elevated/40">
                         <td className="px-lg py-4">
                           <p className="font-label-md text-on-surface">{election.title}</p>
                           {election.category ? (
                             <p className="text-[11px] text-on-surface-variant">{election.category}</p>
                           ) : null}
+                          <p className="mt-1 text-[10px] text-on-surface-variant">{rollStatus.label}</p>
                         </td>
                         <td className="px-lg py-4 text-sm text-on-surface-variant">
                           <p>{election.creator?.full_name ?? '—'}</p>
@@ -144,9 +188,16 @@ export function AdminElectionsPage() {
                           {formatSubmissionDate(election.start_date)} – {formatSubmissionDate(election.end_date)}
                         </td>
                         <td className="px-lg py-4 text-right">
+                          <button
+                            type="button"
+                            onClick={() => setExpandedId(expanded ? null : election.id)}
+                            className="rounded-lg border border-line px-3 py-1.5 font-label-sm text-on-surface-variant hover:text-on-surface"
+                          >
+                            {expanded ? 'Hide roll' : 'Manage roll'}
+                          </button>
                           <Link
                             to={`/elections/${election.id}`}
-                            className="rounded-lg bg-primary/10 px-4 py-1.5 font-label-sm text-primary hover:bg-primary hover:text-on-primary"
+                            className="ml-2 rounded-lg bg-primary/10 px-4 py-1.5 font-label-sm text-primary hover:bg-primary hover:text-on-primary"
                           >
                             View
                           </Link>
@@ -160,7 +211,21 @@ export function AdminElectionsPage() {
                           )}
                         </td>
                       </tr>
-                    ))
+                      {expanded ? (
+                        <tr>
+                          <td colSpan={5} className="px-lg pb-4">
+                            <VoterRollLockPanel
+                              isAdmin
+                              election={election}
+                              finalizingId={finalizingId}
+                              onFinalize={(id) => void handleFinalize(id)}
+                              onChanged={reload}
+                            />
+                          </td>
+                        </tr>
+                      ) : null}
+                      </Fragment>
+                    )})
                   )}
                 </tbody>
               </table>

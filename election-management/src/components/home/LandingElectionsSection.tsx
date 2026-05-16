@@ -166,9 +166,9 @@ function LandingElectionCard({
           <Link to={`/elections/${election.id}`} className="btn-detail">
             View details
           </Link>
-          {phase === 'active' ? (
+          {phase === 'active' || phase === 'upcoming' ? (
             <Link to={`/elections/${election.id}`} className="btn-vote">
-              Vote now
+              {phase === 'active' ? 'Join election' : 'Register interest'}
             </Link>
           ) : null}
         </div>

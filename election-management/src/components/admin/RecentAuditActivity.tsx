@@ -63,7 +63,23 @@ function getAuditPresentation(log: AuditLogEntry) {
         iconBg: 'bg-secondary/20',
         iconColor: 'text-secondary',
         title: 'Voter Roll Finalized',
-        description: `Secret IDs issued for ${electionTitle ?? 'election'}.`,
+        description: `Secret IDs issued for ${electionTitle ?? 'election'}${details.registered_count != null ? ` (${details.registered_count} voters)` : ''}.`,
+      }
+    case 'election_registration_locked':
+      return {
+        icon: 'lock',
+        iconBg: 'bg-amber-500/20',
+        iconColor: 'text-amber-700',
+        title: 'Registration Locked',
+        description: `${electionTitle ?? 'Election'} — ${(details.reason as string) ?? 'locked'}${details.override ? ' (admin override)' : ''}.`,
+      }
+    case 'election_registration_unlocked':
+      return {
+        icon: 'lock_open',
+        iconBg: 'bg-primary/20',
+        iconColor: 'text-primary',
+        title: 'Registration Unlocked',
+        description: `${actorEmail} unlocked ${electionTitle ?? 'an election'}: ${(details.reason as string) ?? 'admin override'}.`,
       }
     case 'creator_approved':
       return {

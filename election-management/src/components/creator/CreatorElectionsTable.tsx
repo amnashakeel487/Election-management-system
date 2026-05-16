@@ -1,7 +1,10 @@
+import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
+import { VoterRollLockPanel } from '@/components/election/VoterRollLockPanel'
 import { ELECTION_CATEGORY_OPTIONS } from '@/constants/electionWizard'
 import type { Election } from '@/types/election'
 import { formatSubmissionDate } from '@/utils/formatDate'
+import { registrationStatusLabel } from '@/utils/registrationLock'
 
 function categoryDisplay(cat: string | null | undefined): string | null {
   if (!cat?.trim()) return null
@@ -13,6 +16,7 @@ interface CreatorElectionsTableProps {
   elections: Election[]
   finalizingId?: string | null
   onFinalizeVoterRoll?: (electionId: string) => void
+  onRollChanged?: () => void
 }
 
 function statusBadge(status: Election['status']) {
@@ -52,6 +56,7 @@ export function CreatorElectionsTable({
   elections,
   finalizingId,
   onFinalizeVoterRoll,
+  onRollChanged,
 }: CreatorElectionsTableProps) {
   return (
     <div className="glass-panel flex flex-col overflow-hidden rounded-[32px] lg:col-span-2">
@@ -99,8 +104,13 @@ export function CreatorElectionsTable({
             ) : (
               elections.map((election) => {
                 const catLabel = categoryDisplay(election.category)
+                const rollStatus = registrationStatusLabel(election)
+                const showRollPanel =
+                  (election.status === 'published' || election.status === 'active') ||
+                  election.voter_roll_finalized_at
                 return (
-                <tr key={election.id} className="group transition-colors hover:bg-elevated/40">
+                <Fragment key={election.id}>
+                <tr className="group transition-colors hover:bg-elevated/40">
                   <td className="px-6 py-5">
                     <div className="flex items-center gap-3">
                       <div
@@ -130,6 +140,9 @@ export function CreatorElectionsTable({
                     <span className="font-label-md text-label-md text-on-surface-variant">
                       max {election.max_voters.toLocaleString()}
                     </span>
+                    {election.status !== 'draft' ? (
+                      <p className="mt-1 text-[10px] text-on-surface-variant">{rollStatus.label}</p>
+                    ) : null}
                   </td>
                   <td className="px-6 py-5 text-right">
                     <div className="flex flex-wrap items-center justify-end gap-2">
@@ -140,18 +153,6 @@ export function CreatorElectionsTable({
                         >
                           Edit
                         </Link>
-                      ) : null}
-                      {(election.status === 'published' || election.status === 'active') &&
-                      !election.voter_roll_finalized_at &&
-                      onFinalizeVoterRoll ? (
-                        <button
-                          type="button"
-                          disabled={finalizingId === election.id}
-                          onClick={() => onFinalizeVoterRoll(election.id)}
-                          className="rounded-lg border border-tertiary/30 bg-tertiary/10 px-4 py-2 font-label-md text-label-md text-tertiary transition-all hover:bg-tertiary/20 disabled:opacity-60"
-                        >
-                          {finalizingId === election.id ? 'Finalizing…' : 'Finalize & Email IDs'}
-                        </button>
                       ) : null}
                       {election.status !== 'draft' ? (
                         <Link
@@ -164,6 +165,20 @@ export function CreatorElectionsTable({
                     </div>
                   </td>
                 </tr>
+                {showRollPanel ? (
+                  <tr className="bg-elevated/20">
+                    <td colSpan={4} className="px-6 pb-5 pt-0">
+                      <VoterRollLockPanel
+                        compact
+                        election={election}
+                        finalizingId={finalizingId}
+                        onFinalize={onFinalizeVoterRoll}
+                        onChanged={onRollChanged}
+                      />
+                    </td>
+                  </tr>
+                ) : null}
+                </Fragment>
                 )
               })
             )}

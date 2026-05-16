@@ -4,6 +4,7 @@ export interface FinalizeVoterRollResult {
   election_id: string
   finalized_at: string
   assigned_count: number
+  registered_count?: number
   assignments: Array<{
     registration_id: string
     user_id: string

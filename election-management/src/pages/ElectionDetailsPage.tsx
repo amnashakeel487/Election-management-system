@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { CandidateAvatar } from '@/components/election/CandidateAvatar'
-import { ElectionParticipationCard } from '@/components/election/ElectionParticipationCard'
+import { VoterRegistrationPanel } from '@/components/voter/VoterRegistrationPanel'
 import { Footer } from '@/components/layout/Footer'
 import { TopNavBar } from '@/components/layout/TopNavBar'
 import { useAuth } from '@/hooks/useAuth'
@@ -222,8 +222,9 @@ export function ElectionDetailsPage() {
                       'This election is hosted on FortressVote with verified voter registration and secure ballot casting.'}
                   </p>
                   <p>
-                    Eligible participants must sign in and join before polling closes. When capacity is reached,
-                    additional registrants are placed on a waitlist in order of registration.
+                    Eligible participants must sign in and join before the registration deadline. Registration
+                    auto-locks when capacity is reached; the organizer finalizes the voter roll to freeze the list
+                    and issue secret voter IDs.
                   </p>
                   <p className="text-xs text-slate-400">
                     Capacity: {stats.registered_count.toLocaleString()} / {stats.max_voters.toLocaleString()} voters
@@ -234,10 +235,9 @@ export function ElectionDetailsPage() {
             </div>
 
             <aside className="space-y-6 lg:col-span-4">
-              <ElectionParticipationCard
+              <VoterRegistrationPanel
                 className="ed-participation-card"
-                electionId={election.id}
-                endDate={election.end_date}
+                election={election}
                 stats={stats}
                 userRegistration={userRegistration}
                 voterRollFinalized={Boolean(election.voter_roll_finalized_at)}

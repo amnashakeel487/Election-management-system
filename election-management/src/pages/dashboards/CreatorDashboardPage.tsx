@@ -195,6 +195,7 @@ export function CreatorDashboardPage() {
                       elections={elections}
                       finalizingId={finalizingId}
                       onFinalizeVoterRoll={(id) => void handleFinalizeVoterRoll(id)}
+                      onRollChanged={() => void reloadElections()}
                     />
                   </>
                 )}

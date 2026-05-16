@@ -13,7 +13,7 @@ const ELECTIONS = 'elections'
 const CANDIDATES = 'candidates'
 
 const ELECTION_COLUMNS =
-  'id, creator_id, title, description, category, start_date, end_date, registration_deadline, max_voters, status, eligibility_rule, privacy_tier, real_time_results, allow_write_ins, created_at, updated_at, published_at, secret_voter_id_prefix, voter_roll_finalized_at'
+  'id, creator_id, title, description, category, start_date, end_date, registration_deadline, max_voters, status, eligibility_rule, privacy_tier, real_time_results, allow_write_ins, created_at, updated_at, published_at, secret_voter_id_prefix, voter_roll_finalized_at, registration_locked_at, registration_lock_reason'
 
 const CANDIDATE_COLUMNS = 'id, election_id, name, description, designation, photo_url, sort_order, created_at'
 
