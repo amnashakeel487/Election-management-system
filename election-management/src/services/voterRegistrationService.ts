@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { sendWaitlistEmail } from '@/services/waitlistService'
 import type {
   ElectionRegistrationStats,
   RegisterForElectionResult,
@@ -64,7 +65,20 @@ export async function registerForElection(electionId: string): Promise<RegisterF
   })
 
   if (error) throw new Error(error.message)
-  return data as RegisterForElectionResult
+
+  const result = data as RegisterForElectionResult
+  if (!result.duplicate && result.status === 'waitlisted' && result.waitlist_position) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (user) {
+      void sendWaitlistEmail('waitlist_joined', user.id, electionId, result.waitlist_position).catch(
+        () => undefined,
+      )
+    }
+  }
+
+  return result
 }
 
 export async function fetchUserRegistrations(userId: string): Promise<VoterRegistrationWithElection[]> {

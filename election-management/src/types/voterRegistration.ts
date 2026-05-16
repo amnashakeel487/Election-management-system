@@ -1,4 +1,4 @@
-export type VoterRegistrationStatus = 'registered' | 'waitlisted'
+export type VoterRegistrationStatus = 'registered' | 'waitlisted' | 'rejected'
 
 export interface VoterRegistration {
   id: string

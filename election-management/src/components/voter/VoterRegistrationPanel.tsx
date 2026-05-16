@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
+import { WaitlistStatusBanner } from '@/components/waitlist/WaitlistStatusBanner'
+import { withdrawFromElection } from '@/services/waitlistService'
 import { registerForElection } from '@/services/voterRegistrationService'
+import { waitlistUserMessage } from '@/utils/waitlistDisplay'
 import type { Election } from '@/types/election'
 import type { ElectionRegistrationStats, VoterRegistration } from '@/types/voterRegistration'
 import { SecretVoterIdDisplay } from '@/components/voter/SecretVoterIdDisplay'
@@ -38,6 +41,7 @@ export function VoterRegistrationPanel({
   const [error, setError] = useState<string | null>(null)
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [withdrawing, setWithdrawing] = useState(false)
 
   const eligibility = useMemo(
     () =>
@@ -93,9 +97,7 @@ export function VoterRegistrationPanel({
       if (result.status === 'registered') {
         setMessage('You have joined this election. You can vote when polling opens and your secret voter ID is issued.')
       } else {
-        setMessage(
-          `Election is full. You were added to the waitlist at position #${result.waitlist_position ?? '—'}.`,
-        )
+        setMessage(waitlistUserMessage(result.waitlist_position))
       }
 
       setConfirmOpen(false)
@@ -220,12 +222,25 @@ export function VoterRegistrationPanel({
         ) : null}
 
         {onWaitlist ? (
-          <div className="vr-status-box vr-status-box--waitlist mb-4">
-            <p className="font-bold">On waitlist — position #{userRegistration?.waitlist_position}</p>
-            <p className="mt-1 text-xs opacity-90">
-              You will be promoted if a registered spot opens before the deadline.
-            </p>
-          </div>
+          <WaitlistStatusBanner
+            className="mb-4"
+            position={userRegistration?.waitlist_position}
+            withdrawing={withdrawing}
+            onWithdraw={() => {
+              if (!window.confirm('Leave the waitlist for this election?')) return
+              setWithdrawing(true)
+              setError(null)
+              void withdrawFromElection(election.id)
+                .then(() => {
+                  setMessage('You have left the waitlist.')
+                  onRegistrationChange()
+                })
+                .catch((err) =>
+                  setError(err instanceof Error ? err.message : 'Could not leave waitlist'),
+                )
+                .finally(() => setWithdrawing(false))
+            }}
+          />
         ) : null}
 
         {showRegistrationClosed ? (

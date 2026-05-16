@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader'
 import { ADMIN_PAGE_META } from '@/config/adminNav'
 import { supabase } from '@/lib/supabase'
@@ -95,6 +96,7 @@ export function AdminVotersPage() {
                     <tr>
                       <th>Election</th>
                       <th>Waitlisted</th>
+                      <th />
                     </tr>
                   </thead>
                   <tbody>
@@ -102,6 +104,11 @@ export function AdminVotersPage() {
                       <tr key={g.election_id}>
                         <td>{g.election_title}</td>
                         <td className="mono">{formatDashboardNumber(g.count)}</td>
+                        <td>
+                          <Link to={`/admin/elections/${g.election_id}`} className="btn btn-ghost btn-sm">
+                            Manage
+                          </Link>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

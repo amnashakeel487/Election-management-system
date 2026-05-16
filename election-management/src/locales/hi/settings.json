@@ -1,0 +1,15 @@
+{
+  "appearance": "Appearance",
+  "languageTitle": "Language",
+  "languageDescription": "Choose your interface language. Urdu and Arabic use right-to-left layout.",
+  "savedOnDevice": "Saved on this device",
+  "savedToAccount": "and synced to your account when signed in.",
+  "activeLanguage": "Active language",
+  "themeLight": "Light mode",
+  "themeDark": "Dark mode",
+  "themeSystem": "System theme",
+  "themeLightDesc": "Bright backgrounds and dark text",
+  "themeDarkDesc": "Dim surfaces optimized for low light",
+  "themeSystemDesc": "Match your device appearance setting",
+  "activeTheme": "Active now"
+}

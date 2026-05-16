@@ -115,3 +115,32 @@ export function winnerEmailHtml(
     `),
   }
 }
+
+export function waitlistJoinedEmailHtml(
+  electionTitle: string,
+  position: number,
+  electionId: string,
+): { subject: string; html: string } {
+  return {
+    subject: `Waitlist confirmation — ${electionTitle}`,
+    html: wrapEmailHtml(`
+      <p>You are <strong>#${position}</strong> on the waitlist for <strong>${electionTitle}</strong>.</p>
+      <p>We will email you if a registered spot opens before the registration deadline.</p>
+      <p><a href="${appUrl()}/elections/${electionId}">View election</a></p>
+    `),
+  }
+}
+
+export function waitlistPromotedEmailHtml(
+  electionTitle: string,
+  electionId: string,
+): { subject: string; html: string } {
+  return {
+    subject: `You are approved to vote — ${electionTitle}`,
+    html: wrapEmailHtml(`
+      <p>Good news! A spot opened and you have been <strong>promoted from the waitlist</strong> for <strong>${electionTitle}</strong>.</p>
+      <p>You are now a registered voter. Your secret voter ID will be issued when the organizer finalizes the roll.</p>
+      <p><a href="${appUrl()}/elections/${electionId}">Open election page</a></p>
+    `),
+  }
+}

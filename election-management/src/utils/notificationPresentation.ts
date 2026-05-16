@@ -8,6 +8,8 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   election_start: 'Election start reminder',
   election_end: 'Election ended',
   winner: 'Winner announcement',
+  waitlist_joined: 'Waitlist joined',
+  waitlist_promoted: 'Waitlist promoted',
 }
 
 export const NOTIFICATION_STATUS_LABELS: Record<NotificationStatus, string> = {

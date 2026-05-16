@@ -26,6 +26,8 @@ const TYPE_FILTERS: Array<{ value: NotificationType | 'all'; label: string }> = 
   { value: 'election_start', label: NOTIFICATION_TYPE_LABELS.election_start },
   { value: 'election_end', label: NOTIFICATION_TYPE_LABELS.election_end },
   { value: 'winner', label: NOTIFICATION_TYPE_LABELS.winner },
+  { value: 'waitlist_joined', label: NOTIFICATION_TYPE_LABELS.waitlist_joined },
+  { value: 'waitlist_promoted', label: NOTIFICATION_TYPE_LABELS.waitlist_promoted },
 ]
 
 const STATUS_FILTERS = [

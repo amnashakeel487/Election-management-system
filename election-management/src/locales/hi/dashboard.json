@@ -1,0 +1,20 @@
+{
+  "welcomeBack": "Welcome back,",
+  "myElections": "My Elections",
+  "myElectionsSub": "Elections you are enrolled in",
+  "browseAll": "Browse All",
+  "joinedElections": "Joined Elections",
+  "votesCast": "Votes Cast",
+  "openBallots": "Open Ballots",
+  "voteAnonymity": "Vote Anonymity",
+  "waitlistBadge": "Waitlist",
+  "viewElection": "View election",
+  "castVote": "Cast My Vote →",
+  "viewResults": "View Results",
+  "voted": "✓ Voted",
+  "live": "Live",
+  "noElections": "You have not joined any elections yet.",
+  "browseCatalog": "Browse the catalog",
+  "onWaitlist": "{{count}} on waitlist",
+  "signedInAs": "Signed in as"
+}

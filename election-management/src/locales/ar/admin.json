@@ -1,0 +1,23 @@
+{
+  "brand": "VoteSecure",
+  "tag": "Admin",
+  "sections": {
+    "Main": "Main",
+    "Users": "Users",
+    "Monitoring": "Monitoring",
+    "Account": "Account"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "requests": "Creator Requests",
+    "elections": "Elections",
+    "users": "Users",
+    "voters": "Voters",
+    "audit": "Audit Logs",
+    "reports": "Reports & Exports",
+    "notifications": "Notifications",
+    "security": "Security Center",
+    "settings": "Settings",
+    "profile": "Profile"
+  }
+}

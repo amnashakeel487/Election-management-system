@@ -1,0 +1,16 @@
+{
+  "appName": "FortressVote",
+  "language": "Language",
+  "loading": "Loading…",
+  "save": "Save",
+  "cancel": "Cancel",
+  "back": "Back",
+  "close": "Close",
+  "optional": "Optional",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "roles": {
+    "admin": "Super Admin",
+    "election_creator": "Election Creator",
+    "voter": "Voter"
+  }
+}

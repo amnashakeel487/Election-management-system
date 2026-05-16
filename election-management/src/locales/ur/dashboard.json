@@ -1,0 +1,20 @@
+{
+  "welcomeBack": "خوش آمدید،",
+  "myElections": "میرے انتخابات",
+  "myElectionsSub": "جن انتخابات میں آپ شامل ہیں",
+  "browseAll": "سب دیکھیں",
+  "joinedElections": "شامل انتخابات",
+  "votesCast": "ڈالے گئے ووٹ",
+  "openBallots": "کھلے بیلٹ",
+  "voteAnonymity": "ووٹ کی رازداری",
+  "waitlistBadge": "انتظار فہرست",
+  "viewElection": "انتخاب دیکھیں",
+  "castVote": "اپنا ووٹ ڈالیں →",
+  "viewResults": "نتائج دیکھیں",
+  "voted": "✓ ووٹ ڈال دیا",
+  "live": "جاری",
+  "noElections": "آپ نے ابھی تک کسی انتخاب میں حصہ نہیں لیا۔",
+  "browseCatalog": "کیٹلاگ دیکھیں",
+  "onWaitlist": "انتظار فہرست میں {{count}}",
+  "signedInAs": "سائن ان بطور"
+}

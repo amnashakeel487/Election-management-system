@@ -1,0 +1,23 @@
+{
+  "brand": "ووٹ سیکیور",
+  "tag": "ایڈمن",
+  "sections": {
+    "Main": "مرکزی",
+    "Users": "صارفین",
+    "Monitoring": "نگرانی",
+    "Account": "اکاؤنٹ"
+  },
+  "nav": {
+    "dashboard": "ڈیش بورڈ",
+    "requests": "تخلیق کار درخواستیں",
+    "elections": "انتخابات",
+    "users": "صارفین",
+    "voters": "ووٹرز",
+    "audit": "آڈٹ لاگز",
+    "reports": "رپورٹس اور برآمد",
+    "notifications": "اطلاعات",
+    "security": "سیکیورٹی مرکز",
+    "settings": "ترتیبات",
+    "profile": "پروفائل"
+  }
+}

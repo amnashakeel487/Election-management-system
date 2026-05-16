@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { VoterRollLockPanel } from '@/components/election/VoterRollLockPanel'
+import { ElectionWaitlistPanel } from '@/components/waitlist/ElectionWaitlistPanel'
 import { ResultsExportToolbar } from '@/components/results/ResultsExportToolbar'
 import { fetchElectionById } from '@/services/electionService'
 import { fetchElectionResults } from '@/services/resultsService'
@@ -179,6 +180,12 @@ export function AdminElectionDetailPage() {
               </div>
             </div>
           </div>
+
+          <ElectionWaitlistPanel
+            electionId={election.id}
+            voterRollFinalized={election.voter_roll_finalized_at}
+            variant="admin"
+          />
 
           <div className="card-elevated">
             <div className="card-header">

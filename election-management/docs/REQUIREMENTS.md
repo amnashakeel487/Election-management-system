@@ -13,7 +13,7 @@ Run migrations **001 → 010** in Supabase SQL Editor before testing.
 | 3. Election creation | Done | Wizard: title, description, category, dates, registration deadline, max voters, publish |
 | 4. Candidates | Partial | Name, description/manifesto, designation, photo URL (paste URL; no file storage UI) |
 | 5. Landing page | Done | Upcoming/active/completed, search/filter, live stats RPC, registration counts |
-| 6. Voter registration | Done | “I Want to Participate”, terms checkbox, waitlist, duplicate prevention |
+| 6. Voter registration | Done | “I Want to Participate”, terms checkbox, waitlist (#N), auto-promote, notifications, duplicate prevention |
 | 7. Voter lock/finalize | Done | Finalize roll RPC, secret IDs, frozen list |
 | 8. Secret IDs | Done | POLL-A-0001 format, email edge function, masked UI |
 | 9. Voting | Done | Secret ID verify, anonymous ballot, one vote, timer |

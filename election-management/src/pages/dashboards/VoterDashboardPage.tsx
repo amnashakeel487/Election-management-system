@@ -9,6 +9,7 @@ import { electionDisplayStatus, userInitials } from '@/utils/dashboardDisplay'
 import { isPollingOpen } from '@/utils/electionPolling'
 import { formatTimeRemaining } from '@/utils/electionTime'
 import { maskSecretVoterId } from '@/utils/maskSecretVoterId'
+import { waitlistUserMessage } from '@/utils/waitlistDisplay'
 
 export function VoterDashboardPage() {
   const { profile, session } = useAuth()
@@ -33,6 +34,7 @@ export function VoterDashboardPage() {
   }, [session?.user.id])
 
   const registered = registrations.filter((r) => r.status === 'registered')
+  const waitlisted = registrations.filter((r) => r.status === 'waitlisted')
   const votedCount = registered.filter((r) => r.voted_at).length
   const liveCount = registered.filter(
     (r) =>
@@ -95,6 +97,9 @@ export function VoterDashboardPage() {
             <div className="vs-voter-chip">Identity verified</div>
             <div className="vs-voter-chip">{registered.length} joined election(s)</div>
             {votedCount > 0 ? <div className="vs-voter-chip">{votedCount} vote(s) cast</div> : null}
+            {waitlisted.length > 0 ? (
+              <div className="vs-voter-chip">{waitlisted.length} on waitlist</div>
+            ) : null}
           </div>
         </div>
         <div className="vs-voter-right">
@@ -168,6 +173,24 @@ export function VoterDashboardPage() {
             ) : (
               registrations.map((reg) => {
                 if (!reg.election) return null
+                if (reg.status === 'waitlisted') {
+                  return (
+                    <div key={reg.id} className="vs-election-card vs-election-card--upcoming">
+                      <div className="vs-ec-top">
+                        <div className="vs-ec-title">{reg.election.title}</div>
+                        <span className="vs-ec-badge vs-ec-badge--upcoming">Waitlist</span>
+                      </div>
+                      <p className="vs-ec-meta" style={{ marginBottom: 12, fontWeight: 600 }}>
+                        {waitlistUserMessage(reg.waitlist_position)}
+                      </p>
+                      <div className="vs-ec-footer">
+                        <Link to={`/elections/${reg.election.id}`} className="vs-btn-voted">
+                          View election
+                        </Link>
+                      </div>
+                    </div>
+                  )
+                }
                 const phase = electionDisplayStatus(
                   reg.election.status,
                   reg.election.start_date,

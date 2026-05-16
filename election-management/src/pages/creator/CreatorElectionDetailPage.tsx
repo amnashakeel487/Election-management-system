@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { VoteSecureDashboardShell } from '@/components/dashboard/VoteSecureDashboardShell'
 import { ElectionQrInvitePanel } from '@/components/election/ElectionQrInvitePanel'
 import { VoterRollLockPanel } from '@/components/election/VoterRollLockPanel'
+import { ElectionWaitlistPanel } from '@/components/waitlist/ElectionWaitlistPanel'
 import { useAuth } from '@/hooks/useAuth'
 import { fetchElectionById } from '@/services/electionService'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
@@ -186,12 +187,19 @@ export function CreatorElectionDetailPage() {
           )}
 
           {showRoll ? (
-            <VoterRollLockPanel
-              election={election}
-              finalizingId={finalizingId}
-              onFinalize={() => void handleFinalize()}
-              onChanged={() => void load()}
-            />
+            <>
+              <ElectionWaitlistPanel
+                electionId={election.id}
+                voterRollFinalized={election.voter_roll_finalized_at}
+                onChanged={() => void load()}
+              />
+              <VoterRollLockPanel
+                election={election}
+                finalizingId={finalizingId}
+                onFinalize={() => void handleFinalize()}
+                onChanged={() => void load()}
+              />
+            </>
           ) : null}
         </div>
       ) : null}

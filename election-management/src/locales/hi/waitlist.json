@@ -1,0 +1,17 @@
+{
+  "positionMessage": "You are #{{position}} on the waitlist.",
+  "positionUnknown": "You are on the waitlist.",
+  "promoteHint": "You will be promoted automatically if a registered spot opens before the registration deadline. We email you when your status changes.",
+  "leaveWaitlist": "Leave waitlist",
+  "leaving": "Withdrawing…",
+  "leftWaitlist": "You have left the waitlist.",
+  "joinWaitlist": "Join waitlist",
+  "waitlistFull": "Registration is full. Joining now adds you to the waitlist in order received.",
+  "capacityWaitlisted": "{{count}} waitlisted",
+  "panelTitle": "Waitlist",
+  "promoteNext": "Promote next",
+  "promote": "Promote",
+  "remove": "Remove",
+  "noWaitlist": "No one on the waitlist.",
+  "rollFinalized": "The voter roll is finalized. Waitlist promotions are disabled."
+}

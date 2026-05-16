@@ -6,6 +6,8 @@ export type NotificationType =
   | 'election_start'
   | 'election_end'
   | 'winner'
+  | 'waitlist_joined'
+  | 'waitlist_promoted'
 
 export type NotificationStatus = 'pending' | 'sent' | 'failed' | 'skipped'
 

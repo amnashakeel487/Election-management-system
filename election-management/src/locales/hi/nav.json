@@ -1,0 +1,12 @@
+{
+  "elections": "Elections",
+  "results": "Results",
+  "browse": "Browse",
+  "dashboard": "Dashboard",
+  "security": "Security",
+  "logout": "Logout",
+  "login": "Login",
+  "register": "Register",
+  "getStarted": "Get started",
+  "languageSwitcherLabel": "Choose language"
+}
