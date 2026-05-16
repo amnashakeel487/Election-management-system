@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VoteSecure — Secure Election Management Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0F2347;--navy2:#1B3A6B;--blue:#2451A3;--purple:#6C3FC5;
+  --cyan:#06B6D4;--success:#10B981;--danger:#EF4444;--warning:#F59E0B;
+  --text:#0F172A;--muted:#475569;--subtle:#94A3B8;--border:#E2E8F0;--bg:#F0F4F9;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Sora',sans-serif;background:#F0F4F9;color:#0F172A;overflow-x:hidden;}
+
+/* ─── NAVBAR ─── */
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:68px;
+  background:rgba(15,35,71,0.92);backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  transition:all 0.3s;
+}
+.navbar.scrolled{background:rgba(9,21,45,0.98);box-shadow:0 8px 40px rgba(0,0,0,0.35);}
+.nav-brand{display:flex;align-items:center;gap:11px;}
+.nav-icon{
+  width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(135deg,#2451A3,#6C3FC5);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 20px rgba(108,63,197,0.45);
+  animation:iconGlow 3s ease-in-out infinite;
+}
+@keyframes iconGlow{0%,100%{box-shadow:0 6px 20px rgba(108,63,197,0.45);}50%{box-shadow:0 6px 32px rgba(108,63,197,0.7);}}
+.nav-icon svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.nav-name{font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.4px;}
+.nav-tag{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.28);border-radius:20px;padding:2px 8px;}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-link{font-size:13px;font-weight:500;color:rgba(255,255,255,0.55);cursor:pointer;transition:color 0.2s;text-decoration:none;}
+.nav-link:hover{color:#fff;}
+.nav-actions{display:flex;gap:10px;align-items:center;}
+.btn-ghost-nav{padding:8px 18px;border-radius:9px;border:1px solid rgba(255,255,255,0.18);background:transparent;color:rgba(255,255,255,0.75);font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.25s;}
+.btn-ghost-nav:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.btn-primary-nav{padding:8px 20px;border-radius:9px;border:none;background:linear-gradient(135deg,#1B3A6B,#6C3FC5);color:#fff;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
+.btn-primary-nav::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0),rgba(255,255,255,0.1));opacity:0;transition:opacity 0.3s;}
+.btn-primary-nav:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(108,63,197,0.45);}
+.btn-primary-nav:hover::after{opacity:1;}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
+.nav-hamburger span{display:block;width:22px;height:2px;background:rgba(255,255,255,0.7);border-radius:1px;transition:all 0.3s;}
+
+/* ─── HERO ─── */
+.hero{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:100px 48px 80px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#080f1e 0%,#0f2347 45%,#1a1040 100%);
+}
+.hero-bg{position:absolute;inset:0;z-index:0;}
+.grid-lines{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;animation:orbDrift linear infinite;}
+.o1{width:600px;height:600px;background:rgba(108,63,197,0.16);top:-200px;right:-150px;animation-duration:20s;}
+.o2{width:450px;height:450px;background:rgba(6,182,212,0.1);bottom:-150px;left:-100px;animation-duration:25s;animation-direction:reverse;}
+.o3{width:320px;height:320px;background:rgba(36,81,163,0.18);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:15s;}
+@keyframes orbDrift{0%{transform:translate(0,0) scale(1);}33%{transform:translate(28px,-22px) scale(1.04);}66%{transform:translate(-18px,28px) scale(0.97);}100%{transform:translate(0,0) scale(1);}}
+.particles{position:absolute;inset:0;pointer-events:none;}
+.particle{position:absolute;border-radius:50%;background:rgba(6,182,212,0.55);animation:rise linear infinite;}
+@keyframes rise{0%{transform:translateY(100vh) translateX(0);opacity:0;}10%{opacity:1;}90%{opacity:0.4;}100%{transform:translateY(-10vh) translateX(var(--dx,0px));opacity:0;}}
+
+.hero-inner{position:relative;z-index:1;max-width:1100px;width:100%;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+
+.hero-left{}
+.live-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:20px;padding:6px 15px;margin-bottom:26px;animation:fadeDown 0.7s ease both;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-14px);}to{opacity:1;transform:translateY(0);}}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#10B981;animation:livePulse 1.5s ease-in-out infinite;}
+@keyframes livePulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.6);opacity:0.5;}}
+.live-badge span{font-size:12px;font-weight:600;color:#34D399;letter-spacing:0.3px;}
+
+.hero-title{font-size:clamp(36px,4.5vw,62px);font-weight:800;line-height:1.1;letter-spacing:-1.5px;color:#fff;margin-bottom:22px;animation:slideUp 0.8s cubic-bezier(0.4,0,0.2,1) 0.1s both;}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.hero-title .line2{display:block;}
+.grad-text{background:linear-gradient(90deg,#67E8F9,#A78BFA,#F9A8D4,#67E8F9);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradFlow 5s linear infinite;}
+@keyframes gradFlow{0%{background-position:0%;}100%{background-position:300%;}}
+
+.hero-sub{font-size:17px;color:rgba(255,255,255,0.55);line-height:1.8;max-width:480px;margin-bottom:36px;animation:slideUp 0.8s cubic-bezier(0.4,0,0.2,1) 0.2s both;}
+
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;animation:slideUp 0.8s cubic-bezier(0.4,0,0.2,1) 0.3s both;}
+.btn-hero-primary{
+  padding:15px 30px;border-radius:13px;border:none;
+  background:linear-gradient(135deg,#1B3A6B,#6C3FC5);
+  color:#fff;font-family:'Sora',sans-serif;font-size:15px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;gap:9px;transition:all 0.3s;position:relative;overflow:hidden;
+}
+.btn-hero-primary .shimmer{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);animation:shimSlide 3s ease-in-out infinite 2s;}
+@keyframes shimSlide{0%{left:-100%;}100%{left:200%;}}
+.btn-hero-primary:hover{transform:translateY(-3px);box-shadow:0 18px 48px rgba(108,63,197,0.5);}
+.btn-hero-primary svg{width:17px;height:17px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.btn-hero-ghost{
+  padding:15px 28px;border-radius:13px;
+  border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.85);font-family:'Sora',sans-serif;font-size:15px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:9px;transition:all 0.3s;backdrop-filter:blur(8px);
+}
+.btn-hero-ghost:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.4);transform:translateY(-2px);}
+.btn-hero-ghost svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+.trust-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:32px;animation:slideUp 0.8s ease 0.4s both;}
+.t-chip{display:flex;align-items:center;gap:5px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:600;color:#6EE7B7;letter-spacing:0.3px;}
+.t-chip svg{width:10px;height:10px;stroke:#10B981;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+
+/* Hero right — live dashboard preview */
+.hero-right{animation:slideRight 0.9s cubic-bezier(0.4,0,0.2,1) 0.2s both;}
+@keyframes slideRight{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+.dashboard-preview{
+  background:rgba(255,255,255,0.97);border-radius:20px;overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.1);
+  animation:previewFloat 7s ease-in-out infinite 1s;
+}
+@keyframes previewFloat{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-10px) rotate(-1deg);}}
+.dp-topbar{background:linear-gradient(135deg,#0F2347,#1B3A6B 60%,#2D1B69);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;}
+.dp-dots{display:flex;gap:6px;}
+.dp-dot{width:10px;height:10px;border-radius:50%;}
+.dp-title{font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);}
+.dp-live{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:#34D399;}
+.dp-live-dot{width:6px;height:6px;border-radius:50%;background:#10B981;animation:livePulse 1.5s infinite;}
+.dp-body{padding:16px;}
+.dp-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.dp-stat{background:#F8FAFC;border-radius:10px;padding:10px 12px;border:1px solid #E2E8F0;}
+.dp-stat-num{font-size:18px;font-weight:800;color:#0F172A;font-family:'IBM Plex Mono',monospace;}
+.dp-stat-label{font-size:9px;color:#94A3B8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+.dp-election{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;margin-bottom:10px;border-left:4px solid #10B981;}
+.dp-el-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.dp-el-title{font-size:11px;font-weight:700;color:#0F172A;}
+.dp-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:12px;}
+.dp-badge.active{background:#DCFCE7;color:#16A34A;}
+.dp-badge.upcoming{background:#DBEAFE;color:#2563EB;}
+.dp-bar-wrap{height:5px;background:#F1F5F9;border-radius:3px;overflow:hidden;}
+.dp-bar-fill{height:100%;border-radius:3px;animation:barGrow 2s cubic-bezier(0.4,0,0.2,1) 1.5s both;}
+@keyframes barGrow{from{width:0;}to{width:var(--w);}}
+.dp-bar-meta{display:flex;justify-content:space-between;font-size:9px;color:#94A3B8;margin-top:4px;}
+.dp-chart-row{display:flex;align-items:flex-end;gap:5px;height:50px;margin-top:12px;padding-top:4px;border-top:1px solid #F1F5F9;}
+.dp-chart-bar{border-radius:4px 4px 0 0;flex:1;animation:barUp 1s cubic-bezier(0.4,0,0.2,1) var(--delay,0s) both;}
+@keyframes barUp{from{transform:scaleY(0);transform-origin:bottom;}to{transform:scaleY(1);transform-origin:bottom;}}
+
+/* ─── STATS STRIP ─── */
+.stats-strip{background:#fff;border-top:1px solid #E2E8F0;border-bottom:1px solid #E2E8F0;padding:28px 48px;}
+.stats-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:0;}
+.stat-col{text-align:center;padding:0 20px;border-right:1px solid #E2E8F0;}
+.stat-col:last-child{border-right:none;}
+.stat-num-big{font-size:32px;font-weight:800;color:#0F172A;font-family:'IBM Plex Mono',monospace;letter-spacing:-1px;}
+.stat-label-big{font-size:12px;color:#94A3B8;font-weight:500;margin-top:4px;}
+.stat-delta{font-size:11px;font-weight:700;color:#10B981;background:#DCFCE7;padding:2px 8px;border-radius:20px;display:inline-block;margin-top:4px;}
+
+/* ─── SECTION SHARED ─── */
+.section{padding:96px 48px;}
+.section-inner{max-width:1100px;margin:0 auto;}
+.section-eyebrow{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:12px;}
+.section-title{font-size:clamp(28px,3.5vw,44px);font-weight:800;line-height:1.15;letter-spacing:-1px;color:#0F172A;margin-bottom:16px;}
+.section-sub{font-size:16px;color:#475569;line-height:1.8;max-width:560px;}
+.section-title .accent{color:var(--blue);}
+
+/* ─── ELECTIONS SECTION ─── */
+.elections-section{background:#F0F4F9;}
+.section-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:40px;flex-wrap:wrap;gap:20px;}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-btn{padding:7px 16px;border-radius:20px;border:1.5px solid #E2E8F0;background:#fff;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;color:#94A3B8;cursor:pointer;transition:all 0.25s;}
+.filter-btn.active,.filter-btn:hover{border-color:#1B3A6B;background:#1B3A6B;color:#fff;}
+.search-wrap{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #E2E8F0;border-radius:11px;padding:9px 14px;transition:all 0.25s;}
+.search-wrap:focus-within{border-color:#2451A3;box-shadow:0 0 0 3px rgba(36,81,163,0.1);}
+.search-wrap svg{width:15px;height:15px;stroke:#94A3B8;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.search-wrap input{border:none;outline:none;font-family:'Sora',sans-serif;font-size:13px;color:#0F172A;background:transparent;width:180px;}
+.search-wrap input::placeholder{color:#CBD5E1;}
+
+.elections-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;}
+.e-card{
+  background:#fff;border-radius:18px;overflow:hidden;border:1px solid #E2E8F0;
+  transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
+  animation:cardFadeUp 0.6s ease both;
+}
+.e-card:hover{transform:translateY(-6px);box-shadow:0 20px 56px rgba(0,0,0,0.1);border-color:rgba(36,81,163,0.25);}
+@keyframes cardFadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.e-card-accent{height:5px;}
+.e-card-body{padding:20px;}
+.e-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.e-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:0.4px;}
+.e-badge.active{background:#DCFCE7;color:#16A34A;}
+.e-badge.upcoming{background:#DBEAFE;color:#2563EB;}
+.e-badge.completed{background:#EDE9FE;color:#6D28D9;}
+.e-badge-pulse{width:6px;height:6px;border-radius:50%;background:#10B981;animation:livePulse 1.5s infinite;}
+.e-id{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#CBD5E1;}
+.e-title{font-size:15px;font-weight:700;color:#0F172A;margin-bottom:6px;line-height:1.4;}
+.e-desc{font-size:12px;color:#94A3B8;line-height:1.6;margin-bottom:14px;}
+.e-progress-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;}
+.e-progress-label span:first-child{color:#475569;font-weight:600;}
+.e-progress-label span:last-child{font-family:'IBM Plex Mono',monospace;color:#94A3B8;}
+.e-bar-wrap{height:7px;background:#F1F5F9;border-radius:99px;overflow:hidden;margin-bottom:14px;}
+.e-bar-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
+.e-countdown{display:flex;gap:7px;margin-bottom:16px;}
+.e-count-unit{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:9px;padding:8px 10px;text-align:center;min-width:52px;}
+.e-count-num{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:700;color:#1B3A6B;line-height:1;}
+.e-count-label{font-size:9px;color:#94A3B8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+.e-meta{display:flex;gap:16px;font-size:11px;color:#94A3B8;padding-top:12px;border-top:1px solid #F1F5F9;margin-bottom:14px;}
+.e-meta span{display:flex;align-items:center;gap:4px;}
+.e-meta svg{width:12px;height:12px;stroke:#CBD5E1;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.e-actions{display:flex;gap:8px;}
+.btn-detail{flex:1;padding:9px;border-radius:9px;border:1.5px solid #E2E8F0;background:transparent;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;color:#475569;cursor:pointer;transition:all 0.25s;}
+.btn-detail:hover{border-color:#1B3A6B;color:#1B3A6B;background:#F0F4F9;}
+.btn-vote{flex:1.2;padding:9px;border-radius:9px;border:none;background:linear-gradient(135deg,#1B3A6B,#6C3FC5);color:#fff;font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.3s;}
+.btn-vote:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(27,58,107,0.35);}
+
+/* ─── FEATURES SECTION ─── */
+.features-section{background:#fff;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px;}
+.feat-card{
+  padding:28px;border-radius:18px;border:1px solid #E2E8F0;
+  transition:all 0.35s;cursor:default;
+  animation:cardFadeUp 0.6s ease both;
+}
+.feat-card:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(0,0,0,0.08);border-color:rgba(36,81,163,0.2);}
+.feat-icon{
+  width:52px;height:52px;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+}
+.feat-icon svg{width:24px;height:24px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.feat-title{font-size:17px;font-weight:700;color:#0F172A;margin-bottom:10px;letter-spacing:-0.3px;}
+.feat-desc{font-size:13px;color:#64748B;line-height:1.75;}
+.feat-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;margin-top:16px;text-decoration:none;transition:gap 0.2s;}
+.feat-link svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.2s;}
+.feat-card:hover .feat-link svg{transform:translateX(3px);}
+
+/* ─── HOW IT WORKS ─── */
+.how-section{background:linear-gradient(135deg,#0F2347,#1B3A6B 50%,#2D1B69);}
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:56px;position:relative;}
+.how-grid::before{content:'';position:absolute;top:32px;left:12.5%;right:12.5%;height:1px;background:linear-gradient(90deg,rgba(6,182,212,0),rgba(6,182,212,0.4),rgba(6,182,212,0));z-index:0;}
+.how-step{text-align:center;padding:24px 16px;position:relative;z-index:1;}
+.how-num{
+  width:64px;height:64px;border-radius:18px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+  font-size:22px;font-weight:800;color:var(--cyan);font-family:'IBM Plex Mono',monospace;
+  transition:all 0.35s;
+}
+.how-step:hover .how-num{background:rgba(6,182,212,0.15);border-color:rgba(6,182,212,0.4);transform:scale(1.08);}
+.how-step-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:8px;}
+.how-step-desc{font-size:12px;color:rgba(255,255,255,0.45);line-height:1.7;}
+
+/* ─── TESTIMONIALS ─── */
+.testi-section{background:#F0F4F9;}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px;}
+.testi-card{
+  background:#fff;border-radius:18px;padding:28px;border:1px solid #E2E8F0;
+  transition:all 0.35s;animation:cardFadeUp 0.6s ease both;
+}
+.testi-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.08);}
+.testi-stars{display:flex;gap:3px;margin-bottom:16px;}
+.star{color:#F59E0B;font-size:14px;}
+.testi-text{font-size:13px;color:#475569;line-height:1.8;margin-bottom:20px;font-style:italic;}
+.testi-author{display:flex;align-items:center;gap:12px;}
+.testi-avatar{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
+.testi-name{font-size:13px;font-weight:700;color:#0F172A;}
+.testi-role{font-size:11px;color:#94A3B8;}
+
+/* ─── CTA SECTION ─── */
+.cta-section{
+  background:linear-gradient(135deg,#080f1e,#0f2347 50%,#1a1040);
+  padding:100px 48px;position:relative;overflow:hidden;
+}
+.cta-orb1{position:absolute;width:500px;height:500px;border-radius:50%;background:rgba(108,63,197,0.15);filter:blur(80px);top:-150px;right:-100px;pointer-events:none;}
+.cta-orb2{position:absolute;width:350px;height:350px;border-radius:50%;background:rgba(6,182,212,0.1);filter:blur(60px);bottom:-100px;left:-50px;pointer-events:none;}
+.cta-inner{max-width:700px;margin:0 auto;text-align:center;position:relative;z-index:1;}
+.cta-title{font-size:clamp(28px,4vw,50px);font-weight:800;color:#fff;line-height:1.15;letter-spacing:-1px;margin-bottom:16px;}
+.cta-sub{font-size:16px;color:rgba(255,255,255,0.55);line-height:1.8;margin-bottom:36px;}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.cta-chip-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:24px;}
+.cta-chip{font-size:11px;color:rgba(255,255,255,0.3);display:flex;align-items:center;gap:5px;}
+.cta-chip svg{width:11px;height:11px;stroke:#10B981;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ─── FOOTER ─── */
+footer{background:#080f1e;padding:60px 48px 28px;border-top:1px solid rgba(255,255,255,0.05);}
+.footer-inner{max-width:1100px;margin:0 auto;}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;}
+.footer-brand{}
+.footer-brand-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.footer-brand-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#2451A3,#6C3FC5);display:flex;align-items:center;justify-content:center;}
+.footer-brand-icon svg{width:17px;height:17px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.footer-brand-name{font-size:16px;font-weight:800;color:#fff;}
+.footer-desc{font-size:13px;color:rgba(255,255,255,0.35);line-height:1.75;max-width:280px;}
+.footer-col-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.5);margin-bottom:16px;}
+.footer-link{display:block;font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:10px;text-decoration:none;transition:color 0.2s;cursor:pointer;}
+.footer-link:hover{color:rgba(255,255,255,0.8);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.06);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.footer-copy{font-size:12px;color:rgba(255,255,255,0.25);}
+.footer-legal{display:flex;gap:18px;}
+.footer-legal a{font-size:12px;color:rgba(255,255,255,0.25);text-decoration:none;transition:color 0.2s;}
+.footer-legal a:hover{color:rgba(255,255,255,0.6);}
+
+/* ─── SCROLL ANIMATIONS ─── */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity 0.7s ease,transform 0.7s cubic-bezier(0.4,0,0.2,1);}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-left{opacity:0;transform:translateX(-32px);transition:opacity 0.7s ease,transform 0.7s cubic-bezier(0.4,0,0.2,1);}
+.reveal-left.visible{opacity:1;transform:translateX(0);}
+.reveal-right{opacity:0;transform:translateX(32px);transition:opacity 0.7s ease,transform 0.7s cubic-bezier(0.4,0,0.2,1);}
+.reveal-right.visible{opacity:1;transform:translateX(0);}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;gap:40px;text-align:center;}
+  .hero-sub,.trust-chips,.hero-btns{margin-left:auto;margin-right:auto;justify-content:center;}
+  .hero-right{display:none;}
+  .features-grid{grid-template-columns:repeat(2,1fr);}
+  .how-grid{grid-template-columns:repeat(2,1fr);}
+  .testi-grid{grid-template-columns:repeat(2,1fr);}
+  .footer-top{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:768px){
+  .navbar{padding:0 20px;}
+  .nav-links,.nav-actions{display:none;}
+  .nav-hamburger{display:flex;}
+  .hero{padding:90px 20px 60px;}
+  .section{padding:64px 20px;}
+  .stats-strip{padding:24px 20px;}
+  .stats-inner{grid-template-columns:repeat(2,1fr);gap:16px;}
+  .stat-col{border-right:none;border-bottom:1px solid #E2E8F0;padding-bottom:16px;}
+  .features-grid,.testi-grid{grid-template-columns:1fr;}
+  .how-grid{grid-template-columns:1fr 1fr;}
+  .footer-top{grid-template-columns:1fr;gap:28px;}
+  footer{padding:40px 20px 20px;}
+  .elections-grid{grid-template-columns:1fr;}
+  .cta-section{padding:64px 20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAVBAR ─── -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <div class="nav-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <span class="nav-name">VoteSecure</span>
+    <span class="nav-tag">Enterprise</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link" href="#elections">Elections</a>
+    <a class="nav-link" href="#features">Features</a>
+    <a class="nav-link" href="#how">How it works</a>
+    <a class="nav-link" href="#testimonials">Reviews</a>
+    <a class="nav-link" href="#">Pricing</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-ghost-nav">Log in</button>
+    <button class="btn-primary-nav">Get Started →</button>
+  </div>
+  <div class="nav-hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="grid-lines"></div>
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="orb o3"></div>
+    <div class="particles" id="particles"></div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        <span>3 Elections Live Right Now</span>
+      </div>
+      <h1 class="hero-title">
+        Democracy<br>
+        <span class="line2">Powered by</span><br>
+        <span class="grad-text">Military-Grade</span><br>
+        Security
+      </h1>
+      <p class="hero-sub">End-to-end encrypted, blockchain-verified, tamper-proof elections for organisations of any size. Trusted by governments, universities and enterprises worldwide.</p>
+      <div class="hero-btns">
+        <button class="btn-hero-primary">
+          <span class="shimmer"></span>
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Start Free Election
+        </button>
+        <button class="btn-hero-ghost">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          Watch Demo
+        </button>
+      </div>
+      <div class="trust-chips">
+        <div class="t-chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>AES-256 Encrypted</div>
+        <div class="t-chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Zero-Knowledge Proof</div>
+        <div class="t-chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>GDPR Compliant</div>
+        <div class="t-chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>SOC 2 Certified</div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="dashboard-preview">
+        <div class="dp-topbar">
+          <div class="dp-dots">
+            <div class="dp-dot" style="background:#EF4444;"></div>
+            <div class="dp-dot" style="background:#F59E0B;"></div>
+            <div class="dp-dot" style="background:#10B981;"></div>
+          </div>
+          <span class="dp-title">VoteSecure Dashboard</span>
+          <div class="dp-live"><div class="dp-live-dot"></div>Live</div>
+        </div>
+        <div class="dp-body">
+          <div class="dp-stat-row">
+            <div class="dp-stat">
+              <div class="dp-stat-num">12</div>
+              <div class="dp-stat-label">Active</div>
+            </div>
+            <div class="dp-stat">
+              <div class="dp-stat-num">84K</div>
+              <div class="dp-stat-label">Voters</div>
+            </div>
+            <div class="dp-stat">
+              <div class="dp-stat-num">99.9%</div>
+              <div class="dp-stat-label">Uptime</div>
+            </div>
+          </div>
+          <div class="dp-election" style="border-left-color:#10B981;">
+            <div class="dp-el-top">
+              <span class="dp-el-title">Student Union Election</span>
+              <span class="dp-badge active">Active</span>
+            </div>
+            <div class="dp-bar-wrap"><div class="dp-bar-fill" style="--w:62%;width:0;background:linear-gradient(90deg,#10B981,#059669);"></div></div>
+            <div class="dp-bar-meta"><span>28,140 voted</span><span>62%</span></div>
+          </div>
+          <div class="dp-election" style="border-left-color:#2563EB;">
+            <div class="dp-el-top">
+              <span class="dp-el-title">Municipal Council By-Election</span>
+              <span class="dp-badge upcoming">Upcoming</span>
+            </div>
+            <div class="dp-bar-wrap"><div class="dp-bar-fill" style="--w:46%;width:0;background:linear-gradient(90deg,#2563EB,#1D4ED8);transition-delay:0.3s;"></div></div>
+            <div class="dp-bar-meta"><span>5,920 voted</span><span>46%</span></div>
+          </div>
+          <div class="dp-chart-row">
+            <div class="dp-chart-bar" style="height:30%;background:#E0E7FF;--delay:0.2s;"></div>
+            <div class="dp-chart-bar" style="height:55%;background:#C7D2FE;--delay:0.3s;"></div>
+            <div class="dp-chart-bar" style="height:40%;background:#A5B4FC;--delay:0.4s;"></div>
+            <div class="dp-chart-bar" style="height:75%;background:#818CF8;--delay:0.5s;"></div>
+            <div class="dp-chart-bar" style="height:60%;background:#6366F1;--delay:0.6s;"></div>
+            <div class="dp-chart-bar" style="height:90%;background:#4F46E5;--delay:0.7s;"></div>
+            <div class="dp-chart-bar" style="height:80%;background:#4338CA;--delay:0.8s;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── STATS STRIP ─── -->
+<div class="stats-strip">
+  <div class="stats-inner">
+    <div class="stat-col reveal">
+      <div class="stat-num-big" data-target="2847">0</div>
+      <div class="stat-label-big">Elections conducted</div>
+      <div class="stat-delta">↑ 24% this year</div>
+    </div>
+    <div class="stat-col reveal" style="transition-delay:0.1s;">
+      <div class="stat-num-big">1.2M+</div>
+      <div class="stat-label-big">Registered voters</div>
+      <div class="stat-delta">↑ 38% growth</div>
+    </div>
+    <div class="stat-col reveal" style="transition-delay:0.2s;">
+      <div class="stat-num-big">48.6M</div>
+      <div class="stat-label-big">Votes cast securely</div>
+      <div class="stat-delta">↑ 12% this month</div>
+    </div>
+    <div class="stat-col reveal" style="transition-delay:0.3s;">
+      <div class="stat-num-big">99.9%</div>
+      <div class="stat-label-big">Security score</div>
+      <div class="stat-delta">Zero breaches ever</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ELECTIONS SECTION ─── -->
+<section class="elections-section section" id="elections">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="reveal-left">
+        <div class="section-eyebrow">Live elections</div>
+        <h2 class="section-title">Active & <span class="accent">Upcoming</span><br>Elections</h2>
+        <p class="section-sub" style="font-size:14px;margin-top:8px;">Browse and participate in ongoing democratic processes across organisations.</p>
+      </div>
+      <div class="reveal-right" style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search elections…" id="searchInput" oninput="filterCards()"/>
+        </div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+          <button class="filter-btn" onclick="setFilter('active',this)">Active</button>
+          <button class="filter-btn" onclick="setFilter('upcoming',this)">Upcoming</button>
+          <button class="filter-btn" onclick="setFilter('completed',this)">Completed</button>
+        </div>
+      </div>
+    </div>
+    <div class="elections-grid" id="electionsGrid">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES SECTION ─── -->
+<section class="features-section section" id="features">
+  <div class="section-inner">
+    <div style="max-width:560px;" class="reveal">
+      <div class="section-eyebrow">Why choose us</div>
+      <h2 class="section-title">Everything you need for<br><span class="accent">secure elections</span></h2>
+      <p class="section-sub">A complete platform built from the ground up for security, transparency and scale.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal" style="border-top:4px solid #1B3A6B;transition-delay:0s;">
+        <div class="feat-icon" style="background:#EFF4FF;">
+          <svg style="stroke:#1B3A6B;" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="feat-title">Military-grade encryption</div>
+        <div class="feat-desc">AES-256 end-to-end encryption ensures every vote remains private and tamper-proof from cast to count.</div>
+        <a class="feat-link" style="color:#1B3A6B;" href="#">Learn more <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      </div>
+      <div class="feat-card reveal" style="border-top:4px solid #6C3FC5;transition-delay:0.1s;">
+        <div class="feat-icon" style="background:#F5F3FF;">
+          <svg style="stroke:#6C3FC5;" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="feat-title">Real-time audit logs</div>
+        <div class="feat-desc">Every action is timestamped and stored in an immutable blockchain-verified audit trail for full accountability.</div>
+        <a class="feat-link" style="color:#6C3FC5;" href="#">Learn more <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      </div>
+      <div class="feat-card reveal" style="border-top:4px solid #06B6D4;transition-delay:0.2s;">
+        <div class="feat-icon" style="background:#ECFEFF;">
+          <svg style="stroke:#06B6D4;" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="feat-title">Multi-role platform</div>
+        <div class="feat-desc">Purpose-built dashboards for super admins, election creators and voters — each with the right level of access.</div>
+        <a class="feat-link" style="color:#06B6D4;" href="#">Learn more <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      </div>
+      <div class="feat-card reveal" style="border-top:4px solid #10B981;transition-delay:0.3s;">
+        <div class="feat-icon" style="background:#ECFDF5;">
+          <svg style="stroke:#10B981;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="feat-title">Live countdown & results</div>
+        <div class="feat-desc">Real-time vote tallying with animated progress charts, winner highlights and instant result publication.</div>
+        <a class="feat-link" style="color:#10B981;" href="#">Learn more <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      </div>
+      <div class="feat-card reveal" style="border-top:4px solid #F59E0B;transition-delay:0.4s;">
+        <div class="feat-icon" style="background:#FFFBEB;">
+          <svg style="stroke:#F59E0B;" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        </div>
+        <div class="feat-title">Secret voter ID system</div>
+        <div class="feat-desc">Cryptographically generated unique voter IDs ensure anonymous, duplicate-free participation across all elections.</div>
+        <a class="feat-link" style="color:#F59E0B;" href="#">Learn more <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      </div>
+      <div class="feat-card reveal" style="border-top:4px solid #EF4444;transition-delay:0.5s;">
+        <div class="feat-icon" style="background:#FEF2F2;">
+          <svg style="stroke:#EF4444;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="feat-title">Enterprise security monitor</div>
+        <div class="feat-desc">24/7 threat detection, login history tracking, suspicious activity alerts and one-click security lockdown.</div>
+        <a class="feat-link" style="color:#EF4444;" href="#">Learn more <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section class="how-section section" id="how">
+  <div class="section-inner">
+    <div style="text-align:center;max-width:560px;margin:0 auto;" class="reveal">
+      <div class="section-eyebrow" style="color:var(--cyan);">Simple process</div>
+      <h2 class="section-title" style="color:#fff;">How it works in<br><span style="color:var(--cyan);">4 easy steps</span></h2>
+      <p class="section-sub" style="color:rgba(255,255,255,0.45);margin:0 auto;">From setup to results in minutes — no technical expertise required.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-step reveal" style="transition-delay:0.1s;">
+        <div class="how-num">01</div>
+        <div class="how-step-title">Create your election</div>
+        <div class="how-step-desc">Set up title, dates, candidates and voting rules with our guided multi-step form.</div>
+      </div>
+      <div class="how-step reveal" style="transition-delay:0.2s;">
+        <div class="how-num">02</div>
+        <div class="how-step-title">Invite voters</div>
+        <div class="how-step-desc">Share secret voter IDs via email or CSV upload. Voters register securely in minutes.</div>
+      </div>
+      <div class="how-step reveal" style="transition-delay:0.3s;">
+        <div class="how-num">03</div>
+        <div class="how-step-title">Cast votes securely</div>
+        <div class="how-step-desc">Voters authenticate with their secret ID and cast anonymous encrypted votes.</div>
+      </div>
+      <div class="how-step reveal" style="transition-delay:0.4s;">
+        <div class="how-num">04</div>
+        <div class="how-step-title">Get instant results</div>
+        <div class="how-step-desc">Live charts, winner announcements and downloadable audit reports — instantly.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ─── -->
+<section class="testi-section section" id="testimonials">
+  <div class="section-inner">
+    <div style="text-align:center;max-width:500px;margin:0 auto 0;" class="reveal">
+      <div class="section-eyebrow">Trusted worldwide</div>
+      <h2 class="section-title">What our <span class="accent">customers</span> say</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal" style="transition-delay:0.1s;">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"VoteSecure transformed how we run our student elections. The transparency and security is unmatched — our students trust the results completely."</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#1B3A6B,#2451A3);">AO</div>
+          <div>
+            <div class="testi-name">Dr. Amara Osei</div>
+            <div class="testi-role">Vice Chancellor, Tech University</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:0.2s;border:2px solid rgba(36,81,163,0.2);">
+        <div style="font-size:10px;font-weight:700;color:#2451A3;background:#DBEAFE;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:12px;letter-spacing:0.5px;">FEATURED REVIEW</div>
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"We ran a 45,000-voter national election without a single issue. The audit logs gave our oversight committee complete confidence in the integrity of results."</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#6C3FC5,#4C1D95);">JW</div>
+          <div>
+            <div class="testi-name">James Whitfield</div>
+            <div class="testi-role">Director, National Elections Office</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:0.3s;">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"The secret voter ID system is brilliant. Our board elections are completely anonymous yet fully auditable. Setup took under 30 minutes."</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#06B6D4,#0891B2);">PS</div>
+          <div>
+            <div class="testi-name">Priya Sharma</div>
+            <div class="testi-role">CEO, Enterprise Solutions Ltd</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA SECTION ─── -->
+<section class="cta-section">
+  <div class="cta-orb1"></div>
+  <div class="cta-orb2"></div>
+  <div class="cta-inner reveal">
+    <div class="live-badge" style="margin:0 auto 24px;">
+      <div class="live-dot"></div>
+      <span>Free to start — no credit card needed</span>
+    </div>
+    <h2 class="cta-title">Ready to run your first<br><span class="grad-text">secure election?</span></h2>
+    <p class="cta-sub">Join 2,847 organisations that trust VoteSecure for their most important democratic decisions.</p>
+    <div class="cta-btns">
+      <button class="btn-hero-primary">
+        <span class="shimmer"></span>
+        <svg viewBox="0 0 24 24" style="width:17px;height:17px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="20 6 9 17 4 12"/></svg>
+        Create Free Account
+      </button>
+      <button class="btn-hero-ghost">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Talk to Sales
+      </button>
+    </div>
+    <div class="cta-chip-row">
+      <div class="cta-chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Free forever plan</div>
+      <div class="cta-chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Setup in 5 minutes</div>
+      <div class="cta-chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>24/7 support</div>
+      <div class="cta-chip"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Cancel anytime</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-brand-row">
+          <div class="footer-brand-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <span class="footer-brand-name">VoteSecure</span>
+        </div>
+        <p class="footer-desc">The world's most trusted secure election management platform. Built for transparency, designed for trust.</p>
+        <div style="display:flex;gap:8px;margin-top:16px;">
+          <div class="t-chip">SOC 2</div>
+          <div class="t-chip">GDPR</div>
+          <div class="t-chip">ISO 27001</div>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Platform</div>
+        <a class="footer-link">Elections</a>
+        <a class="footer-link">Results & Analytics</a>
+        <a class="footer-link">Audit Logs</a>
+        <a class="footer-link">Security Monitor</a>
+        <a class="footer-link">API Docs</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <a class="footer-link">About us</a>
+        <a class="footer-link">Careers</a>
+        <a class="footer-link">Blog</a>
+        <a class="footer-link">Press</a>
+        <a class="footer-link">Contact</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Support</div>
+        <a class="footer-link">Help Centre</a>
+        <a class="footer-link">Documentation</a>
+        <a class="footer-link">Status Page</a>
+        <a class="footer-link">Community</a>
+        <a class="footer-link">Talk to Sales</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 VoteSecure Technologies Ltd. All rights reserved.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Particles
+(function(){
+  const c=document.getElementById('particles');
+  for(let i=0;i<32;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.cssText=`left:${Math.random()*100}%;width:${1+Math.random()*2.5}px;height:${1+Math.random()*2.5}px;animation-duration:${10+Math.random()*16}s;animation-delay:${Math.random()*14}s;--dx:${(Math.random()-.5)*100}px;opacity:${.3+Math.random()*.5};`;
+    c.appendChild(p);
+  }
+})();
+
+// ── Navbar scroll
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',scrollY>40);
+});
+
+// ── Elections data
+const elections=[
+  {id:'E001',title:'National Student Union Presidential Election 2025',desc:'Vote for the next student union president. All registered students may participate.',status:'active',voters:45230,votes:28140,turnout:62,candidates:4,h:8,m:24,s:11,color:'#10B981'},
+  {id:'E002',title:'Municipal Council District 7 By-Election',desc:'Special by-election to fill the vacant seat in Municipal Council District 7.',status:'active',voters:12800,votes:5920,turnout:46,candidates:3,h:2,m:45,s:33,color:'#10B981'},
+  {id:'E003',title:'University Senate Faculty Representatives',desc:'Election for faculty representative positions in the University Senate body.',status:'upcoming',voters:8600,votes:0,turnout:0,candidates:6,h:48,m:0,s:0,color:'#2563EB'},
+  {id:'E004',title:'Corporate Board Director Election Q4 2025',desc:'Annual shareholder vote for Board of Directors positions across all divisions.',status:'upcoming',voters:3200,votes:0,turnout:0,candidates:5,h:72,m:0,s:0,color:'#2563EB'},
+  {id:'E005',title:'Regional Committee Chairperson Election',desc:'Closed election for Regional Committee Chairperson and Deputy Chair positions.',status:'completed',voters:9400,votes:7820,turnout:83,candidates:2,h:0,m:0,s:0,color:'#7C3AED'},
+  {id:'E006',title:'Professional Guild Leadership Vote 2024',desc:'Annual election for Guild leadership team including President and Secretary roles.',status:'completed',voters:6700,votes:5100,turnout:76,candidates:4,h:0,m:0,s:0,color:'#7C3AED'},
+];
+
+let currentFilter='all';
+let currentSearch='';
+
+function setFilter(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+}
+function filterCards(){ currentSearch=document.getElementById('searchInput').value.toLowerCase(); renderCards(); }
+
+function renderCards(){
+  const grid=document.getElementById('electionsGrid');
+  const filtered=elections.filter(e=>{
+    const ms=currentFilter==='all'||e.status===currentFilter;
+    const mq=!currentSearch||e.title.toLowerCase().includes(currentSearch)||e.desc.toLowerCase().includes(currentSearch);
+    return ms&&mq;
+  });
+  grid.innerHTML='';
+  filtered.forEach((e,i)=>{
+    const badgeMap={active:'<span class="e-badge active"><span class="e-badge-pulse"></span>Active</span>',upcoming:'<span class="e-badge upcoming">Upcoming</span>',completed:'<span class="e-badge completed">Completed</span>'};
+    const countdown=e.status!=='completed'?`<div class="e-countdown">
+      ${[{v:e.h,l:'Hrs'},{v:e.m,l:'Min'},{v:e.s,l:'Sec'}].map(u=>`<div class="e-count-unit"><div class="e-count-num">${String(u.v).padStart(2,'0')}</div><div class="e-count-label">${u.l}</div></div>`).join('')}
+    </div>`:'';
+    const progress=e.status==='active'?`<div class="e-progress-label"><span>Voter Turnout</span><span>${e.votes.toLocaleString()} votes · ${e.turnout}%</span></div><div class="e-bar-wrap"><div class="e-bar-fill" style="width:${e.turnout}%;background:linear-gradient(90deg,${e.color},${e.color}bb);"></div></div>`:'';
+    const voteBtn=e.status==='active'?`<button class="btn-vote">Vote Now</button>`:'';
+    grid.innerHTML+=`<div class="e-card" style="animation-delay:${i*0.1}s;">
+      <div class="e-card-accent" style="background:linear-gradient(90deg,${e.color},${e.color}66);"></div>
+      <div class="e-card-body">
+        <div class="e-card-top">${badgeMap[e.status]}<span class="e-id">#${e.id}</span></div>
+        <div class="e-title">${e.title}</div>
+        <div class="e-desc">${e.desc}</div>
+        ${progress}
+        ${countdown}
+        <div class="e-meta">
+          <span><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>${e.voters.toLocaleString()} voters</span>
+          <span><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>${e.candidates} candidates</span>
+        </div>
+        <div class="e-actions"><button class="btn-detail">View Details</button>${voteBtn}</div>
+      </div>
+    </div>`;
+  });
+  if(!filtered.length) grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:60px;color:#94A3B8;font-size:14px;">No elections found matching your search.</div>`;
+}
+renderCards();
+
+// ── Scroll reveal
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}
+  });
+},{threshold:0.12});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>observer.observe(el));
+
+// ── Countdown timer
+function tick(){
+  document.querySelectorAll('.e-count-num').forEach(el=>{
+    let v=parseInt(el.textContent);
+    if(!isNaN(v)&&v>0) el.textContent=String(v-1).padStart(2,'0');
+  });
+}
+setInterval(tick,1000);
+
+// ── Number counter animation
+function animateCounter(el,target){
+  let current=0;
+  const step=Math.ceil(target/60);
+  const timer=setInterval(()=>{
+    current=Math.min(current+step,target);
+    el.textContent=current.toLocaleString();
+    if(current>=target)clearInterval(timer);
+  },25);
+}
+const counterObserver=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const target=parseInt(e.target.dataset.target);
+      if(target)animateCounter(e.target,target);
+      counterObserver.unobserve(e.target);
+    }
+  });
+},{threshold:0.5});
+document.querySelectorAll('[data-target]').forEach(el=>counterObserver.observe(el));
+
+// Trigger bar fills after a moment
+setTimeout(()=>{
+  document.querySelectorAll('.dp-bar-fill').forEach(b=>{b.style.width=b.style.getPropertyValue('--w')||b.style.width;});
+},800);
+</script>
+</body>
+</html>

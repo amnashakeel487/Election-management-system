@@ -1,11 +1,6 @@
-/** design/login_signup (Login) — design/Login alias */
-import { AuthForm } from '@/components/auth/AuthForm'
-import { AuthLayout } from '@/components/auth/AuthLayout'
+/** design/login_signup (Login) — matches Register split layout */
+import { LoginPageView } from '@/components/auth/LoginPageView'
 
 export function LoginPage() {
-  return (
-    <AuthLayout>
-      <AuthForm mode="login" />
-    </AuthLayout>
-  )
+  return <LoginPageView />
 }
