@@ -1,137 +1,115 @@
 import { Link } from 'react-router-dom'
 
-type ElectionCardVariant = 'active' | 'upcoming' | 'completed'
+export type LandingElectionPhase = 'upcoming' | 'active' | 'completed'
 
 export interface ElectionCardProps {
-  variant: ElectionCardVariant
   title: string
-  description: string
-  detailPath?: string
-  timeRemaining?: string
-  startsIn?: string
-  participationRate?: number
-  votesLabel?: string
-  eligibleVoters?: string
-  idRequirements?: string
-  hoverAccent?: 'primary' | 'tertiary'
+  description: string | null
+  category?: string | null
+  phase: LandingElectionPhase
+  detailPath: string
+  /** Primary countdown label (e.g. "Voting ends") */
+  timeLabel: string
+  /** Human-readable remaining / until value */
+  timeValue: string
+  maxVoters: number
+  registeredCount: number
+  /** When false, ballot total is hidden (live election without real-time results). */
+  showBallotCount: boolean
+  ballotCount: number
+}
+
+function phaseBadge(phase: LandingElectionPhase) {
+  if (phase === 'active') {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 font-label-sm text-label-sm font-semibold uppercase tracking-wide text-primary ring-1 ring-primary/25">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-40" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+        </span>
+        Active
+      </span>
+    )
+  }
+  if (phase === 'upcoming') {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-tertiary/15 px-2.5 py-1 font-label-sm text-label-sm font-semibold uppercase tracking-wide text-tertiary ring-1 ring-tertiary/25">
+        Upcoming
+      </span>
+    )
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-on-surface-variant/15 px-2.5 py-1 font-label-sm text-label-sm font-semibold uppercase tracking-wide text-on-surface-variant ring-1 ring-white/10">
+      Completed
+    </span>
+  )
 }
 
 export function ElectionCard({
-  variant,
   title,
   description,
+  category,
+  phase,
   detailPath,
-  timeRemaining,
-  startsIn,
-  participationRate,
-  votesLabel,
-  eligibleVoters,
-  idRequirements,
-  hoverAccent = 'primary',
+  timeLabel,
+  timeValue,
+  maxVoters,
+  registeredCount,
+  showBallotCount,
+  ballotCount,
 }: ElectionCardProps) {
-  const hoverBorder = hoverAccent === 'tertiary' ? 'hover:border-tertiary/30' : 'hover:border-primary/30'
-  const titleHover = hoverAccent === 'tertiary' ? 'group-hover:text-tertiary' : 'group-hover:text-primary'
+  const desc = description?.trim() || 'No description provided.'
 
   return (
-    <div
-      className={`group overflow-hidden rounded-[24px] border border-white/5 bg-[#161B26] transition-all ${hoverBorder}`}
-    >
-      <div className="p-6">
-        <div className="mb-6 flex items-start justify-between">
-          {variant === 'active' ? (
-            <span className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-primary">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-primary" />
-              <span className="font-label-sm text-label-sm uppercase tracking-wider">Live Now</span>
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-surface-container-low/80 shadow-lg shadow-black/20 ring-1 ring-white/5 transition-all hover:border-primary/35 hover:ring-primary/20 sm:rounded-3xl">
+      <div className="flex flex-1 flex-col p-4 sm:p-6">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">{phaseBadge(phase)}</div>
+          {category?.trim() ? (
+            <span className="max-w-[10rem] truncate rounded-lg bg-surface-container-high px-2.5 py-1 font-label-sm text-label-sm text-on-surface-variant ring-1 ring-white/10 sm:max-w-[12rem]">
+              {category.trim()}
             </span>
-          ) : variant === 'completed' ? (
-            <span className="flex items-center gap-1.5 rounded-full bg-on-surface-variant/20 px-3 py-1 text-on-surface-variant">
-              <span className="font-label-sm text-label-sm uppercase tracking-wider">Completed</span>
-            </span>
-          ) : (
-            <span className="flex items-center gap-1.5 rounded-full bg-tertiary/10 px-3 py-1 text-tertiary">
-              <span className="font-label-sm text-label-sm uppercase tracking-wider">{startsIn}</span>
-            </span>
-          )}
-          {variant === 'active' && timeRemaining ? (
-            <div className="flex flex-col items-end">
-              <span className="font-label-sm text-label-sm uppercase text-on-surface-variant">Time Remaining</span>
-              <span className="font-body-md text-body-md font-bold tracking-tight text-on-surface">
-                {timeRemaining}
-              </span>
-            </div>
-          ) : variant === 'upcoming' ? (
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-on-surface-variant">notifications</span>
-            </div>
           ) : null}
         </div>
-        <h3 className={`mb-2 font-headline-md text-headline-md text-on-surface transition-colors ${titleHover}`}>
+
+        <h3 className="mb-2 line-clamp-2 font-headline-md text-headline-md text-on-surface transition-colors group-hover:text-primary">
           {title}
         </h3>
-        <p className="mb-6 line-clamp-2 font-body-sm text-body-sm text-on-surface-variant">{description}</p>
+        <p className="mb-5 line-clamp-3 flex-1 font-body-sm text-body-sm leading-relaxed text-on-surface-variant">{desc}</p>
 
-        {(variant === 'active' || variant === 'completed') && participationRate !== undefined && votesLabel ? (
-          <div className="mb-8 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="font-label-md text-label-md text-on-surface-variant">Participation Rate</span>
-              <span className="font-label-md text-label-md text-on-surface">{participationRate}%</span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container">
-              <div className="h-full rounded-full bg-primary" style={{ width: `${participationRate}%` }} />
-            </div>
-            <div className="flex justify-between text-on-surface-variant">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm">group</span>
-                <span className="font-label-sm text-label-sm">{votesLabel}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm">verified</span>
-                <span className="font-label-sm text-label-sm">Secured</span>
-              </div>
-            </div>
+        <div className="mb-5 grid grid-cols-1 gap-3 rounded-xl border border-white/5 bg-surface-container/60 p-3 sm:grid-cols-3 sm:p-4">
+          <div className="min-w-0 sm:border-r sm:border-white/10 sm:pr-3">
+            <p className="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant">{timeLabel}</p>
+            <p className="mt-1 truncate font-headline-sm text-headline-sm tabular-nums text-on-surface">{timeValue}</p>
           </div>
-        ) : null}
-
-        {variant === 'upcoming' && eligibleVoters && idRequirements ? (
-          <div className="mb-8 flex flex-col gap-3 rounded-xl bg-surface-container-low p-4">
-            <div className="flex items-center justify-between">
-              <span className="font-label-sm text-label-sm text-on-surface-variant">Eligible Voters</span>
-              <span className="font-label-sm text-label-sm text-on-surface">{eligibleVoters}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="font-label-sm text-label-sm text-on-surface-variant">ID Requirements</span>
-              <span className="font-label-sm text-label-sm text-on-surface">{idRequirements}</span>
-            </div>
+          <div className="min-w-0 sm:border-r sm:border-white/10 sm:px-3">
+            <p className="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant">Ballots cast</p>
+            <p className="mt-1 font-headline-sm text-headline-sm tabular-nums text-on-surface">
+              {showBallotCount ? ballotCount.toLocaleString() : '—'}
+            </p>
+            {!showBallotCount && phase === 'active' ? (
+              <p className="mt-0.5 text-[11px] leading-tight text-on-surface-variant">Tally after polls close</p>
+            ) : null}
           </div>
-        ) : null}
+          <div className="min-w-0 sm:pl-0">
+            <p className="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant">Registered</p>
+            <p className="mt-1 font-headline-sm text-headline-sm tabular-nums text-on-surface">
+              {registeredCount.toLocaleString()}
+              <span className="font-body-sm font-normal text-on-surface-variant"> / {maxVoters.toLocaleString()}</span>
+            </p>
+          </div>
+        </div>
 
-        {detailPath ? (
-          <Link
-            to={detailPath}
-            className={
-              variant === 'active'
-                ? 'block w-full rounded-xl border border-primary/20 bg-primary/5 py-3 text-center font-label-md text-label-md text-primary transition-all hover:bg-primary hover:text-on-primary'
-                : 'block w-full rounded-xl border border-outline/10 bg-surface-container-high py-3 text-center font-label-md text-label-md text-on-surface-variant transition-all hover:border-tertiary/20 hover:bg-tertiary/10 hover:text-tertiary'
-            }
-          >
-            {variant === 'active' ? 'Join Election' : 'View Details'}
-          </Link>
-        ) : variant === 'active' ? (
-          <button
-            type="button"
-            className="w-full rounded-xl border border-primary/20 bg-primary/5 py-3 font-label-md text-label-md text-primary transition-all hover:bg-primary hover:text-on-primary"
-          >
-            Cast Your Vote
-          </button>
-        ) : (
-          <button
-            type="button"
-            className="w-full rounded-xl border border-outline/10 bg-surface-container-high py-3 font-label-md text-label-md text-on-surface-variant transition-all hover:border-tertiary/20 hover:bg-tertiary/10 hover:text-tertiary"
-          >
-            View Details
-          </button>
-        )}
+        <Link
+          to={detailPath}
+          className="mt-auto flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-center font-label-md font-bold text-on-primary transition-all hover:bg-primary/90 active:scale-[0.99] sm:py-4"
+        >
+          Election details
+          <span className="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-0.5">
+            arrow_forward
+          </span>
+        </Link>
       </div>
-    </div>
+    </article>
   )
 }

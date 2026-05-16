@@ -1,123 +1,154 @@
 import { useEffect, useState } from 'react'
 import { fetchPublicElections, type PublicElectionFilter } from '@/services/electionService'
-import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
-import { formatTimeRemaining } from '@/utils/electionTime'
+import { fetchPublicLandingMetrics } from '@/services/publicLandingMetricsService'
+import type { Election } from '@/types/election'
+import { formatTimeRemaining, formatTimeUntil } from '@/utils/electionTime'
+import { publicElectionPhase, shouldShowPublicBallotCount } from '@/utils/publicElectionLanding'
 import { ElectionCard } from './ElectionCard'
-
-interface ElectionCardData {
-  id: string
-  variant: 'active' | 'upcoming' | 'completed'
-  title: string
-  description: string
-  timeRemaining?: string
-  startsIn?: string
-  participationRate?: number
-  votesLabel?: string
-}
 
 interface ElectionsGridProps {
   query: string
   statusFilter: PublicElectionFilter
 }
 
+function shortEndedLabel(iso: string): string {
+  try {
+    return new Date(iso).toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  } catch {
+    return '—'
+  }
+}
+
 export function ElectionsGrid({ query, statusFilter }: ElectionsGridProps) {
-  const [elections, setElections] = useState<ElectionCardData[]>([])
+  const [elections, setElections] = useState<Election[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [tick, setTick] = useState(0)
+  const [metricsVersion, setMetricsVersion] = useState(0)
+  const [metrics, setMetrics] = useState(() => new Map<string, { ballots_cast: number; registered: number }>())
+
+  useEffect(() => {
+    const id = window.setInterval(() => setTick((t) => t + 1), 1000)
+    return () => window.clearInterval(id)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
 
     async function load() {
+      setLoading(true)
+      setLoadError(null)
       try {
-        const published = await fetchPublicElections(statusFilter)
-        const q = query.trim().toLowerCase()
-        const filtered = q
-          ? published.filter(
-              (e) =>
-                e.title.toLowerCase().includes(q) ||
-                (e.description ?? '').toLowerCase().includes(q) ||
-                (e.category ?? '').toLowerCase().includes(q) ||
-                e.id.toLowerCase().includes(q),
-            )
-          : published
-
-        const cards: ElectionCardData[] = []
-
-        for (const election of filtered) {
-          const now = Date.now()
-          const start = new Date(election.start_date).getTime()
-          const end = new Date(election.end_date).getTime()
-          const variant: ElectionCardData['variant'] =
-            election.status === 'completed' || now > end
-              ? 'completed'
-              : now < start
-                ? 'upcoming'
-                : 'active'
-
-          let participationRate: number | undefined
-          let votesLabel: string | undefined
-
-          if (variant === 'active' || variant === 'completed') {
-            try {
-              const stats = await fetchElectionRegistrationStats(election.id)
-              participationRate = stats.participation_percent
-              votesLabel = `${stats.registered_count.toLocaleString()} / ${stats.max_voters} registered`
-            } catch {
-              votesLabel = 'Registration open'
-            }
-          }
-
-          const daysUntilStart = Math.ceil((start - now) / (1000 * 60 * 60 * 24))
-
-          cards.push({
-            id: election.id,
-            variant,
-            title: election.title,
-            description: election.description ?? 'No description provided.',
-            timeRemaining:
-              variant === 'active' ? formatTimeRemaining(election.end_date) : variant === 'completed' ? 'Ended' : undefined,
-            startsIn: variant === 'upcoming' ? `Starts in ${Math.max(0, daysUntilStart)} days` : undefined,
-            participationRate,
-            votesLabel,
-          })
+        const [published, m] = await Promise.all([
+          fetchPublicElections(statusFilter),
+          fetchPublicLandingMetrics().catch(() => new Map()),
+        ])
+        if (cancelled) return
+        setElections(published)
+        setMetrics(m)
+        setMetricsVersion((v) => v + 1)
+      } catch (err) {
+        if (!cancelled) {
+          setElections([])
+          setLoadError(err instanceof Error ? err.message : 'Failed to load elections')
         }
-
-        if (!cancelled) setElections(cards)
-      } catch {
-        if (!cancelled) setElections([])
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
 
-    setLoading(true)
     void load()
+    const slow = window.setInterval(() => void load(), 60_000)
     return () => {
       cancelled = true
+      window.clearInterval(slow)
     }
-  }, [query, statusFilter])
+  }, [statusFilter])
+
+  const nowMs = Date.now()
+  const q = query.trim().toLowerCase()
+  const filtered = q
+    ? elections.filter(
+        (e) =>
+          e.title.toLowerCase().includes(q) ||
+          (e.description ?? '').toLowerCase().includes(q) ||
+          (e.category ?? '').toLowerCase().includes(q) ||
+          e.id.toLowerCase().includes(q),
+      )
+    : elections
+
+  // tick + metricsVersion force recompute of countdown strings
+  void tick
+  void metricsVersion
 
   return (
-    <section className="px-margin py-2xl">
-      <div className="mb-12 flex items-end justify-between">
-        <div>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface">Elections</h2>
-          <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
-            Upcoming, active, and completed polls on the platform.
+    <section className="px-4 py-8 sm:px-margin sm:py-2xl">
+      <div className="mx-auto max-w-6xl">
+        {loadError ? (
+          <p className="rounded-xl border border-error/30 bg-error-container/10 px-4 py-3 font-body-sm text-error">
+            {loadError}
           </p>
-        </div>
+        ) : null}
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-16">
+            <span className="material-symbols-outlined animate-spin text-3xl text-primary">progress_activity</span>
+            <p className="font-body-md text-on-surface-variant">Loading elections…</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-white/15 py-14 text-center">
+            <p className="font-body-md text-on-surface-variant">No elections match your filters or search.</p>
+            <p className="mt-2 font-body-sm text-on-surface-variant/80">Try &quot;All&quot; or clear the search box.</p>
+          </div>
+        ) : (
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-gutter lg:grid-cols-3">
+            {filtered.map((election) => {
+              const phase = publicElectionPhase(election, nowMs)
+              const row = metrics.get(election.id)
+              const registeredCount = row?.registered ?? 0
+              const ballotCount = row?.ballots_cast ?? 0
+              const showBallots = shouldShowPublicBallotCount(election, phase, nowMs)
+
+              let timeLabel = 'Schedule'
+              let timeValue = '—'
+              if (phase === 'upcoming') {
+                timeLabel = 'Voting opens in'
+                timeValue = formatTimeUntil(election.start_date, nowMs)
+              } else if (phase === 'active') {
+                timeLabel = 'Voting ends in'
+                timeValue = formatTimeRemaining(election.end_date, nowMs)
+              } else {
+                timeLabel = 'Closed'
+                timeValue = shortEndedLabel(election.end_date)
+              }
+
+              return (
+                <li key={election.id} className="min-w-0">
+                  <ElectionCard
+                    title={election.title}
+                    description={election.description}
+                    category={election.category}
+                    phase={phase}
+                    detailPath={`/elections/${election.id}`}
+                    timeLabel={timeLabel}
+                    timeValue={timeValue}
+                    maxVoters={election.max_voters}
+                    registeredCount={registeredCount}
+                    showBallotCount={showBallots}
+                    ballotCount={ballotCount}
+                  />
+                </li>
+              )
+            })}
+          </ul>
+        )}
       </div>
-      {loading ? (
-        <p className="font-body-md text-body-md text-on-surface-variant">Loading elections…</p>
-      ) : elections.length === 0 ? (
-        <p className="font-body-md text-body-md text-on-surface-variant">No elections match your search.</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-3">
-          {elections.map((election) => (
-            <ElectionCard key={election.id} {...election} detailPath={`/elections/${election.id}`} />
-          ))}
-        </div>
-      )}
     </section>
   )
 }
