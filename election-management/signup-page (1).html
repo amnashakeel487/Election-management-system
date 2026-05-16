@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VoteSecure — Create Account</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0F2347;
+    --navy2: #1B3A6B;
+    --blue: #2451A3;
+    --purple: #6C3FC5;
+    --cyan: #06B6D4;
+    --success: #10B981;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --text: #0F172A;
+    --muted: #475569;
+    --subtle: #94A3B8;
+    --border: #E2E8F0;
+    --bg: #F0F4F9;
+  }
+
+  html, body {
+    min-height: 100vh;
+    font-family: 'Sora', sans-serif;
+    background: var(--navy);
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  .bg-scene {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: linear-gradient(135deg, #080f1e 0%, #0f2347 45%, #1a1040 100%);
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: orbFloat linear infinite;
+    pointer-events: none;
+  }
+  .orb1 { width: 520px; height: 520px; background: rgba(108,63,197,0.18); top: -160px; right: -100px; animation-duration: 18s; }
+  .orb2 { width: 400px; height: 400px; background: rgba(6,182,212,0.12); bottom: -120px; left: -80px; animation-duration: 22s; animation-direction: reverse; }
+  .orb3 { width: 280px; height: 280px; background: rgba(36,81,163,0.2); top: 40%; left: 30%; animation-duration: 14s; }
+
+  @keyframes orbFloat {
+    0%   { transform: translate(0,0) scale(1); }
+    33%  { transform: translate(30px,-20px) scale(1.05); }
+    66%  { transform: translate(-20px,30px) scale(0.97); }
+    100% { transform: translate(0,0) scale(1); }
+  }
+
+  /* Grid lines */
+  .grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* Floating particles */
+  .particles { position: absolute; inset: 0; }
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    background: rgba(6,182,212,0.6);
+    animation: particleDrift linear infinite;
+  }
+  @keyframes particleDrift {
+    0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-10vh) translateX(var(--dx,20px)); opacity: 0; }
+  }
+
+  /* ── LAYOUT ── */
+  .page-wrap {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+
+  /* ── LEFT PANEL ── */
+  .left {
+    padding: 48px 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    animation: slideInLeft 0.8s cubic-bezier(0.4,0,0.2,1) both;
+  }
+  @keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-40px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-icon {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2451A3, #6C3FC5);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 24px rgba(108,63,197,0.4);
+    animation: iconPulse 3s ease-in-out infinite;
+  }
+  @keyframes iconPulse {
+    0%,100% { box-shadow: 0 8px 24px rgba(108,63,197,0.4); }
+    50%      { box-shadow: 0 8px 36px rgba(108,63,197,0.65); }
+  }
+  .brand-icon svg { width: 22px; height: 22px; }
+  .brand-name { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.4px; }
+  .brand-pill {
+    font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--cyan); background: rgba(6,182,212,0.1);
+    border: 1px solid rgba(6,182,212,0.3); border-radius: 20px; padding: 2px 8px;
+  }
+
+  .hero-copy { margin-top: 60px; }
+  .live-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25);
+    border-radius: 20px; padding: 5px 14px; margin-bottom: 24px;
+  }
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #10B981;
+    animation: livePulse 1.5s ease-in-out infinite;
+  }
+  @keyframes livePulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.5); opacity: 0.6; }
+  }
+  .live-badge span { font-size: 11px; font-weight: 600; color: #34D399; letter-spacing: 0.3px; }
+
+  .hero-title {
+    font-size: 42px; font-weight: 800; line-height: 1.15;
+    letter-spacing: -1px; color: #fff; margin-bottom: 16px;
+  }
+  .hero-title .grad {
+    background: linear-gradient(90deg, #67E8F9, #A78BFA, #67E8F9);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradShift 4s linear infinite;
+  }
+  @keyframes gradShift {
+    0%   { background-position: 0%; }
+    100% { background-position: 200%; }
+  }
+  .hero-sub { font-size: 15px; color: rgba(255,255,255,0.55); line-height: 1.75; max-width: 380px; }
+
+  /* Stats row */
+  .stats-row { display: flex; gap: 28px; margin-top: 44px; }
+  .stat-item { }
+  .stat-num {
+    font-size: 26px; font-weight: 800; color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    animation: countUp 1.2s ease both;
+  }
+  .stat-num.delay1 { animation-delay: 0.3s; }
+  .stat-num.delay2 { animation-delay: 0.6s; }
+  .stat-num.delay3 { animation-delay: 0.9s; }
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .stat-label { font-size: 11px; color: rgba(255,255,255,0.35); font-weight: 500; margin-top: 2px; }
+  .stats-divider { width: 1px; background: rgba(255,255,255,0.08); }
+
+  /* Feature cards */
+  .features { margin-top: 48px; display: flex; flex-direction: column; gap: 14px; }
+  .feat-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    transition: all 0.3s;
+    animation: fadeUp 0.6s ease both;
+  }
+  .feat-row:hover { background: rgba(255,255,255,0.07); border-color: rgba(6,182,212,0.2); transform: translateX(4px); }
+  .feat-row.d1 { animation-delay: 0.4s; }
+  .feat-row.d2 { animation-delay: 0.55s; }
+  .feat-row.d3 { animation-delay: 0.7s; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .feat-icon-wrap {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .feat-icon-wrap svg { width: 18px; height: 18px; stroke: var(--cyan); }
+  .feat-text-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 2px; }
+  .feat-text-sub { font-size: 11px; color: rgba(255,255,255,0.35); line-height: 1.5; }
+
+  /* Trust chips */
+  .trust-strip {
+    margin-top: auto; padding-top: 36px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .t-chip {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18);
+    border-radius: 20px; padding: 4px 11px;
+    font-size: 10px; font-weight: 600; color: #6EE7B7; letter-spacing: 0.3px;
+  }
+  .t-dot { width: 5px; height: 5px; border-radius: 50%; background: #10B981; }
+
+  /* ── RIGHT PANEL ── */
+  .right {
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 52px;
+    animation: slideInRight 0.8s cubic-bezier(0.4,0,0.2,1) 0.15s both;
+  }
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .form-card {
+    width: 100%; max-width: 440px;
+    background: rgba(255,255,255,0.97);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+    animation: cardFloat 6s ease-in-out infinite 1s;
+  }
+  @keyframes cardFloat {
+    0%,100% { transform: translateY(0px); }
+    50%      { transform: translateY(-6px); }
+  }
+
+  .card-top {
+    background: linear-gradient(135deg, #0F2347 0%, #1B3A6B 60%, #2D1B69 100%);
+    padding: 28px 32px 24px;
+    position: relative; overflow: hidden;
+  }
+  .card-top-orb {
+    position: absolute; border-radius: 50%; filter: blur(30px); pointer-events: none;
+  }
+  .card-top-orb1 { width: 180px; height: 180px; background: rgba(108,63,197,0.3); top: -60px; right: -40px; }
+  .card-top-orb2 { width: 120px; height: 120px; background: rgba(6,182,212,0.2); bottom: -40px; left: 20px; }
+
+  .card-top-content { position: relative; z-index: 1; }
+  .tab-switcher {
+    display: flex; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 3px; margin-bottom: 20px;
+  }
+  .tab-btn {
+    flex: 1; padding: 8px; border-radius: 8px; border: none; cursor: pointer;
+    font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600;
+    transition: all 0.25s; background: transparent; color: rgba(255,255,255,0.45);
+  }
+  .tab-btn.active {
+    background: rgba(255,255,255,0.14); color: #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.25);
+  }
+  .card-heading { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.4px; margin-bottom: 4px; }
+  .card-subheading { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+  .progress-bar-wrap { margin-top: 18px; }
+  .progress-steps { display: flex; gap: 4px; }
+  .p-step {
+    height: 3px; border-radius: 2px; flex: 1;
+    background: rgba(255,255,255,0.15); overflow: hidden;
+  }
+  .p-step.done, .p-step.active { }
+  .p-step-fill { height: 100%; border-radius: 2px; background: var(--cyan); width: 0; transition: width 0.6s ease; }
+  .p-step.done .p-step-fill { width: 100%; }
+  .p-step.active .p-step-fill { width: 60%; }
+  .progress-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+  .p-label { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .p-label.active { color: var(--cyan); }
+
+  .form-body { padding: 28px 32px 24px; }
+
+  /* Social */
+  .social-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .soc-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px; border: 1.5px solid var(--border); border-radius: 11px;
+    background: #fff; cursor: pointer; font-family: 'Sora', sans-serif;
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    transition: all 0.25s;
+  }
+  .soc-btn:hover { border-color: #2451A3; background: #F0F4F9; color: #1B3A6B; transform: translateY(-1px); }
+  .soc-icon { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
+
+  .or-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .or-line { flex: 1; height: 1px; background: var(--border); }
+  .or-text { font-size: 11px; color: #CBD5E1; font-weight: 500; }
+
+  /* Fields */
+  .field-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field { margin-bottom: 14px; }
+  .field-label {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.7px;
+    margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
+  }
+  .field-label svg { width: 12px; height: 12px; stroke: var(--subtle); }
+  .input-wrap { position: relative; display: flex; align-items: center; }
+  .input-icon { position: absolute; left: 12px; pointer-events: none; }
+  .input-icon svg { width: 15px; height: 15px; stroke: var(--subtle); }
+  .field-input {
+    width: 100%; padding: 11px 14px 11px 38px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-family: 'Sora', sans-serif; font-size: 13px; color: var(--text);
+    background: #fff; outline: none; transition: all 0.25s;
+  }
+  .field-input:focus {
+    border-color: #2451A3;
+    box-shadow: 0 0 0 3px rgba(36,81,163,0.1);
+  }
+  .field-input::placeholder { color: #CBD5E1; }
+  .field-input.has-value { border-color: #10B981; }
+  .eye-tog { position: absolute; right: 12px; background: none; border: none; cursor: pointer; color: var(--subtle); }
+  .eye-tog svg { width: 15px; height: 15px; stroke: currentColor; }
+  .field-input.focused { border-color: #2451A3; box-shadow: 0 0 0 3px rgba(36,81,163,0.1); }
+
+  /* Password strength */
+  .pw-meter { margin-top: 6px; }
+  .pw-bars { display: flex; gap: 3px; }
+  .pw-bar { flex: 1; height: 3px; border-radius: 2px; background: var(--border); transition: background 0.4s; }
+  .pw-bar.w { background: var(--danger); }
+  .pw-bar.m { background: var(--warning); }
+  .pw-bar.s { background: var(--success); }
+  .pw-hint { font-size: 10px; margin-top: 4px; color: var(--subtle); }
+  .pw-hint.w { color: var(--danger); }
+  .pw-hint.m { color: var(--warning); }
+  .pw-hint.s { color: var(--success); }
+
+  /* Role selector */
+  .role-label-row { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 8px; }
+  .role-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+  .role-card {
+    border: 1.5px solid var(--border); border-radius: 11px; padding: 13px 8px;
+    text-align: center; cursor: pointer; transition: all 0.25s; background: #fff;
+  }
+  .role-card:hover { border-color: #2451A3; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(36,81,163,0.12); }
+  .role-card.sel { border-color: #1B3A6B; background: linear-gradient(135deg,#EFF4FF,#F5F0FF); }
+  .role-card.sel .rc-icon-box { background: #DBEAFE; border-color: #BFDBFE; }
+  .role-card.sel .rc-icon-box svg { stroke: #2451A3; }
+  .role-card.sel .rc-name { color: #1B3A6B; }
+  .rc-icon-box {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: #F8FAFC; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;
+    transition: all 0.25s;
+  }
+  .rc-icon-box svg { width: 17px; height: 17px; stroke: var(--subtle); transition: stroke 0.25s; }
+  .rc-name { font-size: 12px; font-weight: 700; color: var(--muted); transition: color 0.25s; }
+  .rc-sub { font-size: 10px; color: #CBD5E1; margin-top: 2px; }
+
+  /* Checkbox */
+  .check-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 18px; }
+  .checkbox {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid #2451A3; background: #EFF4FF;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+    cursor: pointer;
+  }
+  .checkbox svg { width: 11px; height: 11px; stroke: #2451A3; }
+  .check-text { font-size: 11px; color: var(--subtle); line-height: 1.65; }
+  .check-text a { color: #2451A3; font-weight: 600; text-decoration: none; }
+  .check-text a:hover { text-decoration: underline; }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%; padding: 13px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #1B3A6B 0%, #6C3FC5 100%);
+    color: #fff; font-family: 'Sora', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.3s; letter-spacing: 0.2px; position: relative; overflow: hidden;
+  }
+  .submit-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 100%);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(27,58,107,0.5); }
+  .submit-btn:hover::before { opacity: 1; }
+  .submit-btn:active { transform: translateY(0); }
+  .btn-icon svg { width: 16px; height: 16px; stroke: white; }
+
+  /* Shimmer effect on button */
+  .submit-btn .shimmer {
+    position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: shimmerSlide 3s ease-in-out infinite 2s;
+    pointer-events: none;
+  }
+  @keyframes shimmerSlide {
+    0%   { left: -100%; }
+    100% { left: 200%; }
+  }
+
+  .signin-row { text-align: center; margin-top: 14px; font-size: 12px; color: var(--subtle); }
+  .signin-row a { color: #2451A3; font-weight: 700; text-decoration: none; }
+  .signin-row a:hover { text-decoration: underline; }
+
+  .card-footer {
+    border-top: 1px solid var(--border); padding: 12px 32px;
+    display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+  }
+  .security-chip {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 600; color: var(--subtle); letter-spacing: 0.2px;
+  }
+  .security-chip svg { width: 12px; height: 12px; stroke: #10B981; }
+
+  /* Floating nav bar */
+  .nav-bar {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 100; display: flex; align-items: center; gap: 32px;
+    background: rgba(15,35,71,0.85); backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 999px;
+    padding: 10px 24px;
+    animation: navDrop 0.6s cubic-bezier(0.4,0,0.2,1) both;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  @keyframes navDrop {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  .nav-brand { display: flex; align-items: center; gap: 8px; }
+  .nav-brand-icon {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: linear-gradient(135deg, #2451A3, #6C3FC5);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .nav-brand-icon svg { width: 13px; height: 13px; stroke: white; }
+  .nav-brand-name { font-size: 13px; font-weight: 800; color: #fff; }
+  .nav-links { display: flex; gap: 20px; }
+  .nav-link { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 500; cursor: pointer; transition: color 0.2s; }
+  .nav-link:hover { color: #fff; }
+  .nav-cta {
+    font-size: 12px; font-weight: 700; color: var(--cyan);
+    background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25);
+    border-radius: 20px; padding: 5px 14px; cursor: pointer; transition: all 0.2s;
+  }
+  .nav-cta:hover { background: rgba(6,182,212,0.2); }
+
+  /* Success state */
+  .success-overlay {
+    display: none; position: absolute; inset: 0; z-index: 10;
+    background: #fff; border-radius: 24px;
+    flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px; text-align: center;
+  }
+  .success-overlay.show { display: flex; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .success-icon {
+    width: 72px; height: 72px; border-radius: 20px;
+    background: linear-gradient(135deg, #10B981, #059669);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+    box-shadow: 0 16px 40px rgba(16,185,129,0.35);
+    animation: successBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+  }
+  @keyframes successBounce {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .success-icon svg { width: 36px; height: 36px; stroke: white; stroke-width: 2.5; }
+  .success-title { font-size: 22px; font-weight: 800; color: #0F172A; margin-bottom: 8px; }
+  .success-sub { font-size: 14px; color: #94A3B8; line-height: 1.6; margin-bottom: 24px; }
+  .success-id {
+    font-family: 'IBM Plex Mono', monospace; font-size: 14px; letter-spacing: 2px;
+    color: var(--cyan); background: #0F2347; padding: 10px 20px; border-radius: 10px;
+    border: 1px solid rgba(6,182,212,0.25); margin-bottom: 24px;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .page-wrap { grid-template-columns: 1fr; }
+    .left { display: none; }
+    .right { padding: 80px 24px 40px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Animated background -->
+<div class="bg-scene">
+  <div class="grid-lines"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="particles" id="particles"></div>
+</div>
+
+<!-- Floating Nav -->
+<nav class="nav-bar">
+  <div class="nav-brand">
+    <div class="nav-brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <span class="nav-brand-name">VoteSecure</span>
+  </div>
+  <div class="nav-links">
+    <span class="nav-link">Home</span>
+    <span class="nav-link">Elections</span>
+    <span class="nav-link">Security</span>
+    <span class="nav-link">Pricing</span>
+  </div>
+  <span class="nav-cta">Sign in</span>
+</nav>
+
+<!-- Main layout -->
+<div class="page-wrap">
+
+  <!-- LEFT PANEL -->
+  <div class="left">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <span class="brand-name">VoteSecure</span>
+      <span class="brand-pill">Enterprise</span>
+    </div>
+
+    <div class="hero-copy">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        <span>3 Elections Live Right Now</span>
+      </div>
+      <h1 class="hero-title">
+        Democracy<br>powered by<br><span class="grad">military-grade</span><br>security
+      </h1>
+      <p class="hero-sub">Trusted by governments, universities and enterprises worldwide. End-to-end encrypted, blockchain-verified elections.</p>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-num delay1">2,847</div>
+          <div class="stat-label">Elections run</div>
+        </div>
+        <div class="stats-divider"></div>
+        <div class="stat-item">
+          <div class="stat-num delay2">1.2M+</div>
+          <div class="stat-label">Registered voters</div>
+        </div>
+        <div class="stats-divider"></div>
+        <div class="stat-item">
+          <div class="stat-num delay3">99.9%</div>
+          <div class="stat-label">Uptime SLA</div>
+        </div>
+      </div>
+
+      <div class="features">
+        <div class="feat-row d1">
+          <div class="feat-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <div class="feat-text-title">AES-256 end-to-end encryption</div>
+            <div class="feat-text-sub">Every vote encrypted before it leaves your device.</div>
+          </div>
+        </div>
+        <div class="feat-row d2">
+          <div class="feat-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div>
+            <div class="feat-text-title">Real-time audit logs</div>
+            <div class="feat-text-sub">Immutable blockchain-verified transparency trail.</div>
+          </div>
+        </div>
+        <div class="feat-row d3">
+          <div class="feat-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <div class="feat-text-title">Multi-role access control</div>
+            <div class="feat-text-sub">Admins, creators and voters — all in one platform.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trust-strip">
+      <div class="t-chip"><div class="t-dot"></div>SOC 2 Type II</div>
+      <div class="t-chip"><div class="t-dot"></div>GDPR</div>
+      <div class="t-chip"><div class="t-dot"></div>ISO 27001</div>
+      <div class="t-chip"><div class="t-dot"></div>256-bit SSL</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right">
+    <div class="form-card" style="position:relative;">
+
+      <!-- Card top header -->
+      <div class="card-top">
+        <div class="card-top-orb card-top-orb1"></div>
+        <div class="card-top-orb card-top-orb2"></div>
+        <div class="card-top-content">
+          <div class="tab-switcher">
+            <button class="tab-btn" onclick="switchTab('login')">Sign in</button>
+            <button class="tab-btn active" onclick="switchTab('signup')">Create account</button>
+          </div>
+          <div class="card-heading">Create your account</div>
+          <div class="card-subheading">Free forever — no credit card required.</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-steps">
+              <div class="p-step done"><div class="p-step-fill"></div></div>
+              <div class="p-step active"><div class="p-step-fill"></div></div>
+              <div class="p-step"><div class="p-step-fill"></div></div>
+            </div>
+            <div class="progress-labels">
+              <span class="p-label active">Account</span>
+              <span class="p-label active">Details</span>
+              <span class="p-label">Verify</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form body -->
+      <div class="form-body">
+
+        <!-- Social buttons -->
+        <div class="social-btns">
+          <div class="soc-btn">
+            <div class="soc-icon" style="background:#E8F0FE;"><span style="color:#1a73e8;font-size:12px;font-weight:900;">G</span></div>
+            Google
+          </div>
+          <div class="soc-btn">
+            <div class="soc-icon" style="background:#E7F3FF;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="#0A66C2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </div>
+            LinkedIn
+          </div>
+        </div>
+
+        <div class="or-row">
+          <div class="or-line"></div>
+          <span class="or-text">or continue with email</span>
+          <div class="or-line"></div>
+        </div>
+
+        <!-- Name row -->
+        <div class="field-pair">
+          <div class="field">
+            <div class="field-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              First name
+            </div>
+            <div class="input-wrap">
+              <span class="input-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+              <input class="field-input has-value" type="text" placeholder="Jane" value="Jane" id="fname" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Last name
+            </div>
+            <div class="input-wrap">
+              <span class="input-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+              <input class="field-input" type="text" placeholder="Smith" id="lname" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="field">
+          <div class="field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Email address
+          </div>
+          <div class="input-wrap">
+            <span class="input-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+            <input class="field-input focused" type="email" placeholder="jane@organisation.com" id="email" />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="field">
+          <div class="field-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Password
+          </div>
+          <div class="input-wrap">
+            <span class="input-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+            <input class="field-input" type="password" placeholder="Min. 8 characters" id="password" oninput="checkPassword(this.value)" />
+            <button class="eye-tog" onclick="togglePass()" id="eyeBtn" aria-label="Toggle password">
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="pw-meter">
+            <div class="pw-bars">
+              <div class="pw-bar" id="bar1"></div>
+              <div class="pw-bar" id="bar2"></div>
+              <div class="pw-bar" id="bar3"></div>
+              <div class="pw-bar" id="bar4"></div>
+            </div>
+            <div class="pw-hint" id="pwHint">Enter a password to check strength</div>
+          </div>
+        </div>
+
+        <!-- Role -->
+        <div style="margin-bottom:14px;">
+          <div class="role-label-row">I am signing up as</div>
+          <div class="role-cards">
+            <div class="role-card" onclick="selectRole(this)" data-role="voter">
+              <div class="rc-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div class="rc-name">Voter</div>
+              <div class="rc-sub">Participate</div>
+            </div>
+            <div class="role-card sel" onclick="selectRole(this)" data-role="creator">
+              <div class="rc-icon-box" style="background:#DBEAFE;border-color:#BFDBFE;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#2451A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+              </div>
+              <div class="rc-name" style="color:#1B3A6B;">Creator</div>
+              <div class="rc-sub">Run elections</div>
+            </div>
+            <div class="role-card" onclick="selectRole(this)" data-role="admin">
+              <div class="rc-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="rc-name">Admin</div>
+              <div class="rc-sub">Manage all</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terms -->
+        <div class="check-row">
+          <div class="checkbox" id="termsCheck" onclick="toggleCheck(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="check-text">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I consent to secure electronic processing of my data.
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button class="submit-btn" onclick="handleSubmit()">
+          <span class="shimmer"></span>
+          <span class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          Create secure account
+          <span class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </button>
+
+        <div class="signin-row">
+          Already have an account? <a href="#">Sign in instead</a>
+        </div>
+      </div>
+
+      <!-- Security chips -->
+      <div class="card-footer">
+        <div class="security-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          SSL Secured
+        </div>
+        <div class="security-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          GDPR Compliant
+        </div>
+        <div class="security-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          No data sold
+        </div>
+      </div>
+
+      <!-- Success overlay -->
+      <div class="success-overlay" id="successOverlay">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="success-title">Account Created!</div>
+        <div class="success-sub">Welcome to VoteSecure. Your secure voter ID has been generated.</div>
+        <div class="success-id">VS-8821-WXYZ-4492</div>
+        <button class="submit-btn" style="max-width:240px;" onclick="document.getElementById('successOverlay').classList.remove('show')">
+          Go to Dashboard
+          <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // Particles
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      animation-duration: ${8 + Math.random() * 14}s;
+      animation-delay: ${Math.random() * 12}s;
+      --dx: ${(Math.random() - 0.5) * 120}px;
+      width: ${1 + Math.random() * 2}px;
+      height: ${1 + Math.random() * 2}px;
+      opacity: ${0.3 + Math.random() * 0.5};
+    `;
+    container.appendChild(p);
+  }
+
+  // Password strength
+  function checkPassword(val) {
+    const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3'), document.getElementById('bar4')];
+    const hint = document.getElementById('pwHint');
+    bars.forEach(b => { b.className = 'pw-bar'; });
+    if (!val) { hint.textContent = 'Enter a password to check strength'; hint.className = 'pw-hint'; return; }
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const cls = score <= 1 ? 'w' : score <= 2 ? 'm' : 's';
+    const labels = { w: 'Weak — add uppercase & numbers', m: 'Medium — add symbols to improve', s: 'Strong password — great!' };
+    for (let i = 0; i < score; i++) bars[i].className = 'pw-bar ' + cls;
+    hint.textContent = labels[cls];
+    hint.className = 'pw-hint ' + cls;
+  }
+
+  // Toggle password
+  let passVisible = false;
+  function togglePass() {
+    passVisible = !passVisible;
+    const inp = document.getElementById('password');
+    inp.type = passVisible ? 'text' : 'password';
+    const icon = document.getElementById('eyeIcon');
+    icon.innerHTML = passVisible
+      ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+      : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+
+  // Role selection
+  function selectRole(el) {
+    document.querySelectorAll('.role-card').forEach(c => {
+      c.classList.remove('sel');
+      const ib = c.querySelector('.rc-icon-box');
+      ib.style.background = ''; ib.style.borderColor = '';
+      const svg = ib.querySelector('svg'); if (svg) svg.removeAttribute('stroke');
+      c.querySelector('.rc-name').style.color = '';
+    });
+    el.classList.add('sel');
+  }
+
+  // Checkbox toggle
+  function toggleCheck(el) {
+    el.classList.toggle('unchecked');
+    el.style.background = el.classList.contains('unchecked') ? '#fff' : '#EFF4FF';
+    el.style.borderColor = el.classList.contains('unchecked') ? '#E2E8F0' : '#2451A3';
+  }
+
+  // Tab switch
+  function switchTab(t) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', (t === 'login' && i === 0) || (t === 'signup' && i === 1));
+    });
+  }
+
+  // Submit
+  function handleSubmit() {
+    const btn = document.querySelector('.submit-btn');
+    btn.innerHTML = '<div style="width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite;"></div> Creating account...';
+    const style = document.createElement('style');
+    style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+    setTimeout(() => {
+      document.getElementById('successOverlay').classList.add('show');
+    }, 1800);
+  }
+
+  // Input focus effects
+  document.querySelectorAll('.field-input').forEach(inp => {
+    inp.addEventListener('focus', () => inp.classList.add('focused'));
+    inp.addEventListener('blur', () => {
+      inp.classList.remove('focused');
+      if (inp.value) inp.classList.add('has-value');
+      else inp.classList.remove('has-value');
+    });
+  });
+</script>
+</body>
+</html>
