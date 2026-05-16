@@ -1,0 +1,74 @@
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 12px;
+}
+
+.language-switcher--nav {
+  color: inherit;
+}
+
+.language-switcher--nav .language-switcher__btn {
+  color: rgb(255 255 255 / 0.75);
+}
+
+.language-switcher--nav .language-switcher__btn:hover,
+.language-switcher--nav .language-switcher__btn--active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.language-switcher--compact {
+  font-size: 11px;
+}
+
+.language-switcher--settings .language-switcher__options {
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.language-switcher__icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.language-switcher__options {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+}
+
+.language-switcher__sep {
+  opacity: 0.45;
+  padding: 0 0.2rem;
+  user-select: none;
+}
+
+.language-switcher__btn {
+  background: none;
+  border: none;
+  padding: 0.15rem 0.35rem;
+  cursor: pointer;
+  font: inherit;
+  border-radius: 4px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.language-switcher--settings .language-switcher__btn {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgb(var(--tw-line) / 0.9);
+  background: rgb(var(--tw-surface) / 0.5);
+}
+
+.language-switcher--settings .language-switcher__btn--active {
+  border-color: #2451a3;
+  background: rgb(36 81 163 / 0.12);
+  font-weight: 600;
+}
+
+.language-switcher__btn--active {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

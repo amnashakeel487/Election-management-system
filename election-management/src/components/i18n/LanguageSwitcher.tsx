@@ -46,6 +46,6 @@ export function LanguageSwitcher({ variant = 'nav', className = '' }: LanguageSw
           </span>
         ))}
       </div>
-    </motionDiv>
+    </div>
   )
 }

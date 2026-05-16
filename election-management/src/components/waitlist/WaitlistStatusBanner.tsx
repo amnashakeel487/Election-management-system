@@ -1,4 +1,5 @@
-import { waitlistUserMessage } from '@/utils/waitlistDisplay'
+import { useTranslation } from 'react-i18next'
+import { useWaitlistMessage } from '@/hooks/useWaitlistMessage'
 
 export interface WaitlistStatusBannerProps {
   position: number | null | undefined
@@ -13,13 +14,13 @@ export function WaitlistStatusBanner({
   onWithdraw,
   withdrawing = false,
 }: WaitlistStatusBannerProps) {
+  const { t } = useTranslation('waitlist')
+  const formatWaitlist = useWaitlistMessage()
+
   return (
     <div className={`vr-status-box vr-status-box--waitlist ${className}`.trim()}>
-      <p className="font-bold">{waitlistUserMessage(position)}</p>
-      <p className="mt-1 text-xs opacity-90">
-        You will be promoted automatically if a registered spot opens before the registration deadline.
-        We email you when your status changes.
-      </p>
+      <p className="font-bold">{formatWaitlist(position)}</p>
+      <p className="mt-1 text-xs opacity-90">{t('promoteHint')}</p>
       {onWithdraw ? (
         <button
           type="button"
@@ -27,7 +28,7 @@ export function WaitlistStatusBanner({
           disabled={withdrawing}
           onClick={onWithdraw}
         >
-          {withdrawing ? 'Withdrawing…' : 'Leave waitlist'}
+          {withdrawing ? t('leaving') : t('leaveWaitlist')}
         </button>
       ) : null}
     </div>

@@ -9,6 +9,7 @@ import {
   verifyTotpEnrollment,
 } from '@/services/mfaService'
 import type { Factor } from '@supabase/supabase-js'
+import { LanguageSettings } from '@/components/i18n/LanguageSettings'
 import { AppearanceSettings } from '@/components/theme/AppearanceSettings'
 
 export function AccountSecurityPage() {
@@ -106,6 +107,10 @@ export function AccountSecurityPage() {
             {error}
           </p>
         ) : null}
+
+        <div className="mb-lg">
+          <LanguageSettings />
+        </div>
 
         <div className="mb-lg">
           <AppearanceSettings />

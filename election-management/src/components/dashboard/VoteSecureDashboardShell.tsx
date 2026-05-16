@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import '@/styles/dashboard-votesecure.css'
 import '@/styles/dashboard-votesecure-dark.css'
+import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { VoteSecureSidebar, type DashboardRole } from './VoteSecureSidebar'
 
@@ -51,6 +52,7 @@ export function VoteSecureDashboardShell({
             </div>
           ) : null}
           <div className="vs-topbar-right">
+            <LanguageSwitcher variant="compact" />
             <ThemeToggle variant="minimal" />
             {topbarExtra}
           </div>

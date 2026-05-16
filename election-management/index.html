@@ -10,6 +10,11 @@
         var dark = p === 'dark' || (!p || p === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (dark) document.documentElement.classList.add('dark');
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        var loc = localStorage.getItem('fv-locale') || 'en';
+        var rtl = loc === 'ur' || loc === 'ar';
+        document.documentElement.lang = loc;
+        document.documentElement.dir = rtl ? 'rtl' : 'ltr';
+        if (rtl) document.documentElement.classList.add('rtl');
       } catch (e) {}
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />

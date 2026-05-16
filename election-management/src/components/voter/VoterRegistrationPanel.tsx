@@ -4,7 +4,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { WaitlistStatusBanner } from '@/components/waitlist/WaitlistStatusBanner'
 import { withdrawFromElection } from '@/services/waitlistService'
 import { registerForElection } from '@/services/voterRegistrationService'
-import { waitlistUserMessage } from '@/utils/waitlistDisplay'
+import { useTranslation } from 'react-i18next'
+import { useWaitlistMessage } from '@/hooks/useWaitlistMessage'
 import type { Election } from '@/types/election'
 import type { ElectionRegistrationStats, VoterRegistration } from '@/types/voterRegistration'
 import { SecretVoterIdDisplay } from '@/components/voter/SecretVoterIdDisplay'
@@ -42,6 +43,8 @@ export function VoterRegistrationPanel({
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [withdrawing, setWithdrawing] = useState(false)
+  const { t: tWaitlist } = useTranslation('waitlist')
+  const formatWaitlist = useWaitlistMessage()
 
   const eligibility = useMemo(
     () =>
@@ -97,7 +100,7 @@ export function VoterRegistrationPanel({
       if (result.status === 'registered') {
         setMessage('You have joined this election. You can vote when polling opens and your secret voter ID is issued.')
       } else {
-        setMessage(waitlistUserMessage(result.waitlist_position))
+        setMessage(formatWaitlist(result.waitlist_position))
       }
 
       setConfirmOpen(false)
@@ -232,7 +235,7 @@ export function VoterRegistrationPanel({
               setError(null)
               void withdrawFromElection(election.id)
                 .then(() => {
-                  setMessage('You have left the waitlist.')
+                  setMessage(tWaitlist('leftWaitlist'))
                   onRegistrationChange()
                 })
                 .catch((err) =>

@@ -6,7 +6,7 @@ import { REGISTERABLE_ROLES } from '@/types/auth'
 const USERS_TABLE = 'users'
 
 const PROFILE_COLUMNS =
-  'id, email, role, approval_status, full_name, phone, organization, election_purpose, rejection_reason, theme_preference, created_at, updated_at'
+  'id, email, role, approval_status, full_name, phone, organization, election_purpose, rejection_reason, theme_preference, locale_preference, created_at, updated_at'
 
 function wrapAuthError(err: unknown): Error {
   if (err instanceof Error) {

@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ADMIN_NAV } from '@/config/adminNav'
 import { useAuth } from '@/hooks/useAuth'
 import { useAdminApproval } from '@/hooks/useAdminApproval'
 import { AdminNavIcon, ShieldBrandIcon } from '@/components/admin/layout/AdminIcons'
-import { ROLE_LABELS } from '@/types/auth'
 
 export function AdminSidebar() {
+  const { t } = useTranslation(['admin', 'common', 'dashboard', 'nav'])
   const [collapsed, setCollapsed] = useState(false)
   const { profile, signOut } = useAuth()
   const { pendingCount } = useAdminApproval(profile?.id)
@@ -22,15 +23,17 @@ export function AdminSidebar() {
         <div className="sb-icon">
           <ShieldBrandIcon />
         </div>
-        <span className="sb-name">VoteSecure</span>
-        <span className="sb-tag">Admin</span>
+        <span className="sb-name">{t('admin:brand')}</span>
+        <span className="sb-tag">{t('admin:tag')}</span>
       </div>
 
       <div className="sb-role-badge">
         <div className="sb-role-dot" />
         <div className="sb-role-text">
-          <span className="sb-role-sub">Signed in as</span>
-          <span className="sb-role-val">{profile ? ROLE_LABELS[profile.role] : 'Admin'}</span>
+          <span className="sb-role-sub">{t('dashboard:signedInAs')}</span>
+          <span className="sb-role-val">
+            {profile ? t(`common:roles.${profile.role}`) : t('admin:tag')}
+          </span>
         </div>
       </div>
 
@@ -48,14 +51,18 @@ export function AdminSidebar() {
 
         return (
           <div key={item.id}>
-            {showSection ? <div className="sb-section-label">{section}</div> : null}
+            {showSection ? (
+              <div className="sb-section-label">
+                {t(`admin:sections.${section}` as 'admin:sections.Main')}
+              </div>
+            ) : null}
             <NavLink
               to={item.path}
               end={item.id === 'dashboard'}
               className={({ isActive }) => `sb-item${isActive ? ' active' : ''}`}
             >
               <AdminNavIcon icon={item.icon} />
-              <span className="sb-label">{item.label}</span>
+              <span className="sb-label">{t(`admin:nav.${item.id}` as 'admin:nav.dashboard')}</span>
               {badge != null ? <span className="sb-badge">{badge}</span> : null}
             </NavLink>
           </div>
@@ -73,7 +80,7 @@ export function AdminSidebar() {
         }}
       >
         <AdminNavIcon icon="logout" />
-        <span className="sb-label">Logout</span>
+        <span className="sb-label">{t('nav:logout')}</span>
       </div>
 
       <div className="sb-collapse-btn" role="button" tabIndex={0} onClick={() => setCollapsed((c) => !c)}>

@@ -23,6 +23,7 @@ Run migrations **001 → 010** in Supabase SQL Editor before testing.
 | 13. Security | Done | RLS (022), ballot seals, rate limits, Turnstile CAPTCHA, Zod validation, `docs/SECURITY_SETUP.md` |
 | 14. Dashboards | Done | Admin, creator, voter dashboards |
 | 15. Deployment | Done | Vercel + `docs/DEPLOY.md` + env vars |
+| 16. Multi-language | Done | react-i18next, en/ur/ar/hi, RTL (ur/ar), switcher, `locale_preference`, `docs/I18N_SETUP.md` |
 
 ## Roles
 

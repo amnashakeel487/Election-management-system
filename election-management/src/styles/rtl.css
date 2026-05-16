@@ -1,0 +1,36 @@
+/* RTL layout helpers (Urdu, Arabic) */
+
+html.rtl {
+  direction: rtl;
+}
+
+html.rtl body {
+  text-align: right;
+}
+
+html.rtl .language-switcher__options {
+  flex-direction: row-reverse;
+}
+
+html.rtl .vs-sidebar,
+html.rtl .sidebar {
+  border-inline-end: none;
+  border-inline-start: 1px solid rgb(var(--tw-line) / 0.9);
+}
+
+html.rtl .vs-tb-search input,
+html.rtl input:not([type='checkbox']):not([type='radio']),
+html.rtl textarea,
+html.rtl select {
+  text-align: start;
+}
+
+html.rtl .material-symbols-outlined.mr-1 {
+  margin-right: 0;
+  margin-left: 0.25rem;
+}
+
+html.rtl .flex.gap-2 > * + *,
+html.rtl .flex.gap-3 > * + * {
+  /* flex gap works in RTL; mirror only where needed */
+}

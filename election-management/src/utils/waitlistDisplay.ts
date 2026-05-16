@@ -16,9 +16,13 @@ export function participantStatusLabel(status: VoterRegistrationStatus): Partici
   }
 }
 
-export function waitlistUserMessage(position: number | null | undefined): string {
+/** Use via hook in components; this is for non-React callers with explicit t. */
+export function waitlistUserMessage(
+  position: number | null | undefined,
+  t: (key: string, opts?: { position?: number }) => string,
+): string {
   if (position == null || position < 1) {
-    return 'You are on the waitlist.'
+    return t('positionUnknown')
   }
-  return `You are #${position} on the waitlist.`
+  return t('positionMessage', { position })
 }

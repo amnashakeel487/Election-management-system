@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { VoteSecureDashboardShell } from '@/components/dashboard/VoteSecureDashboardShell'
 import { SecretVoterIdDisplay } from '@/components/voter/SecretVoterIdDisplay'
@@ -9,9 +10,11 @@ import { electionDisplayStatus, userInitials } from '@/utils/dashboardDisplay'
 import { isPollingOpen } from '@/utils/electionPolling'
 import { formatTimeRemaining } from '@/utils/electionTime'
 import { maskSecretVoterId } from '@/utils/maskSecretVoterId'
-import { waitlistUserMessage } from '@/utils/waitlistDisplay'
+import { useWaitlistMessage } from '@/hooks/useWaitlistMessage'
 
 export function VoterDashboardPage() {
+  const { t } = useTranslation(['dashboard', 'common'])
+  const formatWaitlist = useWaitlistMessage()
   const { profile, session } = useAuth()
   const [registrations, setRegistrations] = useState<VoterRegistrationWithElection[]>([])
   const [loading, setLoading] = useState(true)
@@ -91,7 +94,7 @@ export function VoterDashboardPage() {
       <div className="vs-voter-id">
         <div className="vs-voter-avatar-big">{userInitials(profile?.full_name, profile?.email)}</div>
         <div className="vs-voter-info">
-          <div className="vs-voter-greeting">Welcome back,</div>
+          <div className="vs-voter-greeting">{t('dashboard:welcomeBack')}</div>
           <div className="vs-voter-name">{displayName}</div>
           <div className="vs-voter-chips">
             <div className="vs-voter-chip">Identity verified</div>
@@ -119,7 +122,7 @@ export function VoterDashboardPage() {
             </svg>
           </div>
           <div className="vs-stat-num">{registered.length}</div>
-          <div className="vs-stat-label">Joined Elections</div>
+          <div className="vs-stat-label">{t('dashboard:joinedElections')}</div>
         </div>
         <div className="vs-stat-card vs-stat-card--green">
           <div className="vs-stat-icon vs-stat-icon--green">
@@ -178,14 +181,14 @@ export function VoterDashboardPage() {
                     <div key={reg.id} className="vs-election-card vs-election-card--upcoming">
                       <div className="vs-ec-top">
                         <div className="vs-ec-title">{reg.election.title}</div>
-                        <span className="vs-ec-badge vs-ec-badge--upcoming">Waitlist</span>
+                        <span className="vs-ec-badge vs-ec-badge--upcoming">{t('dashboard:waitlistBadge')}</span>
                       </div>
                       <p className="vs-ec-meta" style={{ marginBottom: 12, fontWeight: 600 }}>
-                        {waitlistUserMessage(reg.waitlist_position)}
+                        {formatWaitlist(reg.waitlist_position)}
                       </p>
                       <div className="vs-ec-footer">
                         <Link to={`/elections/${reg.election.id}`} className="vs-btn-voted">
-                          View election
+                          {t('dashboard:viewElection')}
                         </Link>
                       </div>
                     </div>

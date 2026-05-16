@@ -24,6 +24,7 @@ export interface UserProfile {
   election_purpose: string | null
   rejection_reason: string | null
   theme_preference?: string | null
+  locale_preference?: string | null
   created_at: string
   updated_at: string
 }
