@@ -16,7 +16,7 @@ interface SearchFiltersProps {
 
 export function SearchFilters({ query, onQueryChange, statusFilter, onStatusChange }: SearchFiltersProps) {
   return (
-    <section className="border-b border-white/5 bg-surface-container-lowest/40 px-4 py-6 backdrop-blur-md sm:px-margin sm:py-8">
+    <section className="border-b border-line bg-surface-container-lowest/40 px-4 py-6 backdrop-blur-md sm:px-margin sm:py-8">
       <div className="mx-auto flex max-w-6xl flex-col gap-5">
         <div>
           <h2 className="font-headline-md text-headline-md text-on-surface sm:font-headline-lg sm:text-headline-lg">
@@ -37,7 +37,7 @@ export function SearchFilters({ query, onQueryChange, statusFilter, onStatusChan
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
             placeholder="Search by title, description, category, or ID…"
-            className="w-full rounded-xl border border-white/10 bg-surface-container py-3.5 pl-11 pr-4 text-base text-on-surface outline-none ring-primary/0 transition-[box-shadow,border-color] focus:border-primary/40 focus:ring-2 focus:ring-primary/30 sm:py-4 sm:pl-12 sm:text-body-md"
+            className="w-full rounded-xl border border-line bg-surface-container py-3.5 pl-11 pr-4 text-base text-on-surface outline-none ring-primary/0 transition-[box-shadow,border-color] focus:border-primary/40 focus:ring-2 focus:ring-primary/30 sm:py-4 sm:pl-12 sm:text-body-md"
           />
         </label>
 
@@ -60,7 +60,7 @@ export function SearchFilters({ query, onQueryChange, statusFilter, onStatusChan
                   className={
                     active
                       ? 'snap-start shrink-0 rounded-xl bg-primary px-4 py-2.5 font-label-md text-label-md font-bold text-on-primary shadow-md shadow-primary/25'
-                      : 'snap-start shrink-0 rounded-xl border border-white/10 bg-surface-container px-4 py-2.5 font-label-md text-label-md text-on-surface-variant transition-colors hover:border-primary/30 hover:text-on-surface'
+                      : 'snap-start shrink-0 rounded-xl border border-line bg-surface-container px-4 py-2.5 font-label-md text-label-md text-on-surface-variant transition-colors hover:border-primary/30 hover:text-on-surface'
                   }
                 >
                   <span className="sm:hidden">{f.short}</span>

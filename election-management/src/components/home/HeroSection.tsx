@@ -1,51 +1,72 @@
-import { Link } from 'react-router-dom'
-import { LANDING_ASSETS } from '@/constants/designAssets'
-
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden px-4 pb-10 pt-20 sm:px-margin sm:pb-16 sm:pt-24 md:pt-28">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-background to-background" />
-        <img
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.18] sm:opacity-25"
-          src={LANDING_ASSETS.heroBanner}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/80" />
-      </div>
+    <section className="relative overflow-hidden px-4 pb-12 pt-20 sm:px-margin sm:pb-16 sm:pt-24 md:pt-28">
+      {/* Deep gradient */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: 'linear-gradient(135deg, rgb(15, 35, 71) 0%, rgb(27, 58, 107) 45%, rgb(45, 27, 105) 100%)',
+        }}
+      />
 
-      <div className="relative z-10 mx-auto max-w-4xl text-center">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5">
-          <span className="material-symbols-outlined text-[18px] text-primary">public</span>
-          <span className="font-label-md text-label-md font-semibold tracking-wide text-primary">Public election hub</span>
+      {/* Floating blobs */}
+      <div
+        className="pointer-events-none absolute -left-24 top-1/4 h-72 w-72 rounded-full bg-[#6C3FC5] opacity-15 blur-3xl animate-blob"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -right-16 bottom-0 h-64 w-64 rounded-full bg-[#06B6D4] opacity-15 blur-3xl animate-blob"
+        style={{ animationDelay: '-6s' }}
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute left-1/3 top-10 h-48 w-48 rounded-full bg-tertiary opacity-[0.12] blur-2xl animate-blob"
+        style={{ animationDelay: '-12s' }}
+        aria-hidden
+      />
+
+      <div className="relative z-10 mx-auto max-w-4xl text-center animate-fade-in-up">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-on-nav/20 bg-on-nav/10 px-3 py-1.5 backdrop-blur-sm">
+          <span className="material-symbols-outlined text-[18px] text-tertiary">verified</span>
+          <span className="font-label-md text-label-md font-bold tracking-wide text-on-nav">Verified platform</span>
         </div>
-        <h1 className="mb-4 text-balance font-headline-xl text-[2rem] font-black leading-tight tracking-tight text-on-surface sm:text-5xl md:text-6xl md:leading-[1.05]">
-          Upcoming, live, and <span className="text-primary">completed</span> elections
+        <h1 className="mb-4 text-balance text-4xl font-extrabold leading-tight tracking-[-0.5px] text-on-nav sm:text-5xl md:text-6xl">
+          Upcoming, live, and completed elections
         </h1>
-        <p className="mx-auto mb-8 max-w-2xl text-pretty font-body-md text-body-md text-on-surface-variant sm:text-lg">
-          Explore open polls on FortressVote—see timing, registration, and ballot totals where released—then jump into
-          details to register or vote when eligible.
+        <p className="mx-auto mb-8 max-w-2xl text-pretty text-lg text-on-nav/75 sm:text-xl">
+          Browse public polls—see schedules, registration, and official ballot counts when released—then open details
+          to register or vote.
         </p>
-        <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center">
+        <div className="mb-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
           <a
             href="#elections-catalog"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 font-label-md font-bold text-on-primary shadow-lg shadow-primary/25 transition-transform hover:scale-[1.02] active:scale-[0.98] sm:px-8 sm:py-4"
+            className="btn-gradient-primary inline-flex items-center justify-center gap-2 px-8 py-3.5 text-base shadow-primary-glow sm:py-4"
           >
             View elections
             <span className="material-symbols-outlined text-[20px]">arrow_downward</span>
           </a>
-          <Link
-            to="/register"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-surface-container-high px-6 py-3.5 font-label-md font-bold text-on-surface transition-colors hover:border-primary/40 hover:bg-surface-container-highest sm:px-8 sm:py-4"
+          <a
+            href="#elections-catalog"
+            className="btn-ghost inline-flex items-center justify-center border-on-nav/30 bg-on-nav/5 px-8 py-3.5 text-on-nav backdrop-blur-sm hover:border-on-nav/50 hover:bg-on-nav/10 hover:text-on-nav sm:py-4"
           >
-            Create account
-          </Link>
-          <Link
-            to="/login"
-            className="inline-flex items-center justify-center rounded-xl px-4 py-3.5 font-label-md font-semibold text-primary underline-offset-4 hover:underline sm:py-4"
-          >
-            Sign in
-          </Link>
+            Search &amp; filter
+          </a>
+        </div>
+
+        {/* Trust badges — green chip style */}
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-3 sm:gap-4">
+          <span className="inline-flex items-center gap-2 rounded-full bg-status-active-bg px-3 py-1.5 font-label-sm font-semibold text-status-active-fg ring-1 ring-status-active-fg/15">
+            <span className="material-symbols-outlined text-[18px]">lock</span>
+            Encrypted ballots
+          </span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-status-active-bg px-3 py-1.5 font-label-sm font-semibold text-status-active-fg ring-1 ring-status-active-fg/15">
+            <span className="material-symbols-outlined text-[18px]">shield</span>
+            Role-based access
+          </span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-status-active-bg px-3 py-1.5 font-label-sm font-semibold text-status-active-fg ring-1 ring-status-active-fg/15">
+            <span className="material-symbols-outlined text-[18px]">visibility</span>
+            Audit-friendly
+          </span>
         </div>
       </div>
     </section>

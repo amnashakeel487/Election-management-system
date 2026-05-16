@@ -20,7 +20,7 @@ export function HomePage() {
         <HeroSection />
 
         <div id="elections-catalog" className="scroll-mt-20">
-          <div className="border-t border-white/5 bg-surface-container-low/30 px-4 py-8 sm:px-margin sm:py-10">
+          <div className="border-t border-line bg-surface-container-low/30 px-4 py-8 sm:px-margin sm:py-10">
             <div className="mx-auto max-w-6xl space-y-6">
               <StatisticsBentoGrid />
             </div>

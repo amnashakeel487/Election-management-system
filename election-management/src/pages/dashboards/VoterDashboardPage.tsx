@@ -64,7 +64,7 @@ export function VoterDashboardPage() {
               {registrations.map((reg) => (
                 <li
                   key={reg.id}
-                  className="rounded-xl border border-white/10 bg-surface-container p-4"
+                  className="rounded-xl border border-line bg-surface-container p-4"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>

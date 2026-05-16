@@ -28,8 +28,8 @@ export function PendingCreatorApprovalsTable({
   }
 
   return (
-    <div className="col-span-12 overflow-hidden rounded-[24px] border border-white/5 bg-surface-container lg:col-span-8">
-      <div className="flex items-center justify-between border-b border-white/5 p-lg">
+    <div className="col-span-12 overflow-hidden rounded-[24px] border border-line bg-surface-container lg:col-span-8">
+      <div className="flex items-center justify-between border-b border-line p-lg">
         <h3 className="font-headline-md text-headline-md text-on-surface">Pending Creator Requests</h3>
       </div>
       <div className="overflow-x-auto">
@@ -55,7 +55,7 @@ export function PendingCreatorApprovalsTable({
               requests.map((request) => {
                 const busy = actingOnId === request.id
                 return (
-                  <tr key={request.id} className="group transition-colors hover:bg-white/5">
+                  <tr key={request.id} className="group transition-colors hover:bg-elevated/40">
                     <td className="px-lg py-4 font-body-sm text-on-surface">{request.full_name ?? '—'}</td>
                     <td className="px-lg py-4 font-body-sm text-on-surface-variant">
                       <div>{request.email}</div>
@@ -100,7 +100,7 @@ export function PendingCreatorApprovalsTable({
                               type="button"
                               disabled={busy}
                               onClick={() => onReview(request)}
-                              className="rounded-lg border border-white/10 px-3 py-1.5 font-label-sm text-on-surface-variant hover:text-on-surface"
+                              className="rounded-lg border border-line px-3 py-1.5 font-label-sm text-on-surface-variant hover:text-on-surface"
                             >
                               Review
                             </button>

@@ -41,7 +41,7 @@ export function StatisticsBentoGrid() {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="flex items-center gap-4 rounded-2xl border border-white/10 bg-surface-container-low/90 px-4 py-4 sm:flex-col sm:items-start sm:px-5 sm:py-5"
+          className="flex items-center gap-4 rounded-2xl border border-line bg-surface-container-low/90 px-4 py-4 sm:flex-col sm:items-start sm:px-5 sm:py-5"
         >
           <span className={`material-symbols-outlined shrink-0 text-3xl sm:mb-1 sm:text-4xl ${stat.color}`}>{stat.icon}</span>
           <div className="min-w-0 flex-1 sm:w-full">

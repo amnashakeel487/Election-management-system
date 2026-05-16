@@ -249,7 +249,7 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
 
   return (
     <div className="space-y-gutter font-body-md">
-      <div className="flex flex-col gap-4 rounded-[24px] border border-white/5 bg-surface-container-low p-6 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-col gap-4 rounded-[24px] border border-line bg-surface-container-low p-6 md:flex-row md:items-end md:justify-between">
         <div>
           <h3 className="font-headline-md text-headline-md text-on-surface">Election</h3>
           <p className="mt-1 max-w-xl font-body-sm text-body-sm text-on-surface-variant">
@@ -284,7 +284,7 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
       ) : null}
 
       {!loadingList && elections.length === 0 ? (
-        <div className="rounded-[24px] border border-dashed border-white/15 p-12 text-center">
+        <div className="rounded-[24px] border border-dashed border-line p-12 text-center">
           <p className="font-body-md text-on-surface-variant">
             Create an election first, then return here to add candidates with photos.
           </p>
@@ -298,7 +298,7 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
       ) : null}
 
       {selectedElectionId && electionDetail ? (
-        <div className="rounded-[24px] border border-white/5 bg-surface-container-low p-6">
+        <div className="rounded-[24px] border border-line bg-surface-container-low p-6">
           <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h3 className="font-headline-md text-headline-md text-on-surface">{electionDetail.title}</h3>
@@ -329,7 +329,7 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px] border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-white/10 font-label-md text-label-sm uppercase tracking-wide text-on-surface-variant">
+                  <tr className="border-b border-line font-label-md text-label-sm uppercase tracking-wide text-on-surface-variant">
                     <th className="py-3 pr-4 font-medium">Photo</th>
                     <th className="py-3 pr-4 font-medium">Name</th>
                     <th className="py-3 pr-4 font-medium">Designation</th>
@@ -339,7 +339,7 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
                 </thead>
                 <tbody>
                   {sortedCandidates.map((c) => (
-                    <tr key={c.id} className="border-b border-white/5 last:border-none">
+                    <tr key={c.id} className="border-b border-line last:border-none">
                       <td className="py-4 pr-4 align-middle">
                         <img
                           src={candidatePortraitOrPlaceholder(c, CANDIDATE_PLACEHOLDER_IMAGES)}
@@ -380,7 +380,7 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
           )}
 
           {isDraftElection ? (
-            <div className="mt-8 flex flex-wrap gap-4 border-t border-white/10 pt-6">
+            <div className="mt-8 flex flex-wrap gap-4 border-t border-line pt-6">
               <Link
                 to={`/creator/elections/${electionDetail.id}/edit`}
                 className="inline-flex items-center gap-2 font-label-md font-bold text-primary hover:underline"
@@ -404,7 +404,7 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
           <div
             role="dialog"
             aria-labelledby="candidate-editor-title"
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-surface-container p-6 shadow-2xl"
+            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-surface-container p-6 shadow-2xl"
           >
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
@@ -417,7 +417,7 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
                 type="button"
                 onClick={closeEditor}
                 disabled={submitting}
-                className="rounded-full p-2 hover:bg-white/5"
+                className="rounded-full p-2 hover:bg-elevated/40"
               >
                 <span className="material-symbols-outlined text-on-surface-variant">close</span>
               </button>
@@ -480,7 +480,7 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
                 <button
                   type="button"
                   disabled={submitting}
-                  className="rounded-xl border border-white/15 px-5 py-3 font-label-md text-on-surface hover:bg-white/5"
+                  className="rounded-xl border border-line px-5 py-3 font-label-md text-on-surface hover:bg-elevated/40"
                   onClick={closeEditor}
                 >
                   Cancel

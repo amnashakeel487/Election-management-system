@@ -36,7 +36,7 @@ export function VoteActivityChart() {
   const max = Math.max(1, ...points.map((p) => p.count))
 
   return (
-    <div className="col-span-12 overflow-hidden rounded-[24px] border border-white/5 bg-surface-container p-lg lg:col-span-8">
+    <div className="col-span-12 overflow-hidden rounded-[24px] border border-line bg-surface-container p-lg lg:col-span-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h3 className="font-headline-md text-headline-md text-on-surface">Vote Activity Trends</h3>
@@ -53,7 +53,7 @@ export function VoteActivityChart() {
               className={
                 range === days
                   ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-label-sm text-on-primary transition-all'
-                  : 'rounded-lg border border-white/5 bg-surface-container-high px-4 py-2 font-label-sm text-label-sm transition-all hover:bg-surface-container-highest'
+                  : 'rounded-lg border border-line bg-surface-container-high px-4 py-2 font-label-sm text-label-sm transition-all hover:bg-surface-container-highest'
               }
             >
               {label}
@@ -71,10 +71,10 @@ export function VoteActivityChart() {
         <>
           <div className="relative flex h-[300px] w-full items-end justify-between gap-2 overflow-hidden px-2">
             <div className="pointer-events-none absolute inset-0 flex flex-col justify-between opacity-20">
-              <div className="h-px w-full border-t border-white/20" />
-              <div className="h-px w-full border-t border-white/20" />
-              <div className="h-px w-full border-t border-white/20" />
-              <div className="h-px w-full border-t border-white/20" />
+              <div className="h-px w-full border-t border-line" />
+              <div className="h-px w-full border-t border-line" />
+              <div className="h-px w-full border-t border-line" />
+              <div className="h-px w-full border-t border-line" />
             </div>
             {points.map((point) => (
               <div key={point.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">

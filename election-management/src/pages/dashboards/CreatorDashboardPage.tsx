@@ -92,7 +92,7 @@ export function CreatorDashboardPage() {
               <span className="material-symbols-outlined text-on-surface">notifications</span>
               <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-error" />
             </button>
-            <div className="flex items-center gap-3 border-l border-white/10 pl-4">
+            <div className="flex items-center gap-3 border-l border-line pl-4">
               <img
                 alt="User Avatar"
                 className="h-10 w-10 rounded-full border border-primary/30 object-cover"
@@ -130,7 +130,7 @@ export function CreatorDashboardPage() {
           {isApproved ? (
             <>
               <div className="grid grid-cols-1 gap-gutter md:grid-cols-4">
-                <div className="flex flex-col justify-between rounded-3xl border border-white/5 bg-surface-container p-6 shadow-sm">
+                <div className="flex flex-col justify-between rounded-3xl border border-line bg-surface-container p-6 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div className="rounded-2xl bg-primary/10 p-3">
                       <span className="material-symbols-outlined text-primary">how_to_reg</span>
@@ -142,7 +142,7 @@ export function CreatorDashboardPage() {
                     <h3 className="mt-1 font-headline-lg text-headline-lg">{elections.length}</h3>
                   </div>
                 </div>
-                <div className="flex flex-col justify-between rounded-3xl border border-white/5 bg-surface-container p-6 shadow-sm">
+                <div className="flex flex-col justify-between rounded-3xl border border-line bg-surface-container p-6 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div className="rounded-2xl bg-secondary/10 p-3">
                       <span className="material-symbols-outlined text-secondary">pending_actions</span>
@@ -153,7 +153,7 @@ export function CreatorDashboardPage() {
                     <h3 className="mt-1 font-headline-lg text-headline-lg">{draftCount}</h3>
                   </div>
                 </div>
-                <div className="flex flex-col justify-between rounded-3xl border border-white/5 bg-surface-container p-6 shadow-sm">
+                <div className="flex flex-col justify-between rounded-3xl border border-line bg-surface-container p-6 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div className="rounded-2xl bg-tertiary/10 p-3">
                       <span className="material-symbols-outlined text-tertiary">verified</span>
@@ -165,7 +165,7 @@ export function CreatorDashboardPage() {
                     <h3 className="mt-1 font-headline-lg text-headline-lg">{publishedCount}</h3>
                   </div>
                 </div>
-                <div className="flex flex-col justify-between rounded-3xl border border-white/5 bg-surface-container p-6 shadow-sm">
+                <div className="flex flex-col justify-between rounded-3xl border border-line bg-surface-container p-6 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div className="rounded-2xl bg-error/10 p-3">
                       <span className="material-symbols-outlined text-error">timer</span>
@@ -200,7 +200,7 @@ export function CreatorDashboardPage() {
                 )}
 
                 <div className="space-y-gutter">
-                  <div className="relative overflow-hidden rounded-[32px] border border-white/5 bg-surface-container p-8">
+                  <div className="relative overflow-hidden rounded-[32px] border border-line bg-surface-container p-8">
                     <div className="relative z-10">
                       <h4 className="mb-2 font-headline-md text-headline-md text-on-surface">Registration Flow</h4>
                       <p className="mb-6 font-body-sm text-body-sm text-on-surface-variant">
@@ -209,10 +209,10 @@ export function CreatorDashboardPage() {
                     </div>
                     <div className="absolute -bottom-12 -right-12 h-48 w-48 rounded-full bg-primary/10 blur-[80px]" />
                   </div>
-                  <div className="rounded-[32px] border border-white/5 bg-surface-container p-8">
+                  <div className="rounded-[32px] border border-line bg-surface-container p-8">
                     <h4 className="mb-6 font-headline-md text-headline-md text-on-surface">Security Controls</h4>
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-surface-container-high p-4">
+                      <div className="flex items-center justify-between rounded-2xl border border-line bg-surface-container-high p-4">
                         <div className="flex items-center gap-3">
                           <span className="material-symbols-outlined text-tertiary">shield</span>
                           <p className="font-label-md text-label-md text-on-surface">Encrypted Vault</p>
@@ -229,7 +229,7 @@ export function CreatorDashboardPage() {
           ) : null}
         </div>
 
-        <footer className="mt-auto flex w-full flex-col items-center justify-between border-t border-white/5 bg-surface-container-lowest px-margin py-xl md:flex-row">
+        <footer className="mt-auto flex w-full flex-col items-center justify-between border-t border-line bg-surface-container-lowest px-margin py-xl md:flex-row">
           <div className="mb-4 md:mb-0">
             <h5 className="font-label-md text-label-md font-bold text-on-surface">FortressVote</h5>
             <p className="font-body-sm text-body-sm text-on-surface-variant">

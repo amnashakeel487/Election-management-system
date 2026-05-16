@@ -1,0 +1,124 @@
+/**
+ * FortressVote — light-first theme + .dark overrides.
+ * RGB triplets for Tailwind alpha modifiers: rgb(var(--x) / <alpha-value>)
+ */
+
+:root {
+  /* Core */
+  --tw-bg: 240 244 249;
+  --tw-bg-elevated: 255 255 255;
+  --tw-fg: 15 23 42;
+  --tw-fg-muted: 71 85 105;
+  --tw-line: 226 232 240;
+  --tw-nav: 15 35 71;
+  --tw-on-nav: 255 255 255;
+
+  /* Surfaces (cards / panels) */
+  --tw-surface: 255 255 255;
+  --tw-surface-dim: 248 250 252;
+  --tw-surface-low: 241 245 249;
+  --tw-surface-high: 226 232 240;
+  --tw-surface-highest: 203 213 225;
+  --tw-surface-bright: 255 255 255;
+  --tw-surface-lowest: 240 244 249;
+  --tw-surface-variant: 226 232 240;
+  --tw-surface-container: 255 255 255;
+  --tw-surface-container-low: 248 250 252;
+  --tw-surface-container-high: 241 245 249;
+  --tw-surface-container-highest: 226 232 240;
+  --tw-surface-container-lowest: 240 244 249;
+  --tw-surface-tint: 27 58 107;
+
+  /* Brand */
+  --tw-primary: 27 58 107;
+  --tw-on-primary: 255 255 255;
+  --tw-primary-container: 36 81 163;
+  --tw-on-primary-container: 255 255 255;
+  --tw-secondary: 108 63 197;
+  --tw-on-secondary: 255 255 255;
+  --tw-tertiary: 6 182 212;
+  --tw-tertiary-dim: 8 145 178;
+  --tw-on-tertiary: 15 23 42;
+
+  /* Status pills (light) */
+  --tw-success-bg: 220 252 231;
+  --tw-success-fg: 22 163 74;
+  --tw-warning-bg: 254 249 195;
+  --tw-warning-fg: 202 138 4;
+  --tw-info-bg: 219 234 254;
+  --tw-info-fg: 37 99 235;
+  --tw-done-bg: 224 231 255;
+  --tw-done-fg: 67 56 202;
+
+  /* Error (keep readable) */
+  --tw-error: 220 38 38;
+  --tw-error-container: 254 226 226;
+  --tw-on-error: 255 255 255;
+  --tw-on-error-container: 127 29 29;
+
+  /* Outline / inverse (legacy MD3 slots) */
+  --tw-outline: 148 163 184;
+  --tw-outline-variant: 226 232 240;
+  --tw-inverse-surface: 15 35 71;
+  --tw-inverse-on-surface: 241 245 249;
+  --tw-inverse-primary: 173 198 255;
+
+  /* Shadows */
+  --tw-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  --tw-card-shadow-hover: 0 12px 40px rgba(15, 35, 71, 0.12);
+
+  /* Hero gradient stops */
+  --tw-hero-1: 15 35 71;
+  --tw-hero-2: 27 58 107;
+  --tw-hero-3: 45 27 105;
+
+  /* Blob accents */
+  --tw-blob-purple: 108 63 197;
+  --tw-blob-cyan: 6 182 212;
+}
+
+.dark {
+  --tw-bg: 15 23 42;
+  --tw-bg-elevated: 30 41 59;
+  --tw-fg: 241 245 249;
+  --tw-fg-muted: 148 163 184;
+  --tw-line: 51 65 85;
+
+  --tw-surface: 30 41 59;
+  --tw-surface-dim: 15 23 42;
+  --tw-surface-low: 30 41 59;
+  --tw-surface-high: 51 65 85;
+  --tw-surface-highest: 71 85 105;
+  --tw-surface-bright: 51 65 85;
+  --tw-surface-lowest: 15 23 42;
+  --tw-surface-variant: 51 65 85;
+  --tw-surface-container: 30 41 59;
+  --tw-surface-container-low: 30 41 59;
+  --tw-surface-container-high: 51 65 85;
+  --tw-surface-container-highest: 71 85 105;
+  --tw-surface-container-lowest: 15 23 42;
+  --tw-surface-tint: 36 81 163;
+
+  --tw-primary: 96 165 250;
+  --tw-on-primary: 15 23 42;
+  --tw-primary-container: 36 81 163;
+  --tw-on-primary-container: 241 245 249;
+  --tw-secondary: 167 139 250;
+  --tw-on-secondary: 15 23 42;
+  --tw-tertiary: 34 211 238;
+  --tw-tertiary-dim: 6 182 212;
+  --tw-on-tertiary: 15 23 42;
+
+  --tw-outline: 100 116 139;
+  --tw-outline-variant: 51 65 85;
+  --tw-inverse-surface: 241 245 249;
+  --tw-inverse-on-surface: 15 23 42;
+  --tw-inverse-primary: 27 58 107;
+
+  --tw-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  --tw-card-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.45);
+
+  --tw-hero-1: 15 23 42;
+  --tw-hero-2: 27 58 107;
+  --tw-hero-3: 45 27 105;
+}

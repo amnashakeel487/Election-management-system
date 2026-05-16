@@ -55,7 +55,7 @@ export function AdminUsersPage() {
               className={
                 filter === 'all'
                   ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-white/10 px-4 py-2 font-label-sm text-on-surface-variant'
+                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
               }
             >
               All users
@@ -66,7 +66,7 @@ export function AdminUsersPage() {
               className={
                 filter === 'pending'
                   ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-white/10 px-4 py-2 font-label-sm text-on-surface-variant'
+                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
               }
             >
               Pending creators ({pendingCount})
@@ -80,7 +80,7 @@ export function AdminUsersPage() {
           {loading ? (
             <p className="mt-6 text-on-surface-variant">Loading users…</p>
           ) : (
-            <div className="mt-6 overflow-hidden rounded-[24px] border border-white/5 bg-surface-container">
+            <div className="mt-6 overflow-hidden rounded-[24px] border border-line bg-surface-container">
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-surface-container-high/50 font-label-sm uppercase tracking-wider text-on-surface-variant">
@@ -101,7 +101,7 @@ export function AdminUsersPage() {
                     </tr>
                   ) : (
                     displayed.map((user) => (
-                      <tr key={user.id} className="hover:bg-white/5">
+                      <tr key={user.id} className="hover:bg-elevated/40">
                         <td className="px-lg py-4 text-on-surface">{user.full_name ?? '—'}</td>
                         <td className="px-lg py-4 text-on-surface-variant">{user.email}</td>
                         <td className="px-lg py-4">{ROLE_LABELS[user.role] ?? user.role}</td>

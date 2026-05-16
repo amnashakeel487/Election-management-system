@@ -1,82 +1,111 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useTheme } from '@/context/ThemeContext'
 import { useAuth } from '@/hooks/useAuth'
 import { ROLE_LABELS } from '@/types/auth'
 
 export function TopNavBar() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { session, profile, signOut, getDashboardPath, mfaRequired } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
   async function handleLogout() {
     await signOut()
     navigate('/login', { replace: true })
   }
 
+  const onLanding = location.pathname === '/'
+
   return (
-    <nav className="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b border-white/10 bg-surface/70 px-8 shadow-sm backdrop-blur-xl">
-      <div className="flex items-center gap-8">
-        <Link to="/" className="font-headline-md text-headline-md font-bold text-primary">
+    <nav className="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b border-line/80 bg-nav px-4 shadow-md backdrop-blur-md sm:px-8">
+      <div className="flex items-center gap-6 md:gap-10">
+        <Link to="/" className="font-headline-md text-headline-md font-extrabold tracking-tight text-on-nav">
           FortressVote
         </Link>
-        <div className="hidden gap-6 md:flex">
-          <a
-            className="border-b-2 border-primary pb-1 font-body-md text-body-md text-primary transition-colors"
-            href="#"
+        <div className="hidden gap-8 md:flex">
+          <Link
+            to="/#elections-catalog"
+            className={
+              onLanding
+                ? 'border-b-2 border-tertiary pb-0.5 font-body-md text-body-md font-medium text-on-nav'
+                : 'font-body-md text-body-md text-on-nav/70 transition-colors hover:text-on-nav'
+            }
           >
             Elections
-          </a>
+          </Link>
           <Link
             to="/results"
-            className="font-body-md text-body-md text-on-surface-variant transition-colors hover:text-primary"
+            className="font-body-md text-body-md text-on-nav/70 transition-colors hover:text-on-nav"
           >
             Results
           </Link>
           <a
-            className="font-body-md text-body-md text-on-surface-variant transition-colors hover:text-primary"
-            href="#"
+            className="font-body-md text-body-md text-on-nav/70 transition-colors hover:text-on-nav"
+            href="#elections-catalog"
           >
-            Resources
+            Browse
           </a>
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <button
+          type="button"
+          onClick={() => toggleTheme()}
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-on-nav/20 text-on-nav/80 transition-colors hover:border-on-nav/40 hover:bg-on-nav/10 hover:text-on-nav"
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          <span className="material-symbols-outlined text-[22px]">
+            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+          </span>
+        </button>
         {session && profile && !mfaRequired ? (
           <>
-            <span className="hidden rounded-full border border-primary/20 bg-primary/10 px-3 py-1 font-label-sm text-label-sm text-primary md:inline">
+            <span className="hidden items-center gap-2 rounded-full border border-on-nav/20 bg-on-nav/10 px-3 py-1 font-label-sm text-label-sm text-on-nav md:inline-flex">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-tertiary opacity-50" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-tertiary" />
+              </span>
               {ROLE_LABELS[profile.role]}
             </span>
             <Link
               to={getDashboardPath() ?? '/'}
-              className="hidden font-body-sm text-body-sm text-on-surface-variant hover:text-primary md:inline"
+              className="hidden font-body-sm text-body-sm text-on-nav/70 hover:text-on-nav md:inline"
             >
               Dashboard
             </Link>
             <Link
               to="/account/security"
-              className="hidden font-body-sm text-body-sm text-on-surface-variant hover:text-primary md:inline"
+              className="hidden font-body-sm text-body-sm text-on-nav/70 hover:text-on-nav md:inline"
             >
               Security
             </Link>
             <button
               type="button"
               onClick={() => void handleLogout()}
-              className="px-4 py-2 font-body-md text-body-md text-on-surface-variant transition-colors hover:text-primary"
+              className="px-3 py-2 font-body-md text-body-md text-on-nav/70 transition-colors hover:text-on-nav sm:px-4"
             >
               Logout
             </button>
           </>
         ) : (
           <>
+            <Link to="/login" className="text-sm font-semibold text-on-nav/80 hover:text-on-nav sm:hidden">
+              Login
+            </Link>
             <Link
               to="/login"
-              className="px-4 py-2 font-body-md text-body-md text-on-surface-variant transition-colors hover:text-primary"
+              className="btn-ghost hidden border-on-nav/25 py-2 text-on-nav/90 hover:border-on-nav/50 hover:bg-on-nav/10 hover:text-on-nav sm:inline-flex sm:px-4"
             >
               Login
             </Link>
             <Link
               to="/register"
-              className="rounded-full bg-primary px-6 py-2 font-body-md text-body-md text-on-primary transition-opacity hover:opacity-80"
+              className="btn-gradient-primary hidden py-2 text-sm sm:inline-flex sm:px-5"
             >
-              Sign Up
+              Sign up
+            </Link>
+            <Link to="/login" className="btn-gradient-primary py-2 text-sm sm:hidden sm:px-4">
+              Join
             </Link>
           </>
         )}

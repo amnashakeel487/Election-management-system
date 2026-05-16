@@ -535,7 +535,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-surface-container-low/50 p-5">
+              <div className="flex items-center justify-between rounded-2xl border border-line bg-surface-container-low/50 p-5">
                 <div className="flex gap-4">
                   <span className="material-symbols-outlined rounded-lg bg-secondary/10 p-2 text-secondary">
                     visibility_off
@@ -555,7 +555,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
                   <div className="peer h-6 w-11 rounded-full bg-surface-container-highest after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full peer-focus:outline-none" />
                 </label>
               </div>
-              <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-surface-container-low/50 p-5">
+              <div className="flex items-center justify-between rounded-2xl border border-line bg-surface-container-low/50 p-5">
                 <div className="flex gap-4">
                   <span className="material-symbols-outlined rounded-lg bg-tertiary/10 p-2 text-tertiary">history_edu</span>
                   <div>
@@ -666,7 +666,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
               {candidates.map((c) => (
                 <li
                   key={c.id}
-                  className="flex items-center justify-between rounded-xl border border-white/5 bg-surface-container-low p-4"
+                  className="flex items-center justify-between rounded-xl border border-line bg-surface-container-low p-4"
                 >
                   <span className="font-body-md text-body-md text-on-surface">{c.name}</span>
                   <button

@@ -30,7 +30,7 @@ export function AdminTopBar({
             </span>
           </Link>
         ) : null}
-        <div className="flex items-center gap-3 rounded-full border border-white/5 bg-surface-container-high py-1 pl-4 pr-1">
+        <div className="flex items-center gap-3 rounded-full border border-line bg-surface-container-high py-1 pl-4 pr-1">
           <span className="font-label-md text-label-md text-on-surface">{displayName}</span>
           <img
             alt="Admin profile"

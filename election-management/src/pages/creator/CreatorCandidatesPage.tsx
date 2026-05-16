@@ -19,7 +19,7 @@ export function CreatorCandidatesPage() {
             <button type="button" className="relative rounded-full p-2 transition-all hover:bg-surface-container-highest">
               <span className="material-symbols-outlined text-on-surface">notifications</span>
             </button>
-            <div className="flex items-center gap-3 border-l border-white/10 pl-4">
+            <div className="flex items-center gap-3 border-l border-line pl-4">
               <img
                 alt="User Avatar"
                 className="h-10 w-10 rounded-full border border-primary/30 object-cover"

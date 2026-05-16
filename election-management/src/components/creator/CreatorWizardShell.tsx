@@ -33,7 +33,7 @@ export function CreatorWizardShell({
 
   return (
     <div className="min-h-screen bg-background text-on-background selection:bg-primary-container selection:text-on-primary-container">
-      <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b border-white/10 bg-surface/70 px-8 shadow-sm backdrop-blur-xl">
+      <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b border-line bg-surface/95 px-8 shadow-sm backdrop-blur-xl">
         <Link to="/" className="flex items-center gap-2 font-headline-md text-headline-md font-bold text-primary">
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
             how_to_vote
@@ -200,7 +200,7 @@ export function CreatorWizardShell({
                       </div>
                     </div>
                   </div>
-                  <div className="rounded-[28px] border border-white/5 bg-surface-container-high/50 p-6">
+                  <div className="rounded-[28px] border border-line bg-surface-container-high/50 p-6">
                     <div className="mb-3 flex items-center gap-2">
                       <span className="material-symbols-outlined text-[20px] text-primary">info</span>
                       <p className="font-label-md text-label-md font-bold text-on-surface">Compliance Tip</p>
@@ -217,7 +217,7 @@ export function CreatorWizardShell({
         </div>
       </main>
 
-      <footer className="flex w-full flex-col items-center justify-between border-t border-white/5 bg-surface-container-lowest px-margin py-xl lg:ml-[280px] md:flex-row">
+      <footer className="flex w-full flex-col items-center justify-between border-t border-line bg-surface-container-lowest px-margin py-xl lg:ml-[280px] md:flex-row">
         <div className="mb-6 text-center md:mb-0 md:text-left">
           <p className="font-label-md text-label-md font-bold text-on-surface">© 2024 FortressVote Secure Systems.</p>
           <p className="mt-1 text-[10px] uppercase tracking-widest text-on-surface-variant">

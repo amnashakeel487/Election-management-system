@@ -141,7 +141,7 @@ export function ElectionParticipationCard({
 
       {!alreadyRegistered && !onWaitlist ? (
         <>
-          <label className="mb-4 flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 p-4">
+          <label className="mb-4 flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4">
             <input
               type="checkbox"
               checked={termsAccepted}
@@ -172,13 +172,13 @@ export function ElectionParticipationCard({
 
       <button
         type="button"
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-transparent py-4 font-label-md text-label-md text-on-surface transition-colors hover:bg-white/5"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-line bg-transparent py-4 font-label-md text-label-md text-on-surface transition-colors hover:bg-elevated/40"
       >
         <span className="material-symbols-outlined">description</span>
         Terms &amp; Conditions
       </button>
 
-      <div className="mt-8 border-t border-white/10 pt-8">
+      <div className="mt-8 border-t border-line pt-8">
         <div className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tertiary/10">
             <span className="material-symbols-outlined text-tertiary">timer</span>

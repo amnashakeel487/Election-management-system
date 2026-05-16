@@ -141,7 +141,7 @@ function TabButton({
       className={
         active
           ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-          : 'rounded-lg border border-white/10 px-4 py-2 font-label-sm text-on-surface-variant hover:text-on-surface'
+          : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant hover:text-on-surface'
       }
     >
       {children} ({count})
@@ -158,14 +158,14 @@ function CreatorStatusList({
 }) {
   if (creators.length === 0) {
     return (
-      <p className="rounded-[24px] border border-white/5 bg-surface-container px-lg py-8 text-center text-on-surface-variant">
+      <p className="rounded-[24px] border border-line bg-surface-container px-lg py-8 text-center text-on-surface-variant">
         No {variant} creator applications yet.
       </p>
     )
   }
 
   return (
-    <div className="overflow-hidden rounded-[24px] border border-white/5 bg-surface-container">
+    <div className="overflow-hidden rounded-[24px] border border-line bg-surface-container">
       <table className="w-full text-left">
         <thead>
           <tr className="bg-surface-container-high/50 font-label-sm uppercase tracking-wider text-on-surface-variant">
@@ -179,7 +179,7 @@ function CreatorStatusList({
         </thead>
         <tbody className="divide-y divide-white/5">
           {creators.map((c) => (
-            <tr key={c.id} className="hover:bg-white/5">
+            <tr key={c.id} className="hover:bg-elevated/40">
               <td className="px-lg py-4 text-on-surface">{c.full_name ?? '—'}</td>
               <td className="px-lg py-4 text-sm text-on-surface-variant">
                 <div>{c.email}</div>

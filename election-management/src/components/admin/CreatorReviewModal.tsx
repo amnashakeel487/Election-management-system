@@ -36,7 +36,7 @@ export function CreatorReviewModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="creator-review-title"
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[28px] border border-white/10 bg-surface-container p-lg shadow-2xl"
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[28px] border border-line bg-surface-container p-lg shadow-2xl"
       >
         <div className="mb-lg flex items-start justify-between gap-md">
           <div>
@@ -51,14 +51,14 @@ export function CreatorReviewModal({
             type="button"
             onClick={onClose}
             disabled={acting}
-            className="rounded-lg p-2 text-on-surface-variant hover:bg-white/10"
+            className="rounded-lg p-2 text-on-surface-variant hover:bg-elevated/50"
             aria-label="Close"
           >
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
 
-        <dl className="space-y-md rounded-xl border border-white/5 bg-surface-container-low p-md">
+        <dl className="space-y-md rounded-xl border border-line bg-surface-container-low p-md">
           <DetailRow label="Full name" value={request.full_name} />
           <DetailRow label="Email" value={request.email} />
           <DetailRow label="Phone" value={request.phone} />

@@ -72,7 +72,7 @@ export function AdminAuditLogsPage() {
               className={
                 actionFilter === 'all'
                   ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-white/10 px-4 py-2 font-label-sm text-on-surface-variant'
+                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
               }
             >
               All activity
@@ -83,7 +83,7 @@ export function AdminAuditLogsPage() {
               className={
                 actionFilter === 'approvals'
                   ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-white/10 px-4 py-2 font-label-sm text-on-surface-variant'
+                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
               }
             >
               Creator approvals
@@ -93,7 +93,7 @@ export function AdminAuditLogsPage() {
           {loading ? (
             <p className="text-on-surface-variant">Loading logs…</p>
           ) : (
-            <div className="overflow-hidden rounded-[24px] border border-white/5 bg-surface-container">
+            <div className="overflow-hidden rounded-[24px] border border-line bg-surface-container">
               <table className="w-full text-left text-sm">
                 <thead className="bg-surface-container-high/50 text-on-surface-variant">
                   <tr>

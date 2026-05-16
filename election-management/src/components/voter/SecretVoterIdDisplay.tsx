@@ -11,7 +11,7 @@ export function SecretVoterIdDisplay({ secretVoterId, emailed, compact }: Secret
   const [revealed, setRevealed] = useState(false)
 
   return (
-    <div className={compact ? 'mt-2' : 'mt-3 rounded-xl border border-white/10 bg-surface-container-low px-md py-3'}>
+    <div className={compact ? 'mt-2' : 'mt-3 rounded-xl border border-line bg-surface-container-low px-md py-3'}>
       <div className="flex items-center justify-between gap-2">
         <div>
           <p className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
@@ -24,7 +24,7 @@ export function SecretVoterIdDisplay({ secretVoterId, emailed, compact }: Secret
         <button
           type="button"
           onClick={() => setRevealed((v) => !v)}
-          className="rounded-lg border border-white/10 px-3 py-1.5 font-label-sm text-label-sm text-primary hover:bg-primary/10"
+          className="rounded-lg border border-line px-3 py-1.5 font-label-sm text-label-sm text-primary hover:bg-primary/10"
         >
           {revealed ? 'Hide' : 'Reveal'}
         </button>

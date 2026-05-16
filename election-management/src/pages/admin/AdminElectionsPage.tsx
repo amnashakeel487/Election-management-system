@@ -75,7 +75,7 @@ export function AdminElectionsPage() {
               className={
                 filter === 'published'
                   ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-white/10 px-4 py-2 font-label-sm text-on-surface-variant'
+                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
               }
             >
               Approved / live elections
@@ -86,7 +86,7 @@ export function AdminElectionsPage() {
               className={
                 filter === 'all'
                   ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-white/10 px-4 py-2 font-label-sm text-on-surface-variant'
+                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
               }
             >
               All elections
@@ -102,7 +102,7 @@ export function AdminElectionsPage() {
           {loading ? (
             <p className="mt-6 text-on-surface-variant">Loading elections…</p>
           ) : (
-            <div className="mt-6 overflow-hidden rounded-[24px] border border-white/5 bg-surface-container">
+            <div className="mt-6 overflow-hidden rounded-[24px] border border-line bg-surface-container">
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-surface-container-high/50 font-label-sm uppercase tracking-wider text-on-surface-variant">
@@ -122,7 +122,7 @@ export function AdminElectionsPage() {
                     </tr>
                   ) : (
                     displayed.map((election) => (
-                      <tr key={election.id} className="hover:bg-white/5">
+                      <tr key={election.id} className="hover:bg-elevated/40">
                         <td className="px-lg py-4">
                           <p className="font-label-md text-on-surface">{election.title}</p>
                           {election.category ? (
@@ -153,7 +153,7 @@ export function AdminElectionsPage() {
                           {(election.status === 'active' || election.status === 'completed') && (
                             <Link
                               to={`/elections/${election.id}/results`}
-                              className="ml-2 rounded-lg border border-white/10 px-4 py-1.5 font-label-sm text-on-surface-variant hover:text-on-surface"
+                              className="ml-2 rounded-lg border border-line px-4 py-1.5 font-label-sm text-on-surface-variant hover:text-on-surface"
                             >
                               Results
                             </Link>

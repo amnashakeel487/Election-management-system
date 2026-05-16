@@ -74,7 +74,7 @@ export function ElectionResultsPage() {
                 <span className="font-label-md text-label-md text-primary">Live updating</span>
               </div>
             ) : (
-              <span className="rounded-full border border-white/10 bg-surface-container-high px-4 py-2 font-label-md text-label-md text-on-surface-variant">
+              <span className="rounded-full border border-line bg-surface-container-high px-4 py-2 font-label-md text-label-md text-on-surface-variant">
                 {electionEnded ? 'Final results' : 'Results available'}
               </span>
             )}
@@ -123,11 +123,11 @@ export function ElectionResultsPage() {
         <div className="mt-8 flex flex-wrap gap-4">
           <Link
             to={`/elections/${results.election_id}`}
-            className="rounded-xl border border-white/10 px-lg py-md font-body-md hover:bg-surface-container"
+            className="rounded-xl border border-line px-lg py-md font-body-md hover:bg-surface-container"
           >
             Election details
           </Link>
-          <Link to="/results" className="rounded-xl border border-white/10 px-lg py-md font-body-md hover:bg-surface-container">
+          <Link to="/results" className="rounded-xl border border-line px-lg py-md font-body-md hover:bg-surface-container">
             All results
           </Link>
         </div>

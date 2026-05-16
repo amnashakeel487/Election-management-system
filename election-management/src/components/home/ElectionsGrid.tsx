@@ -102,7 +102,7 @@ export function ElectionsGrid({ query, statusFilter }: ElectionsGridProps) {
             <p className="font-body-md text-on-surface-variant">Loading elections…</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/15 py-14 text-center">
+          <div className="rounded-2xl border border-dashed border-line py-14 text-center">
             <p className="font-body-md text-on-surface-variant">No elections match your filters or search.</p>
             <p className="mt-2 font-body-sm text-on-surface-variant/80">Try &quot;All&quot; or clear the search box.</p>
           </div>

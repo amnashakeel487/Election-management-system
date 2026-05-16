@@ -9,7 +9,7 @@ interface WinnerCardProps {
 export function WinnerCard({ outcome, totalVotes, electionEnded }: WinnerCardProps) {
   if (outcome.type === 'none') {
     return (
-      <div className="glass-panel rounded-[24px] border border-white/10 p-8 text-center">
+      <div className="glass-panel rounded-[24px] border border-line p-8 text-center">
         <span className="material-symbols-outlined mb-2 text-4xl text-on-surface-variant">hourglass_empty</span>
         <p className="font-headline-md text-headline-md text-on-surface">Awaiting Votes</p>
         <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">

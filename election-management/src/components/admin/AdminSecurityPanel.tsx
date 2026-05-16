@@ -27,10 +27,10 @@ export function AdminSecurityPanel() {
   }, [])
 
   return (
-    <div className="col-span-12 h-full rounded-[24px] border border-white/5 bg-surface-container p-lg lg:col-span-4">
+    <div className="col-span-12 h-full rounded-[24px] border border-line bg-surface-container p-lg lg:col-span-4">
       <h3 className="mb-6 font-headline-md text-headline-md text-on-surface">System Status</h3>
       <div className="space-y-6">
-        <div className="flex items-center justify-between rounded-xl border border-white/5 bg-surface-container-low p-4">
+        <div className="flex items-center justify-between rounded-xl border border-line bg-surface-container-low p-4">
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-tertiary">cloud_done</span>
             <div>
@@ -44,7 +44,7 @@ export function AdminSecurityPanel() {
             className={`h-3 w-3 rounded-full ${apiOk ? 'bg-tertiary shadow-[0_0_8px_rgba(76,215,246,0.6)]' : apiOk === false ? 'bg-error' : 'bg-on-surface-variant'}`}
           />
         </div>
-        <div className="flex items-center justify-between rounded-xl border border-white/5 bg-surface-container-low p-4">
+        <div className="flex items-center justify-between rounded-xl border border-line bg-surface-container-low p-4">
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-primary">receipt_long</span>
             <div>
@@ -56,7 +56,7 @@ export function AdminSecurityPanel() {
           </div>
           <div className="h-3 w-3 rounded-full bg-primary shadow-[0_0_8px_rgba(173,198,255,0.6)]" />
         </div>
-        <div className="flex items-center justify-between rounded-xl border border-white/5 bg-surface-container-low p-4">
+        <div className="flex items-center justify-between rounded-xl border border-line bg-surface-container-low p-4">
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-on-surface-variant">how_to_vote</span>
             <div>

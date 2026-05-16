@@ -167,7 +167,7 @@ export function ElectionDetailsPage() {
                     </p>
                     <p className="font-label-sm text-label-sm text-on-surface-variant">Registered Voters</p>
                   </div>
-                  <div className="h-8 w-px bg-white/10" />
+                  <div className="h-8 w-px bg-line" />
                   <div className="text-center">
                     <p className="font-headline-md text-headline-md text-on-surface">
                       {formatTimeRemaining(election.end_date)}
@@ -191,7 +191,7 @@ export function ElectionDetailsPage() {
                 {election.candidates.map((candidate) => (
                   <div
                     key={candidate.id}
-                    className="group flex flex-col gap-4 rounded-[24px] border border-white/10 bg-surface-container p-6 transition-all hover:border-primary/40"
+                    className="group flex flex-col gap-4 rounded-[24px] border border-line bg-surface-container p-6 transition-all hover:border-primary/40"
                   >
                       <div className="flex items-start gap-4">
                       <div className="relative">
@@ -224,7 +224,7 @@ export function ElectionDetailsPage() {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-white/5 bg-surface-container-low p-8">
+            <div className="rounded-3xl border border-line bg-surface-container-low p-8">
               <h2 className="mb-4 font-headline-md text-headline-md text-on-surface">Election Overview</h2>
               <div className="space-y-4 font-body-md text-on-surface-variant">
                 <p>
@@ -254,7 +254,7 @@ export function ElectionDetailsPage() {
               onRegistrationChange={() => void loadRegistrationData()}
             />
 
-            <div className="rounded-[24px] border border-white/5 bg-surface-container p-6">
+            <div className="rounded-[24px] border border-line bg-surface-container p-6">
               <h3 className="mb-6 font-label-md text-label-md font-bold uppercase tracking-widest text-on-surface">
                 Key Milestones
               </h3>
@@ -262,7 +262,7 @@ export function ElectionDetailsPage() {
                 <div className="flex gap-4">
                   <div className="flex flex-col items-center">
                     <div className="h-3 w-3 rounded-full bg-on-surface-variant" />
-                    <div className="h-full w-[2px] bg-white/10" />
+                    <div className="h-full w-[2px] bg-line" />
                   </div>
                   <div>
                     <p className="font-label-sm text-label-sm text-on-surface-variant">
@@ -274,7 +274,7 @@ export function ElectionDetailsPage() {
                 <div className="flex gap-4">
                   <div className="flex flex-col items-center">
                     <div className="h-3 w-3 rounded-full bg-on-surface-variant" />
-                    <div className="h-full w-[2px] bg-white/10" />
+                    <div className="h-full w-[2px] bg-line" />
                   </div>
                   <div>
                     <p className="font-label-sm text-label-sm text-on-surface-variant">
@@ -293,7 +293,7 @@ export function ElectionDetailsPage() {
                         play_arrow
                       </span>
                     </div>
-                    <div className="h-full w-[2px] bg-white/10" />
+                    <div className="h-full w-[2px] bg-line" />
                   </div>
                   <div>
                     <p className="font-label-sm text-label-sm font-bold text-primary">

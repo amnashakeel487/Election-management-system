@@ -29,7 +29,7 @@ const trustFeatures = [
 
 export function TrustSection() {
   return (
-    <section className="bg-surface-container-lowest px-margin py-2xl">
+    <section className="bg-background px-4 py-16 sm:px-margin sm:py-2xl">
       <div className="grid grid-cols-1 items-center gap-2xl lg:grid-cols-2">
         <div>
           <h2 className="mb-6 font-headline-lg text-headline-lg text-on-surface">

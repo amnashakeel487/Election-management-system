@@ -126,7 +126,7 @@ export function VerifyEmailPage() {
                 <div className="h-[1px] max-w-[80px] flex-grow bg-outline-variant" />
               </div>
               <div className="grid grid-cols-1 items-stretch gap-lg md:grid-cols-2">
-                <div className="flex flex-col items-center space-y-md rounded-2xl border border-white/5 bg-surface-container-low p-lg text-center">
+                <div className="flex flex-col items-center space-y-md rounded-2xl border border-line bg-surface-container-low p-lg text-center">
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
                     Didn&apos;t receive the secure link?
                   </p>
@@ -139,7 +139,7 @@ export function VerifyEmailPage() {
                     Resend Verification
                   </button>
                 </div>
-                <div className="flex items-start space-x-md rounded-2xl border border-white/5 bg-surface-container-low p-lg text-left">
+                <div className="flex items-start space-x-md rounded-2xl border border-line bg-surface-container-low p-lg text-left">
                   <span className="material-symbols-outlined mt-1 text-[24px] text-tertiary">shield_lock</span>
                   <p className="font-label-sm text-label-sm leading-relaxed text-on-surface-variant">
                     Encryption check: AES-256 GCM verified. Connection is secure and end-to-end encrypted for your
@@ -152,7 +152,7 @@ export function VerifyEmailPage() {
         </div>
       </main>
 
-      <footer className="mx-auto w-full max-w-7xl border-t border-white/5 px-margin py-xl">
+      <footer className="mx-auto w-full max-w-7xl border-t border-line px-margin py-xl">
         <div className="flex flex-col items-center justify-between space-y-md md:flex-row md:space-y-0">
           <p className="font-body-sm text-body-sm text-outline">
             © 2024 FortressVote Secure Systems. Part of the Federal Election Infrastructure.

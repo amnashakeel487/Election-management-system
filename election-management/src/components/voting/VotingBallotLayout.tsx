@@ -71,7 +71,7 @@ export function VotingBallotLayout({
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="flex items-center gap-3 rounded-xl border border-white/5 bg-surface-container-high px-4 py-2">
+            <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-container-high px-4 py-2">
               <div className="relative flex h-3 w-3 items-center justify-center">
                 <div className="absolute h-3 w-3 animate-pulse rounded-full bg-tertiary" />
                 <div className="h-3 w-3 rounded-full bg-tertiary" />
@@ -172,7 +172,7 @@ export function VotingBallotLayout({
               </div>
             </section>
 
-            <div className="mb-8 flex items-center gap-4 rounded-2xl border border-white/5 bg-surface-container-low p-4">
+            <div className="mb-8 flex items-center gap-4 rounded-2xl border border-line bg-surface-container-low p-4">
               <span className="material-symbols-outlined text-tertiary">visibility_off</span>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
                 <strong className="text-on-surface">Anonymous Voting Notice:</strong> Your vote is stored without
@@ -191,7 +191,7 @@ export function VotingBallotLayout({
                       className={
                         selected
                           ? 'relative overflow-hidden rounded-[24px] border-2 border-primary bg-surface-container shadow-2xl shadow-primary/10'
-                          : 'group relative cursor-pointer overflow-hidden rounded-[24px] border border-white/10 bg-surface-container transition-all selection-glow hover:border-primary/50'
+                          : 'group relative cursor-pointer overflow-hidden rounded-[24px] border border-line bg-surface-container transition-all selection-glow hover:border-primary/50'
                       }
                     >
                       {selected ? (
@@ -240,7 +240,7 @@ export function VotingBallotLayout({
               </div>
             </section>
 
-            <section className="flex flex-col items-center border-t border-white/5 py-12">
+            <section className="flex flex-col items-center border-t border-line py-12">
               <p className="mb-6 max-w-md text-center font-body-md text-body-md text-on-surface-variant">
                 Once confirmed, your vote will be encrypted and submitted. This action cannot be reversed.
               </p>

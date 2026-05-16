@@ -13,7 +13,7 @@ export function AdminStatsGrid({ stats, pendingCount, loading }: AdminStatsGridP
 
   return (
     <div className="grid grid-cols-1 gap-gutter md:grid-cols-3">
-      <div className="group relative overflow-hidden rounded-[24px] border border-white/5 bg-surface-container p-lg">
+      <div className="group relative overflow-hidden rounded-[24px] border border-line bg-surface-container p-lg">
         <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/10 blur-2xl transition-all group-hover:bg-primary/20" />
         <div className="mb-4 flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -31,7 +31,7 @@ export function AdminStatsGrid({ stats, pendingCount, loading }: AdminStatsGridP
         </div>
       </div>
 
-      <div className="group relative overflow-hidden rounded-[24px] border border-white/5 bg-surface-container p-lg">
+      <div className="group relative overflow-hidden rounded-[24px] border border-line bg-surface-container p-lg">
         <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-secondary/10 blur-2xl transition-all group-hover:bg-secondary/20" />
         <div className="mb-4 flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
@@ -54,7 +54,7 @@ export function AdminStatsGrid({ stats, pendingCount, loading }: AdminStatsGridP
         </div>
       </div>
 
-      <div className="group relative overflow-hidden rounded-[24px] border border-white/5 bg-surface-container p-lg">
+      <div className="group relative overflow-hidden rounded-[24px] border border-line bg-surface-container p-lg">
         <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-tertiary/10 blur-2xl transition-all group-hover:bg-tertiary/20" />
         <div className="mb-4 flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-tertiary/10 text-tertiary">

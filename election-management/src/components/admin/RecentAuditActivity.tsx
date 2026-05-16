@@ -94,9 +94,9 @@ function getAuditPresentation(log: AuditLogEntry) {
 
 export function RecentAuditActivity({ logs }: RecentAuditActivityProps) {
   return (
-    <div className="col-span-12 rounded-[24px] border border-white/5 bg-surface-container p-lg lg:col-span-4">
+    <div className="col-span-12 rounded-[24px] border border-line bg-surface-container p-lg lg:col-span-4">
       <h3 className="mb-6 font-headline-md text-headline-md text-on-surface">Recent Activity</h3>
-      <div className="relative space-y-6 before:absolute before:bottom-2 before:left-[11px] before:top-2 before:w-[1px] before:bg-white/10">
+      <div className="relative space-y-6 before:absolute before:bottom-2 before:left-[11px] before:top-2 before:w-[1px] before:bg-elevated/50">
         {logs.length === 0 ? (
           <p className="font-body-sm text-body-sm text-on-surface-variant">No audit activity yet.</p>
         ) : (
@@ -121,7 +121,7 @@ export function RecentAuditActivity({ logs }: RecentAuditActivityProps) {
       </div>
       <Link
         to="/admin/audit-logs"
-        className="mt-8 block w-full rounded-xl border border-white/10 py-3 text-center font-label-md text-label-md text-on-surface-variant transition-all hover:bg-surface-container-high"
+        className="mt-8 block w-full rounded-xl border border-line py-3 text-center font-label-md text-label-md text-on-surface-variant transition-all hover:bg-surface-container-high"
       >
         Full Audit Trail
       </Link>
