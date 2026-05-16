@@ -223,8 +223,8 @@ export function CreatorDashboardPage() {
                               </td>
                               <td>
                                 <div className="vs-t-actions">
-                                  <Link to={`/elections/${e.id}`} className="vs-t-btn vs-t-btn--primary">
-                                    Manage
+                                  <Link to={`/creator/elections/${e.id}`} className="vs-t-btn vs-t-btn--primary">
+                                    Details
                                   </Link>
                                   {!e.voter_roll_finalized_at ? (
                                     <button
@@ -273,8 +273,8 @@ export function CreatorDashboardPage() {
                         <div className="vs-quick-lbl">Live results</div>
                       </div>
                     </div>
-                    <Link to={`/elections/${primaryLive.id}`} className="vs-panel-action" style={{ display: 'inline-block' }}>
-                      Open election hub
+                    <Link to={`/creator/elections/${primaryLive.id}`} className="vs-panel-action" style={{ display: 'inline-block' }}>
+                      Election details &amp; QR invite
                     </Link>
                   </div>
                 </div>

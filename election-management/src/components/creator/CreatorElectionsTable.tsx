@@ -155,12 +155,20 @@ export function CreatorElectionsTable({
                         </Link>
                       ) : null}
                       {election.status !== 'draft' ? (
-                        <Link
-                          to={`/elections/${election.id}/results`}
-                          className="rounded-lg border border-line px-4 py-2 font-label-md text-label-md text-on-surface hover:bg-elevated/50"
-                        >
-                          Results
-                        </Link>
+                        <>
+                          <Link
+                            to={`/creator/elections/${election.id}`}
+                            className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 font-label-md text-label-md text-primary hover:bg-primary/15"
+                          >
+                            Invite QR
+                          </Link>
+                          <Link
+                            to={`/elections/${election.id}/results`}
+                            className="rounded-lg border border-line px-4 py-2 font-label-md text-label-md text-on-surface hover:bg-elevated/50"
+                          >
+                            Results
+                          </Link>
+                        </>
                       ) : null}
                     </div>
                   </td>

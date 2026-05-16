@@ -26,7 +26,9 @@ import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage'
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
 import { AdminVotersPage } from '@/pages/admin/AdminVotersPage'
 import { CreateElectionPage } from '@/pages/creator/CreateElectionPage'
+import { CreatorElectionDetailPage } from '@/pages/creator/CreatorElectionDetailPage'
 import { EditElectionPage } from '@/pages/creator/EditElectionPage'
+import { ElectionJoinPage } from '@/pages/ElectionJoinPage'
 import { CreatorCandidatesPage } from '@/pages/creator/CreatorCandidatesPage'
 import { CreatorDashboardPage } from '@/pages/dashboards/CreatorDashboardPage'
 import { VoterDashboardPage } from '@/pages/dashboards/VoterDashboardPage'
@@ -41,6 +43,7 @@ export function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/elections/:id" element={<ElectionDetailsPage />} />
+      <Route path="/elections/:id/join" element={<ElectionJoinPage />} />
       <Route
         path="/results"
         element={
@@ -173,6 +176,16 @@ export function AppRoutes() {
           <ProtectedRoute allowedRoles={['election_creator']}>
             <CreatorApprovedRoute>
               <CreateElectionPage />
+            </CreatorApprovedRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/creator/elections/:id"
+        element={
+          <ProtectedRoute allowedRoles={['election_creator']}>
+            <CreatorApprovedRoute>
+              <CreatorElectionDetailPage />
             </CreatorApprovedRoute>
           </ProtectedRoute>
         }
