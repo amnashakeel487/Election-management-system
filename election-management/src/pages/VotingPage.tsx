@@ -163,7 +163,7 @@ export function VotingPage() {
     e.preventDefault()
     if (!electionId || !election) return
 
-    const formatError = validateSecretIdInput(secretInput)
+    const formatError = validateSecretIdInput(secretInput, election.secret_voter_id_prefix)
     if (formatError) {
       setVerifyError(formatError)
       return

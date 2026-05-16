@@ -7,7 +7,7 @@ import {
   msUntilPollingOpens,
   pollingPhaseLabel,
 } from '@/utils/electionPolling'
-import { isPlausibleSecretVoterId } from '@/utils/secretVoterId'
+import { formatSecretVoterId, isPlausibleSecretVoterId, normalizeSecretVoterIdPrefix } from '@/utils/secretVoterId'
 
 export type VotingCheckId =
   | 'signed_in'
@@ -114,9 +114,12 @@ export function buildVotingEligibilityDetail(
   }
 }
 
-export function validateSecretIdInput(value: string): string | null {
+export function validateSecretIdInput(value: string, pollPrefix?: string | null): string | null {
   const trimmed = value.trim()
   if (!trimmed) return 'Enter your Secret Voter ID'
-  if (!isPlausibleSecretVoterId(trimmed)) return 'Format should be like POLL-A-0001'
+  if (!isPlausibleSecretVoterId(trimmed)) {
+    const example = formatSecretVoterId(normalizeSecretVoterIdPrefix(pollPrefix ?? 'POLL-A'), 1)
+    return `Format should be like ${example} (prefix, then four digits)`
+  }
   return null
 }

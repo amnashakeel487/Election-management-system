@@ -35,8 +35,13 @@ export function exampleSecretVoterIds(prefix: string): { first: string; masked: 
   }
 }
 
-/** Loose validation for ballot entry */
+/**
+ * Loose validation for ballot entry.
+ * Must match format_secret_voter_id / formatSecretVoterId: e.g. POLL-A-0001
+ * (prefix may contain hyphens; sequence is always -####).
+ */
 export function isPlausibleSecretVoterId(value: string): boolean {
   const v = value.trim()
-  return /^[A-Za-z0-9]+-[0-9]{4}$/.test(v) && v.length >= 6 && v.length <= 32
+  if (v.length < 6 || v.length > 32) return false
+  return /^[A-Za-z0-9][A-Za-z0-9-]*-\d{4}$/.test(v)
 }
