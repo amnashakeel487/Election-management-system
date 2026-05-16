@@ -14,6 +14,7 @@ interface ElectionParticipationCardProps {
   voterRollFinalized?: boolean
   canCastVote?: boolean
   onRegistrationChange: () => void
+  className?: string
 }
 
 export function ElectionParticipationCard({
@@ -24,6 +25,7 @@ export function ElectionParticipationCard({
   voterRollFinalized,
   canCastVote,
   onRegistrationChange,
+  className = '',
 }: ElectionParticipationCardProps) {
   const navigate = useNavigate()
   const { session } = useAuth()
@@ -77,7 +79,7 @@ export function ElectionParticipationCard({
   const onWaitlist = userRegistration?.status === 'waitlisted'
 
   return (
-    <div className="glass rounded-[32px] border-primary/20 p-8">
+    <div className={`glass rounded-[32px] border-primary/20 p-8 ${className}`.trim()}>
       <div className="mb-8 text-center">
         <h3 className="mb-2 font-headline-md text-headline-md text-on-surface">Ready to Vote?</h3>
         <p className="font-body-sm text-body-sm text-on-surface-variant">

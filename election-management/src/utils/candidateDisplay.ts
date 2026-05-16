@@ -1,5 +1,21 @@
 import type { Candidate } from '@/types/election'
 
+export function candidatePhotoUrl(photoUrl?: string | null): string | null {
+  const u = photoUrl?.trim()
+  return u || null
+}
+
+/** First letter for avatar fallback (supports multi-word names). */
+export function candidateInitial(name: string): string {
+  const trimmed = name.trim()
+  if (!trimmed) return '?'
+  const parts = trimmed.split(/\s+/).filter(Boolean)
+  if (parts.length >= 2) {
+    return `${parts[0]!.charAt(0)}${parts[1]!.charAt(0)}`.toUpperCase()
+  }
+  return trimmed.charAt(0).toUpperCase()
+}
+
 /** Deterministic index so the same candidate picks the same fallback art across views. */
 export function stablePlaceholderIndex(id: string, length: number): number {
   if (length <= 0) return 0
