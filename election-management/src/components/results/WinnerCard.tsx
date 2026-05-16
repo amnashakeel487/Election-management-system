@@ -4,9 +4,10 @@ interface WinnerCardProps {
   outcome: WinnerOutcome
   totalVotes: number
   electionEnded: boolean
+  resultsLocked?: boolean
 }
 
-export function WinnerCard({ outcome, totalVotes, electionEnded }: WinnerCardProps) {
+export function WinnerCard({ outcome, totalVotes, electionEnded, resultsLocked }: WinnerCardProps) {
   if (outcome.type === 'none') {
     return (
       <div className="glass-panel rounded-[24px] border border-line p-8 text-center">
@@ -48,7 +49,7 @@ export function WinnerCard({ outcome, totalVotes, electionEnded }: WinnerCardPro
         </span>
         <div>
           <p className="font-label-md text-label-md uppercase tracking-widest text-tertiary">
-            {electionEnded ? 'Certified Winner' : 'Current Leader'}
+            {resultsLocked ? 'Declared Winner' : electionEnded ? 'Certified Winner' : 'Current Leader'}
           </p>
           <h3 className="mt-1 font-headline-lg text-headline-lg text-on-surface">{outcome.candidate.name}</h3>
           <p className="mt-2 font-body-md text-body-md text-on-surface-variant">

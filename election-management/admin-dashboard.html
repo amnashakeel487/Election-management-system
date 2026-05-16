@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VoteSecure — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0F2347;--navy2:#1B3A6B;--blue:#2451A3;--purple:#6C3FC5;
+  --cyan:#06B6D4;--success:#10B981;--danger:#EF4444;--warning:#F59E0B;
+  --info:#3B82F6;--text:#0F172A;--muted:#475569;--subtle:#94A3B8;
+  --border:#E2E8F0;--bg:#F0F4F9;--card:#FFFFFF;--sidebar:#0A1628;
+  --sidebar2:#0F2347;--sidebar-border:rgba(255,255,255,0.06);
+}
+html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:230px;flex-shrink:0;background:var(--sidebar);
+  display:flex;flex-direction:column;height:100vh;overflow-y:auto;overflow-x:hidden;
+  border-right:1px solid var(--sidebar-border);
+  transition:width 0.3s cubic-bezier(0.4,0,0.2,1);
+  position:relative;z-index:50;
+}
+.sidebar.collapsed{width:62px;}
+.sidebar::-webkit-scrollbar{width:0;}
+
+.sb-brand{
+  display:flex;align-items:center;gap:10px;padding:20px 16px 18px;
+  border-bottom:1px solid var(--sidebar-border);flex-shrink:0;
+}
+.sb-icon{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,#2451A3,#6C3FC5);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(108,63,197,0.4);
+}
+.sb-icon svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.sb-name{font-size:15px;font-weight:800;color:#fff;white-space:nowrap;letter-spacing:-0.3px;}
+.sb-tag{font-size:8px;font-weight:700;color:var(--cyan);background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.25);border-radius:20px;padding:1px 7px;white-space:nowrap;}
+.collapsed .sb-name,.collapsed .sb-tag{display:none;}
+
+.sb-role-badge{
+  margin:12px 10px;padding:9px 12px;border-radius:10px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;gap:8px;
+}
+.collapsed .sb-role-badge{padding:9px;justify-content:center;}
+.sb-role-dot{width:7px;height:7px;border-radius:50%;background:#EF4444;flex-shrink:0;animation:rolePulse 2s infinite;}
+@keyframes rolePulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.sb-role-text{display:flex;flex-direction:column;}
+.sb-role-sub{font-size:9px;color:rgba(255,255,255,0.35);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.sb-role-val{font-size:11px;color:#fff;font-weight:700;}
+.collapsed .sb-role-text{display:none;}
+
+.sb-section-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.25);padding:16px 16px 6px;white-space:nowrap;}
+.collapsed .sb-section-label{padding:10px 0;text-align:center;letter-spacing:0;font-size:8px;color:rgba(255,255,255,0.15);}
+
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;margin:1px 8px;
+  border-radius:9px;cursor:pointer;transition:all 0.2s;position:relative;
+  color:rgba(255,255,255,0.5);font-size:13px;font-weight:500;white-space:nowrap;
+}
+.collapsed .sb-item{padding:9px;margin:1px 6px;justify-content:center;}
+.sb-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85);}
+.sb-item.active{background:linear-gradient(135deg,rgba(36,81,163,0.7),rgba(108,63,197,0.5));color:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.25);}
+.sb-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.sb-label{flex:1;}
+.collapsed .sb-label{display:none;}
+.sb-badge{font-size:9px;font-weight:700;background:#EF4444;color:#fff;padding:1px 6px;border-radius:10px;min-width:16px;text-align:center;}
+.collapsed .sb-badge{position:absolute;top:4px;right:4px;font-size:8px;padding:1px 4px;}
+
+.sb-collapse-btn{
+  display:flex;align-items:center;justify-content:flex-end;padding:10px 14px;
+  cursor:pointer;color:rgba(255,255,255,0.25);transition:color 0.2s;border-top:1px solid var(--sidebar-border);
+  margin-top:auto;flex-shrink:0;
+}
+.collapsed .sb-collapse-btn{justify-content:center;}
+.sb-collapse-btn:hover{color:rgba(255,255,255,0.6);}
+.sb-collapse-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.3s;}
+.collapsed .sb-collapse-btn svg{transform:rotate(180deg);}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+/* ── TOPBAR ── */
+.topbar{
+  height:58px;background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:14px;flex-shrink:0;
+  position:sticky;top:0;z-index:40;
+}
+.topbar-title{font-size:15px;font-weight:700;color:var(--text);flex:1;}
+.topbar-subtitle{font-size:11px;color:var(--subtle);font-weight:400;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.topbar-search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;min-width:200px;transition:all 0.2s;}
+.topbar-search:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,81,163,0.1);}
+.topbar-search svg{width:14px;height:14px;stroke:var(--subtle);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.topbar-search input{border:none;outline:none;background:transparent;font-family:'Sora',sans-serif;font-size:12px;color:var(--text);width:100%;}
+.topbar-search input::placeholder{color:var(--subtle);}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;position:relative;color:var(--muted);}
+.icon-btn:hover{background:var(--bg);border-color:var(--blue);color:var(--blue);}
+.icon-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.icon-btn .notif-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:#EF4444;border:2px solid #fff;}
+.avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1B3A6B,#6C3FC5);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:24px;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-track{background:transparent;}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:24px;}
+.page-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:4px;}
+.page-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
+.page-subtitle{font-size:13px;color:var(--subtle);margin-top:3px;}
+
+/* ── CARDS ── */
+.card{background:var(--card);border-radius:14px;border:1px solid var(--border);}
+.card-elevated{background:var(--card);border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,0.05);border:1px solid var(--border);}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:14px;font-weight:700;color:var(--text);}
+.card-subtitle{font-size:11px;color:var(--subtle);margin-top:2px;}
+.card-body{padding:20px;}
+
+/* ── STAT CARDS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:20px;}
+.stat-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:18px;transition:all 0.3s;cursor:default;}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.08);}
+.stat-icon-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.stat-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.stat-delta{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.delta-up{background:#DCFCE7;color:#16A34A;}
+.delta-down{background:#FEE2E2;color:#DC2626;}
+.delta-neutral{background:#F1F5F9;color:#64748B;}
+.stat-num{font-size:26px;font-weight:800;color:var(--text);line-height:1;font-family:'IBM Plex Mono',monospace;letter-spacing:-1px;}
+.stat-label{font-size:11px;color:var(--subtle);margin-top:4px;font-weight:500;}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.4px;}
+.badge-active{background:#DCFCE7;color:#16A34A;}
+.badge-upcoming{background:#DBEAFE;color:#2563EB;}
+.badge-completed{background:#EDE9FE;color:#6D28D9;}
+.badge-pending{background:#FEF9C3;color:#CA8A04;}
+.badge-suspended{background:#FEE2E2;color:#DC2626;}
+.badge-approved{background:#DCFCE7;color:#16A34A;}
+.badge-rejected{background:#FEE2E2;color:#DC2626;}
+.badge-blocked{background:#FEE2E2;color:#DC2626;}
+.badge-admin{background:#EDE9FE;color:#6D28D9;}
+.badge-creator{background:#FEF9C3;color:#B45309;}
+.badge-voter{background:#DBEAFE;color:#2563EB;}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.badge-live{background:#DCFCE7;color:#16A34A;animation:badgePulse 2s infinite;}
+@keyframes badgePulse{0%,100%{opacity:1;}50%{opacity:0.7;}}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 16px;border-radius:9px;border:none;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.25s;}
+.btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.btn-primary{background:linear-gradient(135deg,#1B3A6B,#6C3FC5);color:#fff;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(27,58,107,0.35);}
+.btn-success{background:linear-gradient(135deg,#10B981,#059669);color:#fff;}
+.btn-success:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(16,185,129,0.35);}
+.btn-danger{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;}
+.btn-danger:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(239,68,68,0.35);}
+.btn-warning{background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;}
+.btn-warning:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(245,158,11,0.35);}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{background:var(--bg);border-color:var(--blue);color:var(--blue);}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:7px;}
+.btn-xs{padding:4px 10px;font-size:10px;border-radius:6px;}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;background:var(--card);}
+thead tr{border-bottom:1.5px solid var(--border);}
+th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:0.6px;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#F8FAFC;}
+td{padding:11px 14px;font-size:12px;color:var(--text);}
+td.mono{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blue);}
+td.muted{color:var(--subtle);}
+.td-actions{display:flex;gap:6px;align-items:center;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:2px;background:var(--bg);border-radius:10px;padding:3px;width:fit-content;margin-bottom:18px;}
+.tab-btn{padding:7px 16px;border-radius:8px;border:none;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--subtle);}
+.tab-btn.active{background:var(--card);color:var(--navy2);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.tab-btn:hover:not(.active){color:var(--text);}
+
+/* ── FORM ── */
+.form-group{margin-bottom:16px;}
+.form-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:6px;display:block;}
+.form-input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);background:var(--card);outline:none;transition:all 0.2s;}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,81,163,0.1);}
+.form-input::placeholder{color:#CBD5E1;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");background-position:right 10px center;background-repeat:no-repeat;background-size:14px;padding-right:32px;}
+
+/* ── PROGRESS ── */
+.progress-wrap{height:8px;background:var(--border);border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(0.4,0,0.2,1);}
+
+/* ── MINI CHART ── */
+.mini-chart{display:flex;align-items:flex-end;gap:4px;height:60px;}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;transition:height 0.8s ease;}
+.chart-label{font-size:9px;color:var(--subtle);}
+
+/* ── TIMELINE ── */
+.timeline{padding:0 0 0 20px;position:relative;}
+.timeline::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:1.5px;background:linear-gradient(to bottom,var(--blue),var(--border));}
+.tl-item{position:relative;padding:0 0 18px 20px;}
+.tl-dot{position:absolute;left:-20px;top:3px;width:14px;height:14px;border-radius:50%;border:2px solid var(--card);display:flex;align-items:center;justify-content:center;}
+.tl-dot-inner{width:6px;height:6px;border-radius:50%;}
+.tl-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.tl-sub{font-size:11px;color:var(--subtle);line-height:1.5;}
+.tl-time{font-size:10px;color:var(--subtle);font-family:'IBM Plex Mono',monospace;margin-top:3px;}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;animation:fadeIn 0.2s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--card);border-radius:18px;padding:28px;width:92%;max-width:500px;box-shadow:0 32px 80px rgba(0,0,0,0.25);animation:modalUp 0.3s cubic-bezier(0.4,0,0.2,1);}
+@keyframes modalUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-0.3px;}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--subtle);padding:2px;}
+.modal-close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.modal-footer{display:flex;gap:10px;margin-top:22px;justify-content:flex-end;}
+
+/* ── SECURITY CARD ── */
+.security-metric{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:16px;display:flex;align-items:center;gap:14px;}
+.sec-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sec-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── NOTIF ITEM ── */
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);}
+.notif-item:last-child{border-bottom:none;}
+.notif-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.notif-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.notif-title{font-size:12px;font-weight:700;color:var(--text);}
+.notif-sub{font-size:11px;color:var(--subtle);margin-top:2px;line-height:1.5;}
+.notif-time{font-size:10px;color:var(--subtle);font-family:'IBM Plex Mono',monospace;white-space:nowrap;margin-left:auto;}
+.notif-unread{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:5px;}
+
+/* ── GRID LAYOUTS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-7-3{display:grid;grid-template-columns:1.8fr 1fr;gap:16px;}
+
+/* ── USER CARD ── */
+.user-row{display:flex;align-items:center;gap:10px;}
+.user-avatar{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.user-name{font-size:12px;font-weight:700;color:var(--text);}
+.user-email{font-size:10px;color:var(--subtle);}
+
+/* ── DONUT SVG ── */
+.donut-wrap{display:flex;align-items:center;gap:20px;}
+.donut-legend{display:flex;flex-direction:column;gap:8px;}
+.legend-item{display:flex;align-items:center;gap:8px;}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.legend-label{font-size:11px;color:var(--muted);}
+.legend-val{font-size:11px;font-weight:700;color:var(--text);font-family:'IBM Plex Mono',monospace;margin-left:auto;}
+
+/* ── LINE CHART MOCK ── */
+.line-chart-wrap{position:relative;height:120px;}
+.line-chart-wrap svg{width:100%;height:100%;}
+
+/* ── ALERTS ── */
+.alert{padding:12px 16px;border-radius:10px;font-size:12px;display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+.alert svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:1px;}
+.alert-danger{background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;}
+.alert-warning{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;}
+.alert-info{background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;}
+.alert-success{background:#F0FDF4;border:1px solid #BBF7D0;color:#166534;}
+
+/* ── TOGGLE ── */
+.toggle-wrap{display:flex;align-items:center;gap:10px;}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;cursor:pointer;transition:background 0.25s;flex-shrink:0;}
+.toggle.on{background:var(--success);}
+.toggle-thumb{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:transform 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.toggle.on .toggle-thumb{transform:translateX(18px);}
+.toggle-label{font-size:12px;font-weight:600;color:var(--text);}
+.toggle-sub{font-size:11px;color:var(--subtle);}
+
+/* ── PAGE TRANSITIONS ── */
+.page{display:none;animation:pageIn 0.3s ease;}
+.page.active{display:block;}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── RANGE INPUT ── */
+input[type=range]{width:100%;accent-color:var(--blue);}
+
+/* ── SCROLLBAR ── */
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-track{background:transparent;}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{position:fixed;z-index:100;height:100%;transform:translateX(-100%);transition:transform 0.3s;}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .grid-2,.grid-3,.grid-7-3,.form-row{grid-template-columns:1fr;}
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .topbar-search{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <span class="sb-name">VoteSecure</span>
+    <span class="sb-tag">Admin</span>
+  </div>
+
+  <div class="sb-role-badge">
+    <div class="sb-role-dot"></div>
+    <div class="sb-role-text">
+      <span class="sb-role-sub">Signed in as</span>
+      <span class="sb-role-val">Super Admin</span>
+    </div>
+  </div>
+
+  <div class="sb-section-label">Main</div>
+  <div class="sb-item active" onclick="nav('dashboard',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    <span class="sb-label">Dashboard</span>
+  </div>
+  <div class="sb-item" onclick="nav('requests',this)">
+    <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+    <span class="sb-label">Creator Requests</span>
+    <span class="sb-badge">3</span>
+  </div>
+  <div class="sb-item" onclick="nav('elections',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span class="sb-label">Elections</span>
+  </div>
+
+  <div class="sb-section-label">Users</div>
+  <div class="sb-item" onclick="nav('users',this)">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span class="sb-label">Users</span>
+  </div>
+  <div class="sb-item" onclick="nav('voters',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+    <span class="sb-label">Voters</span>
+  </div>
+
+  <div class="sb-section-label">Monitoring</div>
+  <div class="sb-item" onclick="nav('audit',this)">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <span class="sb-label">Audit Logs</span>
+  </div>
+  <div class="sb-item" onclick="nav('reports',this)">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span class="sb-label">Reports & Exports</span>
+  </div>
+  <div class="sb-item" onclick="nav('notifications',this)">
+    <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="sb-label">Notifications</span>
+    <span class="sb-badge">5</span>
+  </div>
+  <div class="sb-item" onclick="nav('security',this)">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <span class="sb-label">Security Center</span>
+  </div>
+
+  <div class="sb-section-label">Account</div>
+  <div class="sb-item" onclick="nav('settings',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span class="sb-label">Settings</span>
+  </div>
+  <div class="sb-item" onclick="nav('profile',this)">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="sb-label">Profile</span>
+  </div>
+  <div class="sb-item" style="color:rgba(239,68,68,0.7);" onclick="alert('Logging out…')">
+    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    <span class="sb-label">Logout</span>
+  </div>
+
+  <div class="sb-collapse-btn" onclick="toggleSidebar()">
+    <svg id="collapseIcon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;flex-direction:column;flex:1;">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-subtitle" id="topbarSub">Welcome back, Admin · Saturday May 16, 2026</div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search anything…"/>
+      </div>
+      <div class="icon-btn" onclick="nav('notifications',document.querySelector('[onclick*=notifications]'))">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+      <div class="avatar" onclick="nav('profile',document.querySelector('[onclick*=profile]'))">SA</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ══ PAGE: DASHBOARD ══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-eyebrow">Overview</div>
+        <div class="page-title">Admin Dashboard</div>
+        <div class="page-subtitle">Platform-wide overview and key metrics at a glance</div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+            <span class="stat-delta delta-up">+12%</span>
+          </div>
+          <div class="stat-num">84,291</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:#F5F3FF;color:#6C3FC5;"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div>
+            <span class="stat-delta delta-up">+8%</span>
+          </div>
+          <div class="stat-num">4,210</div>
+          <div class="stat-label">Election Creators</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:#ECFDF5;color:#10B981;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <span class="stat-delta delta-up">+38%</span>
+          </div>
+          <div class="stat-num">78,420</div>
+          <div class="stat-label">Registered Voters</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:#EFF6FF;color:#3B82F6;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <span class="stat-delta delta-up">+4</span>
+          </div>
+          <div class="stat-num">47</div>
+          <div class="stat-label">Total Elections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <span class="stat-delta delta-up">+2</span>
+          </div>
+          <div class="stat-num">12</div>
+          <div class="stat-label">Active Elections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <span class="stat-delta delta-neutral">0</span>
+          </div>
+          <div class="stat-num">3</div>
+          <div class="stat-label">Pending Approvals</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:#ECFDF5;color:#10B981;"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <span class="stat-delta delta-up">99.9%</span>
+          </div>
+          <div class="stat-num">48.6M</div>
+          <div class="stat-label">Votes Cast (All Time)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:#FEF2F2;color:#EF4444;"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <span class="stat-delta delta-down">+1</span>
+          </div>
+          <div class="stat-num">3</div>
+          <div class="stat-label">Security Alerts</div>
+        </div>
+      </div>
+
+      <div class="grid-7-3" style="margin-bottom:16px;">
+        <!-- Vote Analytics Chart -->
+        <div class="card-elevated">
+          <div class="card-header">
+            <div><div class="card-title">Vote Analytics</div><div class="card-subtitle">Monthly votes cast platform-wide</div></div>
+            <span class="badge badge-live"><span class="badge-dot"></span>Live</span>
+          </div>
+          <div class="card-body">
+            <div class="mini-chart">
+              <div class="chart-col"><div class="chart-bar" style="height:35%;background:#DBEAFE;border-radius:4px 4px 0 0;"></div><div class="chart-label">Jan</div></div>
+              <div class="chart-col"><div class="chart-bar" style="height:55%;background:#BFDBFE;"></div><div class="chart-label">Feb</div></div>
+              <div class="chart-col"><div class="chart-bar" style="height:42%;background:#93C5FD;"></div><div class="chart-label">Mar</div></div>
+              <div class="chart-col"><div class="chart-bar" style="height:70%;background:#60A5FA;"></div><div class="chart-label">Apr</div></div>
+              <div class="chart-col"><div class="chart-bar" style="height:58%;background:#3B82F6;"></div><div class="chart-label">May</div></div>
+              <div class="chart-col"><div class="chart-bar" style="height:85%;background:#2563EB;"></div><div class="chart-label">Jun</div></div>
+              <div class="chart-col"><div class="chart-bar" style="height:74%;background:#1D4ED8;"></div><div class="chart-label">Jul</div></div>
+              <div class="chart-col"><div class="chart-bar" style="height:92%;background:#1E40AF;"></div><div class="chart-label">Aug</div></div>
+              <div class="chart-col"><div class="chart-bar" style="height:80%;background:#1E3A8A;"></div><div class="chart-label">Sep</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+              <div style="font-size:11px;color:var(--subtle);">Total this period: <span style="font-weight:700;color:var(--text);font-family:'IBM Plex Mono',monospace;">2,847,221</span></div>
+              <div style="font-size:11px;color:var(--success);font-weight:600;">↑ 24.3% vs last year</div>
+            </div>
+          </div>
+        </div>
+        <!-- User Distribution -->
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">User Distribution</div></div>
+          <div class="card-body">
+            <div class="donut-wrap">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#E2E8F0" stroke-width="12"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#1B3A6B" stroke-width="12" stroke-dasharray="138 82" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#6C3FC5" stroke-width="12" stroke-dasharray="33 187" stroke-dashoffset="-138" transform="rotate(-90 50 50)"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#06B6D4" stroke-width="12" stroke-dasharray="10 210" stroke-dashoffset="-171" transform="rotate(-90 50 50)"/>
+                <text x="50" y="54" text-anchor="middle" font-size="11" font-weight="800" fill="#0F172A" font-family="IBM Plex Mono">84K</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#1B3A6B;"></div><span class="legend-label">Voters</span><span class="legend-val" style="margin-left:12px;">78,420</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#6C3FC5;"></div><span class="legend-label">Creators</span><span class="legend-val" style="margin-left:12px;">4,210</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#06B6D4;"></div><span class="legend-label">Admins</span><span class="legend-val" style="margin-left:12px;">1,661</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-7-3">
+        <!-- Recent Activity -->
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Recent Activity</div><div class="card-subtitle">Latest system events</div></div>
+          <div class="card-body" style="padding:16px 20px;">
+            <div class="timeline">
+              <div class="tl-item"><div class="tl-dot" style="background:#EFF4FF;"><div class="tl-dot-inner" style="background:#2451A3;"></div></div><div class="tl-title">Election E001 approved</div><div class="tl-sub">Student Union Election approved by Admin-001</div><div class="tl-time">14:32:01 today</div></div>
+              <div class="tl-item"><div class="tl-dot" style="background:#DCFCE7;"><div class="tl-dot-inner" style="background:#10B981;"></div></div><div class="tl-title">28,140 votes recorded</div><div class="tl-sub">Live tally update — National Student Union Election</div><div class="tl-time">13:45:22 today</div></div>
+              <div class="tl-item"><div class="tl-dot" style="background:#FEF9C3;"><div class="tl-dot-inner" style="background:#CA8A04;"></div></div><div class="tl-title">New creator request</div><div class="tl-sub">City Admin Office submitted REQ-042</div><div class="tl-time">11:18:00 today</div></div>
+              <div class="tl-item"><div class="tl-dot" style="background:#FEF2F2;"><div class="tl-dot-inner" style="background:#EF4444;"></div></div><div class="tl-title">Failed login detected</div><div class="tl-sub">Suspicious IP 45.33.32.*** — 5 attempts</div><div class="tl-time">02:13:55 today</div></div>
+              <div class="tl-item" style="padding-bottom:0;"><div class="tl-dot" style="background:#F5F3FF;"><div class="tl-dot-inner" style="background:#6C3FC5;"></div></div><div class="tl-title">Voter VOT-***-4402 registered</div><div class="tl-sub">Joined National Student Union Election</div><div class="tl-time">Yesterday 22:04</div></div>
+            </div>
+          </div>
+        </div>
+        <!-- Creator Requests -->
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Pending Requests</div></div>
+          <div class="card-body" style="padding:12px 16px;">
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px;">
+                <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:4px;">REQ-041</div>
+                <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Engineering Faculty Election</div>
+                <div style="font-size:10px;color:var(--subtle);margin-bottom:8px;">Prof. Maria Chen · 1,240 voters</div>
+                <div style="display:flex;gap:6px;"><button class="btn btn-success btn-xs">Approve</button><button class="btn btn-danger btn-xs">Reject</button></div>
+              </div>
+              <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px;">
+                <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:4px;">REQ-042</div>
+                <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Urban District Council Vote</div>
+                <div style="font-size:10px;color:var(--subtle);margin-bottom:8px;">City Admin Office · 45,000 voters</div>
+                <div style="display:flex;gap:6px;"><button class="btn btn-success btn-xs">Approve</button><button class="btn btn-danger btn-xs">Reject</button></div>
+              </div>
+              <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px;">
+                <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:4px;">REQ-043</div>
+                <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Healthcare Workers Union</div>
+                <div style="font-size:10px;color:var(--subtle);margin-bottom:8px;">Union HQ · 8,900 voters</div>
+                <div style="display:flex;gap:6px;"><button class="btn btn-success btn-xs">Approve</button><button class="btn btn-danger btn-xs">Reject</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: CREATOR REQUESTS ══ -->
+    <div class="page" id="page-requests">
+      <div class="page-header"><div class="page-eyebrow">Management</div><div class="page-title">Creator Requests</div><div class="page-subtitle">Review and manage election creator applications</div></div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'req')">Pending <span style="background:#FEF9C3;color:#CA8A04;font-size:9px;padding:1px 6px;border-radius:10px;margin-left:4px;">3</span></button>
+        <button class="tab-btn" onclick="switchTab(this,'req')">Approved</button>
+        <button class="tab-btn" onclick="switchTab(this,'req')">Rejected</button>
+        <button class="tab-btn" onclick="switchTab(this,'req')">Suspended</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Request ID</th><th>Organisation</th><th>Contact</th><th>Elections Planned</th><th>Expected Voters</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">REQ-041</td><td><div class="user-row"><div class="user-avatar" style="background:#2451A3;">EF</div><div><div class="user-name">Eng. Faculty Senate</div><div class="user-email">University of Tech</div></div></div></td><td class="muted">Prof. Maria Chen</td><td class="muted" style="text-align:center;">3</td><td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;">1,240</span></td><td class="muted">Oct 12, 2025</td><td><span class="badge badge-pending">Pending</span></td><td><div class="td-actions"><button class="btn btn-success btn-xs" onclick="openModal('approveModal')">Approve</button><button class="btn btn-danger btn-xs">Reject</button><button class="btn btn-ghost btn-xs">View Docs</button></div></td></tr>
+            <tr><td class="mono">REQ-042</td><td><div class="user-row"><div class="user-avatar" style="background:#6C3FC5;">CA</div><div><div class="user-name">City Admin Office</div><div class="user-email">Municipal Government</div></div></div></td><td class="muted">Director Walsh</td><td class="muted" style="text-align:center;">1</td><td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;">45,000</span></td><td class="muted">Oct 14, 2025</td><td><span class="badge badge-pending">Pending</span></td><td><div class="td-actions"><button class="btn btn-success btn-xs" onclick="openModal('approveModal')">Approve</button><button class="btn btn-danger btn-xs">Reject</button><button class="btn btn-ghost btn-xs">View Docs</button></div></td></tr>
+            <tr><td class="mono">REQ-043</td><td><div class="user-row"><div class="user-avatar" style="background:#06B6D4;">HW</div><div><div class="user-name">Healthcare Workers Union</div><div class="user-email">National Union HQ</div></div></div></td><td class="muted">Sarah Blake</td><td class="muted" style="text-align:center;">2</td><td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;">8,900</span></td><td class="muted">Oct 15, 2025</td><td><span class="badge badge-pending">Pending</span></td><td><div class="td-actions"><button class="btn btn-success btn-xs" onclick="openModal('approveModal')">Approve</button><button class="btn btn-danger btn-xs">Reject</button><button class="btn btn-ghost btn-xs">View Docs</button></div></td></tr>
+            <tr><td class="mono">REQ-039</td><td><div class="user-row"><div class="user-avatar" style="background:#10B981;">PG</div><div><div class="user-name">Professional Guild</div><div class="user-email">Industry Association</div></div></div></td><td class="muted">James Porter</td><td class="muted" style="text-align:center;">4</td><td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;">6,700</span></td><td class="muted">Oct 8, 2025</td><td><span class="badge badge-approved">Approved</span></td><td><div class="td-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-warning btn-xs">Suspend</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: ELECTIONS ══ -->
+    <div class="page" id="page-elections">
+      <div class="page-header"><div class="page-eyebrow">Management</div><div class="page-title">Elections Management</div><div class="page-subtitle">View, manage and control all elections on the platform</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div class="tabs" style="margin-bottom:0;">
+          <button class="tab-btn active" onclick="switchTab(this,'el')">All (47)</button>
+          <button class="tab-btn" onclick="switchTab(this,'el')">Active (12)</button>
+          <button class="tab-btn" onclick="switchTab(this,'el')">Upcoming (8)</button>
+          <button class="tab-btn" onclick="switchTab(this,'el')">Completed (24)</button>
+          <button class="tab-btn" onclick="switchTab(this,'el')">Suspended (3)</button>
+        </div>
+        <div class="topbar-search" style="min-width:0;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Search elections…"/></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Election Title</th><th>Creator</th><th>Status</th><th>Voters</th><th>Turnout</th><th>End Date</th><th>Controls</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">E001</td><td><div style="font-size:12px;font-weight:600;max-width:200px;">National Student Union Presidential Election</div></td><td class="muted">Prof. Chen</td><td><span class="badge badge-active"><span class="badge-dot"></span>Active</span></td><td class="muted">45,230</td><td><div><div class="progress-wrap" style="height:5px;width:80px;margin-bottom:3px;"><div class="progress-fill" style="width:62%;background:#10B981;"></div></div><span style="font-size:10px;color:var(--subtle);">62%</span></div></td><td class="muted">Oct 20</td><td><div class="td-actions"><button class="btn btn-ghost btn-xs" onclick="nav('election-detail',null)">View</button><button class="btn btn-warning btn-xs">Suspend</button><button class="btn btn-danger btn-xs">Close</button></div></td></tr>
+            <tr><td class="mono">E002</td><td><div style="font-size:12px;font-weight:600;max-width:200px;">Municipal Council District 7 By-Election</div></td><td class="muted">City Admin</td><td><span class="badge badge-active"><span class="badge-dot"></span>Active</span></td><td class="muted">12,800</td><td><div><div class="progress-wrap" style="height:5px;width:80px;margin-bottom:3px;"><div class="progress-fill" style="width:46%;background:#3B82F6;"></div></div><span style="font-size:10px;color:var(--subtle);">46%</span></div></td><td class="muted">Oct 18</td><td><div class="td-actions"><button class="btn btn-ghost btn-xs" onclick="nav('election-detail',null)">View</button><button class="btn btn-warning btn-xs">Suspend</button><button class="btn btn-danger btn-xs">Close</button></div></td></tr>
+            <tr><td class="mono">E003</td><td><div style="font-size:12px;font-weight:600;max-width:200px;">University Senate Faculty Representatives</div></td><td class="muted">Uni Admin</td><td><span class="badge badge-upcoming">Upcoming</span></td><td class="muted">8,600</td><td class="muted">—</td><td class="muted">Oct 25</td><td><div class="td-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-danger btn-xs">Delete</button></div></td></tr>
+            <tr><td class="mono">E004</td><td><div style="font-size:12px;font-weight:600;max-width:200px;">Regional Committee Chairperson Election</div></td><td class="muted">RC Office</td><td><span class="badge badge-completed">Completed</span></td><td class="muted">9,400</td><td><div><div class="progress-wrap" style="height:5px;width:80px;margin-bottom:3px;"><div class="progress-fill" style="width:83%;background:#6C3FC5;"></div></div><span style="font-size:10px;color:var(--subtle);">83%</span></div></td><td class="muted">Oct 10</td><td><div class="td-actions"><button class="btn btn-ghost btn-xs">Results</button><button class="btn btn-primary btn-xs">Restart</button></div></td></tr>
+            <tr><td class="mono">E005</td><td><div style="font-size:12px;font-weight:600;max-width:200px;">Corporate Board Director Election Q4</div></td><td class="muted">Corp HQ</td><td><span class="badge badge-suspended">Suspended</span></td><td class="muted">3,200</td><td class="muted">—</td><td class="muted">Nov 1</td><td><div class="td-actions"><button class="btn btn-success btn-xs">Restore</button><button class="btn btn-danger btn-xs">Delete</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: ELECTION DETAIL ══ -->
+    <div class="page" id="page-election-detail">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <button class="btn btn-ghost btn-sm" onclick="nav('elections',document.querySelector('[onclick*=elections]'))" style="gap:5px;">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="15 18 9 12 15 6"/></svg>Back
+        </button>
+        <div class="page-title" style="margin:0;">Election E001 — Details</div>
+        <span class="badge badge-active"><span class="badge-dot"></span>Live</span>
+      </div>
+      <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div></div><div class="stat-num">45,230</div><div class="stat-label">Registered Voters</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div></div><div class="stat-num">28,140</div><div class="stat-label">Votes Cast</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#ECFEFF;color:#06B6D4;"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div></div><div class="stat-num">62%</div><div class="stat-label">Turnout</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div><div class="stat-num">08:24</div><div class="stat-label">Time Remaining</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Candidate Standings</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="font-weight:700;">👩🏾‍💼 Dr. Amara Osei-Bonsu</span><span style="font-family:'IBM Plex Mono',monospace;color:#1B3A6B;font-weight:700;">11,240 (40%)</span></div><div class="progress-wrap"><div class="progress-fill" style="width:40%;background:linear-gradient(90deg,#1B3A6B,#2451A3);"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="font-weight:700;">👨🏼‍💼 Prof. James Whitfield</span><span style="font-family:'IBM Plex Mono',monospace;color:#6C3FC5;font-weight:700;">9,820 (35%)</span></div><div class="progress-wrap"><div class="progress-fill" style="width:35%;background:linear-gradient(90deg,#6C3FC5,#7C3AED);"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="font-weight:700;">👩🏽‍💼 Eng. Priya Sharma</span><span style="font-family:'IBM Plex Mono',monospace;color:#06B6D4;font-weight:700;">4,480 (16%)</span></div><div class="progress-wrap"><div class="progress-fill" style="width:16%;background:linear-gradient(90deg,#06B6D4,#0891B2);"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="font-weight:700;">👨🏿‍💼 Dr. Marcus Cole</span><span style="font-family:'IBM Plex Mono',monospace;color:#10B981;font-weight:700;">2,600 (9%)</span></div><div class="progress-wrap"><div class="progress-fill" style="width:9%;background:linear-gradient(90deg,#10B981,#059669);"></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Override Controls</div><div style="font-size:10px;color:#EF4444;font-weight:600;">Admin Only</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+            <div class="alert alert-warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Override actions are irreversible and logged in the audit trail.</div>
+            <button class="btn btn-warning" style="width:100%;justify-content:center;">⏸ Suspend Election</button>
+            <button class="btn btn-danger" style="width:100%;justify-content:center;">⏹ Force Close Election</button>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;">🔄 Restart Election</button>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center;color:#EF4444;border-color:#FECACA;">🗑 Delete Election</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: USERS ══ -->
+    <div class="page" id="page-users">
+      <div class="page-header"><div class="page-eyebrow">Management</div><div class="page-title">Users Management</div><div class="page-subtitle">View, search and manage all platform users</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div class="tabs" style="margin-bottom:0;">
+          <button class="tab-btn active" onclick="switchTab(this,'usr')">All (84,291)</button>
+          <button class="tab-btn" onclick="switchTab(this,'usr')">Admins (24)</button>
+          <button class="tab-btn" onclick="switchTab(this,'usr')">Creators (4,210)</button>
+          <button class="tab-btn" onclick="switchTab(this,'usr')">Voters (78,420)</button>
+          <button class="tab-btn" onclick="switchTab(this,'usr')">Blocked (37)</button>
+        </div>
+        <button class="btn btn-primary btn-sm">+ Invite User</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Joined</th><th>Last Active</th><th>Elections</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td><div class="user-row"><div class="user-avatar" style="background:#1B3A6B;">JD</div><div><div class="user-name">Jane Doe</div><div class="user-email">UID-88210</div></div></div></td><td class="muted">jane@example.com</td><td><span class="badge badge-voter">Voter</span></td><td class="muted">Aug 2025</td><td class="muted">Today</td><td class="muted" style="text-align:center;">3</td><td><span class="badge badge-approved">Active</span></td><td><div class="td-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-warning btn-xs">Block</button></div></td></tr>
+            <tr><td><div class="user-row"><div class="user-avatar" style="background:#6C3FC5;">MC</div><div><div class="user-name">Maria Chen</div><div class="user-email">UID-10042</div></div></div></td><td class="muted">mchen@uni.edu</td><td><span class="badge badge-creator">Creator</span></td><td class="muted">Jun 2025</td><td class="muted">2h ago</td><td class="muted" style="text-align:center;">8</td><td><span class="badge badge-approved">Active</span></td><td><div class="td-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-warning btn-xs">Suspend</button></div></td></tr>
+            <tr><td><div class="user-row"><div class="user-avatar" style="background:#EF4444;">BX</div><div><div class="user-name">Bob X.</div><div class="user-email">UID-20211</div></div></div></td><td class="muted">bobx@email.com</td><td><span class="badge badge-voter">Voter</span></td><td class="muted">Sep 2025</td><td class="muted">3 days ago</td><td class="muted" style="text-align:center;">0</td><td><span class="badge badge-blocked">Blocked</span></td><td><div class="td-actions"><button class="btn btn-success btn-xs">Unblock</button><button class="btn btn-danger btn-xs">Delete</button></div></td></tr>
+            <tr><td><div class="user-row"><div class="user-avatar" style="background:#10B981;">SA</div><div><div class="user-name">Super Admin</div><div class="user-email">UID-00001</div></div></div></td><td class="muted">admin@votesecure.io</td><td><span class="badge badge-admin">Admin</span></td><td class="muted">Jan 2025</td><td class="muted">Just now</td><td class="muted" style="text-align:center;">—</td><td><span class="badge badge-approved">Active</span></td><td><div class="td-actions"><button class="btn btn-ghost btn-xs">View</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: VOTERS ══ -->
+    <div class="page" id="page-voters">
+      <div class="page-header"><div class="page-eyebrow">Monitoring</div><div class="page-title">Voter Monitoring</div><div class="page-subtitle">Track voter registrations, secret IDs and duplicate detection</div></div>
+      <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div></div><div class="stat-num">78,420</div><div class="stat-label">Total Voters</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div></div><div class="stat-num">1,240</div><div class="stat-label">On Waitlist</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF2F2;color:#EF4444;"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div></div><div class="stat-num">14</div><div class="stat-label">Duplicates Detected</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#F5F3FF;color:#6C3FC5;"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5"/></svg></div></div><div class="stat-num">78,406</div><div class="stat-label">Active Secret IDs</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Duplicate Detection</div><span class="badge badge-pending">14 Found</span></div>
+          <div class="card-body">
+            <div class="alert alert-danger"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>14 potential duplicate voter accounts detected. Review and action required.</div>
+            <table style="width:100%;">
+              <thead><tr><th>Voter ID</th><th>Match Score</th><th>Reason</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">VOT-1122</td><td><span style="color:#EF4444;font-weight:700;font-size:11px;">98%</span></td><td class="muted">Same email domain + IP</td><td><button class="btn btn-danger btn-xs">Flag</button></td></tr>
+                <tr><td class="mono">VOT-3341</td><td><span style="color:#F59E0B;font-weight:700;font-size:11px;">82%</span></td><td class="muted">Name + phone match</td><td><button class="btn btn-warning btn-xs">Review</button></td></tr>
+                <tr><td class="mono">VOT-7720</td><td><span style="color:#F59E0B;font-weight:700;font-size:11px;">76%</span></td><td class="muted">Same device fingerprint</td><td><button class="btn btn-warning btn-xs">Review</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Waitlist Monitor</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="background:#F8FAFC;border-radius:10px;padding:12px;border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:12px;font-weight:700;">National Student Union E001</span><span class="badge badge-active">Waitlist Open</span></div>
+                <div style="font-size:11px;color:var(--subtle);margin-bottom:8px;">842 on waitlist · 45,230 cap</div>
+                <div class="progress-wrap"><div class="progress-fill" style="width:98%;background:#F59E0B;"></div></div>
+              </div>
+              <div style="background:#F8FAFC;border-radius:10px;padding:12px;border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:12px;font-weight:700;">Municipal Council E002</span><span class="badge badge-upcoming">Open Spots</span></div>
+                <div style="font-size:11px;color:var(--subtle);margin-bottom:8px;">398 on waitlist · 12,800 cap</div>
+                <div class="progress-wrap"><div class="progress-fill" style="width:46%;background:#3B82F6;"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: AUDIT LOGS ══ -->
+    <div class="page" id="page-audit">
+      <div class="page-header"><div class="page-eyebrow">Transparency</div><div class="page-title">Audit Logs</div><div class="page-subtitle">Immutable blockchain-verified activity log</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <select class="form-input form-select" style="width:auto;font-size:12px;padding:7px 32px 7px 10px;"><option>All Actions</option><option>Login</option><option>Vote</option><option>Approval</option><option>Override</option><option>Election Edit</option></select>
+          <select class="form-input form-select" style="width:auto;font-size:12px;padding:7px 32px 7px 10px;"><option>All Users</option><option>Admins Only</option><option>Creators</option><option>Voters</option></select>
+          <input type="date" class="form-input" style="width:auto;font-size:12px;padding:7px 10px;"/>
+        </div>
+        <button class="btn btn-ghost btn-sm"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Timestamp</th><th>Action</th><th>User ID</th><th>Election</th><th>IP Address</th><th>Severity</th><th>Tx Hash</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">14:32:01</td><td><span style="font-size:12px;font-weight:600;">Vote Cast</span></td><td class="mono">VOT-***-8821</td><td class="muted">E001</td><td class="mono" style="color:var(--subtle);">192.168.1.***</td><td><span class="badge badge-approved">Low</span></td><td class="mono" style="color:var(--subtle);">0x8f3a1b...</td></tr>
+            <tr><td class="mono">09:00:00</td><td><span style="font-size:12px;font-weight:600;">Election Approved</span></td><td class="mono">ADMIN-001</td><td class="muted">E001</td><td class="mono" style="color:var(--subtle);">10.0.0.***</td><td><span class="badge badge-upcoming">Medium</span></td><td class="mono" style="color:var(--subtle);">0x3c9d2e...</td></tr>
+            <tr><td class="mono">02:13:55</td><td><span style="font-size:12px;font-weight:600;color:#EF4444;">Failed Login (5x)</span></td><td class="mono">unknown</td><td class="muted">—</td><td class="mono" style="color:#EF4444;">45.33.32.***</td><td><span class="badge badge-rejected">High</span></td><td class="mono" style="color:var(--subtle);">0x7f1c4a...</td></tr>
+            <tr><td class="mono">Yesterday</td><td><span style="font-size:12px;font-weight:600;">Candidate Added</span></td><td class="mono">CRT-105</td><td class="muted">E003</td><td class="mono" style="color:var(--subtle);">172.16.0.***</td><td><span class="badge badge-approved">Low</span></td><td class="mono" style="color:var(--subtle);">0x2b8e5c...</td></tr>
+            <tr><td class="mono">2 days ago</td><td><span style="font-size:12px;font-weight:600;">Election Force Closed</span></td><td class="mono">ADMIN-002</td><td class="muted">E009</td><td class="mono" style="color:var(--subtle);">10.0.0.***</td><td><span class="badge badge-suspended">Critical</span></td><td class="mono" style="color:var(--subtle);">0x9d4f7b...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: REPORTS ══ -->
+    <div class="page" id="page-reports">
+      <div class="page-header"><div class="page-eyebrow">Data</div><div class="page-title">Reports & Exports</div><div class="page-subtitle">Download platform data in various formats</div></div>
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Quick Export</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:#F8FAFC;border-radius:10px;border:1px solid var(--border);">
+              <div><div style="font-size:13px;font-weight:700;">Users CSV</div><div style="font-size:11px;color:var(--subtle);">All 84,291 users with metadata</div></div>
+              <button class="btn btn-primary btn-sm"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:#F8FAFC;border-radius:10px;border:1px solid var(--border);">
+              <div><div style="font-size:13px;font-weight:700;">Election Results PDF</div><div style="font-size:11px;color:var(--subtle);">All completed election reports</div></div>
+              <button class="btn btn-danger btn-sm"><svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export PDF</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:#F8FAFC;border-radius:10px;border:1px solid var(--border);">
+              <div><div style="font-size:13px;font-weight:700;">Audit Logs</div><div style="font-size:11px;color:var(--subtle);">Full platform audit trail</div></div>
+              <button class="btn btn-ghost btn-sm">Export JSON</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:#F8FAFC;border-radius:10px;border:1px solid var(--border);">
+              <div><div style="font-size:13px;font-weight:700;">Voter Lists</div><div style="font-size:11px;color:var(--subtle);">Anonymised voter participation data</div></div>
+              <button class="btn btn-ghost btn-sm">Export CSV</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Custom Report</div></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Report Type</label><select class="form-input form-select"><option>Election Performance Report</option><option>User Growth Report</option><option>Security Incident Report</option><option>Turnout Analytics</option></select></div>
+            <div class="form-group"><label class="form-label">Date Range</label><div class="form-row"><input class="form-input" type="date"/><input class="form-input" type="date"/></div></div>
+            <div class="form-group"><label class="form-label">Output Format</label><select class="form-input form-select"><option>PDF Report</option><option>CSV Spreadsheet</option><option>JSON Data</option></select></div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;">Generate Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: NOTIFICATIONS ══ -->
+    <div class="page" id="page-notifications">
+      <div class="page-header"><div class="page-eyebrow">Communications</div><div class="page-title">Notifications Center</div><div class="page-subtitle">System emails, alerts and election reminders</div></div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'notif')">All <span style="background:#DBEAFE;color:#2563EB;font-size:9px;padding:1px 6px;border-radius:10px;margin-left:4px;">5</span></button>
+        <button class="tab-btn" onclick="switchTab(this,'notif')">Sent Emails</button>
+        <button class="tab-btn" onclick="switchTab(this,'notif')">Failed <span style="background:#FEE2E2;color:#DC2626;font-size:9px;padding:1px 6px;border-radius:10px;margin-left:4px;">2</span></button>
+        <button class="tab-btn" onclick="switchTab(this,'notif')">Reminders</button>
+        <button class="tab-btn" onclick="switchTab(this,'notif')">Approvals</button>
+      </div>
+      <div class="card-elevated">
+        <div class="card-body" style="padding:8px 16px;">
+          <div class="notif-item"><div class="notif-unread"></div><div class="notif-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div><div style="flex:1;"><div class="notif-title">New Creator Request — REQ-043</div><div class="notif-sub">Healthcare Workers Union submitted a creator request. Review pending.</div></div><span class="notif-time">2h ago</span></div>
+          <div class="notif-item"><div class="notif-unread"></div><div class="notif-icon" style="background:#FEF2F2;color:#EF4444;"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div style="flex:1;"><div class="notif-title">Security Alert — Suspicious Login Attempts</div><div class="notif-sub">5 failed login attempts detected from IP 45.33.32.*** — account temporarily locked.</div></div><span class="notif-time">8h ago</span></div>
+          <div class="notif-item"><div class="notif-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div style="flex:1;"><div class="notif-title">Election E001 Approval Email Sent</div><div class="notif-sub">Approval confirmation sent to Prof. Maria Chen — Engineering Faculty Senate.</div></div><span class="notif-time">Yesterday</span></div>
+          <div class="notif-item"><div class="notif-icon" style="background:#FEF2F2;color:#EF4444;"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div style="flex:1;"><div class="notif-title">Email Delivery Failed — 2 Recipients</div><div class="notif-sub">Voter reminder emails failed for VOT-3302 and VOT-7741. Invalid addresses.</div></div><span class="notif-time">Yesterday</span></div>
+          <div class="notif-item"><div class="notif-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div style="flex:1;"><div class="notif-title">Election E002 — 2 Hour Reminder Sent</div><div class="notif-sub">Automated reminder dispatched to 6,880 remaining voters in Municipal Council election.</div></div><span class="notif-time">2 days ago</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: SECURITY ══ -->
+    <div class="page" id="page-security">
+      <div class="page-header"><div class="page-eyebrow">Protection</div><div class="page-title">Security Center</div><div class="page-subtitle">Platform security monitoring and configuration</div></div>
+      <div class="grid-3" style="margin-bottom:16px;">
+        <div class="security-metric"><div class="sec-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div style="font-size:18px;font-weight:800;color:#0F172A;">99.9%</div><div style="font-size:11px;color:var(--subtle);">RLS Security Score</div></div></div>
+        <div class="security-metric"><div class="sec-icon" style="background:#FEF2F2;color:#EF4444;"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div><div><div style="font-size:18px;font-weight:800;color:#EF4444;">3</div><div style="font-size:11px;color:var(--subtle);">Active Security Alerts</div></div></div>
+        <div class="security-metric"><div class="sec-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div><div style="font-size:18px;font-weight:800;color:#0F172A;">847</div><div style="font-size:11px;color:var(--subtle);">Requests/min (Rate)</div></div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Suspicious Activities</div><span class="badge badge-rejected">3 Alerts</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div class="alert alert-danger"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div><div style="font-weight:700;">Brute Force Attempt — IP 45.33.32.***</div><div>5 failed logins in 2 minutes. Auto-blocked. <span style="font-weight:700;cursor:pointer;">Review</span></div></div></div>
+              <div class="alert alert-warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div><div style="font-weight:700;">Duplicate Vote Attempt — VOT-3302</div><div>User attempted to vote twice in E001. Blocked by system.</div></div></div>
+              <div class="alert alert-warning"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><div><div style="font-weight:700;">Unusual Traffic Spike</div><div>API requests 3x above baseline — monitoring.</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Security Settings</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:16px;">
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">CAPTCHA on Login</div><div class="toggle-sub">Requires reCAPTCHA for all logins</div></div></div>
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Fraud Detection Engine</div><div class="toggle-sub">ML-based anomaly detection</div></div></div>
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Auto IP Block on Brute Force</div><div class="toggle-sub">Block IPs after 5 failed attempts</div></div></div>
+            <div class="toggle-wrap"><div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Maintenance Mode</div><div class="toggle-sub">Disables all public access</div></div></div>
+            <div class="form-group" style="margin:0;"><label class="form-label">Rate Limit (req/min)</label><input class="form-input" type="range" min="100" max="5000" value="1000" style="margin-top:4px;"/><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--subtle);margin-top:2px;"><span>100</span><span style="font-weight:700;color:var(--text);">1,000</span><span>5,000</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: SETTINGS ══ -->
+    <div class="page" id="page-settings">
+      <div class="page-header"><div class="page-eyebrow">Configuration</div><div class="page-title">Settings</div><div class="page-subtitle">Platform configuration and preferences</div></div>
+      <div class="grid-2">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Change Password</div></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Current Password</label><input class="form-input" type="password" placeholder="••••••••"/></div>
+            <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" placeholder="Min 8 characters"/></div>
+            <div class="form-group"><label class="form-label">Confirm New Password</label><input class="form-input" type="password" placeholder="Repeat new password"/></div>
+            <button class="btn btn-primary">Update Password</button>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Notification Preferences</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">New creator requests</div></div></div>
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Security alerts</div></div></div>
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Election status changes</div></div></div>
+            <div class="toggle-wrap"><div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Weekly summary reports</div></div></div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Election Defaults</div></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Default Voting Duration</label><select class="form-input form-select"><option>24 hours</option><option>48 hours</option><option>72 hours</option><option>7 days</option></select></div>
+            <div class="form-group"><label class="form-label">Default Max Voters</label><input class="form-input" type="number" value="50000"/></div>
+            <div class="form-group"><label class="form-label">Auto-approve Creators</label><select class="form-input form-select"><option>Manual review required</option><option>Auto-approve verified orgs</option></select></div>
+            <button class="btn btn-primary">Save Defaults</button>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Danger Zone</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+            <div class="alert alert-danger"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>These actions are irreversible. Proceed with extreme caution.</div>
+            <button class="btn btn-warning" style="width:100%;justify-content:center;">Enable Maintenance Mode</button>
+            <button class="btn btn-danger" style="width:100%;justify-content:center;">Reset All Rate Limits</button>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center;color:#EF4444;border-color:#FECACA;">Purge Test Data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAGE: PROFILE ══ -->
+    <div class="page" id="page-profile">
+      <div class="page-header"><div class="page-eyebrow">Account</div><div class="page-title">My Profile</div><div class="page-subtitle">Manage your admin account information</div></div>
+      <div class="grid-2">
+        <div class="card-elevated">
+          <div class="card-body" style="text-align:center;padding:32px;">
+            <div style="width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#1B3A6B,#6C3FC5);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;margin:0 auto 16px;">SA</div>
+            <div style="font-size:18px;font-weight:800;color:var(--text);">Super Admin</div>
+            <div style="font-size:13px;color:var(--subtle);margin-top:4px;">admin@votesecure.io</div>
+            <div style="margin-top:12px;"><span class="badge badge-admin">Admin</span></div>
+            <div style="margin-top:16px;display:flex;gap:12px;justify-content:center;text-align:center;">
+              <div><div style="font-size:20px;font-weight:800;color:var(--text);">47</div><div style="font-size:11px;color:var(--subtle);">Elections</div></div>
+              <div style="width:1px;background:var(--border);"></div>
+              <div><div style="font-size:20px;font-weight:800;color:var(--text);">284</div><div style="font-size:11px;color:var(--subtle);">Actions</div></div>
+              <div style="width:1px;background:var(--border);"></div>
+              <div><div style="font-size:20px;font-weight:800;color:var(--text);">99.9%</div><div style="font-size:11px;color:var(--subtle);">Uptime</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Edit Profile</div></div>
+          <div class="card-body">
+            <div class="form-row"><div class="form-group"><label class="form-label">First Name</label><input class="form-input" value="Super"/></div><div class="form-group"><label class="form-label">Last Name</label><input class="form-input" value="Admin"/></div></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" value="admin@votesecure.io"/></div>
+            <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" placeholder="+1 (555) 000-0000"/></div>
+            <div class="form-group"><label class="form-label">Timezone</label><select class="form-input form-select"><option>UTC+0 (London)</option><option>UTC+5 (Karachi)</option><option>UTC-5 (New York)</option></select></div>
+            <button class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</main>
+</div><!-- end app -->
+
+<!-- MODAL: Approve -->
+<div class="modal-overlay" id="approveModal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Approve Creator Request</div>
+      <button class="modal-close" onclick="closeModal('approveModal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div style="background:#F8FAFC;border-radius:10px;padding:14px;margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="font-size:11px;color:var(--subtle);">Request ID</div><div style="font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--blue);">REQ-041</div>
+        <div style="font-size:11px;color:var(--subtle);">Organisation</div><div style="font-size:11px;font-weight:700;">Eng. Faculty Senate</div>
+        <div style="font-size:11px;color:var(--subtle);">Contact</div><div style="font-size:11px;font-weight:700;">Prof. Maria Chen</div>
+        <div style="font-size:11px;color:var(--subtle);">Expected Voters</div><div style="font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace;">1,240</div>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Approval Note (optional)</label><textarea class="form-input" rows="3" placeholder="Add a note for the creator…" style="resize:none;"></textarea></div>
+    <div class="alert alert-info" style="margin-top:0;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>An approval email will be sent to the creator automatically.</div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('approveModal')">Cancel</button><button class="btn btn-success" onclick="closeModal('approveModal')">✓ Confirm Approval</button></div>
+  </div>
+</div>
+
+<script>
+// Navigation
+const pageMap = {
+  'dashboard':'Dashboard','requests':'Creator Requests','elections':'Elections Management',
+  'election-detail':'Election E001 — Details','users':'Users Management','voters':'Voter Monitoring',
+  'audit':'Audit Logs','reports':'Reports & Exports','notifications':'Notifications Center',
+  'security':'Security Center','settings':'Settings','profile':'My Profile'
+};
+const subMap = {
+  'dashboard':'Platform overview and key metrics','requests':'Review and manage creator applications',
+  'elections':'View, manage and control all elections','election-detail':'Live stats, controls and audit trail',
+  'users':'View, search and manage all platform users','voters':'Track registrations, IDs and duplicates',
+  'audit':'Immutable blockchain-verified activity log','reports':'Download platform data in various formats',
+  'notifications':'System emails, alerts and reminders','security':'Platform security monitoring and config',
+  'settings':'Platform configuration and preferences','profile':'Manage your admin account'
+};
+
+function nav(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('topbarTitle').textContent = pageMap[page] || page;
+  document.getElementById('topbarSub').textContent = subMap[page] || '';
+}
+
+function switchTab(btn, group) {
+  btn.closest('.tabs').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); }));
+</script>
+</body>
+</html>

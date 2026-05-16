@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { GuestRoute } from '@/components/auth/GuestRoute'
 import { MfaRoute } from '@/components/auth/MfaRoute'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
@@ -12,11 +12,19 @@ import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { VerifyEmailPage } from '@/pages/VerifyEmailPage'
 import { MfaVerifyPage } from '@/pages/MfaVerifyPage'
 import { AccountSecurityPage } from '@/pages/AccountSecurityPage'
-import { AdminApprovalsPage } from '@/pages/admin/AdminApprovalsPage'
+import { AdminLayout } from '@/components/admin/layout/AdminLayout'
 import { AdminAuditLogsPage } from '@/pages/admin/AdminAuditLogsPage'
+import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage'
+import { AdminElectionDetailPage } from '@/pages/admin/AdminElectionDetailPage'
 import { AdminElectionsPage } from '@/pages/admin/AdminElectionsPage'
+import { AdminNotificationsPage } from '@/pages/admin/AdminNotificationsPage'
+import { AdminProfilePage } from '@/pages/admin/AdminProfilePage'
+import { AdminReportsPage } from '@/pages/admin/AdminReportsPage'
+import { AdminRequestsPage } from '@/pages/admin/AdminRequestsPage'
+import { AdminSecurityPage } from '@/pages/admin/AdminSecurityPage'
+import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage'
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
-import { AdminDashboardPage } from '@/pages/dashboards/AdminDashboardPage'
+import { AdminVotersPage } from '@/pages/admin/AdminVotersPage'
 import { CreateElectionPage } from '@/pages/creator/CreateElectionPage'
 import { EditElectionPage } from '@/pages/creator/EditElectionPage'
 import { CreatorCandidatesPage } from '@/pages/creator/CreatorCandidatesPage'
@@ -119,45 +127,28 @@ export function AppRoutes() {
       />
 
       <Route
-        path="/admin/dashboard"
+        path="/admin"
         element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <AdminDashboardPage />
+            <AdminLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/admin/approvals"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AdminApprovalsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/audit-logs"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AdminAuditLogsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/elections"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AdminElectionsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/users"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AdminUsersPage />
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<AdminDashboardPage />} />
+        <Route path="requests" element={<AdminRequestsPage />} />
+        <Route path="elections" element={<AdminElectionsPage />} />
+        <Route path="elections/:id" element={<AdminElectionDetailPage />} />
+        <Route path="users" element={<AdminUsersPage />} />
+        <Route path="voters" element={<AdminVotersPage />} />
+        <Route path="audit-logs" element={<AdminAuditLogsPage />} />
+        <Route path="reports" element={<AdminReportsPage />} />
+        <Route path="notifications" element={<AdminNotificationsPage />} />
+        <Route path="security" element={<AdminSecurityPage />} />
+        <Route path="settings" element={<AdminSettingsPage />} />
+        <Route path="profile" element={<AdminProfilePage />} />
+      </Route>
+      <Route path="/admin/approvals" element={<Navigate to="/admin/requests" replace />} />
       <Route
         path="/creator/dashboard"
         element={

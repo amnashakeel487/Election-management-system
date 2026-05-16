@@ -1,5 +1,27 @@
 import { supabase } from '@/lib/supabase'
 import type { ElectionResultsPayload } from '@/types/electionResults'
+import { isPollingEnded } from '@/utils/electionPolling'
+
+function normalizeResultsPayload(raw: ElectionResultsPayload): ElectionResultsPayload {
+  const pollingEnded =
+    raw.polling_ended ??
+    isPollingEnded({ end_date: raw.end_date, status: raw.status as 'published' | 'active' | 'completed' })
+
+  const isLive =
+    raw.is_live ??
+    Boolean(raw.real_time_results && !pollingEnded && !raw.results_locked_at)
+
+  return {
+    ...raw,
+    registered_voters: raw.registered_voters ?? 0,
+    turnout_percent: Number(raw.turnout_percent ?? 0),
+    results_locked_at: raw.results_locked_at ?? null,
+    polling_ended: pollingEnded,
+    is_live: isLive,
+    vote_trend: raw.vote_trend ?? [],
+    candidates: raw.candidates ?? [],
+  }
+}
 
 export async function fetchElectionResults(electionId: string): Promise<ElectionResultsPayload> {
   const { data, error } = await supabase.rpc('get_election_results', {
@@ -7,7 +29,7 @@ export async function fetchElectionResults(electionId: string): Promise<Election
   })
 
   if (error) throw new Error(error.message)
-  return data as ElectionResultsPayload
+  return normalizeResultsPayload(data as ElectionResultsPayload)
 }
 
 export function subscribeToElectionResults(
@@ -33,12 +55,28 @@ export function subscribeToElectionResults(
   }
 }
 
-export async function fetchElectionsWithVisibleResults(): Promise<
-  { id: string; title: string; status: string; end_date: string; real_time_results: boolean }[]
-> {
+export async function lockElectionResults(electionId: string): Promise<ElectionResultsPayload> {
+  const { data, error } = await supabase.rpc('lock_election_results', {
+    p_election_id: electionId,
+  })
+
+  if (error) throw new Error(error.message)
+  return normalizeResultsPayload(data as ElectionResultsPayload)
+}
+
+export interface ResultsElectionListItem {
+  id: string
+  title: string
+  status: string
+  end_date: string
+  real_time_results: boolean
+  results_locked_at: string | null
+}
+
+export async function fetchElectionsWithVisibleResults(): Promise<ResultsElectionListItem[]> {
   const { data, error } = await supabase
     .from('elections')
-    .select('id, title, status, end_date, real_time_results')
+    .select('id, title, status, end_date, real_time_results, results_locked_at')
     .in('status', ['published', 'active', 'completed'])
     .order('end_date', { ascending: false })
 
@@ -46,6 +84,7 @@ export async function fetchElectionsWithVisibleResults(): Promise<
 
   const now = Date.now()
   return (data ?? []).filter((e) => {
+    if (e.results_locked_at) return true
     if (e.real_time_results) return true
     if (e.status === 'completed') return true
     return new Date(e.end_date).getTime() <= now

@@ -1,238 +1,171 @@
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AdminSidebar } from '@/components/admin/AdminSidebar'
-import { AdminTopBar } from '@/components/admin/AdminTopBar'
-import { VoterRollLockPanel } from '@/components/election/VoterRollLockPanel'
-import { useAdminApproval } from '@/hooks/useAdminApproval'
-import { useAuth } from '@/hooks/useAuth'
-import {
-  fetchAdminElections,
-  fetchPublishedElections,
-  type ElectionWithCreator,
-} from '@/services/adminDashboardService'
-import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
+import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader'
+import { ADMIN_PAGE_META } from '@/config/adminNav'
+import { fetchAdminElections, type ElectionWithCreator } from '@/services/adminDashboardService'
+import { adminElectionBadgeClass, shortElectionCode } from '@/utils/adminDisplay'
+import { electionDisplayStatus } from '@/utils/dashboardDisplay'
 import { formatSubmissionDate } from '@/utils/formatDate'
-import { registrationStatusLabel } from '@/utils/registrationLock'
 
-const STATUS_STYLES: Record<string, string> = {
-  draft: 'bg-on-surface-variant/20 text-on-surface-variant',
-  published: 'bg-primary/20 text-primary',
-  active: 'bg-tertiary/20 text-tertiary',
-  completed: 'bg-secondary/20 text-secondary',
-  archived: 'bg-error/20 text-error',
-}
+const meta = ADMIN_PAGE_META.elections
 
-type ElectionFilter = 'all' | 'published'
+type StatusTab = 'all' | 'active' | 'upcoming' | 'completed' | 'draft'
 
 export function AdminElectionsPage() {
-  const { profile } = useAuth()
-  const { pendingCount } = useAdminApproval(profile?.id)
   const [elections, setElections] = useState<ElectionWithCreator[]>([])
-  const [filter, setFilter] = useState<ElectionFilter>('published')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [finalizingId, setFinalizingId] = useState<string | null>(null)
-  const [actionMessage, setActionMessage] = useState<string | null>(null)
+  const [tab, setTab] = useState<StatusTab>('all')
+  const [search, setSearch] = useState('')
 
-  function reload() {
-    setLoading(true)
-    setError(null)
-    const load = filter === 'published' ? fetchPublishedElections : fetchAdminElections
-    void load()
+  useEffect(() => {
+    void fetchAdminElections()
       .then(setElections)
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load elections'))
       .finally(() => setLoading(false))
-  }
+  }, [])
 
-  useEffect(() => {
-    reload()
-  }, [filter])
-
-  async function handleFinalize(electionId: string) {
-    const election = elections.find((e) => e.id === electionId)
-    if (!election) return
-    const ok = window.confirm(
-      `Finalize voter roll for "${election.title}"? This freezes the list, locks registration, assigns secret IDs, and emails voters.`,
-    )
-    if (!ok) return
-
-    setFinalizingId(electionId)
-    setActionMessage(null)
-    try {
-      const { finalize, email } = await finalizeAndEmailSecretVoterIds(electionId)
-      setActionMessage(
-        `Finalized ${finalize.registered_count ?? finalize.assigned_count} voter(s). Emailed ${email.sent}.`,
-      )
-      reload()
-    } catch (err) {
-      setActionMessage(err instanceof Error ? err.message : 'Finalization failed')
-    } finally {
-      setFinalizingId(null)
+  const counts = useMemo(() => {
+    let active = 0
+    let upcoming = 0
+    let completed = 0
+    let draft = 0
+    for (const e of elections) {
+      const phase = electionDisplayStatus(e.status, e.start_date, e.end_date)
+      if (phase === 'active') active++
+      else if (phase === 'upcoming') upcoming++
+      else if (phase === 'completed') completed++
+      else if (phase === 'draft') draft++
     }
-  }
+    return { all: elections.length, active, upcoming, completed, draft }
+  }, [elections])
 
-  const approvedCreatorElections = useMemo(
-    () =>
-      elections.filter(
-        (e) => !e.creator || e.creator.approval_status === 'approved' || e.status !== 'draft',
-      ),
-    [elections],
-  )
-
-  const displayed = filter === 'published' ? approvedCreatorElections : elections
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return elections.filter((e) => {
+      const phase = electionDisplayStatus(e.status, e.start_date, e.end_date)
+      if (tab !== 'all' && phase !== tab) return false
+      if (!q) return true
+      return (
+        e.title.toLowerCase().includes(q) ||
+        e.creator?.email?.toLowerCase().includes(q) ||
+        shortElectionCode(e.id).toLowerCase().includes(q)
+      )
+    })
+  }, [elections, tab, search])
 
   return (
-    <div className="text-on-surface">
-      <AdminSidebar pendingCount={pendingCount} />
-      <main className="ml-[252px] min-h-screen">
-        <AdminTopBar title="Elections" />
-        <div className="p-margin">
-          <div className="flex flex-wrap items-center justify-between gap-md">
-            <Link to="/admin/dashboard" className="font-label-sm text-primary hover:underline">
-              ← Back to dashboard
-            </Link>
-            <Link to="/admin/approvals" className="font-label-sm text-primary hover:underline">
-              Creator approvals →
-            </Link>
-          </div>
+    <>
+      <AdminPageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
 
-          <p className="mt-2 font-body-sm text-on-surface-variant">
-            Elections from approved creators. Published and active elections appear on the public landing page.
-          </p>
+      {error ? <div className="alert alert-danger">{error}</div> : null}
 
-          <div className="mt-4 flex gap-2">
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+          flexWrap: 'wrap',
+          gap: 12,
+        }}
+      >
+        <div className="tabs" style={{ marginBottom: 0 }}>
+          {(
+            [
+              ['all', counts.all],
+              ['active', counts.active],
+              ['upcoming', counts.upcoming],
+              ['completed', counts.completed],
+              ['draft', counts.draft],
+            ] as const
+          ).map(([key, count]) => (
             <button
+              key={key}
               type="button"
-              onClick={() => setFilter('published')}
-              className={
-                filter === 'published'
-                  ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
-              }
+              className={`tab-btn${tab === key ? ' active' : ''}`}
+              onClick={() => setTab(key)}
             >
-              Approved / live elections
+              {key.charAt(0).toUpperCase() + key.slice(1)} ({count})
             </button>
-            <button
-              type="button"
-              onClick={() => setFilter('all')}
-              className={
-                filter === 'all'
-                  ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
-              }
-            >
-              All elections
-            </button>
-          </div>
+          ))}
+        </div>
+        <div className="topbar-search" style={{ minWidth: 0 }}>
+          <svg viewBox="0 0 24 24" aria-hidden>
+            <circle cx="11" cy="11" r="8" fill="none" strokeWidth="2" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" strokeWidth="2" />
+          </svg>
+          <input
+            type="search"
+            placeholder="Search elections…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
 
-          {error ? (
-            <p className="mt-4 rounded-xl border border-error/30 bg-error-container/20 px-lg py-md text-error">
-              {error}
-            </p>
-          ) : null}
-
-          {actionMessage ? (
-            <p className="mt-4 rounded-xl border border-tertiary/30 bg-tertiary/10 px-lg py-md text-sm text-tertiary">
-              {actionMessage}
-            </p>
-          ) : null}
-
-          {loading ? (
-            <p className="mt-6 text-on-surface-variant">Loading elections…</p>
-          ) : (
-            <div className="mt-6 overflow-hidden rounded-[24px] border border-line bg-surface-container">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-surface-container-high/50 font-label-sm uppercase tracking-wider text-on-surface-variant">
-                    <th className="px-lg py-4">Title</th>
-                    <th className="px-lg py-4">Creator</th>
-                    <th className="px-lg py-4">Status</th>
-                    <th className="px-lg py-4">Dates</th>
-                    <th className="px-lg py-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {displayed.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="px-lg py-8 text-center text-on-surface-variant">
-                        No elections in this view yet.
+      {loading ? (
+        <p style={{ color: 'var(--subtle)', fontSize: 13 }}>Loading elections…</p>
+      ) : (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Election Title</th>
+                <th>Creator</th>
+                <th>Status</th>
+                <th>Window</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="muted" style={{ textAlign: 'center', padding: 24 }}>
+                    No elections match this filter.
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((e) => {
+                  const phase = electionDisplayStatus(e.status, e.start_date, e.end_date)
+                  return (
+                    <tr key={e.id}>
+                      <td className="mono">{shortElectionCode(e.id)}</td>
+                      <td>
+                        <div style={{ fontSize: 12, fontWeight: 600, maxWidth: 220 }}>{e.title}</div>
+                        {e.category ? (
+                          <div style={{ fontSize: 10, color: 'var(--subtle)' }}>{e.category}</div>
+                        ) : null}
                       </td>
-                    </tr>
-                  ) : (
-                    displayed.map((election) => {
-                      const rollStatus = registrationStatusLabel(election)
-                      const expanded = expandedId === election.id
-                      return (
-                      <Fragment key={election.id}>
-                      <tr className="hover:bg-elevated/40">
-                        <td className="px-lg py-4">
-                          <p className="font-label-md text-on-surface">{election.title}</p>
-                          {election.category ? (
-                            <p className="text-[11px] text-on-surface-variant">{election.category}</p>
-                          ) : null}
-                          <p className="mt-1 text-[10px] text-on-surface-variant">{rollStatus.label}</p>
-                        </td>
-                        <td className="px-lg py-4 text-sm text-on-surface-variant">
-                          <p>{election.creator?.full_name ?? '—'}</p>
-                          <p className="text-[11px]">{election.creator?.email ?? '—'}</p>
-                        </td>
-                        <td className="px-lg py-4">
-                          <span
-                            className={`rounded-full px-3 py-1 text-[11px] font-bold uppercase ${STATUS_STYLES[election.status] ?? ''}`}
-                          >
-                            {election.status}
-                          </span>
-                        </td>
-                        <td className="px-lg py-4 text-sm text-on-surface-variant">
-                          {formatSubmissionDate(election.start_date)} – {formatSubmissionDate(election.end_date)}
-                        </td>
-                        <td className="px-lg py-4 text-right">
-                          <button
-                            type="button"
-                            onClick={() => setExpandedId(expanded ? null : election.id)}
-                            className="rounded-lg border border-line px-3 py-1.5 font-label-sm text-on-surface-variant hover:text-on-surface"
-                          >
-                            {expanded ? 'Hide roll' : 'Manage roll'}
-                          </button>
-                          <Link
-                            to={`/elections/${election.id}`}
-                            className="ml-2 rounded-lg bg-primary/10 px-4 py-1.5 font-label-sm text-primary hover:bg-primary hover:text-on-primary"
-                          >
+                      <td className="muted">
+                        <div>{e.creator?.full_name ?? '—'}</div>
+                        <div style={{ fontSize: 10 }}>{e.creator?.email ?? '—'}</div>
+                      </td>
+                      <td>
+                        <span className={adminElectionBadgeClass(e.status, e.start_date, e.end_date)}>
+                          {phase === 'active' ? <span className="badge-dot" /> : null}
+                          {phase}
+                        </span>
+                      </td>
+                      <td className="muted">
+                        {formatSubmissionDate(e.start_date)} – {formatSubmissionDate(e.end_date)}
+                      </td>
+                      <td>
+                        <div className="td-actions">
+                          <Link to={`/admin/elections/${e.id}`} className="btn btn-ghost btn-xs">
                             View
                           </Link>
-                          {(election.status === 'active' || election.status === 'completed') && (
-                            <Link
-                              to={`/elections/${election.id}/results`}
-                              className="ml-2 rounded-lg border border-line px-4 py-1.5 font-label-sm text-on-surface-variant hover:text-on-surface"
-                            >
-                              Results
-                            </Link>
-                          )}
-                        </td>
-                      </tr>
-                      {expanded ? (
-                        <tr>
-                          <td colSpan={5} className="px-lg pb-4">
-                            <VoterRollLockPanel
-                              isAdmin
-                              election={election}
-                              finalizingId={finalizingId}
-                              onFinalize={(id) => void handleFinalize(id)}
-                              onChanged={reload}
-                            />
-                          </td>
-                        </tr>
-                      ) : null}
-                      </Fragment>
-                    )})
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+            </tbody>
+          </table>
         </div>
-      </main>
-    </div>
+      )}
+    </>
   )
 }

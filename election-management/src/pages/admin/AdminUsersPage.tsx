@@ -1,25 +1,26 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { AdminSidebar } from '@/components/admin/AdminSidebar'
-import { AdminTopBar } from '@/components/admin/AdminTopBar'
-import { useAdminApproval } from '@/hooks/useAdminApproval'
-import { useAuth } from '@/hooks/useAuth'
+import { useEffect, useMemo, useState } from 'react'
+import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader'
+import { ADMIN_PAGE_META } from '@/config/adminNav'
 import { fetchAdminUsers, type AdminUserRow } from '@/services/adminDashboardService'
+import { adminApprovalBadgeClass, adminRoleBadgeClass } from '@/utils/adminDisplay'
+import { avatarGradient, userInitials } from '@/utils/dashboardDisplay'
 import { formatSubmissionDate } from '@/utils/formatDate'
+
+const meta = ADMIN_PAGE_META.users
+
+type RoleTab = 'all' | 'admin' | 'election_creator' | 'voter'
 
 const ROLE_LABELS: Record<string, string> = {
   admin: 'Admin',
-  election_creator: 'Election Creator',
+  election_creator: 'Creator',
   voter: 'Voter',
 }
 
 export function AdminUsersPage() {
-  const { profile } = useAuth()
-  const { pendingCount, approve, actingOnId } = useAdminApproval(profile?.id)
   const [users, setUsers] = useState<AdminUserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'pending'>('all')
+  const [tab, setTab] = useState<RoleTab>('all')
 
   useEffect(() => {
     void fetchAdminUsers()
@@ -28,114 +29,90 @@ export function AdminUsersPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const displayed =
-    filter === 'pending'
-      ? users.filter((u) => u.role === 'election_creator' && u.approval_status === 'pending')
-      : users
+  const counts = useMemo(() => {
+    return {
+      all: users.length,
+      admin: users.filter((u) => u.role === 'admin').length,
+      election_creator: users.filter((u) => u.role === 'election_creator').length,
+      voter: users.filter((u) => u.role === 'voter').length,
+    }
+  }, [users])
 
-  async function reloadUsers() {
-    const data = await fetchAdminUsers()
-    setUsers(data)
-  }
+  const displayed = useMemo(() => {
+    if (tab === 'all') return users
+    return users.filter((u) => u.role === tab)
+  }, [users, tab])
 
   return (
-    <div className="text-on-surface">
-      <AdminSidebar pendingCount={pendingCount} />
-      <main className="ml-[252px] min-h-screen">
-        <AdminTopBar title="Users" />
-        <div className="p-margin">
-          <Link to="/admin/dashboard" className="font-label-sm text-primary hover:underline">
-            ← Back to dashboard
-          </Link>
+    <>
+      <AdminPageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
 
-          <div className="mt-4 flex gap-2">
-            <button
-              type="button"
-              onClick={() => setFilter('all')}
-              className={
-                filter === 'all'
-                  ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
-              }
-            >
-              All users
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('pending')}
-              className={
-                filter === 'pending'
-                  ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
-              }
-            >
-              Pending creators ({pendingCount})
-            </button>
-          </div>
+      {error ? <div className="alert alert-danger">{error}</div> : null}
 
-          {error ? (
-            <p className="mt-4 rounded-xl border border-error/30 px-lg py-md text-error">{error}</p>
-          ) : null}
+      <div className="tabs">
+        {(['all', 'admin', 'election_creator', 'voter'] as const).map((key) => (
+          <button
+            key={key}
+            type="button"
+            className={`tab-btn${tab === key ? ' active' : ''}`}
+            onClick={() => setTab(key)}
+          >
+            {key === 'all' ? 'All' : ROLE_LABELS[key]} ({counts[key]})
+          </button>
+        ))}
+      </div>
 
-          {loading ? (
-            <p className="mt-6 text-on-surface-variant">Loading users…</p>
-          ) : (
-            <div className="mt-6 overflow-hidden rounded-[24px] border border-line bg-surface-container">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-surface-container-high/50 font-label-sm uppercase tracking-wider text-on-surface-variant">
-                    <th className="px-lg py-4">Name</th>
-                    <th className="px-lg py-4">Email</th>
-                    <th className="px-lg py-4">Role</th>
-                    <th className="px-lg py-4">Status</th>
-                    <th className="px-lg py-4">Joined</th>
-                    {filter === 'pending' ? <th className="px-lg py-4 text-right">Action</th> : null}
+      {loading ? (
+        <p style={{ color: 'var(--subtle)', fontSize: 13 }}>Loading users…</p>
+      ) : (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Approval</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayed.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="muted" style={{ textAlign: 'center', padding: 24 }}>
+                    No users in this view.
+                  </td>
+                </tr>
+              ) : (
+                displayed.map((user) => (
+                  <tr key={user.id}>
+                    <td>
+                      <div className="user-row">
+                        <div className="user-avatar" style={{ background: avatarGradient(user.email) }}>
+                          {userInitials(user.full_name, user.email)}
+                        </div>
+                        <div className="user-name">{user.full_name ?? '—'}</div>
+                      </div>
+                    </td>
+                    <td className="muted">{user.email}</td>
+                    <td>
+                      <span className={adminRoleBadgeClass(user.role)}>{ROLE_LABELS[user.role] ?? user.role}</span>
+                    </td>
+                    <td>
+                      {user.role === 'election_creator' ? (
+                        <span className={adminApprovalBadgeClass(user.approval_status)}>{user.approval_status ?? '—'}</span>
+                      ) : (
+                        <span className="muted">—</span>
+                      )}
+                    </td>
+                    <td className="muted">{formatSubmissionDate(user.created_at)}</td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {displayed.length === 0 ? (
-                    <tr>
-                      <td colSpan={filter === 'pending' ? 6 : 5} className="px-lg py-8 text-center text-on-surface-variant">
-                        No users in this view.
-                      </td>
-                    </tr>
-                  ) : (
-                    displayed.map((user) => (
-                      <tr key={user.id} className="hover:bg-elevated/40">
-                        <td className="px-lg py-4 text-on-surface">{user.full_name ?? '—'}</td>
-                        <td className="px-lg py-4 text-on-surface-variant">{user.email}</td>
-                        <td className="px-lg py-4">{ROLE_LABELS[user.role] ?? user.role}</td>
-                        <td className="px-lg py-4 text-on-surface-variant">
-                          {user.role === 'election_creator' ? (user.approval_status ?? '—') : '—'}
-                        </td>
-                        <td className="px-lg py-4 text-on-surface-variant">
-                          {formatSubmissionDate(user.created_at)}
-                        </td>
-                        {filter === 'pending' && user.approval_status === 'pending' ? (
-                          <td className="px-lg py-4 text-right">
-                            <button
-                              type="button"
-                              disabled={actingOnId === user.id}
-                              onClick={() => {
-                                void approve(user.id, user.email).then(() => reloadUsers())
-                              }}
-                              className="rounded-lg bg-primary/10 px-4 py-1.5 font-label-sm text-primary hover:bg-primary hover:text-on-primary disabled:opacity-50"
-                            >
-                              Approve
-                            </button>
-                          </td>
-                        ) : filter === 'pending' ? (
-                          <td />
-                        ) : null}
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-      </main>
-    </div>
+      )}
+    </>
   )
 }

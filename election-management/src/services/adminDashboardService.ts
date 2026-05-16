@@ -9,6 +9,14 @@ export interface AdminDashboardStats {
   verifiedVoters: number
 }
 
+export interface AdminExtendedStats extends AdminDashboardStats {
+  totalElections: number
+  pendingApprovals: number
+  creators: number
+  voters: number
+  admins: number
+}
+
 export interface AdminUserRow {
   id: string
   email: string
@@ -26,18 +34,68 @@ export interface VoteActivityPoint {
 export type VoteActivityRange = 1 | 7 | 30
 
 export async function fetchAdminDashboardStats(): Promise<AdminDashboardStats> {
-  const [platform, usersResult] = await Promise.all([
+  const extended = await fetchAdminExtendedStats()
+  return {
+    totalUsers: extended.totalUsers,
+    activeElections: extended.activeElections,
+    totalVotes: extended.totalVotes,
+    verifiedVoters: extended.verifiedVoters,
+  }
+}
+
+export async function fetchAdminExtendedStats(): Promise<AdminExtendedStats> {
+  const [platform, usersRes, electionsRes, pendingRes] = await Promise.all([
     fetchPlatformStats(),
-    supabase.from('users').select('*', { count: 'exact', head: true }),
+    supabase.from('users').select('role', { count: 'exact' }),
+    supabase.from('elections').select('*', { count: 'exact', head: true }),
+    supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'election_creator')
+      .eq('approval_status', 'pending'),
   ])
 
-  if (usersResult.error) throw new Error(usersResult.error.message)
+  if (usersRes.error) throw new Error(usersRes.error.message)
+  if (electionsRes.error) throw new Error(electionsRes.error.message)
+  if (pendingRes.error) throw new Error(pendingRes.error.message)
+
+  const rows = usersRes.data ?? []
+  const creators = rows.filter((r) => r.role === 'election_creator').length
+  const voters = rows.filter((r) => r.role === 'voter').length
+  const admins = rows.filter((r) => r.role === 'admin').length
+  const totalUsers = usersRes.count ?? rows.length
 
   return {
-    totalUsers: usersResult.count ?? 0,
+    totalUsers,
     activeElections: platform.active_elections,
     totalVotes: platform.total_votes,
     verifiedVoters: platform.verified_voters,
+    totalElections: electionsRes.count ?? 0,
+    pendingApprovals: pendingRes.count ?? 0,
+    creators,
+    voters,
+    admins,
+  }
+}
+
+export async function fetchVoterMonitoringStats(): Promise<{
+  totalRegistrations: number
+  waitlisted: number
+  voted: number
+  withSecretId: number
+}> {
+  const { data, error } = await supabase
+    .from('voter_registrations')
+    .select('status, secret_voter_id, voted_at')
+
+  if (error) throw new Error(error.message)
+
+  const rows = data ?? []
+  return {
+    totalRegistrations: rows.length,
+    waitlisted: rows.filter((r) => r.status === 'waitlisted').length,
+    voted: rows.filter((r) => r.voted_at != null).length,
+    withSecretId: rows.filter((r) => r.secret_voter_id != null).length,
   }
 }
 

@@ -22,6 +22,8 @@ export interface Election {
   voter_roll_finalized_at: string | null
   registration_locked_at: string | null
   registration_lock_reason: RegistrationLockReason | null
+  results_locked_at?: string | null
+  results_locked_by?: string | null
 }
 
 export type RegistrationLockReason = 'capacity' | 'manual' | 'admin' | 'finalized'

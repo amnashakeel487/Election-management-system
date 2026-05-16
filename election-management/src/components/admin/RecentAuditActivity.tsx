@@ -1,111 +1,10 @@
 import { Link } from 'react-router-dom'
 import type { AuditLogEntry } from '@/types/auth'
+import { getAuditPresentation } from '@/utils/auditPresentation'
 import { formatRelativeTime } from '@/utils/formatDate'
 
 interface RecentAuditActivityProps {
   logs: AuditLogEntry[]
-}
-
-function getAuditPresentation(log: AuditLogEntry) {
-  const actorEmail = (log.actor as { email?: string } | null)?.email ?? 'System'
-  const targetEmail =
-    (log.target as { email?: string } | null)?.email ??
-    (log.details?.target_email as string | undefined)
-  const electionTitle =
-    (log.election as { title?: string } | null)?.title ??
-    (log.details?.title as string | undefined)
-  const details = log.details ?? {}
-
-  switch (log.action) {
-    case 'user_login':
-      return {
-        icon: 'login',
-        iconBg: 'bg-primary/20',
-        iconColor: 'text-primary',
-        title: 'User Login',
-        description: `${actorEmail} signed in.`,
-      }
-    case 'vote_cast':
-      return {
-        icon: 'how_to_vote',
-        iconBg: 'bg-tertiary/20',
-        iconColor: 'text-tertiary',
-        title: 'Vote Cast',
-        description: `${actorEmail} voted in ${electionTitle ?? 'an election'}${details.candidate_name ? ` (${details.candidate_name as string})` : ''}.`,
-      }
-    case 'election_created':
-      return {
-        icon: 'add_circle',
-        iconBg: 'bg-primary/20',
-        iconColor: 'text-primary',
-        title: 'Election Created',
-        description: `${actorEmail} created "${electionTitle ?? (details.title as string) ?? 'election'}".`,
-      }
-    case 'election_published':
-      return {
-        icon: 'publish',
-        iconBg: 'bg-tertiary/20',
-        iconColor: 'text-tertiary',
-        title: 'Election Published',
-        description: `${electionTitle ?? (details.title as string) ?? 'Election'} is now open for registration.`,
-      }
-    case 'election_updated':
-      return {
-        icon: 'edit_note',
-        iconBg: 'bg-surface-container-high',
-        iconColor: 'text-on-surface-variant',
-        title: 'Election Updated',
-        description: `${actorEmail} updated ${electionTitle ?? 'an election'} (${(details.old_status as string) ?? '?'} → ${(details.new_status as string) ?? '?'}).`,
-      }
-    case 'election_voter_roll_finalized':
-      return {
-        icon: 'badge',
-        iconBg: 'bg-secondary/20',
-        iconColor: 'text-secondary',
-        title: 'Voter Roll Finalized',
-        description: `Secret IDs issued for ${electionTitle ?? 'election'}${details.registered_count != null ? ` (${details.registered_count} voters)` : ''}.`,
-      }
-    case 'election_registration_locked':
-      return {
-        icon: 'lock',
-        iconBg: 'bg-amber-500/20',
-        iconColor: 'text-amber-700',
-        title: 'Registration Locked',
-        description: `${electionTitle ?? 'Election'} — ${(details.reason as string) ?? 'locked'}${details.override ? ' (admin override)' : ''}.`,
-      }
-    case 'election_registration_unlocked':
-      return {
-        icon: 'lock_open',
-        iconBg: 'bg-primary/20',
-        iconColor: 'text-primary',
-        title: 'Registration Unlocked',
-        description: `${actorEmail} unlocked ${electionTitle ?? 'an election'}: ${(details.reason as string) ?? 'admin override'}.`,
-      }
-    case 'creator_approved':
-      return {
-        icon: 'verified',
-        iconBg: 'bg-tertiary',
-        iconColor: 'text-tertiary-fixed',
-        title: 'Creator Approved',
-        description: `${targetEmail ?? 'User'} granted election creator access.`,
-      }
-    case 'creator_rejected':
-      return {
-        icon: 'report',
-        iconBg: 'bg-error',
-        iconColor: 'text-on-error',
-        title: 'Creator Rejected',
-        description: `${targetEmail ?? 'User'} rejected${details.rejection_reason ? `: ${details.rejection_reason as string}` : '.'}`,
-      }
-    default:
-      return {
-        icon: 'settings',
-        iconBg: 'bg-on-surface-variant',
-        iconColor: 'text-surface',
-        title: log.action.replace(/_/g, ' '),
-        description: electionTitle ? `${electionTitle}` : JSON.stringify(details),
-      }
-  }
 }
 
 export function RecentAuditActivity({ logs }: RecentAuditActivityProps) {
@@ -139,7 +38,7 @@ export function RecentAuditActivity({ logs }: RecentAuditActivityProps) {
         to="/admin/audit-logs"
         className="mt-8 block w-full rounded-xl border border-line py-3 text-center font-label-md text-label-md text-on-surface-variant transition-all hover:bg-surface-container-high"
       >
-        Full Audit Trail
+        Transparency dashboard
       </Link>
     </div>
   )

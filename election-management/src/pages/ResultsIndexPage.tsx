@@ -5,16 +5,10 @@ import { TopNavBar } from '@/components/layout/TopNavBar'
 import { fetchElectionsWithVisibleResults } from '@/services/resultsService'
 import { formatSubmissionDate } from '@/utils/formatDate'
 
-interface ResultsElectionRow {
-  id: string
-  title: string
-  status: string
-  end_date: string
-  real_time_results: boolean
-}
+import type { ResultsElectionListItem } from '@/services/resultsService'
 
 export function ResultsIndexPage() {
-  const [elections, setElections] = useState<ResultsElectionRow[]>([])
+  const [elections, setElections] = useState<ResultsElectionListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -65,8 +59,12 @@ export function ResultsIndexPage() {
                 <div>
                   <p className="font-headline-md text-headline-md text-on-surface">{e.title}</p>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    {e.real_time_results ? 'Live results enabled' : 'Final results'} · Ends{' '}
-                    {formatSubmissionDate(e.end_date)}
+                    {e.results_locked_at
+                      ? 'Final results locked'
+                      : e.real_time_results
+                        ? 'Live counting enabled'
+                        : 'Final results'}{' '}
+                    · Ends {formatSubmissionDate(e.end_date)}
                   </p>
                 </div>
                 <Link

@@ -1,126 +1,226 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { AdminSidebar } from '@/components/admin/AdminSidebar'
-import { AdminTopBar } from '@/components/admin/AdminTopBar'
-import { fetchRecentAuditLogs } from '@/services/auditService'
-import type { AuditLogEntry } from '@/types/auth'
-import { formatRelativeTime } from '@/utils/formatDate'
+import { useState } from 'react'
+import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader'
+import { ADMIN_PAGE_META } from '@/config/adminNav'
+import { useAuditTransparency } from '@/hooks/useAuditTransparency'
+import { downloadAuditCsv, fetchFilteredAuditLogs } from '@/services/auditService'
+import { AUDIT_CATEGORIES, type AuditCategory } from '@/types/audit'
+import { AUDIT_CATEGORY_LABELS } from '@/utils/auditPresentation'
+import { formatDashboardNumber } from '@/utils/dashboardDisplay'
+import { formatSubmissionDate } from '@/utils/formatDate'
+import { getAuditPresentation, isAdminOverrideLog } from '@/utils/auditPresentation'
+
+const meta = ADMIN_PAGE_META.audit
+const RANGE_OPTIONS = [7, 30, 90] as const
 
 export function AdminAuditLogsPage() {
-  const [logs, setLogs] = useState<AuditLogEntry[]>([])
-  const [loading, setLoading] = useState(true)
-  const [actionFilter, setActionFilter] = useState<'all' | 'approvals'>('all')
+  const {
+    summary,
+    logs,
+    total,
+    loading,
+    error,
+    category,
+    overrideOnly,
+    rangeDays,
+    offset,
+    pageSize,
+    setCategoryFilter,
+    toggleOverrideOnly,
+    changeRange,
+    nextPage,
+    prevPage,
+    refresh,
+  } = useAuditTransparency()
 
-  useEffect(() => {
-    void fetchRecentAuditLogs(200)
-      .then(setLogs)
-      .finally(() => setLoading(false))
-  }, [])
+  const [exporting, setExporting] = useState(false)
 
-  const displayed =
-    actionFilter === 'approvals'
-      ? logs.filter((l) => l.action === 'creator_approved' || l.action === 'creator_rejected')
-      : logs
-
-  function downloadCsv() {
-    const header = ['time', 'action', 'actor', 'target', 'election', 'details']
-    const rows = displayed.map((log) => [
-      log.created_at,
-      log.action,
-      log.actor?.email ?? '',
-      log.target?.email ?? '',
-      log.election?.title ?? '',
-      JSON.stringify(log.details ?? {}),
-    ])
-    const csv = [header, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n')
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `fortressvote-audit-${new Date().toISOString().slice(0, 10)}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+  async function downloadAllCsv() {
+    setExporting(true)
+    try {
+      const since = new Date()
+      since.setDate(since.getDate() - (rangeDays - 1))
+      since.setHours(0, 0, 0, 0)
+      const page = await fetchFilteredAuditLogs({
+        category,
+        overrideOnly,
+        from: since.toISOString(),
+        limit: 500,
+        offset: 0,
+      })
+      downloadAuditCsv(page.logs, 'fortressvote-transparency')
+    } finally {
+      setExporting(false)
+    }
   }
 
+  const pageStart = total === 0 ? 0 : offset + 1
+  const pageEnd = Math.min(offset + pageSize, total)
+
   return (
-    <div className="min-h-screen bg-background text-on-background">
-      <AdminSidebar pendingCount={0} />
-      <main className="lg:pl-[280px]">
-        <AdminTopBar title="Audit Trail" />
-        <div className="p-margin">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <Link to="/admin/dashboard" className="font-label-sm text-primary hover:underline">
-                ← Back to dashboard
-              </Link>
-              <h1 className="mt-2 font-headline-lg text-headline-lg text-on-surface">Full Audit Trail</h1>
-            </div>
+    <>
+      <AdminPageHeader
+        eyebrow={meta.eyebrow}
+        title={meta.title}
+        subtitle={meta.subtitle}
+        actions={
+          <>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => refresh()} disabled={loading}>
+              Refresh
+            </button>
             <button
               type="button"
-              onClick={downloadCsv}
-              disabled={displayed.length === 0}
-              className="rounded-xl bg-primary px-4 py-2 font-label-md text-on-primary disabled:opacity-50"
+              className="btn btn-primary btn-sm"
+              onClick={() => void downloadAllCsv()}
+              disabled={exporting || loading}
             >
-              Download CSV
+              {exporting ? 'Exporting…' : 'Download CSV'}
             </button>
-          </div>
+          </>
+        }
+      />
 
-          <div className="mb-4 flex gap-2">
-            <button
-              type="button"
-              onClick={() => setActionFilter('all')}
-              className={
-                actionFilter === 'all'
-                  ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
-              }
-            >
-              All activity
-            </button>
-            <button
-              type="button"
-              onClick={() => setActionFilter('approvals')}
-              className={
-                actionFilter === 'approvals'
-                  ? 'rounded-lg bg-primary px-4 py-2 font-label-sm text-on-primary'
-                  : 'rounded-lg border border-line px-4 py-2 font-label-sm text-on-surface-variant'
-              }
-            >
-              Creator approvals
-            </button>
-          </div>
-
-          {loading ? (
-            <p className="text-on-surface-variant">Loading logs…</p>
-          ) : (
-            <div className="overflow-hidden rounded-[24px] border border-line bg-surface-container">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-surface-container-high/50 text-on-surface-variant">
-                  <tr>
-                    <th className="px-4 py-3">Time</th>
-                    <th className="px-4 py-3">Action</th>
-                    <th className="px-4 py-3">Actor</th>
-                    <th className="px-4 py-3">Details</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {displayed.map((log) => (
-                    <tr key={log.id}>
-                      <td className="px-4 py-3 text-on-surface-variant">{formatRelativeTime(log.created_at)}</td>
-                      <td className="px-4 py-3 text-on-surface">{log.action}</td>
-                      <td className="px-4 py-3 text-on-surface-variant">{log.actor?.email ?? 'System'}</td>
-                      <td className="max-w-md truncate px-4 py-3 text-on-surface-variant">
-                        {log.election?.title ?? JSON.stringify(log.details ?? {})}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+      {error ? (
+        <div className="alert alert-danger">
+          {error}
+          <p style={{ marginTop: 8, fontSize: 11 }}>
+            Apply migration <code>019_audit_transparency_module.sql</code> in Supabase if RPCs are missing.
+          </p>
         </div>
-      </main>
-    </div>
+      ) : null}
+
+      <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+        {[
+          { label: 'Events (range)', value: summary?.total_in_range ?? 0 },
+          { label: 'Last 24h', value: summary?.total_24h ?? 0 },
+          { label: 'Logins', value: summary?.logins ?? 0 },
+          { label: 'Votes', value: summary?.votes ?? 0 },
+          { label: 'Overrides', value: summary?.overrides ?? 0 },
+        ].map((s) => (
+          <div key={s.label} className="stat-card">
+            <div className="stat-num">{loading ? '—' : formatDashboardNumber(s.value)}</div>
+            <div className="stat-label">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card-elevated" style={{ marginBottom: 16 }}>
+        <div className="card-header">
+          <div className="card-title">Filters</div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {RANGE_OPTIONS.map((days) => (
+              <button
+                key={days}
+                type="button"
+                className={`btn btn-ghost btn-xs${rangeDays === days ? ' active' : ''}`}
+                onClick={() => changeRange(days)}
+              >
+                {days}D
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="card-body">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+            {AUDIT_CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                className={`tab-btn${category === cat && !overrideOnly ? ' active' : ''}`}
+                style={{ padding: '5px 12px' }}
+                onClick={() => setCategoryFilter(cat as AuditCategory)}
+              >
+                {AUDIT_CATEGORY_LABELS[cat]}
+              </button>
+            ))}
+            <button
+              type="button"
+              className={`tab-btn${overrideOnly ? ' active' : ''}`}
+              style={{ padding: '5px 12px' }}
+              onClick={toggleOverrideOnly}
+            >
+              Overrides only
+            </button>
+          </div>
+
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Event</th>
+                  <th>Actor</th>
+                  <th>Context</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading && logs.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="muted" style={{ textAlign: 'center', padding: 24 }}>
+                      Loading audit logs…
+                    </td>
+                  </tr>
+                ) : logs.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="muted" style={{ textAlign: 'center', padding: 24 }}>
+                      No events match these filters.
+                    </td>
+                  </tr>
+                ) : (
+                  logs.map((log) => {
+                    const item = getAuditPresentation(log)
+                    const override = isAdminOverrideLog(log)
+                    return (
+                      <tr key={log.id} style={override ? { background: '#FFFBEB' } : undefined}>
+                        <td className="mono">{formatSubmissionDate(log.created_at)}</td>
+                        <td>
+                          <div style={{ fontWeight: 700 }}>{item.title}</div>
+                          <div style={{ fontSize: 10, color: 'var(--subtle)' }}>{log.action}</div>
+                        </td>
+                        <td className="muted">{log.actor?.email ?? 'System'}</td>
+                        <td className="muted">{log.election?.title ?? log.target?.email ?? '—'}</td>
+                        <td className="muted" style={{ maxWidth: 240 }}>
+                          {item.description}
+                        </td>
+                      </tr>
+                    )
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {total > pageSize ? (
+            <div
+              style={{
+                marginTop: 16,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                fontSize: 12,
+                color: 'var(--subtle)',
+              }}
+            >
+              <span>
+                Showing {pageStart}–{pageEnd} of {total}
+              </span>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button type="button" className="btn btn-ghost btn-sm" disabled={offset === 0 || loading} onClick={prevPage}>
+                  Previous
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  disabled={offset + pageSize >= total || loading}
+                  onClick={nextPage}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </>
   )
 }
-
