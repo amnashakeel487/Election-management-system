@@ -23,8 +23,10 @@ src/locales/
 
 ## Language switcher
 
-- Public nav: **🌐 English | اردو | العربية | हिन्दी**
-- Dashboard top bar and **Account → Security** settings
+- **Public landing** top nav: **🌐 English | اردو | العربية | हिन्दी**
+- **Admin** top bar (next to dark mode): same switcher
+- **Voter / Creator** dashboard top bar (compact)
+- **Account → Security** and **Admin → Settings**: full language panel
 - Preference key: `localStorage` `fv-locale`
 
 ## Database

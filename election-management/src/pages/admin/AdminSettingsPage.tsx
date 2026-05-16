@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader'
 import { ADMIN_PAGE_META } from '@/config/adminNav'
+import { LanguageSettings } from '@/components/i18n/LanguageSettings'
 import { AppearanceSettings } from '@/components/theme/AppearanceSettings'
 
 const meta = ADMIN_PAGE_META.settings
@@ -46,7 +47,11 @@ export function AdminSettingsPage() {
     <>
       <AdminPageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
 
-      <AppearanceSettings variant="admin" />
+      <LanguageSettings variant="admin" />
+
+      <div style={{ marginTop: 16 }}>
+        <AppearanceSettings variant="admin" />
+      </div>
 
       <div className="grid-2" style={{ marginTop: 16 }}>
         <div className="card-elevated">

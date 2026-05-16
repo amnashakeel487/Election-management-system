@@ -1,6 +1,7 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import '@/styles/admin-dashboard.css'
 import '@/styles/admin-dashboard-dark.css'
+import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { ADMIN_PAGE_META } from '@/config/adminNav'
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar'
@@ -48,6 +49,7 @@ export function AdminLayout() {
                 </svg>
                 <input type="search" placeholder="Search anything…" aria-label="Search admin" />
               </div>
+              <LanguageSwitcher variant="admin" />
               <ThemeToggle variant="icon-btn" />
               <button
                 type="button"

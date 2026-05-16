@@ -23,6 +23,32 @@
   font-size: 11px;
 }
 
+/* Admin dashboard top bar (light card background) */
+.language-switcher--admin {
+  font-size: 11px;
+  align-items: center;
+  padding: 0 8px;
+  min-height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #e2e8f0);
+  background: var(--card, #fff);
+  color: var(--muted, #64748b);
+}
+
+.language-switcher--admin .language-switcher__btn {
+  color: var(--muted, #64748b);
+}
+
+.language-switcher--admin .language-switcher__btn:hover,
+.language-switcher--admin .language-switcher__btn--active {
+  color: var(--blue, #2451a3);
+  font-weight: 600;
+}
+
+.language-switcher--admin .language-switcher__icon {
+  font-size: 13px;
+}
+
 .language-switcher--settings .language-switcher__options {
   flex-wrap: wrap;
   margin-top: 0.75rem;

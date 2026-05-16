@@ -3,7 +3,7 @@ import { useLocale } from '@/context/LocaleContext'
 import { LOCALE_OPTIONS, type AppLocale } from '@/types/locale'
 
 export interface LanguageSwitcherProps {
-  variant?: 'nav' | 'compact' | 'settings'
+  variant?: 'nav' | 'compact' | 'settings' | 'admin'
   className?: string
 }
 
@@ -16,7 +16,9 @@ export function LanguageSwitcher({ variant = 'nav', className = '' }: LanguageSw
       ? 'language-switcher language-switcher--settings'
       : variant === 'compact'
         ? 'language-switcher language-switcher--compact'
-        : 'language-switcher language-switcher--nav'
+        : variant === 'admin'
+          ? 'language-switcher language-switcher--admin'
+          : 'language-switcher language-switcher--nav'
 
   return (
     <div
