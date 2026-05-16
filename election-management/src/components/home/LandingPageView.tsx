@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ShieldIcon } from '@/components/auth/AuthSplitChrome'
+import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
 import { useAuth } from '@/hooks/useAuth'
 import { LandingElectionsSection } from './LandingElectionsSection'
 import { useLandingCounter, useLandingReveal } from './useLandingReveal'
@@ -209,9 +210,10 @@ export function LandingPageView() {
           <span className="nav-tag">Enterprise</span>
         </Link>
 
-        <NavLinks mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+        <NavLinks mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} showLangInMobile />
 
         <div className="nav-actions">
+          <LanguageSwitcher variant="nav" className="nav-lang" />
           {signedIn ? (
             <button type="button" className="btn-primary-nav" onClick={() => navigate(dashboardPath)}>
               Dashboard →
@@ -567,9 +569,11 @@ export function LandingPageView() {
 function NavLinks({
   mobileOpen,
   setMobileOpen,
+  showLangInMobile = false,
 }: {
   mobileOpen: boolean
   setMobileOpen: (v: boolean) => void
+  showLangInMobile?: boolean
 }) {
   const links = [
     { href: '#elections-catalog', label: 'Elections' },
@@ -603,6 +607,11 @@ function NavLinks({
           {l.label}
         </a>
       ))}
+      {showLangInMobile && mobileOpen ? (
+        <div className="nav-lang-mobile">
+          <LanguageSwitcher variant="nav" />
+        </div>
+      ) : null}
     </div>
   )
 }
