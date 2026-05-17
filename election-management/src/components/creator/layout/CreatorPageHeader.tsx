@@ -16,7 +16,7 @@ export function CreatorPageHeader({ eyebrow, title, subtitle, actions }: Creator
         <div className="page-title">{title}</div>
         {subtitle ? <div className="page-subtitle">{subtitle}</div> : null}
       </div>
-      {actions}
+      {actions ? <div className="page-header-actions">{actions}</div> : null}
     </div>
   )
 }
