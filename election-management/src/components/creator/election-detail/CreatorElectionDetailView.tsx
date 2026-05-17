@@ -5,10 +5,12 @@ import { CreatorElectionDetailQrSection } from '@/components/creator/election-de
 import { CreatorElectionVotingControls } from '@/components/creator/election-detail/CreatorElectionVotingControls'
 import { ElectionWaitlistPanel } from '@/components/waitlist/ElectionWaitlistPanel'
 import { VoterRollLockPanel } from '@/components/election/VoterRollLockPanel'
-import { CANDIDATE_PLACEHOLDER_IMAGES } from '@/constants/electionDetailsAssets'
+import {
+  CREATOR_CANDIDATE_CARD_THEMES,
+  CreatorCandidateCard,
+} from '@/components/creator/candidates/CreatorCandidateCard'
 import type { AuditLogEntry } from '@/types/auth'
 import type { Candidate, ElectionWithCandidates } from '@/types/election'
-import { candidateInitial, candidatePortraitOrPlaceholder } from '@/utils/candidateDisplay'
 import type { ElectionResultsPayload } from '@/types/electionResults'
 import type { ElectionRegistrationStats } from '@/types/voterRegistration'
 import { avatarGradient, formatDashboardNumber } from '@/utils/dashboardDisplay'
@@ -29,6 +31,7 @@ import {
   registrationFillPercent,
   votingCountdownLabel,
 } from '@/components/creator/election-detail/creatorElectionDetailUtils'
+import { canCreatorDeleteElection } from '@/services/electionService'
 
 export interface CreatorElectionDetailViewProps {
   election: ElectionWithCandidates
@@ -41,10 +44,19 @@ export interface CreatorElectionDetailViewProps {
   onFinalize: () => void
   onDeleteCandidate?: (candidate: Candidate) => void
   deletingCandidateId?: string | null
+  onDeleteElection?: () => void
+  deletingElection?: boolean
 }
 
 const RANK_CLASS = ['gold', 'silver', 'bronze'] as const
-const CARD_CLASS = ['c1', 'c2', 'c3'] as const
+
+function clampCandidateBio(s: string, max = 120): string {
+  const t = s.trim()
+  if (!t) return ''
+  if (t.length <= max) return t
+  return `${t.slice(0, max)}…`
+}
+
 const BAR_GRADIENTS = [
   'linear-gradient(90deg,#F59E0B,#d97706)',
   'linear-gradient(90deg,#2451A3,#1B3A6B)',
@@ -62,6 +74,8 @@ export function CreatorElectionDetailView({
   onFinalize,
   onDeleteCandidate,
   deletingCandidateId = null,
+  onDeleteElection,
+  deletingElection = false,
 }: CreatorElectionDetailViewProps) {
   const [activeSection, setActiveSection] = useState<string>('sec-stats')
   const [nowMs, setNowMs] = useState(() => Date.now())
@@ -76,6 +90,7 @@ export function CreatorElectionDetailView({
   const status = ehStatusClass(election, nowMs)
   const canManageCandidates =
     election.status === 'draft' || election.status === 'published'
+  const canDeleteElection = canCreatorDeleteElection(election.status)
   const candidatesManageUrl = `/creator/candidates?election=${election.id}`
   const showInvite = election.status !== 'draft'
   const showRoll =
@@ -206,6 +221,20 @@ export function CreatorElectionDetailView({
               </svg>
               Public page
             </Link>
+            {canDeleteElection && onDeleteElection ? (
+              <button
+                type="button"
+                className="btn-delete-election"
+                disabled={deletingElection}
+                onClick={() => onDeleteElection()}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden>
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+                {deletingElection ? 'Deleting…' : 'Delete election'}
+              </button>
+            ) : null}
             <Link to="/creator/elections" className="btn-more" title="All elections" aria-label="All elections">
               <svg viewBox="0 0 24 24" aria-hidden>
                 <polyline points="15 18 9 12 15 6" />
@@ -374,82 +403,35 @@ export function CreatorElectionDetailView({
           ) : (
             <div className="candidates-grid">
               {sortedCandidates.slice(0, 6).map((c, i) => {
-                const { pct } = candidateVoteShare(c.id, results)
+                const { pct, votes } = candidateVoteShare(c.id, results)
                 const rank = RANK_CLASS[i] ?? 'bronze'
-                const cardClass = CARD_CLASS[i % 3]
-                const photo = candidatePortraitOrPlaceholder(c, CANDIDATE_PLACEHOLDER_IMAGES)
-                const hasPhoto = Boolean(c.photo_url?.trim())
+                const theme = CREATOR_CANDIDATE_CARD_THEMES[i % CREATOR_CANDIDATE_CARD_THEMES.length]
+                const pctLabel =
+                  totalVotes > 0
+                    ? `${pct}% of total`
+                    : election.status === 'draft'
+                      ? 'Votes appear after publishing'
+                      : '0% of total'
+
                 return (
-                  <div key={c.id} className={`candidate-card ${cardClass}`}>
-                    {results && pct > 0 ? (
-                      <span className={`candidate-rank-badge ${rank}`}>#{i + 1}</span>
-                    ) : null}
-                    {hasPhoto ? (
-                      <img src={photo} alt="" className="candidate-photo-img" />
-                    ) : (
-                      <div
-                        className="candidate-photo"
-                        style={{ background: avatarGradient(c.name) }}
-                      >
-                        {candidateInitial(c.name)}
-                      </div>
-                    )}
-                    <div className="candidate-name">{c.name}</div>
-                    <div className="candidate-designation">
-                      {c.designation?.trim() || 'Candidate'}
-                    </div>
-                    {c.description ? (
-                      <div className="candidate-manifesto">&ldquo;{c.description}&rdquo;</div>
-                    ) : null}
-                    {results && results.total_votes > 0 ? (
-                      <div className="candidate-vote-bar">
-                        <div className="cvb-header">
-                          <span className="cvb-label">Vote share</span>
-                          <span className="cvb-pct">{pct}%</span>
-                        </div>
-                        <div className="cvb-bar">
-                          <div
-                            className="cvb-fill"
-                            style={{
-                              width: `${Math.min(100, pct)}%`,
-                              background: BAR_GRADIENTS[i % 3],
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ) : null}
-                    <div className="candidate-footer">
-                      {canManageCandidates ? (
-                        <>
-                          <Link to={candidatesManageUrl} className="c-btn c-btn-edit">
-                            <svg viewBox="0 0 24 24" aria-hidden>
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                            </svg>
-                            Edit
-                          </Link>
-                          {onDeleteCandidate ? (
-                            <button
-                              type="button"
-                              className="c-btn-del"
-                              disabled={deletingCandidateId === c.id}
-                              aria-label={`Delete ${c.name}`}
-                              onClick={() => onDeleteCandidate(c)}
-                            >
-                              <svg viewBox="0 0 24 24" aria-hidden>
-                                <polyline points="3 6 5 6 21 6" />
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                              </svg>
-                            </button>
-                          ) : null}
-                        </>
-                      ) : (
-                        <Link to={candidatesManageUrl} className="c-btn c-btn-edit">
-                          View details
-                        </Link>
-                      )}
-                    </div>
-                  </div>
+                  <CreatorCandidateCard
+                    key={c.id}
+                    candidate={c}
+                    theme={theme}
+                    votes={votes}
+                    pct={pct}
+                    pctLabel={pctLabel}
+                    bio={clampCandidateBio(c.description ?? '')}
+                    canManage={canManageCandidates}
+                    editHref={candidatesManageUrl}
+                    onDelete={onDeleteCandidate ? () => onDeleteCandidate(c) : undefined}
+                    deleteDisabled={deletingCandidateId === c.id}
+                    headerExtra={
+                      results && pct > 0 ? (
+                        <span className={`candidate-rank-badge ${rank}`}>#{i + 1}</span>
+                      ) : null
+                    }
+                  />
                 )
               })}
             </div>

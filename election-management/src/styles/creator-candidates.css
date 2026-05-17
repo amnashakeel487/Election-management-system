@@ -127,7 +127,8 @@
   color: #64748b;
 }
 
-.creator-candidates-page .ccm-grid {
+.creator-candidates-page .ccm-grid,
+.creator-election-detail .candidates-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(252px, 1fr));
   gap: 18px;
@@ -140,38 +141,42 @@
   }
 }
 
-.creator-candidates-page .ccm-card {
+.creator-candidates-page .ccm-card,
+.creator-election-detail .ccm-card {
   background: #fff;
   border: 1px solid #e8edf4;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 420px;
+  min-height: 0;
   height: 100%;
   transition: transform 0.28s, box-shadow 0.28s;
   position: relative;
-  box-shadow: 0 2px 12px rgba(15, 35, 71, 0.06);
+  box-shadow: 0 4px 18px rgba(27, 58, 107, 0.08);
 }
 
-.creator-candidates-page .ccm-card::before {
+.creator-candidates-page .ccm-card::before,
+.creator-election-detail .ccm-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: var(--ccm-accent, #2451a3);
-  border-radius: 14px 14px 0 0;
+  height: 5px;
+  background: var(--ccm-accent, #1b3a6b);
+  border-radius: 16px 16px 0 0;
 }
 
-.creator-candidates-page .ccm-card:hover {
+.creator-candidates-page .ccm-card:hover,
+.creator-election-detail .ccm-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 36px rgba(15, 35, 71, 0.1);
+  box-shadow: 0 12px 32px rgba(27, 58, 107, 0.12);
 }
 
-.creator-candidates-page .ccm-card-body {
-  padding: 16px 18px 12px;
+.creator-candidates-page .ccm-card-body,
+.creator-election-detail .ccm-card-body {
+  padding: 22px 22px 20px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -179,20 +184,23 @@
   text-align: left;
 }
 
-.creator-candidates-page .ccm-avatar-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
+.creator-candidates-page .ccm-avatar-wrap,
+.creator-election-detail .ccm-avatar-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
-  padding: 6px;
+  margin-bottom: 14px;
+  padding: 8px;
   box-sizing: border-box;
   flex-shrink: 0;
+  background: var(--ccm-soft, #f0f4fa);
 }
 
-.creator-candidates-page .ccm-avatar {
+.creator-candidates-page .ccm-avatar,
+.creator-election-detail .ccm-avatar {
   width: 100%;
   height: 100%;
   border-radius: 10px;
@@ -200,7 +208,8 @@
   display: block;
 }
 
-.creator-candidates-page .ccm-avatar-fallback {
+.creator-candidates-page .ccm-avatar-fallback,
+.creator-election-detail .ccm-avatar-fallback {
   width: 100%;
   height: 100%;
   border-radius: 8px;
@@ -212,63 +221,78 @@
   color: #fff;
 }
 
-.creator-candidates-page .ccm-card-identity {
+.creator-candidates-page .ccm-card-identity,
+.creator-election-detail .ccm-card-identity {
   width: 100%;
   margin-bottom: 12px;
 }
 
-.creator-candidates-page .ccm-name {
+.creator-candidates-page .ccm-name,
+.creator-election-detail .ccm-name {
   display: block;
   width: 100%;
   padding: 0;
-  margin: 0 0 3px;
+  margin: 0 0 4px;
   border: none;
   background: none;
   font-family: inherit;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
-  color: #0f172a;
-  letter-spacing: -0.25px;
+  color: #1b3a6b;
+  letter-spacing: -0.3px;
   line-height: 1.3;
   text-align: left;
   cursor: pointer;
   transition: color 0.2s;
 }
 
-.creator-candidates-page .ccm-name:hover {
+.creator-candidates-page .ccm-name--static,
+.creator-election-detail .ccm-name--static {
+  cursor: default;
+}
+
+.creator-candidates-page .ccm-name:hover,
+.creator-election-detail .ccm-name:hover {
   color: var(--ccm-accent, #2451a3);
 }
 
-.creator-candidates-page .ccm-party {
+.creator-candidates-page .ccm-party,
+.creator-election-detail .ccm-party {
   font-size: 12px;
   font-weight: 500;
   color: #94a3b8;
   margin: 0;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
-.creator-candidates-page .ccm-stats {
+.creator-candidates-page .ccm-stats,
+.creator-election-detail .ccm-stats {
   width: 100%;
   margin-bottom: 10px;
 }
 
-.creator-candidates-page .ccm-votes {
-  font-size: 22px;
+.creator-candidates-page .ccm-votes,
+.creator-election-detail .ccm-votes {
+  font-size: 26px;
   font-weight: 800;
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  color: var(--ccm-accent, #2451a3);
-  letter-spacing: -0.4px;
-  margin-bottom: 8px;
+  color: #1b3a6b;
+  letter-spacing: -0.5px;
+  margin-bottom: 10px;
   line-height: 1;
 }
 
-.creator-candidates-page .ccm-votes-label {
+.creator-candidates-page .ccm-votes-label,
+.creator-election-detail .ccm-votes-label {
   font-size: 12px;
   font-weight: 600;
   color: #94a3b8;
   font-family: Sora, system-ui, sans-serif;
 }
 
-.creator-candidates-page .ccm-bar-track {
+.creator-candidates-page .ccm-bar-track,
+.creator-election-detail .ccm-bar-track {
   width: 100%;
   height: 8px;
   background: #eef2f7;
@@ -277,7 +301,8 @@
   margin-bottom: 6px;
 }
 
-.creator-candidates-page .ccm-bar-fill {
+.creator-candidates-page .ccm-bar-fill,
+.creator-election-detail .ccm-bar-fill {
   height: 100%;
   border-radius: 99px;
   background: var(--ccm-bar, linear-gradient(90deg, #2451a3, #1b3a6b));
@@ -285,14 +310,16 @@
   min-width: 0;
 }
 
-.creator-candidates-page .ccm-pct {
+.creator-candidates-page .ccm-pct,
+.creator-election-detail .ccm-pct {
   font-size: 11px;
   font-weight: 500;
   color: #94a3b8;
   margin: 0;
 }
 
-.creator-candidates-page .ccm-bio {
+.creator-candidates-page .ccm-bio,
+.creator-election-detail .ccm-bio {
   font-size: 12px;
   color: #64748b;
   line-height: 1.55;
@@ -306,47 +333,44 @@
   overflow: hidden;
 }
 
-.creator-candidates-page .ccm-card-footer {
-  margin-top: auto;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 12px 14px;
-  background: #0f172a;
-  border-radius: 0 0 13px 13px;
-}
-
-.creator-candidates-page .ccm-card-actions {
+.creator-candidates-page .ccm-card-actions,
+.creator-election-detail .ccm-card-actions {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
   width: 100%;
+  margin-top: 14px;
+  padding-top: 2px;
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-edit-btn {
+.creator-candidates-page .ccm-edit-btn,
+.creator-election-detail .ccm-edit-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 14px;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
   border-radius: 8px;
-  border: none;
+  border: 1px solid #e2e8f0;
   background: #fff;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  color: #0f172a;
+  color: #475569;
+  text-decoration: none;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
   flex: 0 0 auto;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-edit-btn svg {
-  width: 14px;
-  height: 14px;
-  stroke: #2451a3;
+.creator-candidates-page .ccm-edit-btn svg,
+.creator-election-detail .ccm-edit-btn svg {
+  width: 13px;
+  height: 13px;
+  stroke: #64748b;
   fill: none;
   stroke-width: 2;
   stroke-linecap: round;
@@ -354,18 +378,23 @@
   flex-shrink: 0;
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-edit-btn:hover {
+.creator-candidates-page .ccm-edit-btn:hover,
+.creator-election-detail .ccm-edit-btn:hover {
   background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-edit-btn:active {
+.creator-candidates-page .ccm-edit-btn:active,
+.creator-election-detail .ccm-edit-btn:active {
   transform: scale(0.98);
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-del-btn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+.creator-candidates-page .ccm-del-btn,
+.creator-election-detail .ccm-del-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
   padding: 0;
   border-radius: 8px;
   border: none;
@@ -379,27 +408,38 @@
   flex-shrink: 0;
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-del-btn:hover:not(:disabled) {
+.creator-candidates-page .ccm-del-btn:hover:not(:disabled),
+.creator-election-detail .ccm-del-btn:hover:not(:disabled) {
   background: #dc2626;
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-del-btn:active:not(:disabled) {
+.creator-candidates-page .ccm-del-btn:active:not(:disabled),
+.creator-election-detail .ccm-del-btn:active:not(:disabled) {
   transform: scale(0.96);
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-del-btn:disabled {
+.creator-candidates-page .ccm-del-btn:disabled,
+.creator-election-detail .ccm-del-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-del-btn svg {
-  width: 16px;
-  height: 16px;
+.creator-candidates-page .ccm-del-btn svg,
+.creator-election-detail .ccm-del-btn svg {
+  width: 15px;
+  height: 15px;
   stroke: #fff;
   fill: none;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.creator-election-detail .ccm-card .candidate-rank-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
 }
 
 .creator-candidates-page .ccm-add-card {

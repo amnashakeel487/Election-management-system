@@ -5,6 +5,7 @@ import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader
 import { CREATOR_PAGE_META } from '@/config/creatorNav'
 import { useCreatorElection } from '@/context/CreatorElectionContext'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
+import { canCreatorDeleteElection, deleteCreatorElection } from '@/services/electionService'
 import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import { creatorPhaseBadge, electionShortCode } from '@/utils/creatorDisplay'
 import { formatSubmissionDate } from '@/utils/formatDate'
@@ -12,9 +13,10 @@ import { formatSubmissionDate } from '@/utils/formatDate'
 const meta = CREATOR_PAGE_META.elections
 
 export function CreatorMyElectionsPage() {
-  const { elections, loading, refreshElections } = useCreatorElection()
+  const { elections, loading, refreshElections, setSelectedId } = useCreatorElection()
   const [tab, setTab] = useState<'all' | 'active' | 'draft' | 'completed'>('all')
   const [finalizingId, setFinalizingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
 
   const filtered = elections.filter((e) => {
@@ -25,6 +27,22 @@ export function CreatorMyElectionsPage() {
     if (tab === 'completed') return badge.label === 'Completed'
     return true
   })
+
+  async function handleDelete(electionId: string, title: string) {
+    if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return
+    setDeletingId(electionId)
+    setMessage(null)
+    try {
+      await deleteCreatorElection(electionId)
+      setSelectedId(null)
+      setMessage(`Deleted "${title}".`)
+      await refreshElections()
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Failed to delete election')
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   async function handleFinalize(electionId: string, title: string) {
     const regStats = await fetchElectionRegistrationStats(electionId)
@@ -123,10 +141,20 @@ export function CreatorMyElectionsPage() {
                       <button
                         type="button"
                         className="btn btn-sm btn-cyan"
-                        disabled={finalizingId === e.id}
+                        disabled={finalizingId === e.id || deletingId === e.id}
                         onClick={() => void handleFinalize(e.id, e.title)}
                       >
                         {finalizingId === e.id ? '…' : 'Finalize roll'}
+                      </button>
+                    ) : null}
+                    {canCreatorDeleteElection(e.status) ? (
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-danger"
+                        disabled={deletingId === e.id || finalizingId === e.id}
+                        onClick={() => void handleDelete(e.id, e.title)}
+                      >
+                        {deletingId === e.id ? '…' : 'Delete'}
                       </button>
                     ) : null}
                   </div>

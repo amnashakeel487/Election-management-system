@@ -1,5 +1,6 @@
 import { sanitizeText } from '@/lib/security/sanitize'
 import { electionDescriptionSchema, electionTitleSchema, parseOrThrow } from '@/lib/validation/schemas'
+import { removeCandidatePortrait } from '@/services/candidatePhotoService'
 import { supabase } from '@/lib/supabase'
 import type {
   Candidate,
@@ -169,6 +170,30 @@ export async function updateCreatorElectionControls(
 
   if (error) throw new Error(error.message)
   return data as Election
+}
+
+export function canCreatorDeleteElection(status: ElectionStatus): boolean {
+  return status === 'draft' || status === 'published'
+}
+
+/** Deletes an election and cascades related rows. Only draft/published (see RLS). */
+export async function deleteCreatorElection(electionId: string): Promise<void> {
+  const election = await fetchElectionById(electionId)
+  if (!election) throw new Error('Election not found')
+  if (!canCreatorDeleteElection(election.status)) {
+    throw new Error(
+      'Only draft or published elections can be deleted. Active or completed elections cannot be removed.',
+    )
+  }
+
+  await Promise.all(
+    election.candidates.map((c) =>
+      c.photo_url ? removeCandidatePortrait(c.photo_url).catch(() => undefined) : Promise.resolve(),
+    ),
+  )
+
+  const { error } = await supabase.from(ELECTIONS).delete().eq('id', electionId)
+  if (error) throw new Error(error.message)
 }
 
 export async function publishElection(electionId: string): Promise<Election> {

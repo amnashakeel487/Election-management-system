@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import '@/styles/creator-election-detail.css'
+import '@/styles/creator-candidates.css'
 import { CreatorElectionDetailView } from '@/components/creator/election-detail/CreatorElectionDetailView'
 import { useCreatorElection } from '@/context/CreatorElectionContext'
 import { useAuth } from '@/hooks/useAuth'
 import { fetchCreatorElectionAuditLogs } from '@/services/auditService'
 import { removeCandidatePortrait } from '@/services/candidatePhotoService'
-import { fetchElectionById, removeCandidate } from '@/services/electionService'
+import { deleteCreatorElection, fetchElectionById, removeCandidate } from '@/services/electionService'
 import { fetchElectionResults } from '@/services/resultsService'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
 import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
@@ -18,7 +19,8 @@ import type { ElectionRegistrationStats } from '@/types/voterRegistration'
 export function CreatorElectionDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { profile } = useAuth()
-  const { setSelectedId } = useCreatorElection()
+  const navigate = useNavigate()
+  const { setSelectedId, refreshElections } = useCreatorElection()
   const [election, setElection] = useState<ElectionWithCandidates | null>(null)
   const [stats, setStats] = useState<ElectionRegistrationStats | null>(null)
   const [results, setResults] = useState<ElectionResultsPayload | null>(null)
@@ -28,6 +30,7 @@ export function CreatorElectionDetailPage() {
   const [finalizingId, setFinalizingId] = useState<string | null>(null)
   const [finalizeMessage, setFinalizeMessage] = useState<string | null>(null)
   const [deletingCandidateId, setDeletingCandidateId] = useState<string | null>(null)
+  const [deletingElection, setDeletingElection] = useState(false)
 
   const load = useCallback(async () => {
     if (!id) return
@@ -107,6 +110,33 @@ export function CreatorElectionDetailPage() {
     }
   }
 
+  async function handleDeleteElection() {
+    if (!election) return
+    const registered = stats?.registered_count ?? 0
+    const warn =
+      registered > 0
+        ? `\n\nThis election has ${registered} registered voter(s). All data will be permanently removed.`
+        : ''
+    if (
+      !window.confirm(
+        `Delete "${election.title}"? This cannot be undone.${warn}`,
+      )
+    ) {
+      return
+    }
+    setDeletingElection(true)
+    setError(null)
+    try {
+      await deleteCreatorElection(election.id)
+      setSelectedId(null)
+      await refreshElections()
+      navigate('/creator/elections', { replace: true })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete election')
+      setDeletingElection(false)
+    }
+  }
+
   async function handleFinalize() {
     if (!election) return
     setFinalizingId(election.id)
@@ -161,6 +191,8 @@ export function CreatorElectionDetailPage() {
       onFinalize={() => void handleFinalize()}
       onDeleteCandidate={(c) => void handleDeleteCandidate(c)}
       deletingCandidateId={deletingCandidateId}
+      onDeleteElection={() => void handleDeleteElection()}
+      deletingElection={deletingElection}
     />
   )
 }
