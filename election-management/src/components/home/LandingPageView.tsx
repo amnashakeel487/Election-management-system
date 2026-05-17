@@ -176,7 +176,7 @@ export function LandingPageView() {
 
   return (
     <div className="lp-root">
-      <PublicSiteNav variant="landing" />
+      <PublicSiteNav variant="landing" trailing={<LiveClock variant="compact" />} />
 
       <section className="hero">
         <div className="hero-bg">
@@ -238,7 +238,6 @@ export function LandingPageView() {
                 </div>
               ))}
             </div>
-            <LiveClock variant="hero" />
           </div>
 
           <div className="hero-right">

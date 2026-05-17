@@ -1,7 +1,7 @@
 import { useLiveClock } from '@/hooks/useLiveClock'
 import '@/styles/dashboard-widgets.css'
 
-export type LiveClockVariant = 'default' | 'landing' | 'hero'
+export type LiveClockVariant = 'default' | 'landing' | 'hero' | 'compact'
 
 export interface LiveClockProps {
   variant?: LiveClockVariant
@@ -30,6 +30,28 @@ function CalendarIcon() {
 
 export function LiveClock({ variant = 'default', className = '' }: LiveClockProps) {
   const { weekday, date, time } = useLiveClock()
+
+  if (variant === 'compact') {
+    const compactClass = ['fv-live-clock', 'fv-live-clock--compact', 'fv-widget--fade', className]
+      .filter(Boolean)
+      .join(' ')
+
+    return (
+      <div className={compactClass} role="group" aria-label="Live clock">
+        <div className="fv-live-clock__compact-icon" aria-hidden>
+          <ClockIcon />
+        </div>
+        <div className="fv-live-clock__compact-body">
+          <span className="fv-live-clock__compact-time" aria-live="polite" aria-atomic="true">
+            {time}
+          </span>
+          <span className="fv-live-clock__compact-meta">
+            {weekday} · {date}
+          </span>
+        </div>
+      </div>
+    )
+  }
 
   const rootClass = [
     'fv-widget',
