@@ -1,7 +1,7 @@
 import { useDailyQuote } from '@/hooks/useDailyQuote'
 import '@/styles/dashboard-widgets.css'
 
-export type DailyQuoteVariant = 'default' | 'landing'
+export type DailyQuoteVariant = 'default' | 'landing' | 'hero'
 
 export interface DailyQuoteProps {
   variant?: DailyQuoteVariant
@@ -19,6 +19,27 @@ function QuoteIcon() {
 
 export function DailyQuote({ variant = 'default', className = '' }: DailyQuoteProps) {
   const { quote, loading } = useDailyQuote()
+
+  if (variant === 'hero') {
+    const heroClass = ['fv-daily-quote', 'fv-daily-quote--hero', 'fv-widget--fade', className]
+      .filter(Boolean)
+      .join(' ')
+
+    return (
+      <blockquote className={heroClass} cite={quote?.author}>
+        {loading ? (
+          <p className="fv-daily-quote__hero-placeholder" aria-busy="true" aria-label="Loading quote">
+            &nbsp;
+          </p>
+        ) : (
+          <>
+            <p className="fv-daily-quote__hero-text">&ldquo;{quote?.text}&rdquo;</p>
+            {quote?.author ? <footer className="fv-daily-quote__hero-author">{quote.author}</footer> : null}
+          </>
+        )}
+      </blockquote>
+    )
+  }
 
   const rootClass = [
     'fv-widget',

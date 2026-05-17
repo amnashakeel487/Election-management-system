@@ -11,7 +11,7 @@ import { LandingTeamSection } from './LandingTeamSection'
 import { LandingDashboardPreview } from './LandingDashboardPreview'
 import { LandingStatsStrip } from './LandingStatsStrip'
 import { LiveClock } from '@/components/common/LiveClock'
-import { DashboardWidgetsRow } from '@/components/common/DashboardWidgetsRow'
+import { DailyQuote } from '@/components/common/DailyQuote'
 import { useLandingLiveData } from '@/hooks/useLandingLiveData'
 import { useLandingReveal } from './useLandingReveal'
 import './landing-page.css'
@@ -242,6 +242,7 @@ export function LandingPageView() {
           </div>
 
           <div className="hero-right">
+            <DailyQuote variant="hero" />
             <LandingDashboardPreview
               snapshot={snapshot}
               loading={liveLoading}
@@ -256,8 +257,6 @@ export function LandingPageView() {
         loading={liveLoading}
         formatCompact={formatCompactNum}
       />
-
-      <DashboardWidgetsRow variant="landing" />
 
       <LandingElectionsSection />
 

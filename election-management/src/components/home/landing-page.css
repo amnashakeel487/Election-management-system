@@ -72,7 +72,46 @@ html{scroll-behavior:smooth;}
 .lp-root .t-chip svg{width:10px;height:10px;stroke:#10B981;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
 
 /* Hero right â€” live dashboard preview */
-.lp-root .hero-right{animation:slideRight 0.9s cubic-bezier(0.4,0,0.2,1) 0.2s both;}
+.lp-root .hero-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:20px;
+  animation:slideRight 0.9s cubic-bezier(0.4,0,0.2,1) 0.2s both;
+}
+.lp-root .fv-daily-quote--hero{
+  margin:0;
+  padding:0;
+  border:none;
+  background:transparent;
+  box-shadow:none;
+  max-width:min(300px,100%);
+  text-align:right;
+}
+.lp-root .fv-daily-quote__hero-text{
+  margin:0;
+  font-size:clamp(11px,1.35vw,13px);
+  font-weight:400;
+  font-style:italic;
+  line-height:1.6;
+  color:rgba(255,255,255,0.88);
+  overflow-wrap:anywhere;
+}
+.lp-root .fv-daily-quote__hero-author{
+  margin:8px 0 0;
+  font-size:11px;
+  font-weight:500;
+  font-style:normal;
+  color:rgba(255,255,255,0.5);
+}
+.lp-root .fv-daily-quote__hero-author::before{
+  content:'— ';
+}
+.lp-root .fv-daily-quote__hero-placeholder{
+  margin:0;
+  min-height:2.5em;
+  opacity:0;
+}
 @keyframes slideRight{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
 .lp-root .dashboard-preview{
   background:rgba(255,255,255,0.97);border-radius:20px;overflow:hidden;
@@ -515,7 +554,9 @@ footer{background:#080f1e;padding:60px 48px 28px;border-top:1px solid rgba(255,2
 @media(max-width:1024px){
 .lp-root .hero-inner{grid-template-columns:1fr;gap:40px;text-align:center;}
 .lp-root .hero-sub,.trust-chips,.hero-btns{margin-left:auto;margin-right:auto;justify-content:center;}
-.lp-root .hero-right{display:none;}
+.lp-root .hero-right{display:flex;align-items:center;margin:0 auto;}
+.lp-root .hero-right .dashboard-preview{display:none;}
+.lp-root .fv-daily-quote--hero{max-width:420px;text-align:center;}
 .lp-root .features-grid{grid-template-columns:repeat(2,1fr);}
 .lp-root .how-grid{grid-template-columns:repeat(2,1fr);}
 .lp-root .testi-grid{grid-template-columns:repeat(2,1fr);}
