@@ -283,6 +283,75 @@ html{scroll-behavior:smooth;}
 .lp-root .testi-name{font-size:13px;font-weight:700;color:#0F172A;}
 .lp-root .testi-role{font-size:11px;color:#94A3B8;}
 
+/* ——— GET IN TOUCH ——— */
+.lp-root .contact-section{
+  background:linear-gradient(135deg,#080f1e 0%,#0f2347 48%,#1a1040 100%);
+  position:relative;overflow:hidden;color:#fff;
+}
+.lp-root .contact-section .section-title{color:#fff;}
+.lp-root .contact-section .section-sub{color:rgba(255,255,255,0.55);}
+.lp-root .contact-section .section-eyebrow{color:var(--cyan);}
+.lp-root .contact-orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;}
+.lp-root .contact-orb--1{width:360px;height:360px;background:rgba(108,63,197,0.18);top:-120px;right:5%;}
+.lp-root .contact-orb--2{width:300px;height:300px;background:rgba(6,182,212,0.12);bottom:-80px;left:0;}
+.lp-root .contact-card{
+  position:relative;max-width:820px;margin:48px auto 0;padding:32px 34px 28px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  border-radius:24px;backdrop-filter:blur(12px);
+  box-shadow:0 24px 64px rgba(0,0,0,0.35);
+  overflow:hidden;
+}
+.lp-root .contact-card-glow{
+  position:absolute;top:-40%;left:50%;transform:translateX(-50%);
+  width:80%;height:60%;background:radial-gradient(ellipse,rgba(108,63,197,0.25),transparent 70%);
+  pointer-events:none;animation:contactGlow 6s ease-in-out infinite;
+}
+@keyframes contactGlow{0%,100%{opacity:0.6;transform:translateX(-50%) scale(1);}50%{opacity:1;transform:translateX(-50%) scale(1.08);}}
+.lp-root .contact-card-header{display:flex;gap:16px;align-items:flex-start;margin-bottom:20px;position:relative;z-index:1;}
+.lp-root .contact-help-icon{
+  width:48px;height:48px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(36,81,163,0.35),rgba(108,63,197,0.35));
+  border:1px solid rgba(255,255,255,0.15);
+  display:flex;align-items:center;justify-content:center;color:#67E8F9;
+}
+.lp-root .contact-help-icon svg{width:22px;height:22px;}
+.lp-root .contact-card-title{font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:6px;}
+.lp-root .contact-card-lead{font-size:13px;line-height:1.7;color:rgba(255,255,255,0.55);}
+.lp-root .contact-topics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;position:relative;z-index:1;}
+.lp-root .contact-topic-chip{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;
+  padding:5px 11px;border-radius:20px;color:rgba(255,255,255,0.75);
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
+  transition:background 0.25s,border-color 0.25s;
+}
+.lp-root .contact-topic-chip:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.2);}
+.lp-root .contact-email-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;position:relative;z-index:1;}
+.lp-root .contact-email-card{
+  display:flex;flex-direction:column;gap:12px;padding:18px 18px 16px;
+  background:rgba(255,255,255,0.97);border:1px solid rgba(255,255,255,0.2);border-radius:16px;
+  text-decoration:none;color:inherit;
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1),box-shadow 0.35s ease,border-color 0.3s;
+}
+.lp-root .contact-email-card:hover{
+  transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,0.25);border-color:rgba(36,81,163,0.35);
+}
+.lp-root .contact-email-icon{
+  width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+}
+.lp-root .contact-email-icon svg{width:18px;height:18px;}
+.lp-root .contact-email-name{font-size:14px;font-weight:800;color:#0F172A;letter-spacing:-0.2px;}
+.lp-root .contact-email-role{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.45px;color:#64748B;margin:2px 0 6px;}
+.lp-root .contact-email-address{font-size:12px;font-weight:600;color:#2451A3;word-break:break-all;}
+.lp-root .contact-email-action{
+  font-size:11px;font-weight:700;color:#6C3FC5;margin-top:auto;padding-top:4px;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.lp-root .contact-email-card:hover .contact-email-action{text-decoration:underline;}
+.lp-root .contact-note{
+  margin-top:20px;font-size:11px;line-height:1.6;color:rgba(255,255,255,0.4);
+  text-align:center;position:relative;z-index:1;
+}
+
 /* ——— OUR TEAM ——— */
 .lp-root .team-section{
   background:linear-gradient(180deg,#fff 0%,#F0F4F9 55%,#E8EEF7 100%);
@@ -401,6 +470,8 @@ footer{background:#080f1e;padding:60px 48px 28px;border-top:1px solid rgba(255,2
 .lp-root .how-grid{grid-template-columns:repeat(2,1fr);}
 .lp-root .testi-grid{grid-template-columns:repeat(2,1fr);}
 .lp-root .team-grid{grid-template-columns:1fr;max-width:440px;}
+.lp-root .contact-email-grid{grid-template-columns:1fr;}
+.lp-root .contact-card{padding:24px 20px 22px;}
 .lp-root .footer-top{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:768px){
@@ -414,6 +485,8 @@ footer{background:#080f1e;padding:60px 48px 28px;border-top:1px solid rgba(255,2
 .lp-root .stat-col{border-right:none;border-bottom:1px solid #E2E8F0;padding-bottom:16px;}
 .lp-root .features-grid,.testi-grid,.team-grid{grid-template-columns:1fr;}
 .lp-root .team-card-inner{flex-direction:column;text-align:center;align-items:center;}
+.lp-root .contact-card{padding:22px 18px 20px;}
+.lp-root .contact-card-header{flex-direction:column;align-items:center;text-align:center;}
 .lp-root .how-grid{grid-template-columns:1fr 1fr;}
 .lp-root .footer-top{grid-template-columns:1fr;gap:28px;}
   footer{padding:40px 20px 20px;}

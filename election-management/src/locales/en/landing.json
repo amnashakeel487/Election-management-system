@@ -124,6 +124,29 @@
     "signIn": "Sign in",
     "chips": ["Free to register", "Setup in minutes", "Email verification", "Cancel anytime"]
   },
+  "contact": {
+    "eyebrow": "We're here to help",
+    "title": "Get in",
+    "titleAccent": "touch",
+    "sub": "Questions about elections, registration, or the platform? Reach out — we'll point you in the right direction.",
+    "cardTitle": "Need help or have feedback?",
+    "cardLead": "Whether you're a voter, election organizer, or partner exploring FortressVote, our team responds to product questions, technical issues, and partnership inquiries.",
+    "helpTopics": [
+      "Voter registration",
+      "Casting a ballot",
+      "Organizer setup",
+      "Security & privacy",
+      "Bug reports",
+      "Partnerships"
+    ],
+    "abdullahName": "Muhammad Abdullah",
+    "abdullahRole": "Technical & platform support",
+    "amnaName": "Amna Shakeel",
+    "amnaRole": "Product, design & UX",
+    "sendEmail": "Send email →",
+    "mailSubject": "FortressVote — Support request",
+    "note": "We typically reply within 1–2 business days. For account security issues, include your registered email and never share passwords."
+  },
   "team": {
     "eyebrow": "Built with care",
     "title": "Meet our",
