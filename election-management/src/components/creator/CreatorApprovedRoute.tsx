@@ -9,11 +9,7 @@ export function CreatorApprovedRoute({ children }: CreatorApprovedRouteProps) {
   const { profile, loading } = useAuth()
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-surface text-on-surface">
-        <span className="font-body-md text-body-md text-on-surface-variant">Loading…</span>
-      </div>
-    )
+    return <p style={{ fontSize: 13, color: 'var(--subtle)' }}>Loading…</p>
   }
 
   if (profile?.role === 'election_creator' && profile.approval_status !== 'approved') {

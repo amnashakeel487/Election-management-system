@@ -25,11 +25,21 @@ import { AdminSecurityPage } from '@/pages/admin/AdminSecurityPage'
 import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage'
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
 import { AdminVotersPage } from '@/pages/admin/AdminVotersPage'
+import { CreatorLayout } from '@/components/creator/layout/CreatorLayout'
 import { CreateElectionPage } from '@/pages/creator/CreateElectionPage'
+import { CreatorCandidatesPage } from '@/pages/creator/CreatorCandidatesPage'
+import { CreatorControlPage } from '@/pages/creator/CreatorControlPage'
 import { CreatorElectionDetailPage } from '@/pages/creator/CreatorElectionDetailPage'
+import { CreatorMyElectionsPage } from '@/pages/creator/CreatorMyElectionsPage'
+import { CreatorNotificationsPage } from '@/pages/creator/CreatorNotificationsPage'
+import { CreatorParticipantsPage } from '@/pages/creator/CreatorParticipantsPage'
+import { CreatorProfilePage } from '@/pages/creator/CreatorProfilePage'
+import { CreatorReportsPage } from '@/pages/creator/CreatorReportsPage'
+import { CreatorResultsPage } from '@/pages/creator/CreatorResultsPage'
+import { CreatorSecretIdsPage } from '@/pages/creator/CreatorSecretIdsPage'
+import { CreatorSettingsPage } from '@/pages/creator/CreatorSettingsPage'
 import { EditElectionPage } from '@/pages/creator/EditElectionPage'
 import { ElectionJoinPage } from '@/pages/ElectionJoinPage'
-import { CreatorCandidatesPage } from '@/pages/creator/CreatorCandidatesPage'
 import { CreatorDashboardPage } from '@/pages/dashboards/CreatorDashboardPage'
 import { VoterDashboardPage } from '@/pages/dashboards/VoterDashboardPage'
 import { ElectionDetailsPage } from '@/pages/ElectionDetailsPage'
@@ -153,53 +163,106 @@ export function AppRoutes() {
       </Route>
       <Route path="/admin/approvals" element={<Navigate to="/admin/requests" replace />} />
       <Route
-        path="/creator/dashboard"
+        path="/creator"
         element={
           <ProtectedRoute allowedRoles={['election_creator']}>
-            <CreatorDashboardPage />
+            <CreatorLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/creator/candidates"
-        element={
-          <ProtectedRoute allowedRoles={['election_creator']}>
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<CreatorDashboardPage />} />
+        <Route
+          path="elections"
+          element={
+            <CreatorApprovedRoute>
+              <CreatorMyElectionsPage />
+            </CreatorApprovedRoute>
+          }
+        />
+        <Route
+          path="candidates"
+          element={
             <CreatorApprovedRoute>
               <CreatorCandidatesPage />
             </CreatorApprovedRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/creator/elections/new"
-        element={
-          <ProtectedRoute allowedRoles={['election_creator']}>
+          }
+        />
+        <Route
+          path="participants"
+          element={
+            <CreatorApprovedRoute>
+              <CreatorParticipantsPage />
+            </CreatorApprovedRoute>
+          }
+        />
+        <Route
+          path="control"
+          element={
+            <CreatorApprovedRoute>
+              <CreatorControlPage />
+            </CreatorApprovedRoute>
+          }
+        />
+        <Route
+          path="secret-ids"
+          element={
+            <CreatorApprovedRoute>
+              <CreatorSecretIdsPage />
+            </CreatorApprovedRoute>
+          }
+        />
+        <Route
+          path="results"
+          element={
+            <CreatorApprovedRoute>
+              <CreatorResultsPage />
+            </CreatorApprovedRoute>
+          }
+        />
+        <Route
+          path="notifications"
+          element={
+            <CreatorApprovedRoute>
+              <CreatorNotificationsPage />
+            </CreatorApprovedRoute>
+          }
+        />
+        <Route
+          path="reports"
+          element={
+            <CreatorApprovedRoute>
+              <CreatorReportsPage />
+            </CreatorApprovedRoute>
+          }
+        />
+        <Route path="settings" element={<CreatorSettingsPage />} />
+        <Route path="profile" element={<CreatorProfilePage />} />
+        <Route
+          path="elections/new"
+          element={
             <CreatorApprovedRoute>
               <CreateElectionPage />
             </CreatorApprovedRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/creator/elections/:id"
-        element={
-          <ProtectedRoute allowedRoles={['election_creator']}>
+          }
+        />
+        <Route
+          path="elections/:id"
+          element={
             <CreatorApprovedRoute>
               <CreatorElectionDetailPage />
             </CreatorApprovedRoute>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/creator/elections/:id/edit"
-        element={
-          <ProtectedRoute allowedRoles={['election_creator']}>
+          }
+        />
+        <Route
+          path="elections/:id/edit"
+          element={
             <CreatorApprovedRoute>
               <EditElectionPage />
             </CreatorApprovedRoute>
-          </ProtectedRoute>
-        }
-      />
+          }
+        />
+      </Route>
       <Route
         path="/voter/dashboard"
         element={

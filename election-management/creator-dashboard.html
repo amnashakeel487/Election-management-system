@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VoteSecure — Creator Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0F2347;--navy2:#1B3A6B;--blue:#2451A3;--purple:#6C3FC5;
+  --cyan:#06B6D4;--success:#10B981;--danger:#EF4444;--warning:#F59E0B;
+  --info:#3B82F6;--text:#0F172A;--muted:#475569;--subtle:#94A3B8;
+  --border:#E2E8F0;--bg:#F0F4F9;--card:#FFFFFF;--sidebar:#0A1628;
+}
+html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+.app{display:flex;height:100vh;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:232px;flex-shrink:0;background:var(--sidebar);display:flex;flex-direction:column;height:100vh;overflow-y:auto;overflow-x:hidden;border-right:1px solid rgba(255,255,255,0.05);transition:width 0.3s cubic-bezier(0.4,0,0.2,1);position:relative;z-index:50;}
+.sidebar.collapsed{width:62px;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:20px 16px 18px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;}
+.sb-icon{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,#2451A3,#6C3FC5);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(108,63,197,0.4);}
+.sb-icon svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.sb-name{font-size:15px;font-weight:800;color:#fff;white-space:nowrap;letter-spacing:-0.3px;}
+.sb-tag{font-size:8px;font-weight:700;color:#F59E0B;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.28);border-radius:20px;padding:1px 7px;white-space:nowrap;}
+.collapsed .sb-name,.collapsed .sb-tag{display:none;}
+.sb-role-badge{margin:12px 10px;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:8px;}
+.collapsed .sb-role-badge{padding:9px;justify-content:center;}
+.sb-role-dot{width:7px;height:7px;border-radius:50%;background:#F59E0B;flex-shrink:0;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.sb-role-text{display:flex;flex-direction:column;}
+.sb-role-sub{font-size:9px;color:rgba(255,255,255,0.35);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.sb-role-val{font-size:11px;color:#fff;font-weight:700;}
+.collapsed .sb-role-text{display:none;}
+.sb-section-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.22);padding:14px 16px 5px;white-space:nowrap;}
+.collapsed .sb-section-label{padding:10px 0;text-align:center;font-size:7px;color:rgba(255,255,255,0.12);}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;margin:1px 8px;border-radius:9px;cursor:pointer;transition:all 0.2s;position:relative;color:rgba(255,255,255,0.48);font-size:13px;font-weight:500;white-space:nowrap;}
+.collapsed .sb-item{padding:9px;margin:1px 6px;justify-content:center;}
+.sb-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85);}
+.sb-item.active{background:linear-gradient(135deg,rgba(36,81,163,0.65),rgba(108,63,197,0.5));color:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.25);}
+.sb-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.sb-label{flex:1;}
+.collapsed .sb-label{display:none;}
+.sb-badge-num{font-size:9px;font-weight:700;background:#EF4444;color:#fff;padding:1px 6px;border-radius:10px;min-width:16px;text-align:center;}
+.collapsed .sb-badge-num{position:absolute;top:4px;right:4px;font-size:8px;padding:1px 4px;}
+.sb-collapse-btn{display:flex;align-items:center;justify-content:flex-end;padding:10px 14px;cursor:pointer;color:rgba(255,255,255,0.22);transition:color 0.2s;border-top:1px solid rgba(255,255,255,0.06);margin-top:auto;flex-shrink:0;}
+.collapsed .sb-collapse-btn{justify-content:center;}
+.sb-collapse-btn:hover{color:rgba(255,255,255,0.6);}
+.sb-collapse-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.3s;}
+.collapsed .sb-collapse-btn svg{transform:rotate(180deg);}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{height:58px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;flex-shrink:0;}
+.topbar-left{flex:1;display:flex;flex-direction:column;}
+.topbar-title{font-size:15px;font-weight:700;color:var(--text);}
+.topbar-sub{font-size:11px;color:var(--subtle);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;min-width:200px;transition:all 0.2s;}
+.tb-search:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,81,163,0.1);}
+.tb-search svg{width:14px;height:14px;stroke:var(--subtle);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.tb-search input{border:none;outline:none;background:transparent;font-family:'Sora',sans-serif;font-size:12px;color:var(--text);width:100%;}
+.tb-search input::placeholder{color:var(--subtle);}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;position:relative;color:var(--muted);}
+.icon-btn:hover{background:var(--bg);border-color:var(--blue);color:var(--blue);}
+.icon-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.notif-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:#EF4444;border:2px solid #fff;}
+.avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;}
+.content{flex:1;overflow-y:auto;padding:22px 24px;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-track{background:transparent;}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* ── PAGE SYSTEM ── */
+.page{display:none;animation:pageIn 0.3s ease;}
+.page.active{display:block;}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── TYPOGRAPHY ── */
+.page-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:4px;}
+.page-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
+.page-subtitle{font-size:13px;color:var(--subtle);margin-top:3px;}
+.page-header{margin-bottom:22px;}
+.section-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;}
+
+/* ── CARDS ── */
+.card{background:var(--card);border-radius:14px;border:1px solid var(--border);}
+.card-elevated{background:var(--card);border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,0.05);border:1px solid var(--border);}
+.card-header{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.card-title{font-size:14px;font-weight:700;color:var(--text);}
+.card-subtitle{font-size:11px;color:var(--subtle);margin-top:2px;}
+.card-body{padding:18px 20px;}
+
+/* ── STAT CARDS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:14px;margin-bottom:20px;}
+.stat-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:18px;transition:all 0.3s;}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.08);}
+.stat-icon-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.stat-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.stat-delta{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.du{background:#DCFCE7;color:#16A34A;}
+.dd{background:#FEE2E2;color:#DC2626;}
+.dn{background:#F1F5F9;color:#64748B;}
+.stat-num{font-size:26px;font-weight:800;color:var(--text);line-height:1;font-family:'IBM Plex Mono',monospace;letter-spacing:-1px;}
+.stat-label{font-size:11px;color:var(--subtle);margin-top:4px;font-weight:500;}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.4px;}
+.b-active{background:#DCFCE7;color:#16A34A;}
+.b-upcoming{background:#DBEAFE;color:#2563EB;}
+.b-completed{background:#EDE9FE;color:#6D28D9;}
+.b-draft{background:#F1F5F9;color:#64748B;}
+.b-pending{background:#FEF9C3;color:#CA8A04;}
+.b-suspended{background:#FEE2E2;color:#DC2626;}
+.b-live{background:#DCFCE7;color:#16A34A;animation:bp 2s infinite;}
+@keyframes bp{0%,100%{opacity:1;}50%{opacity:0.7;}}
+.b-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#10B981;animation:ld 1.5s ease-in-out infinite;display:inline-block;}
+@keyframes ld{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.6);opacity:0.5;}}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 16px;border-radius:9px;border:none;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.25s;}
+.btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.btn-primary{background:linear-gradient(135deg,#1B3A6B,#6C3FC5);color:#fff;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(27,58,107,0.35);}
+.btn-success{background:linear-gradient(135deg,#10B981,#059669);color:#fff;}
+.btn-success:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(16,185,129,0.35);}
+.btn-danger{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;}
+.btn-danger:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(239,68,68,0.35);}
+.btn-warning{background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;}
+.btn-warning:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(245,158,11,0.35);}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{background:var(--bg);border-color:var(--blue);color:var(--blue);}
+.btn-cyan{background:linear-gradient(135deg,#06B6D4,#0891B2);color:#fff;}
+.btn-cyan:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(6,182,212,0.35);}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:7px;}
+.btn-xs{padding:4px 10px;font-size:10px;border-radius:6px;}
+
+/* ── TABLES ── */
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;background:var(--card);}
+thead tr{border-bottom:1.5px solid var(--border);}
+th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:0.6px;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#F8FAFC;}
+td{padding:11px 14px;font-size:12px;color:var(--text);vertical-align:middle;}
+td.mono{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blue);}
+td.muted{color:var(--subtle);}
+.td-actions{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:2px;background:var(--bg);border-radius:10px;padding:3px;width:fit-content;margin-bottom:16px;}
+.tab-btn{padding:7px 16px;border-radius:8px;border:none;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--subtle);}
+.tab-btn.active{background:var(--card);color:var(--navy2);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.tab-btn:hover:not(.active){color:var(--text);}
+
+/* ── FORM ── */
+.form-group{margin-bottom:16px;}
+.form-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:6px;display:block;}
+.form-input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);background:var(--card);outline:none;transition:all 0.2s;}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,81,163,0.1);}
+.form-input::placeholder{color:#CBD5E1;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");background-position:right 10px center;background-repeat:no-repeat;background-size:14px;padding-right:32px;}
+textarea.form-input{resize:vertical;min-height:80px;}
+
+/* ── PROGRESS ── */
+.progress-wrap{height:8px;background:var(--border);border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(0.4,0,0.2,1);}
+
+/* ── MINI CHART ── */
+.mini-chart{display:flex;align-items:flex-end;gap:5px;height:70px;}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.chart-bar{width:100%;border-radius:5px 5px 0 0;}
+.chart-label{font-size:9px;color:var(--subtle);}
+
+/* ── GRID LAYOUTS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-7-3{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;}
+.grid-3-7{display:grid;grid-template-columns:1fr 1.7fr;gap:16px;}
+
+/* ── TIMELINE ── */
+.timeline{padding:0 0 0 20px;position:relative;}
+.timeline::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:1.5px;background:linear-gradient(to bottom,var(--blue),var(--border));}
+.tl-item{position:relative;padding:0 0 18px 20px;}
+.tl-dot{position:absolute;left:-20px;top:2px;width:14px;height:14px;border-radius:50%;border:2px solid var(--card);display:flex;align-items:center;justify-content:center;}
+.tl-dot-inner{width:6px;height:6px;border-radius:50%;}
+.tl-title{font-size:12px;font-weight:700;color:var(--text);}
+.tl-sub{font-size:11px;color:var(--subtle);margin-top:2px;line-height:1.5;}
+.tl-time{font-size:10px;color:var(--subtle);font-family:'IBM Plex Mono',monospace;margin-top:3px;}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;animation:mfade 0.2s ease;}
+@keyframes mfade{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--card);border-radius:18px;padding:28px;width:92%;max-width:520px;box-shadow:0 32px 80px rgba(0,0,0,0.25);animation:mup 0.3s cubic-bezier(0.4,0,0.2,1);}
+@keyframes mup{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-size:17px;font-weight:800;color:var(--text);}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--subtle);}
+.modal-close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.modal-footer{display:flex;gap:10px;margin-top:22px;justify-content:flex-end;}
+
+/* ── ALERTS ── */
+.alert{padding:11px 14px;border-radius:10px;font-size:12px;display:flex;align-items:flex-start;gap:9px;margin-bottom:12px;}
+.alert svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:1px;}
+.a-danger{background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;}
+.a-warning{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;}
+.a-info{background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;}
+.a-success{background:#F0FDF4;border:1px solid #BBF7D0;color:#166534;}
+
+/* ── TOGGLE ── */
+.toggle-wrap{display:flex;align-items:center;gap:12px;}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;cursor:pointer;transition:background 0.25s;flex-shrink:0;}
+.toggle.on{background:var(--success);}
+.toggle-thumb{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:transform 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.toggle.on .toggle-thumb{transform:translateX(18px);}
+.toggle-label{font-size:12px;font-weight:600;color:var(--text);}
+.toggle-sub{font-size:11px;color:var(--subtle);margin-top:1px;}
+
+/* ── STEP WIZARD ── */
+.wizard-steps{display:flex;align-items:center;margin-bottom:28px;}
+.wiz-step{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;z-index:1;}
+.wiz-connector{flex:1;height:2px;background:var(--border);margin:0 8px;margin-bottom:20px;transition:background 0.4s;}
+.wiz-connector.done{background:var(--success);}
+.wiz-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all 0.3s;border:2px solid var(--border);background:var(--card);color:var(--subtle);}
+.wiz-circle.active{background:linear-gradient(135deg,#1B3A6B,#6C3FC5);color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(27,58,107,0.4);}
+.wiz-circle.done{background:var(--success);color:#fff;border-color:transparent;}
+.wiz-label{font-size:10px;font-weight:600;color:var(--subtle);white-space:nowrap;}
+.wiz-label.active{color:var(--navy2);}
+
+/* ── CONTROL PANEL ── */
+.control-panel{background:linear-gradient(135deg,#0F2347,#1B3A6B 60%,#2D1B69);border-radius:16px;padding:24px;color:#fff;position:relative;overflow:hidden;}
+.control-panel::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(108,63,197,0.2);filter:blur(60px);top:-100px;right:-60px;pointer-events:none;}
+.control-timer{font-family:'IBM Plex Mono',monospace;font-size:42px;font-weight:700;color:#fff;letter-spacing:2px;margin:16px 0;}
+.timer-units{display:flex;gap:10px;}
+.timer-unit{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;text-align:center;min-width:64px;}
+.timer-num{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;color:#fff;line-height:1;}
+.timer-label{font-size:9px;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:3px;}
+.control-btns{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.ctrl-btn{padding:11px 20px;border-radius:10px;border:none;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all 0.25s;}
+.ctrl-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.ctrl-start{background:#10B981;color:#fff;}
+.ctrl-start:hover{background:#059669;transform:translateY(-2px);box-shadow:0 8px 20px rgba(16,185,129,0.4);}
+.ctrl-stop{background:#EF4444;color:#fff;}
+.ctrl-stop:hover{background:#DC2626;transform:translateY(-2px);box-shadow:0 8px 20px rgba(239,68,68,0.4);}
+.ctrl-restart{background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);color:#fff;}
+.ctrl-restart:hover{background:rgba(255,255,255,0.18);}
+.ctrl-lock{background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);}
+.ctrl-lock:hover{background:rgba(255,255,255,0.14);}
+
+/* ── CANDIDATE CARD ── */
+.candidate-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:18px;transition:all 0.3s;position:relative;}
+.candidate-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,0.09);border-color:rgba(36,81,163,0.25);}
+.cand-avatar{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:12px;}
+.cand-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.cand-party{font-size:11px;color:var(--subtle);}
+.cand-votes{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;margin:10px 0 6px;}
+.cand-actions{display:flex;gap:6px;margin-top:12px;}
+
+/* ── SECRET ID ── */
+.sid-box{background:#0F2347;border:1px solid rgba(6,182,212,0.3);border-radius:10px;padding:10px 16px;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--cyan);letter-spacing:3px;display:inline-flex;align-items:center;gap:8px;}
+.sid-box svg{width:13px;height:13px;stroke:var(--cyan);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── PHOTO UPLOAD ── */
+.photo-upload{border:2px dashed var(--border);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all 0.25s;background:#F8FAFC;}
+.photo-upload:hover{border-color:var(--blue);background:#EFF4FF;}
+.photo-upload-icon{font-size:28px;margin-bottom:8px;}
+.photo-upload-text{font-size:12px;color:var(--subtle);}
+
+/* ── RESULT BAR ── */
+.result-row{margin-bottom:16px;}
+.result-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.result-name{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.result-pct{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;}
+.result-bar{height:10px;background:var(--border);border-radius:99px;overflow:hidden;}
+.result-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
+.result-votes{font-size:10px;color:var(--subtle);margin-top:4px;font-family:'IBM Plex Mono',monospace;}
+
+/* ── WINNER CARD ── */
+.winner-card{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:2px solid #F59E0B;border-radius:16px;padding:20px;position:relative;overflow:hidden;}
+.winner-card::after{content:'🏆';position:absolute;right:-10px;top:-10px;font-size:72px;opacity:0.1;}
+.winner-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#92400E;margin-bottom:8px;}
+.winner-name{font-size:20px;font-weight:800;color:#78350F;}
+.winner-votes{font-size:13px;color:#92400E;margin-top:4px;}
+
+/* ── NOTIF ITEM ── */
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);}
+.notif-item:last-child{border-bottom:none;}
+.notif-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.notif-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.notif-title{font-size:12px;font-weight:700;color:var(--text);}
+.notif-sub{font-size:11px;color:var(--subtle);margin-top:2px;line-height:1.5;}
+.notif-time{font-size:10px;color:var(--subtle);font-family:'IBM Plex Mono',monospace;white-space:nowrap;margin-left:auto;padding-left:10px;}
+.notif-unread{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:5px;}
+
+/* ── ELECTION LIST CARD ── */
+.el-card{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;transition:all 0.3s;}
+.el-card:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(0,0,0,0.09);}
+.el-accent{height:5px;}
+.el-body{padding:16px 18px;}
+
+/* ── DONUT ── */
+.donut-wrap{display:flex;align-items:center;gap:20px;}
+.donut-legend{display:flex;flex-direction:column;gap:8px;}
+.legend-item{display:flex;align-items:center;gap:8px;}
+.legend-dot{width:10px;height:10px;border-radius:3px;}
+.legend-label{font-size:11px;color:var(--muted);flex:1;}
+.legend-val{font-size:11px;font-weight:700;color:var(--text);font-family:'IBM Plex Mono',monospace;}
+
+/* ── REPORT CARD ── */
+.report-card{background:#F8FAFC;border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;transition:background 0.2s;}
+.report-card:hover{background:#EFF4FF;}
+.report-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.report-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+@media(max-width:768px){
+  .grid-2,.grid-3,.grid-7-3,.grid-3-7,.form-row,.form-row-3{grid-template-columns:1fr;}
+  .sidebar{position:fixed;z-index:100;transform:translateX(-100%);transition:transform 0.3s;}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .tb-search{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <span class="sb-name">VoteSecure</span>
+    <span class="sb-tag">Creator</span>
+  </div>
+  <div class="sb-role-badge">
+    <div class="sb-role-dot"></div>
+    <div class="sb-role-text">
+      <span class="sb-role-sub">Signed in as</span>
+      <span class="sb-role-val">Election Creator</span>
+    </div>
+  </div>
+
+  <div class="sb-section-label">Overview</div>
+  <div class="sb-item active" onclick="nav('dashboard',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    <span class="sb-label">Dashboard</span>
+  </div>
+
+  <div class="sb-section-label">Elections</div>
+  <div class="sb-item" onclick="nav('my-elections',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span class="sb-label">My Elections</span>
+  </div>
+  <div class="sb-item" onclick="nav('create',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    <span class="sb-label">Create Election</span>
+  </div>
+
+  <div class="sb-section-label">Management</div>
+  <div class="sb-item" onclick="nav('candidates',this)">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span class="sb-label">Candidates</span>
+  </div>
+  <div class="sb-item" onclick="nav('participants',this)">
+    <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+    <span class="sb-label">Participants</span>
+  </div>
+  <div class="sb-item" onclick="nav('control',this)">
+    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    <span class="sb-label">Voting Control</span>
+  </div>
+  <div class="sb-item" onclick="nav('secret-ids',this)">
+    <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+    <span class="sb-label">Secret IDs</span>
+  </div>
+  <div class="sb-item" onclick="nav('results',this)">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span class="sb-label">Results</span>
+  </div>
+
+  <div class="sb-section-label">Tools</div>
+  <div class="sb-item" onclick="nav('notifications',this)">
+    <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="sb-label">Notifications</span>
+    <span class="sb-badge-num">4</span>
+  </div>
+  <div class="sb-item" onclick="nav('reports',this)">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <span class="sb-label">Reports</span>
+  </div>
+
+  <div class="sb-section-label">Account</div>
+  <div class="sb-item" onclick="nav('settings',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span class="sb-label">Settings</span>
+  </div>
+  <div class="sb-item" onclick="nav('profile',this)">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="sb-label">Profile</span>
+  </div>
+  <div class="sb-item" style="color:rgba(239,68,68,0.7);" onclick="alert('Logging out…')">
+    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    <span class="sb-label">Logout</span>
+  </div>
+  <div class="sb-collapse-btn" onclick="toggleSidebar()">
+    <svg id="collapseIcon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="topbarTitle">Creator Dashboard</div>
+      <div class="topbar-sub" id="topbarSub">Welcome back, Prof. Maria Chen · Saturday May 17, 2026</div>
+    </div>
+    <div class="topbar-right">
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search elections, candidates…"/>
+      </div>
+      <div class="icon-btn" onclick="nav('notifications',document.querySelector('[onclick*=notifications]'))">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="nav('create',document.querySelector('[onclick*=create]'))">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Election
+      </button>
+      <div class="avatar">MC</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ 1. DASHBOARD ══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-eyebrow">Overview</div>
+        <div class="page-title">Creator Dashboard</div>
+        <div class="page-subtitle">Your election platform summary and live stats</div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="stat-delta du">+3</span></div><div class="stat-num">8</div><div class="stat-label">Total Elections</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span class="stat-delta du">Live</span></div><div class="stat-num">2</div><div class="stat-label">Active Elections</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#F5F3FF;color:#6C3FC5;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><span class="stat-delta du">+18%</span></div><div class="stat-num">12,840</div><div class="stat-label">Total Participants</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#ECFEFF;color:#06B6D4;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><span class="stat-delta du">+2.1K</span></div><div class="stat-num">34,060</div><div class="stat-label">Total Votes Cast</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div><span class="stat-delta dn">Waiting</span></div><div class="stat-num">840</div><div class="stat-label">On Waitlist</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#ECFDF5;color:#10B981;"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><span class="stat-delta du">+4%</span></div><div class="stat-num">67%</div><div class="stat-label">Avg Turnout</div></div>
+      </div>
+
+      <div class="grid-7-3" style="margin-bottom:16px;">
+        <div class="card-elevated">
+          <div class="card-header"><div><div class="card-title">Live Elections Overview</div><div class="card-subtitle">Real-time turnout tracking</div></div><span class="badge b-live"><span class="b-dot"></span>Live</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div style="background:#F8FAFC;border-radius:12px;padding:14px;border:1px solid var(--border);border-left:4px solid #10B981;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+                  <div><div style="font-size:13px;font-weight:700;">National Student Union Election</div><div style="font-size:11px;color:var(--subtle);">E001 · Ends in 08h 24m</div></div>
+                  <span class="badge b-active"><span class="b-dot"></span>Active</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--subtle);margin-bottom:5px;"><span>28,140 / 45,230 voted</span><span style="font-weight:700;color:#10B981;">62%</span></div>
+                <div class="progress-wrap"><div class="progress-fill" style="width:62%;background:linear-gradient(90deg,#10B981,#059669);"></div></div>
+              </div>
+              <div style="background:#F8FAFC;border-radius:12px;padding:14px;border:1px solid var(--border);border-left:4px solid #3B82F6;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+                  <div><div style="font-size:13px;font-weight:700;">Municipal Council By-Election</div><div style="font-size:11px;color:var(--subtle);">E002 · Ends in 02h 45m</div></div>
+                  <span class="badge b-active"><span class="b-dot"></span>Active</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--subtle);margin-bottom:5px;"><span>5,920 / 12,800 voted</span><span style="font-weight:700;color:#3B82F6;">46%</span></div>
+                <div class="progress-wrap"><div class="progress-fill" style="width:46%;background:linear-gradient(90deg,#3B82F6,#2563EB);"></div></div>
+              </div>
+            </div>
+            <div style="margin-top:16px;">
+              <div style="font-size:11px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Monthly Votes</div>
+              <div class="mini-chart">
+                <div class="chart-col"><div class="chart-bar" style="height:30%;background:#DBEAFE;"></div><div class="chart-label">J</div></div>
+                <div class="chart-col"><div class="chart-bar" style="height:50%;background:#BFDBFE;"></div><div class="chart-label">F</div></div>
+                <div class="chart-col"><div class="chart-bar" style="height:38%;background:#93C5FD;"></div><div class="chart-label">M</div></div>
+                <div class="chart-col"><div class="chart-bar" style="height:70%;background:#60A5FA;"></div><div class="chart-label">A</div></div>
+                <div class="chart-col"><div class="chart-bar" style="height:55%;background:#3B82F6;"></div><div class="chart-label">M</div></div>
+                <div class="chart-col"><div class="chart-bar" style="height:88%;background:#2563EB;"></div><div class="chart-label">J</div></div>
+                <div class="chart-col"><div class="chart-bar" style="height:75%;background:#1D4ED8;"></div><div class="chart-label">J</div></div>
+                <div class="chart-col"><div class="chart-bar" style="height:92%;background:#1E3A8A;"></div><div class="chart-label">A</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="card-elevated">
+            <div class="card-header"><div class="card-title">Election Status</div></div>
+            <div class="card-body">
+              <div class="donut-wrap">
+                <svg width="90" height="90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="#E2E8F0" stroke-width="12"/>
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="#10B981" stroke-width="12" stroke-dasharray="55 165" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="#3B82F6" stroke-width="12" stroke-dasharray="33 187" stroke-dashoffset="-55" transform="rotate(-90 50 50)"/>
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="#6C3FC5" stroke-width="12" stroke-dasharray="77 143" stroke-dashoffset="-88" transform="rotate(-90 50 50)"/>
+                  <text x="50" y="54" text-anchor="middle" font-size="12" font-weight="800" fill="#0F172A" font-family="IBM Plex Mono">8</text>
+                </svg>
+                <div class="donut-legend">
+                  <div class="legend-item"><div class="legend-dot" style="background:#10B981;"></div><span class="legend-label">Active</span><span class="legend-val">2</span></div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div><span class="legend-label">Upcoming</span><span class="legend-val">3</span></div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#6C3FC5;"></div><span class="legend-label">Completed</span><span class="legend-val">3</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-elevated">
+            <div class="card-header"><div class="card-title">Quick Actions</div></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px;padding:12px 16px;">
+              <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="nav('create',document.querySelector('[onclick*=create]'))"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Election</button>
+              <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="nav('candidates',document.querySelector('[onclick*=candidates]'))"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Add Candidate</button>
+              <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="nav('results',document.querySelector('[onclick*=results]'))"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>View Results</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-elevated">
+        <div class="card-header"><div class="card-title">Recent Activity</div></div>
+        <div class="card-body" style="padding:16px 20px;">
+          <div class="timeline">
+            <div class="tl-item"><div class="tl-dot" style="background:#DCFCE7;"><div class="tl-dot-inner" style="background:#10B981;"></div></div><div class="tl-title">28,140 votes recorded in E001</div><div class="tl-sub">Live tally — National Student Union Election</div><div class="tl-time">14:32 today</div></div>
+            <div class="tl-item"><div class="tl-dot" style="background:#EFF4FF;"><div class="tl-dot-inner" style="background:#2451A3;"></div></div><div class="tl-title">Election E003 published</div><div class="tl-sub">University Senate Faculty Election is now live for registration</div><div class="tl-time">10:15 today</div></div>
+            <div class="tl-item"><div class="tl-dot" style="background:#F5F3FF;"><div class="tl-dot-inner" style="background:#6C3FC5;"></div></div><div class="tl-title">4 new candidates added to E003</div><div class="tl-sub">Candidate management updated</div><div class="tl-time">Yesterday 16:45</div></div>
+            <div class="tl-item" style="padding-bottom:0;"><div class="tl-dot" style="background:#FEF9C3;"><div class="tl-dot-inner" style="background:#CA8A04;"></div></div><div class="tl-title">840 voters joined waitlist</div><div class="tl-sub">E001 at capacity — waitlist opened automatically</div><div class="tl-time">2 days ago</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 2. MY ELECTIONS ══ -->
+    <div class="page" id="page-my-elections">
+      <div class="page-header"><div class="page-eyebrow">Elections</div><div class="page-title">My Elections</div><div class="page-subtitle">All elections you have created and manage</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div class="tabs" style="margin-bottom:0;">
+          <button class="tab-btn active" onclick="switchTab(this)">All (8)</button>
+          <button class="tab-btn" onclick="switchTab(this)">Active (2)</button>
+          <button class="tab-btn" onclick="switchTab(this)">Upcoming (3)</button>
+          <button class="tab-btn" onclick="switchTab(this)">Completed (3)</button>
+          <button class="tab-btn" onclick="switchTab(this)">Drafts (1)</button>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <div class="tb-search" style="min-width:180px;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Search…"/></div>
+          <button class="btn btn-primary btn-sm" onclick="nav('create',document.querySelector('[onclick*=create]'))"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create New</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;">
+        <div class="el-card"><div class="el-accent" style="background:linear-gradient(90deg,#10B981,#059669);"></div><div class="el-body"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;"><span class="badge b-active"><span class="b-dot"></span>Active</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--subtle);">E001</span></div><div style="font-size:14px;font-weight:700;margin-bottom:4px;">National Student Union Election</div><div style="font-size:11px;color:var(--subtle);margin-bottom:12px;">45,230 voters · 4 candidates · Ends Oct 20</div><div style="font-size:10px;color:var(--subtle);margin-bottom:5px;display:flex;justify-content:space-between;"><span>Turnout</span><span style="font-weight:700;color:#10B981;">62%</span></div><div class="progress-wrap" style="margin-bottom:14px;"><div class="progress-fill" style="width:62%;background:#10B981;"></div></div><div style="display:flex;gap:7px;"><button class="btn btn-ghost btn-sm" onclick="nav('control',document.querySelector('[onclick*=control]'))">⚙ Control</button><button class="btn btn-ghost btn-sm" onclick="nav('results',document.querySelector('[onclick*=results]'))">📊 Results</button><button class="btn btn-ghost btn-sm" onclick="nav('candidates',document.querySelector('[onclick*=candidates]'))">👥 Candidates</button></div></div></div>
+        <div class="el-card"><div class="el-accent" style="background:linear-gradient(90deg,#3B82F6,#2563EB);"></div><div class="el-body"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;"><span class="badge b-active"><span class="b-dot"></span>Active</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--subtle);">E002</span></div><div style="font-size:14px;font-weight:700;margin-bottom:4px;">Municipal Council By-Election</div><div style="font-size:11px;color:var(--subtle);margin-bottom:12px;">12,800 voters · 3 candidates · Ends Oct 18</div><div style="font-size:10px;color:var(--subtle);margin-bottom:5px;display:flex;justify-content:space-between;"><span>Turnout</span><span style="font-weight:700;color:#3B82F6;">46%</span></div><div class="progress-wrap" style="margin-bottom:14px;"><div class="progress-fill" style="width:46%;background:#3B82F6;"></div></div><div style="display:flex;gap:7px;"><button class="btn btn-ghost btn-sm" onclick="nav('control',document.querySelector('[onclick*=control]'))">⚙ Control</button><button class="btn btn-ghost btn-sm" onclick="nav('results',document.querySelector('[onclick*=results]'))">📊 Results</button></div></div></div>
+        <div class="el-card"><div class="el-accent" style="background:linear-gradient(90deg,#6C3FC5,#4C1D95);"></div><div class="el-body"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;"><span class="badge b-upcoming">Upcoming</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--subtle);">E003</span></div><div style="font-size:14px;font-weight:700;margin-bottom:4px;">University Senate Faculty Election</div><div style="font-size:11px;color:var(--subtle);margin-bottom:12px;">8,600 voters · 6 candidates · Starts Oct 25</div><div style="font-size:11px;color:var(--subtle);margin-bottom:14px;">Registration open · 3,240 registered so far</div><div style="display:flex;gap:7px;"><button class="btn btn-primary btn-sm">Edit</button><button class="btn btn-ghost btn-sm" onclick="nav('candidates',document.querySelector('[onclick*=candidates]'))">Candidates</button><button class="btn btn-danger btn-sm" style="padding:5px 8px;">🗑</button></div></div></div>
+        <div class="el-card" style="border:2px dashed var(--border);"><div class="el-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;text-align:center;"><div style="font-size:24px;margin-bottom:8px;">📝</div><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Draft: Board Election Q4</div><div style="font-size:11px;color:var(--subtle);margin-bottom:14px;">Last edited 3 days ago — incomplete</div><div style="display:flex;gap:7px;"><button class="btn btn-primary btn-sm" onclick="nav('create',document.querySelector('[onclick*=create]'))">Continue Draft</button><button class="btn btn-ghost btn-sm">🗑 Delete</button></div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ 3. CREATE ELECTION ══ -->
+    <div class="page" id="page-create">
+      <div class="page-header"><div class="page-eyebrow">Create</div><div class="page-title">Create New Election</div><div class="page-subtitle">Set up your election step by step</div></div>
+      <!-- Wizard -->
+      <div class="wizard-steps">
+        <div class="wiz-step"><div class="wiz-circle active" id="wc1">1</div><div class="wiz-label active" id="wl1">Basic Info</div></div>
+        <div class="wiz-connector" id="wcon1"></div>
+        <div class="wiz-step"><div class="wiz-circle" id="wc2">2</div><div class="wiz-label" id="wl2">Schedule</div></div>
+        <div class="wiz-connector" id="wcon2"></div>
+        <div class="wiz-step"><div class="wiz-circle" id="wc3">3</div><div class="wiz-label" id="wl3">Voter Setup</div></div>
+        <div class="wiz-connector" id="wcon3"></div>
+        <div class="wiz-step"><div class="wiz-circle" id="wc4">4</div><div class="wiz-label" id="wl4">Review</div></div>
+      </div>
+
+      <div class="card-elevated">
+        <div class="card-body">
+          <!-- Step 1 -->
+          <div id="step1">
+            <div class="section-title">Basic Information</div>
+            <div class="form-group"><label class="form-label">Election Title *</label><input class="form-input" placeholder="e.g. National Student Union Presidential Election 2025"/></div>
+            <div class="form-group"><label class="form-label">Description *</label><textarea class="form-input" placeholder="Describe the purpose, rules and scope of this election…"></textarea></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Category</label><select class="form-input form-select"><option>Academic/University</option><option>Government</option><option>Corporate</option><option>Union/Guild</option><option>Community</option><option>Other</option></select></div>
+              <div class="form-group"><label class="form-label">Election Type</label><select class="form-input form-select"><option>Single Choice</option><option>Multiple Choice</option><option>Ranked Choice</option></select></div>
+            </div>
+            <div class="form-group"><label class="form-label">Visibility</label>
+              <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;">
+                <label style="display:flex;align-items:center;gap:7px;padding:10px 16px;border:1.5px solid var(--blue);border-radius:9px;cursor:pointer;background:#EFF4FF;font-size:13px;font-weight:600;color:var(--navy2);"><input type="radio" name="vis" checked style="accent-color:var(--blue);"/> Public</label>
+                <label style="display:flex;align-items:center;gap:7px;padding:10px 16px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);"><input type="radio" name="vis" style="accent-color:var(--blue);"/> Private (Invite Only)</label>
+                <label style="display:flex;align-items:center;gap:7px;padding:10px 16px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);"><input type="radio" name="vis" style="accent-color:var(--blue);"/> Secret ID Required</label>
+              </div>
+            </div>
+          </div>
+          <!-- Step 2 -->
+          <div id="step2" style="display:none;">
+            <div class="section-title">Schedule & Timing</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Registration Opens</label><input class="form-input" type="datetime-local"/></div>
+              <div class="form-group"><label class="form-label">Registration Deadline</label><input class="form-input" type="datetime-local"/></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Voting Start *</label><input class="form-input" type="datetime-local"/></div>
+              <div class="form-group"><label class="form-label">Voting End *</label><input class="form-input" type="datetime-local"/></div>
+            </div>
+            <div class="form-group"><label class="form-label">Timezone</label><select class="form-input form-select"><option>UTC+0 (London/UTC)</option><option>UTC+5 (Karachi/PKT)</option><option>UTC-5 (New York/EST)</option><option>UTC+1 (Paris/CET)</option></select></div>
+            <div class="a-info alert"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>All times are displayed in the selected timezone. Voters see times in their local timezone.</div>
+          </div>
+          <!-- Step 3 -->
+          <div id="step3" style="display:none;">
+            <div class="section-title">Voter Configuration</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Maximum Voters</label><input class="form-input" type="number" placeholder="50000"/></div>
+              <div class="form-group"><label class="form-label">Minimum Age (optional)</label><input class="form-input" type="number" placeholder="18"/></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" defaultChecked style="width:16px;height:16px;accent-color:var(--blue);"/><div><div style="font-size:13px;font-weight:600;">Require Secret ID for voting</div><div style="font-size:11px;color:var(--subtle);">Each voter gets a unique cryptographic ID</div></div></label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--blue);"/><div><div style="font-size:13px;font-weight:600;">Enable waitlist when at capacity</div><div style="font-size:11px;color:var(--subtle);">Overflow voters join a waitlist automatically</div></div></label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" defaultChecked style="width:16px;height:16px;accent-color:var(--blue);"/><div><div style="font-size:13px;font-weight:600;">Publish results after voting ends</div><div style="font-size:11px;color:var(--subtle);">Results become visible to all participants</div></div></label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--blue);"/><div><div style="font-size:13px;font-weight:600;">Require voter approval before joining</div><div style="font-size:11px;color:var(--subtle);">You manually approve each voter registration</div></div></label>
+            </div>
+          </div>
+          <!-- Step 4 -->
+          <div id="step4" style="display:none;">
+            <div style="text-align:center;padding:20px 0;">
+              <div style="width:64px;height:64px;background:linear-gradient(135deg,#10B981,#059669);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 12px 32px rgba(16,185,129,0.35);">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px;">Ready to Submit!</div>
+              <div style="font-size:13px;color:var(--subtle);margin-bottom:24px;max-width:380px;margin-left:auto;margin-right:auto;">Your election will be reviewed by our admin team. You'll receive an approval email within 24 hours.</div>
+              <div style="background:var(--bg);border-radius:12px;padding:16px;text-align:left;max-width:380px;margin:0 auto;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div style="font-size:11px;color:var(--subtle);">Title</div><div style="font-size:11px;font-weight:700;">Student Union Election 2025</div>
+                  <div style="font-size:11px;color:var(--subtle);">Type</div><div style="font-size:11px;font-weight:700;">Single Choice · Public</div>
+                  <div style="font-size:11px;color:var(--subtle);">Duration</div><div style="font-size:11px;font-weight:700;">72 hours</div>
+                  <div style="font-size:11px;color:var(--subtle);">Max Voters</div><div style="font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace;">50,000</div>
+                  <div style="font-size:11px;color:var(--subtle);">Secret IDs</div><div style="font-size:11px;font-weight:700;color:#10B981;">✓ Enabled</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);">
+            <button class="btn btn-ghost" id="prevBtn" onclick="wizardPrev()" style="display:none;">← Previous</button>
+            <div style="flex:1;"></div>
+            <button class="btn btn-ghost" style="margin-right:10px;">Save Draft</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="wizardNext()">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 4. CANDIDATES ══ -->
+    <div class="page" id="page-candidates">
+      <div class="page-header"><div class="page-eyebrow">Management</div><div class="page-title">Candidate Management</div><div class="page-subtitle">Manage candidates for National Student Union Election (E001)</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+        <div class="tabs" style="margin-bottom:0;">
+          <button class="tab-btn active" onclick="switchTab(this)">E001 — Student Union</button>
+          <button class="tab-btn" onclick="switchTab(this)">E002 — Council</button>
+          <button class="tab-btn" onclick="switchTab(this)">E003 — Faculty</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('addCandModal')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Candidate</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">
+        <div class="candidate-card" style="border-top:4px solid #1B3A6B;">
+          <div class="cand-avatar" style="background:#EFF4FF;">👩🏾‍💼</div>
+          <div class="cand-name">Dr. Amara Osei-Bonsu</div>
+          <div class="cand-party">Progressive Alliance</div>
+          <div class="cand-votes" style="color:#1B3A6B;">11,240 <span style="font-size:12px;color:var(--subtle);">votes</span></div>
+          <div class="progress-wrap"><div class="progress-fill" style="width:40%;background:#1B3A6B;"></div></div>
+          <div style="font-size:11px;color:var(--subtle);margin-top:4px;">40% of total</div>
+          <div style="font-size:11px;color:var(--subtle);margin-top:8px;line-height:1.5;">Education reform, digital infrastructure, student welfare.</div>
+          <div class="cand-actions"><button class="btn btn-ghost btn-xs">✏ Edit</button><button class="btn btn-danger btn-xs">🗑</button></div>
+        </div>
+        <div class="candidate-card" style="border-top:4px solid #6C3FC5;">
+          <div class="cand-avatar" style="background:#F5F3FF;">👨🏼‍💼</div>
+          <div class="cand-name">Prof. James Whitfield</div>
+          <div class="cand-party">Reform Coalition</div>
+          <div class="cand-votes" style="color:#6C3FC5;">9,820 <span style="font-size:12px;color:var(--subtle);">votes</span></div>
+          <div class="progress-wrap"><div class="progress-fill" style="width:35%;background:#6C3FC5;"></div></div>
+          <div style="font-size:11px;color:var(--subtle);margin-top:4px;">35% of total</div>
+          <div style="font-size:11px;color:var(--subtle);margin-top:8px;line-height:1.5;">Economic stability, research funding, campus development.</div>
+          <div class="cand-actions"><button class="btn btn-ghost btn-xs">✏ Edit</button><button class="btn btn-danger btn-xs">🗑</button></div>
+        </div>
+        <div class="candidate-card" style="border-top:4px solid #06B6D4;">
+          <div class="cand-avatar" style="background:#ECFEFF;">👩🏽‍💼</div>
+          <div class="cand-name">Eng. Priya Sharma</div>
+          <div class="cand-party">Innovation Party</div>
+          <div class="cand-votes" style="color:#06B6D4;">4,480 <span style="font-size:12px;color:var(--subtle);">votes</span></div>
+          <div class="progress-wrap"><div class="progress-fill" style="width:16%;background:#06B6D4;"></div></div>
+          <div style="font-size:11px;color:var(--subtle);margin-top:4px;">16% of total</div>
+          <div style="font-size:11px;color:var(--subtle);margin-top:8px;line-height:1.5;">Tech modernisation, renewable energy, student startups.</div>
+          <div class="cand-actions"><button class="btn btn-ghost btn-xs">✏ Edit</button><button class="btn btn-danger btn-xs">🗑</button></div>
+        </div>
+        <div class="candidate-card" style="border-top:4px solid #10B981;">
+          <div class="cand-avatar" style="background:#ECFDF5;">👨🏿‍💼</div>
+          <div class="cand-name">Dr. Marcus Cole</div>
+          <div class="cand-party">Independent</div>
+          <div class="cand-votes" style="color:#10B981;">2,600 <span style="font-size:12px;color:var(--subtle);">votes</span></div>
+          <div class="progress-wrap"><div class="progress-fill" style="width:9%;background:#10B981;"></div></div>
+          <div style="font-size:11px;color:var(--subtle);margin-top:4px;">9% of total</div>
+          <div style="font-size:11px;color:var(--subtle);margin-top:8px;line-height:1.5;">Transparency, anti-corruption, grassroots leadership.</div>
+          <div class="cand-actions"><button class="btn btn-ghost btn-xs">✏ Edit</button><button class="btn btn-danger btn-xs">🗑</button></div>
+        </div>
+        <div class="candidate-card" style="border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;text-align:center;cursor:pointer;background:#F8FAFC;" onclick="openModal('addCandModal')">
+          <div style="width:44px;height:44px;border-radius:12px;background:#EFF4FF;display:flex;align-items:center;justify-content:center;margin-bottom:10px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2451A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div style="font-size:13px;font-weight:700;color:var(--blue);">Add Candidate</div>
+          <div style="font-size:11px;color:var(--subtle);margin-top:4px;">Click to add a new candidate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 5. PARTICIPANTS ══ -->
+    <div class="page" id="page-participants">
+      <div class="page-header"><div class="page-eyebrow">Voters</div><div class="page-title">Participants</div><div class="page-subtitle">Voter registrations and waitlist for E001 — National Student Union Election</div></div>
+      <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div></div><div class="stat-num">45,230</div><div class="stat-label">Registered</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div></div><div class="stat-num">28,140</div><div class="stat-label">Voted</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div><div class="stat-num">840</div><div class="stat-label">Waitlist</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#ECFEFF;color:#06B6D4;"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div></div><div class="stat-num">62%</div><div class="stat-label">Turnout</div></div>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this)">Registered Voters</button>
+        <button class="tab-btn" onclick="switchTab(this)">Waitlist (840)</button>
+        <button class="tab-btn" onclick="switchTab(this)">Final Voter List</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Voter ID</th><th>Name</th><th>Email</th><th>Registered On</th><th>Voted</th><th>Secret ID Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">VOT-8821</td><td style="font-size:12px;font-weight:600;">Alex Johnson</td><td class="muted">alex@student.edu</td><td class="muted">Oct 10</td><td><span class="badge b-active">✓ Voted</span></td><td><span class="badge b-active">Issued</span></td><td><div class="td-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-warning btn-xs">Remove</button></div></td></tr>
+            <tr><td class="mono">VOT-4402</td><td style="font-size:12px;font-weight:600;">Sarah Kim</td><td class="muted">skim@student.edu</td><td class="muted">Oct 11</td><td><span class="badge b-draft">Not voted</span></td><td><span class="badge b-active">Issued</span></td><td><div class="td-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-cyan btn-xs">Resend ID</button></div></td></tr>
+            <tr><td class="mono">VOT-3302</td><td style="font-size:12px;font-weight:600;">Omar Hassan</td><td class="muted">ohassan@uni.edu</td><td class="muted">Oct 12</td><td><span class="badge b-draft">Not voted</span></td><td><span class="badge b-pending">Pending</span></td><td><div class="td-actions"><button class="btn btn-ghost btn-xs">View</button><button class="btn btn-success btn-xs">Issue ID</button></div></td></tr>
+            <tr><td class="mono">VOT-7741</td><td style="font-size:12px;font-weight:600;">Mei Lin</td><td class="muted">mlin@student.edu</td><td class="muted">Oct 13</td><td><span class="badge b-active">✓ Voted</span></td><td><span class="badge b-active">Issued</span></td><td><div class="td-actions"><button class="btn btn-ghost btn-xs">View</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ 6. VOTING CONTROL ══ -->
+    <div class="page" id="page-control">
+      <div class="page-header"><div class="page-eyebrow">Control</div><div class="page-title">Voting Control Panel</div><div class="page-subtitle">Start, stop and manage your active election</div></div>
+      <div class="grid-3-7" style="margin-bottom:16px;">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div></div><div class="stat-num">28,140</div><div class="stat-label">Votes Cast</div></div>
+          <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div></div><div class="stat-num">45,230</div><div class="stat-label">Registered</div></div>
+          <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#ECFDF5;color:#10B981;"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div></div><div class="stat-num">62%</div><div class="stat-label">Turnout</div></div>
+        </div>
+        <div class="control-panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px;">
+            <div><div style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">National Student Union Election E001</div><div style="font-size:16px;font-weight:700;color:#fff;margin-top:4px;">Time Remaining</div></div>
+            <span class="badge b-live" style="font-size:11px;"><span class="live-dot"></span>LIVE</span>
+          </div>
+          <div class="timer-units">
+            <div class="timer-unit"><div class="timer-num" id="t-h">08</div><div class="timer-label">Hours</div></div>
+            <div class="timer-unit"><div class="timer-num" id="t-m">24</div><div class="timer-label">Mins</div></div>
+            <div class="timer-unit"><div class="timer-num" id="t-s">11</div><div class="timer-label">Secs</div></div>
+          </div>
+          <div style="margin-top:18px;">
+            <div style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:6px;">Live turnout</div>
+            <div style="height:8px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;">
+              <div style="width:62%;height:100%;background:linear-gradient(90deg,#10B981,#34D399);border-radius:99px;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px;"><span>28,140 voted</span><span>62%</span></div>
+          </div>
+          <div class="control-btns">
+            <button class="ctrl-btn ctrl-stop"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Stop Election</button>
+            <button class="ctrl-btn ctrl-restart"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Restart</button>
+            <button class="ctrl-btn ctrl-lock"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Lock Election</button>
+          </div>
+          <div style="margin-top:14px;background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.08);">
+            <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;text-transform:uppercase;margin-bottom:8px;">Lock Status</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div>
+              <div><div style="font-size:12px;font-weight:600;color:#fff;">New Registrations</div><div style="font-size:10px;color:rgba(255,255,255,0.4);">Allow new voters to join</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-elevated">
+        <div class="card-header"><div class="card-title">Real-time Vote Log</div><span class="badge b-live"><span class="b-dot"></span>Streaming</span></div>
+        <div class="card-body" style="max-height:200px;overflow-y:auto;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:#F8FAFC;border-radius:8px;font-size:11px;"><span style="color:var(--subtle);font-family:'IBM Plex Mono',monospace;">14:32:11</span><span style="flex:1;color:var(--text);">VOT-***-8821 cast vote in E001</span><span class="badge b-active">Recorded</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:#F8FAFC;border-radius:8px;font-size:11px;"><span style="color:var(--subtle);font-family:'IBM Plex Mono',monospace;">14:31:58</span><span style="flex:1;color:var(--text);">VOT-***-4402 cast vote in E001</span><span class="badge b-active">Recorded</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:#FEF2F2;border-radius:8px;font-size:11px;"><span style="color:var(--subtle);font-family:'IBM Plex Mono',monospace;">14:31:34</span><span style="flex:1;color:#B91C1C;">VOT-***-3302 duplicate attempt — blocked</span><span class="badge b-suspended">Blocked</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:#F8FAFC;border-radius:8px;font-size:11px;"><span style="color:var(--subtle);font-family:'IBM Plex Mono',monospace;">14:30:47</span><span style="flex:1;color:var(--text);">VOT-***-7741 cast vote in E001</span><span class="badge b-active">Recorded</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;background:#F8FAFC;border-radius:8px;font-size:11px;"><span style="color:var(--subtle);font-family:'IBM Plex Mono',monospace;">14:30:12</span><span style="flex:1;color:var(--text);">VOT-***-1122 cast vote in E001</span><span class="badge b-active">Recorded</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 7. SECRET IDs ══ -->
+    <div class="page" id="page-secret-ids">
+      <div class="page-header"><div class="page-eyebrow">Security</div><div class="page-title">Secret ID Management</div><div class="page-subtitle">Cryptographic voter IDs for E001 — National Student Union Election</div></div>
+      <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5"/></svg></div></div><div class="stat-num">45,230</div><div class="stat-label">IDs Generated</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div></div><div class="stat-num">44,890</div><div class="stat-label">IDs Sent</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg></div></div><div class="stat-num">340</div><div class="stat-label">Pending Send</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div></div><div class="stat-num">28,140</div><div class="stat-label">IDs Used (Voted)</div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Generate & Send IDs</div></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Select Election</label><select class="form-input form-select"><option>E001 — National Student Union Election</option><option>E002 — Municipal Council</option><option>E003 — Faculty Senate</option></select></div>
+            <div class="form-group"><label class="form-label">Delivery Method</label><select class="form-input form-select"><option>Email (recommended)</option><option>CSV Download</option><option>SMS (if configured)</option></select></div>
+            <div class="a-info alert"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Secret IDs are cryptographically unique. Each voter receives exactly one ID.</div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-primary" style="flex:1;justify-content:center;">Generate New IDs</button>
+              <button class="btn btn-cyan" style="flex:1;justify-content:center;"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Send All Pending</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Masked ID Preview</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#F8FAFC;border-radius:10px;border:1px solid var(--border);">
+                <div><div style="font-size:11px;font-weight:700;color:var(--text);">Alex Johnson</div><div style="font-size:10px;color:var(--subtle);">alex@student.edu</div></div>
+                <div class="sid-box" style="font-size:12px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VS-8821-••••-••••</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#F8FAFC;border-radius:10px;border:1px solid var(--border);">
+                <div><div style="font-size:11px;font-weight:700;color:var(--text);">Sarah Kim</div><div style="font-size:10px;color:var(--subtle);">skim@student.edu</div></div>
+                <div class="sid-box" style="font-size:12px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VS-4402-••••-••••</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#F8FAFC;border-radius:10px;border:1px solid var(--border);">
+                <div><div style="font-size:11px;font-weight:700;color:var(--text);">Omar Hassan</div><div style="font-size:10px;color:var(--subtle);">ohassan@uni.edu</div></div>
+                <div class="sid-box" style="font-size:12px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VS-3302-••••-••••</div>
+              </div>
+            </div>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:12px;"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download Full Voter List</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 8. RESULTS ══ -->
+    <div class="page" id="page-results">
+      <div class="page-header"><div class="page-eyebrow">Analytics</div><div class="page-title">Election Results</div><div class="page-subtitle">Live vote counting — National Student Union Election E001</div></div>
+      <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><span class="stat-delta du">+2.1K/h</span></div><div class="stat-num">28,140</div><div class="stat-label">Total Votes</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><span class="stat-delta du">+4%</span></div><div class="stat-num">62%</div><div class="stat-label">Turnout</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div><div class="stat-num">08:24</div><div class="stat-label">Time Left</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF2F2;color:#EF4444;"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div></div><div class="stat-num">124</div><div class="stat-label">Invalid Votes</div></div>
+      </div>
+      <div class="grid-7-3">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Live Vote Standings</div><span class="badge b-live"><span class="b-dot"></span>Live</span></div>
+          <div class="card-body">
+            <!-- Winner highlight -->
+            <div class="winner-card" style="margin-bottom:20px;">
+              <div class="winner-label">🏆 Current Leader</div>
+              <div style="display:flex;align-items:center;gap:14px;">
+                <div style="font-size:36px;">👩🏾‍💼</div>
+                <div style="flex:1;">
+                  <div class="winner-name">Dr. Amara Osei-Bonsu</div>
+                  <div class="winner-votes">11,240 votes · Progressive Alliance</div>
+                </div>
+                <div style="text-align:center;"><div style="font-size:36px;font-weight:900;color:#78350F;font-family:'IBM Plex Mono',monospace;">40%</div></div>
+              </div>
+            </div>
+            <!-- Bar chart -->
+            <div class="mini-chart" style="height:90px;margin-bottom:16px;">
+              <div class="chart-col"><div style="font-size:10px;color:var(--subtle);margin-bottom:4px;">40%</div><div class="chart-bar" style="height:100%;background:#1B3A6B;border-radius:6px 6px 0 0;"></div><div class="chart-label" style="margin-top:5px;">Amara</div></div>
+              <div class="chart-col"><div style="font-size:10px;color:var(--subtle);margin-bottom:4px;">35%</div><div class="chart-bar" style="height:87%;background:#6C3FC5;border-radius:6px 6px 0 0;"></div><div class="chart-label" style="margin-top:5px;">James</div></div>
+              <div class="chart-col"><div style="font-size:10px;color:var(--subtle);margin-bottom:4px;">16%</div><div class="chart-bar" style="height:40%;background:#06B6D4;border-radius:6px 6px 0 0;"></div><div class="chart-label" style="margin-top:5px;">Priya</div></div>
+              <div class="chart-col"><div style="font-size:10px;color:var(--subtle);margin-bottom:4px;">9%</div><div class="chart-bar" style="height:22%;background:#10B981;border-radius:6px 6px 0 0;"></div><div class="chart-label" style="margin-top:5px;">Marcus</div></div>
+            </div>
+            <!-- Results list -->
+            <div class="result-row"><div class="result-meta"><div class="result-name"><div style="font-size:18px;">👩🏾‍💼</div>Dr. Amara Osei-Bonsu</div><div class="result-pct" style="color:#1B3A6B;">40%</div></div><div class="result-bar"><div class="result-fill" style="width:40%;background:linear-gradient(90deg,#1B3A6B,#2451A3);"></div></div><div class="result-votes">11,240 votes</div></div>
+            <div class="result-row"><div class="result-meta"><div class="result-name"><div style="font-size:18px;">👨🏼‍💼</div>Prof. James Whitfield</div><div class="result-pct" style="color:#6C3FC5;">35%</div></div><div class="result-bar"><div class="result-fill" style="width:35%;background:linear-gradient(90deg,#6C3FC5,#7C3AED);"></div></div><div class="result-votes">9,820 votes</div></div>
+            <div class="result-row"><div class="result-meta"><div class="result-name"><div style="font-size:18px;">👩🏽‍💼</div>Eng. Priya Sharma</div><div class="result-pct" style="color:#06B6D4;">16%</div></div><div class="result-bar"><div class="result-fill" style="width:16%;background:linear-gradient(90deg,#06B6D4,#0891B2);"></div></div><div class="result-votes">4,480 votes</div></div>
+            <div class="result-row"><div class="result-meta"><div class="result-name"><div style="font-size:18px;">👨🏿‍💼</div>Dr. Marcus Cole</div><div class="result-pct" style="color:#10B981;">9%</div></div><div class="result-bar"><div class="result-fill" style="width:9%;background:linear-gradient(90deg,#10B981,#059669);"></div></div><div class="result-votes">2,600 votes</div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card-elevated">
+            <div class="card-header"><div class="card-title">Turnout Analytics</div></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;"><span>Voted</span><span style="font-weight:700;color:#10B981;">28,140</span></div><div class="progress-wrap"><div class="progress-fill" style="width:62%;background:#10B981;"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;"><span>Pending</span><span style="font-weight:700;color:#F59E0B;">17,090</span></div><div class="progress-wrap"><div class="progress-fill" style="width:38%;background:#F59E0B;"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;"><span>Invalid</span><span style="font-weight:700;color:#EF4444;">124</span></div><div class="progress-wrap"><div class="progress-fill" style="width:0.3%;background:#EF4444;"></div></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card-elevated">
+            <div class="card-header"><div class="card-title">Export Results</div></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px;padding:12px 16px;">
+              <button class="btn btn-danger" style="width:100%;justify-content:center;"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export PDF Report</button>
+              <button class="btn btn-ghost" style="width:100%;justify-content:center;"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV Data</button>
+              <button class="btn btn-ghost" style="width:100%;justify-content:center;">📤 Share Results Link</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 9. NOTIFICATIONS ══ -->
+    <div class="page" id="page-notifications">
+      <div class="page-header"><div class="page-eyebrow">Communications</div><div class="page-title">Notifications</div><div class="page-subtitle">System alerts, email logs and election reminders</div></div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this)">All <span style="background:#DBEAFE;color:#2563EB;font-size:9px;padding:1px 6px;border-radius:10px;margin-left:4px;">4</span></button>
+        <button class="tab-btn" onclick="switchTab(this)">Sent Emails</button>
+        <button class="tab-btn" onclick="switchTab(this)">Reminders</button>
+        <button class="tab-btn" onclick="switchTab(this)">Alerts</button>
+      </div>
+      <div class="card-elevated">
+        <div class="card-body" style="padding:8px 16px;">
+          <div class="notif-item"><div class="notif-unread"></div><div class="notif-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div style="flex:1;"><div class="notif-title">Election E001 is LIVE</div><div class="notif-sub">Your election started on time. 28,140 votes cast so far.</div></div><span class="notif-time">2h ago</span></div>
+          <div class="notif-item"><div class="notif-unread"></div><div class="notif-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div style="flex:1;"><div class="notif-title">Secret IDs sent to 44,890 voters</div><div class="notif-sub">Batch delivery complete for E001. 340 pending due to invalid emails.</div></div><span class="notif-time">Yesterday</span></div>
+          <div class="notif-item"><div class="notif-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div style="flex:1;"><div class="notif-title">E001 at capacity — Waitlist opened</div><div class="notif-sub">840 voters placed on waitlist automatically. Registration locked.</div></div><span class="notif-time">2 days ago</span></div>
+          <div class="notif-item"><div class="notif-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div style="flex:1;"><div class="notif-title">Election E001 approved by admin</div><div class="notif-sub">Your election request was approved. You can now publish and launch.</div></div><span class="notif-time">3 days ago</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 10. REPORTS ══ -->
+    <div class="page" id="page-reports">
+      <div class="page-header"><div class="page-eyebrow">Data</div><div class="page-title">Reports</div><div class="page-subtitle">Export election data, participants and analytics</div></div>
+      <div class="grid-2">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Quick Export</div></div>
+          <div class="card-body">
+            <div class="report-card"><div style="display:flex;align-items:center;gap:12px;"><div class="report-icon" style="background:#FEF2F2;color:#EF4444;"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div style="font-size:13px;font-weight:700;">Election Results PDF</div><div style="font-size:11px;color:var(--subtle);">Full report with charts and winner</div></div></div><button class="btn btn-danger btn-sm"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</button></div>
+            <div class="report-card"><div style="display:flex;align-items:center;gap:12px;"><div class="report-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><div><div style="font-size:13px;font-weight:700;">Participants CSV</div><div style="font-size:11px;color:var(--subtle);">All registered voters and status</div></div></div><button class="btn btn-success btn-sm">CSV</button></div>
+            <div class="report-card"><div style="display:flex;align-items:center;gap:12px;"><div class="report-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5"/></svg></div><div><div style="font-size:13px;font-weight:700;">Voter List with Secret IDs</div><div style="font-size:11px;color:var(--subtle);">Anonymised voter + ID pairs</div></div></div><button class="btn btn-primary btn-sm">CSV</button></div>
+            <div class="report-card"><div style="display:flex;align-items:center;gap:12px;"><div class="report-icon" style="background:#F5F3FF;color:#6C3FC5;"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div><div style="font-size:13px;font-weight:700;">Analytics Report</div><div style="font-size:11px;color:var(--subtle);">Turnout, time-series and charts</div></div></div><button class="btn btn-ghost btn-sm">PDF</button></div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Custom Report Builder</div></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Select Election</label><select class="form-input form-select"><option>E001 — National Student Union</option><option>E002 — Municipal Council</option><option>All Elections</option></select></div>
+            <div class="form-group"><label class="form-label">Report Type</label><select class="form-input form-select"><option>Results & Analytics</option><option>Participant List</option><option>Audit Trail</option><option>Turnout Report</option></select></div>
+            <div class="form-row"><div class="form-group"><label class="form-label">From Date</label><input class="form-input" type="date"/></div><div class="form-group"><label class="form-label">To Date</label><input class="form-input" type="date"/></div></div>
+            <div class="form-group"><label class="form-label">Output Format</label><select class="form-input form-select"><option>PDF Report</option><option>CSV Spreadsheet</option><option>JSON Data</option></select></div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;">Generate Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 11. SETTINGS ══ -->
+    <div class="page" id="page-settings">
+      <div class="page-header"><div class="page-eyebrow">Configuration</div><div class="page-title">Creator Settings</div><div class="page-subtitle">Organisation info, security and notification preferences</div></div>
+      <div class="grid-2">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Organisation Information</div></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Organisation Name</label><input class="form-input" value="University of Technology"/></div>
+            <div class="form-group"><label class="form-label">Organisation Type</label><select class="form-input form-select"><option>Academic/University</option><option>Government</option><option>Corporate</option></select></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Website</label><input class="form-input" placeholder="https://…"/></div>
+              <div class="form-group"><label class="form-label">Country</label><select class="form-input form-select"><option>United Kingdom</option><option>Pakistan</option><option>United States</option></select></div>
+            </div>
+            <div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" type="email" value="mchen@uni.edu"/></div>
+            <button class="btn btn-primary">Save Organisation</button>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Change Password</div></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Current Password</label><input class="form-input" type="password" placeholder="••••••••"/></div>
+            <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" placeholder="Min 8 characters"/></div>
+            <div class="form-group"><label class="form-label">Confirm New Password</label><input class="form-input" type="password" placeholder="Repeat new password"/></div>
+            <button class="btn btn-primary">Update Password</button>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Notification Preferences</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Election approval status</div><div class="toggle-sub">Email when admin approves or rejects</div></div></div>
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Voter registration alerts</div><div class="toggle-sub">Notify when election reaches milestones</div></div></div>
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Live vote updates</div><div class="toggle-sub">Hourly summaries during active elections</div></div></div>
+            <div class="toggle-wrap"><div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Marketing & tips</div><div class="toggle-sub">Platform tips and feature announcements</div></div></div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Election Defaults</div></div>
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Default Duration</label><select class="form-input form-select"><option>24 hours</option><option>48 hours</option><option>72 hours</option><option>7 days</option></select></div>
+            <div class="form-group"><label class="form-label">Default Max Voters</label><input class="form-input" type="number" value="10000"/></div>
+            <div class="form-group"><label class="form-label">Default Visibility</label><select class="form-input form-select"><option>Public</option><option>Private</option><option>Secret ID Required</option></select></div>
+            <button class="btn btn-primary">Save Defaults</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 12. PROFILE ══ -->
+    <div class="page" id="page-profile">
+      <div class="page-header"><div class="page-eyebrow">Account</div><div class="page-title">My Profile</div><div class="page-subtitle">Manage your creator account</div></div>
+      <div class="grid-2">
+        <div class="card-elevated">
+          <div class="card-body" style="text-align:center;padding:32px 20px;">
+            <div style="width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;margin:0 auto 16px;">MC</div>
+            <div style="font-size:18px;font-weight:800;color:var(--text);">Prof. Maria Chen</div>
+            <div style="font-size:13px;color:var(--subtle);margin-top:3px;">mchen@uni.edu</div>
+            <div style="margin-top:10px;display:flex;justify-content:center;gap:8px;"><span class="badge" style="background:#FEF9C3;color:#B45309;">Election Creator</span><span class="badge b-active">Verified</span></div>
+            <div style="margin-top:16px;display:flex;gap:16px;justify-content:center;text-align:center;">
+              <div><div style="font-size:22px;font-weight:800;color:var(--text);">8</div><div style="font-size:11px;color:var(--subtle);">Elections</div></div>
+              <div style="width:1px;background:var(--border);"></div>
+              <div><div style="font-size:22px;font-weight:800;color:var(--text);">34K</div><div style="font-size:11px;color:var(--subtle);">Votes Cast</div></div>
+              <div style="width:1px;background:var(--border);"></div>
+              <div><div style="font-size:22px;font-weight:800;color:var(--text);">12K</div><div style="font-size:11px;color:var(--subtle);">Participants</div></div>
+            </div>
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:center;">
+              <div class="sid-box" style="font-size:11px;padding:6px 12px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>CRT-10042</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Edit Profile</div></div>
+          <div class="card-body">
+            <div class="form-row"><div class="form-group"><label class="form-label">First Name</label><input class="form-input" value="Maria"/></div><div class="form-group"><label class="form-label">Last Name</label><input class="form-input" value="Chen"/></div></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" value="mchen@uni.edu"/></div>
+            <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" placeholder="+1 (555) 000-0000"/></div>
+            <div class="form-group"><label class="form-label">Bio / Title</label><input class="form-input" value="Professor & Head of Student Affairs, University of Technology"/></div>
+            <div class="form-group"><label class="form-label">Timezone</label><select class="form-input form-select"><option>UTC+0 (London)</option><option>UTC+5 (Karachi)</option></select></div>
+            <button class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</main>
+</div>
+
+<!-- ══ MODAL: Add Candidate ══ -->
+<div class="modal-overlay" id="addCandModal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Add New Candidate</div>
+      <button class="modal-close" onclick="closeModal('addCandModal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="photo-upload" style="margin-bottom:16px;" onclick="this.style.background='#EFF4FF';this.style.borderColor='#2451A3'">
+      <div class="photo-upload-icon">📸</div>
+      <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:3px;">Upload Candidate Photo</div>
+      <div class="photo-upload-text">PNG, JPG up to 5MB · Click to browse</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" placeholder="Dr. Jane Smith"/></div>
+      <div class="form-group"><label class="form-label">Party / Affiliation</label><input class="form-input" placeholder="Progressive Alliance"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">Position / Tagline</label><input class="form-input" placeholder="Candidate for President"/></div>
+    <div class="form-group"><label class="form-label">Manifesto / Bio</label><textarea class="form-input" rows="3" placeholder="Brief candidate bio or manifesto…"></textarea></div>
+    <div class="form-group"><label class="form-label">Election</label><select class="form-input form-select"><option>E001 — National Student Union</option><option>E002 — Municipal Council</option><option>E003 — Faculty Senate</option></select></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('addCandModal')">Cancel</button><button class="btn btn-primary" onclick="closeModal('addCandModal')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Candidate</button></div>
+  </div>
+</div>
+
+<script>
+// ── Page titles
+const titles={
+  'dashboard':'Creator Dashboard','my-elections':'My Elections','create':'Create Election',
+  'candidates':'Candidate Management','participants':'Participants','control':'Voting Control',
+  'secret-ids':'Secret ID Management','results':'Election Results','notifications':'Notifications',
+  'reports':'Reports','settings':'Settings','profile':'My Profile'
+};
+const subs={
+  'dashboard':'Your election platform summary and live stats',
+  'my-elections':'All elections you have created and manage',
+  'create':'Set up a new election step by step',
+  'candidates':'Add, edit and manage election candidates',
+  'participants':'Voter registrations, waitlists and stats',
+  'control':'Start, stop and control your active election',
+  'secret-ids':'Cryptographic voter ID generation and delivery',
+  'results':'Live vote counting and analytics',
+  'notifications':'System alerts, email logs and reminders',
+  'reports':'Export election data and analytics',
+  'settings':'Organisation info and preferences',
+  'profile':'Manage your creator account'
+};
+function nav(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const t=document.getElementById('page-'+page);
+  if(t)t.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('topbarTitle').textContent=titles[page]||page;
+  document.getElementById('topbarSub').textContent=subs[page]||'';
+}
+function switchTab(btn){
+  btn.closest('.tabs').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+
+// ── Wizard
+let wizStep=1;
+function wizardNext(){
+  if(wizStep<4){
+    document.getElementById('step'+wizStep).style.display='none';
+    document.getElementById('wc'+wizStep).className='wiz-circle done';
+    document.getElementById('wl'+wizStep).className='wiz-label';
+    if(wizStep<4)document.getElementById('wcon'+wizStep).className='wiz-connector done';
+    wizStep++;
+    document.getElementById('step'+wizStep).style.display='block';
+    document.getElementById('wc'+wizStep).className='wiz-circle active';
+    document.getElementById('wl'+wizStep).className='wiz-label active';
+    document.getElementById('prevBtn').style.display='inline-flex';
+    if(wizStep===4){document.getElementById('nextBtn').textContent='🚀 Submit for Approval';document.getElementById('nextBtn').onclick=()=>{nav('my-elections',document.querySelector('[onclick*=my-elections]'));wizStep=1;resetWizard();}}
+  }
+}
+function wizardPrev(){
+  if(wizStep>1){
+    document.getElementById('step'+wizStep).style.display='none';
+    document.getElementById('wc'+wizStep).className='wiz-circle';
+    document.getElementById('wl'+wizStep).className='wiz-label';
+    wizStep--;
+    document.getElementById('step'+wizStep).style.display='block';
+    document.getElementById('wc'+wizStep).className='wiz-circle active';
+    document.getElementById('wl'+wizStep).className='wiz-label active';
+    if(wizStep>1)document.getElementById('wcon'+(wizStep-1)).className='wiz-connector';
+    if(wizStep===1)document.getElementById('prevBtn').style.display='none';
+    document.getElementById('nextBtn').textContent='Continue →';
+    document.getElementById('nextBtn').onclick=wizardNext;
+  }
+}
+function resetWizard(){
+  for(let i=1;i<=4;i++){document.getElementById('wc'+i).className=i===1?'wiz-circle active':'wiz-circle';document.getElementById('wl'+i).className=i===1?'wiz-label active':'wiz-label';document.getElementById('step'+i).style.display=i===1?'block':'none';if(i<4)document.getElementById('wcon'+i).className='wiz-connector';}
+  document.getElementById('prevBtn').style.display='none';document.getElementById('nextBtn').textContent='Continue →';document.getElementById('nextBtn').onclick=wizardNext;wizStep=1;
+}
+
+// ── Live countdown
+let th=8,tm=24,ts=11;
+setInterval(()=>{
+  ts--;if(ts<0){ts=59;tm--;if(tm<0){tm=59;th--;if(th<0){th=0;tm=0;ts=0;}}}
+  const h=document.getElementById('t-h'),m=document.getElementById('t-m'),s=document.getElementById('t-s');
+  if(h)h.textContent=String(th).padStart(2,'0');
+  if(m)m.textContent=String(tm).padStart(2,'0');
+  if(s)s.textContent=String(ts).padStart(2,'0');
+},1000);
+</script>
+</body>
+</html>

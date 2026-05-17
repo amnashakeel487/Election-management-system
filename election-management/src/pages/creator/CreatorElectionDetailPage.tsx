@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
-import { VoteSecureDashboardShell } from '@/components/dashboard/VoteSecureDashboardShell'
+import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader'
+import { CREATOR_PAGE_META } from '@/config/creatorNav'
 import { ElectionQrInvitePanel } from '@/components/election/ElectionQrInvitePanel'
 import { VoterRollLockPanel } from '@/components/election/VoterRollLockPanel'
 import { ElectionWaitlistPanel } from '@/components/waitlist/ElectionWaitlistPanel'
@@ -85,22 +86,23 @@ export function CreatorElectionDetailPage() {
     election &&
     (election.status === 'published' || election.status === 'active' || election.voter_roll_finalized_at)
 
+  const detailMeta = CREATOR_PAGE_META['election-detail']
+
   return (
-    <VoteSecureDashboardShell
-      role="creator"
-      pageTitle={election?.title ?? 'Election details'}
-      pageCrumb={
-        election
-          ? `${formatElectionCode(election.id)} · ${phase ?? election.status}`
-          : 'Loading election…'
-      }
-      showSearch={false}
-      topbarExtra={
-        <Link to="/creator/dashboard" className="vs-t-btn">
-          Back to dashboard
-        </Link>
-      }
-    >
+    <>
+      <CreatorPageHeader
+        title={election?.title ?? detailMeta.title}
+        subtitle={
+          election
+            ? `${formatElectionCode(election.id)} · ${phase ?? election.status}`
+            : detailMeta.topSub
+        }
+        actions={
+          <Link to="/creator/elections" className="btn btn-sm btn-ghost">
+            All elections
+          </Link>
+        }
+      />
       {loading ? (
         <p className="vs-empty">Loading election details…</p>
       ) : error ? (
@@ -203,6 +205,6 @@ export function CreatorElectionDetailPage() {
           ) : null}
         </div>
       ) : null}
-    </VoteSecureDashboardShell>
+    </>
   )
 }

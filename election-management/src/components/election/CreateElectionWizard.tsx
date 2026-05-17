@@ -23,6 +23,8 @@ import {
 
 interface CreateElectionWizardProps {
   electionId?: string
+  /** Use creator dashboard layout chrome (no duplicate sidebar/header) */
+  embedded?: boolean
 }
 
 const CATEGORY_CUSTOM = '__custom__'
@@ -39,7 +41,7 @@ function persistedCategory(slug: string, customDetail: string): string {
   return slug
 }
 
-export function CreateElectionWizard({ electionId: initialElectionId }: CreateElectionWizardProps) {
+export function CreateElectionWizard({ electionId: initialElectionId, embedded = true }: CreateElectionWizardProps) {
   const navigate = useNavigate()
   const { profile } = useAuth()
   const [step, setStep] = useState(1)
@@ -295,7 +297,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
 
   if (loading) {
     return (
-      <CreatorWizardShell currentStep={step} headline={initialElectionId ? 'Edit draft election' : undefined}>
+      <CreatorWizardShell embedded={embedded} currentStep={step} headline={initialElectionId ? 'Edit draft election' : undefined}>
         <p className="font-body-md text-body-md text-on-surface-variant">Loading election…</p>
       </CreatorWizardShell>
     )
@@ -321,6 +323,7 @@ export function CreateElectionWizard({ electionId: initialElectionId }: CreateEl
 
   return (
     <CreatorWizardShell
+      embedded={embedded}
       currentStep={step}
       headline={shellHeadline}
       subhead={shellSub}

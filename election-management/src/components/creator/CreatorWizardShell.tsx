@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ELECTION_SECURITY_GRAPHIC } from '@/constants/electionAssets'
 import { CreatorSidebar } from './CreatorSidebar'
@@ -19,7 +19,11 @@ interface CreatorWizardShellProps {
   headline?: string
   /** Supplemental line below headline */
   subhead?: string
+  /** Render inside creator layout without duplicate chrome */
+  embedded?: boolean
 }
+
+const WIZARD_STEP_LABELS = ['Poll identity', 'Timing & registration', 'Limits & rules', 'Candidates & publish'] as const
 
 export function CreatorWizardShell({
   currentStep,
@@ -28,8 +32,46 @@ export function CreatorWizardShell({
   footerActions,
   headline,
   subhead,
+  embedded = false,
 }: CreatorWizardShellProps) {
   const mobileProgress = ((currentStep - 1) / 3) * 100
+
+  if (embedded) {
+    return (
+      <>
+        {headline || subhead ? (
+          <div style={{ marginBottom: 20 }}>
+            {headline ? <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>{headline}</h2> : null}
+            {subhead ? <p style={{ fontSize: 13, color: 'var(--subtle)', marginTop: 4 }}>{subhead}</p> : null}
+          </div>
+        ) : null}
+        <div className="wizard-steps">
+          {WIZARD_STEP_LABELS.map((label, i) => {
+            const stepNum = i + 1
+            const done = stepNum < currentStep
+            const active = stepNum === currentStep
+            return (
+              <Fragment key={label}>
+                {i > 0 ? <div className={`wiz-connector${done || active ? ' done' : ''}`} /> : null}
+                <div className="wiz-step">
+                  <div className={`wiz-circle${active ? ' active' : ''}${done ? ' done' : ''}`}>
+                    {done ? '✓' : stepNum}
+                  </div>
+                  <span className={`wiz-label${active ? ' active' : ''}`}>{label}</span>
+                </div>
+              </Fragment>
+            )
+          })}
+        </div>
+        <div className="card-elevated">
+          <div className="card-body">
+            {children}
+            {footerActions ? <div style={{ marginTop: 20, display: 'flex', gap: 8, flexWrap: 'wrap' }}>{footerActions}</div> : null}
+          </div>
+        </div>
+      </>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background text-on-background selection:bg-primary-container selection:text-on-primary-container">
