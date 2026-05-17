@@ -38,11 +38,11 @@ export function CreatorWizardShell({
 
   if (embedded) {
     return (
-      <>
+      <div className="creator-wizard-wrap">
         {headline || subhead ? (
-          <div style={{ marginBottom: 20 }}>
-            {headline ? <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>{headline}</h2> : null}
-            {subhead ? <p style={{ fontSize: 13, color: 'var(--subtle)', marginTop: 4 }}>{subhead}</p> : null}
+          <div style={{ marginBottom: 12 }}>
+            {headline ? <h2 style={{ fontSize: 18, fontWeight: 800, letterSpacing: -0.4 }}>{headline}</h2> : null}
+            {subhead ? <p style={{ fontSize: 12, color: 'var(--subtle)', marginTop: 4 }}>{subhead}</p> : null}
           </div>
         ) : null}
         <div className="wizard-steps">
@@ -66,10 +66,10 @@ export function CreatorWizardShell({
         <div className="card-elevated">
           <div className="card-body">
             {children}
-            {footerActions ? <div style={{ marginTop: 20, display: 'flex', gap: 8, flexWrap: 'wrap' }}>{footerActions}</div> : null}
+            {footerActions ? <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>{footerActions}</div> : null}
           </div>
         </div>
-      </>
+      </div>
     )
   }
 

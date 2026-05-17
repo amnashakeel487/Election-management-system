@@ -344,7 +344,7 @@ export function CreateElectionWizard({ electionId: initialElectionId, embedded =
       ) : null}
 
       {step === 1 ? (
-        <div className="glass-card rounded-[32px] p-6 md:p-10">
+        <div className="creator-wizard-step">
           <h2 className="mb-8 flex items-center gap-3 font-headline-md text-headline-md text-on-surface">
             <span className="material-symbols-outlined rounded-lg bg-primary/10 p-2 text-primary">badge</span>
             Poll identity
@@ -370,7 +370,7 @@ export function CreateElectionWizard({ electionId: initialElectionId, embedded =
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                rows={4}
+                rows={3}
                 className="w-full rounded-xl border border-outline-variant bg-surface-container-low p-4 text-on-surface outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-primary"
                 placeholder="Purpose, eligibility context, and what this vote decides…"
               />
@@ -412,7 +412,7 @@ export function CreateElectionWizard({ electionId: initialElectionId, embedded =
       ) : null}
 
       {step === 2 ? (
-        <div className="glass-card rounded-[32px] p-6 md:p-10">
+        <div className="creator-wizard-step">
           <h2 className="mb-8 flex items-center gap-3 font-headline-md text-headline-md text-on-surface">
             <span className="material-symbols-outlined rounded-lg bg-primary/10 p-2 text-primary">schedule</span>
             Timing &amp; registration window
@@ -463,7 +463,7 @@ export function CreateElectionWizard({ electionId: initialElectionId, embedded =
       ) : null}
 
       {step === 3 ? (
-        <div className="glass-card rounded-[32px] p-6 md:p-10">
+        <div className="creator-wizard-step">
           <h2 className="mb-8 flex items-center gap-3 font-headline-md text-headline-md text-on-surface">
             <span className="material-symbols-outlined rounded-lg bg-primary/10 p-2 text-primary">gavel</span>
             Participation limits &amp; rules
@@ -619,7 +619,7 @@ export function CreateElectionWizard({ electionId: initialElectionId, embedded =
 
       {step === 4 ? (
         <>
-          <div className="glass-card rounded-[32px] p-6 md:p-10">
+          <div className="creator-wizard-step">
             <h2 className="mb-4 flex items-center gap-3 font-headline-md text-headline-md text-on-surface">
               <span className="material-symbols-outlined rounded-lg bg-primary/10 p-2 text-primary">verified</span>
               Candidates &amp; publish

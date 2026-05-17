@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Footer } from '@/components/layout/Footer'
 import { TopNavBar } from '@/components/layout/TopNavBar'
-import { fetchElectionsWithVisibleResults } from '@/services/resultsService'
+import { Footer } from '@/components/layout/Footer'
+import { fetchElectionsWithVisibleResults, type ResultsElectionListItem } from '@/services/resultsService'
 import { formatSubmissionDate } from '@/utils/formatDate'
+import '@/styles/fortressvote-results-light.css'
 
-import type { ResultsElectionListItem } from '@/services/resultsService'
+function isLiveElection(e: ResultsElectionListItem): boolean {
+  if (e.results_locked_at) return false
+  if (!e.real_time_results) return false
+  return new Date(e.end_date).getTime() > Date.now()
+}
 
 export function ResultsIndexPage() {
   const [elections, setElections] = useState<ResultsElectionListItem[]>([])
@@ -27,57 +32,59 @@ export function ResultsIndexPage() {
     }
 
     void load()
+    const refresh = window.setInterval(() => void load(), 30_000)
     return () => {
       cancelled = true
+      window.clearInterval(refresh)
     }
   }, [])
 
   return (
-    <div className="min-h-screen bg-background text-on-background">
+    <div className="fv-results-index">
       <TopNavBar />
-      <main className="mx-auto max-w-5xl px-margin pb-16 pt-24">
-        <header className="mb-12">
-          <h1 className="font-headline-xl text-headline-xl text-on-surface">Election Results</h1>
-          <p className="mt-2 font-body-lg text-body-lg text-on-surface-variant">
-            Live and final certified results for published elections.
-          </p>
-        </header>
+      <div className="fv-results-index-inner" style={{ paddingTop: 24 }}>
+        <Link to="/" style={{ fontSize: 12, color: '#64748b', textDecoration: 'none', marginBottom: 16, display: 'inline-block' }}>
+          ← Back to home
+        </Link>
+        <h1>Live election results</h1>
+        <p className="fv-index-sub">
+          Watch real-time tallies and certified outcomes for published elections. No account required.
+        </p>
 
         {loading ? (
-          <p className="font-body-md text-on-surface-variant">Loading…</p>
+          <p style={{ fontSize: 13, color: '#64748b' }}>Loading…</p>
         ) : error ? (
-          <p className="font-body-md text-error">{error}</p>
+          <p style={{ fontSize: 13, color: '#dc2626' }}>{error}</p>
         ) : elections.length === 0 ? (
-          <p className="font-body-md text-on-surface-variant">No results are available yet.</p>
+          <p style={{ fontSize: 13, color: '#64748b' }}>No public results are available yet.</p>
         ) : (
-          <ul className="space-y-4">
-            {elections.map((e) => (
-              <li
-                key={e.id}
-                className="glass-panel flex flex-wrap items-center justify-between gap-4 rounded-[24px] p-6"
-              >
+          elections.map((e) => {
+            const live = isLiveElection(e)
+            return (
+              <Link key={e.id} to={`/elections/${e.id}/results`} className="fv-election-row">
                 <div>
-                  <p className="font-headline-md text-headline-md text-on-surface">{e.title}</p>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  {live ? (
+                    <span className="fv-live-pill-sm">
+                      <span className="fv-live-blink" style={{ width: 6, height: 6 }} />
+                      LIVE
+                    </span>
+                  ) : null}
+                  <h2>{e.title}</h2>
+                  <p>
                     {e.results_locked_at
                       ? 'Final results locked'
-                      : e.real_time_results
-                        ? 'Live counting enabled'
-                        : 'Final results'}{' '}
+                      : live
+                        ? 'Live counting'
+                        : 'Results published'}{' '}
                     · Ends {formatSubmissionDate(e.end_date)}
                   </p>
                 </div>
-                <Link
-                  to={`/elections/${e.id}/results`}
-                  className="rounded-xl bg-tertiary px-6 py-3 font-label-md text-label-md text-on-tertiary hover:opacity-90"
-                >
-                  View Results
-                </Link>
-              </li>
-            ))}
-          </ul>
+                <span className="fv-view-btn">View</span>
+              </Link>
+            )
+          })
         )}
-      </main>
+      </div>
       <Footer />
     </div>
   )

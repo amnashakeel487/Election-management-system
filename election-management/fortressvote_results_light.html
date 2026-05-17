@@ -1,0 +1,498 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0F1F4B;--navy2:#1B3278;--navy3:#2451A3;
+  --purple:#6C63FF;--purple2:#8B85FF;--purple3:#EDE9FE;
+  --teal:#22C55E;--teal2:#16A34A;--teal3:#DCFCE7;
+  --cyan:#06B6D4;--cyan3:#CFFAFE;
+  --gold:#F59E0B;--gold3:#FEF3C7;
+  --red:#EF4444;--red3:#FEE2E2;
+  --slate:#F1F5F9;--slate2:#E2E8F0;--slate3:#CBD5E1;
+  --tx:#0F172A;--txm:#475569;--txd:#94A3B8;
+  --white:#FFFFFF;
+}
+.wrap{background:#F8FAFC;min-height:100vh;color:var(--tx);font-size:14px;font-family:system-ui,-apple-system,sans-serif;padding-bottom:3rem}
+
+nav{background:var(--navy);padding:0 1.5rem;height:58px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;border-radius:9px;background:var(--purple);display:flex;align-items:center;justify-content:center}
+.logo-text{font-size:16px;font-weight:700;color:#fff;letter-spacing:-0.3px}
+.nav-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:#2451A3;color:#93C5FD;letter-spacing:0.5px}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-btn{background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:6px 13px;font-size:12px;color:rgba(255,255,255,0.7);cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;transition:all 0.2s}
+.nav-btn:hover{background:rgba(255,255,255,0.08);color:#fff}
+.nav-btn.primary{background:var(--purple);border-color:var(--purple);color:#fff}
+.nav-btn.primary:hover{background:#5B54EE}
+
+.hero{background:var(--navy);padding:2rem 1.5rem 2.5rem;border-bottom:3px solid var(--purple)}
+.hero-inner{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:2rem;flex-wrap:wrap}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#86EFAC;margin-bottom:1rem;letter-spacing:0.3px}
+.live-blink{width:7px;height:7px;border-radius:50%;background:#22C55E;animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero-title{font-size:22px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:8px;letter-spacing:-0.5px}
+.hero-desc{font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:6px}
+.hero-org{font-size:12px;color:rgba(255,255,255,0.35);display:flex;align-items:center;gap:5px}
+.hero-right{display:flex;flex-direction:column;align-items:flex-end;gap:12px;flex-shrink:0}
+.live-pill{display:flex;align-items:center;gap:7px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:7px 14px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#EF4444;animation:blink 1.2s ease-in-out infinite}
+.live-txt{font-size:12px;font-weight:700;color:#FCA5A5;letter-spacing:0.8px}
+.countdown-box{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 20px;text-align:center}
+.cd-label{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;margin-bottom:5px;font-weight:600}
+.cd-time{font-size:22px;font-weight:700;color:var(--purple2);letter-spacing:3px;font-variant-numeric:tabular-nums}
+
+.status-bar{background:#fff;border-bottom:1px solid var(--slate2);padding:8px 1.5rem}
+.status-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.status-live{display:flex;align-items:center;gap:6px;font-size:12px;color:#DC2626;font-weight:500}
+.status-sep{width:1px;height:14px;background:var(--slate2)}
+.status-meta{font-size:12px;color:var(--txd)}
+.auto-chip{font-size:10px;font-weight:600;background:var(--cyan3);color:#0E7490;border-radius:5px;padding:2px 8px;margin-left:auto;letter-spacing:0.3px}
+
+.main{max-width:860px;margin:0 auto;padding:0 1.5rem}
+.sec-head{display:flex;align-items:center;gap:9px;margin:1.8rem 0 1rem}
+.sec-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.sec-title{font-size:14px;font-weight:700;color:var(--tx)}
+.sec-line{flex:1;height:1px;background:var(--slate2)}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:2rem}
+.stat-card{background:#fff;border:1px solid var(--slate2);border-radius:12px;padding:1rem 1rem 0.9rem;border-top:3px solid var(--accent,#6C63FF);position:relative}
+.stat-lbl{font-size:11px;color:var(--txd);margin-bottom:5px;font-weight:500;display:flex;align-items:center;gap:4px}
+.stat-val{font-size:20px;font-weight:800;color:var(--tx);font-variant-numeric:tabular-nums;letter-spacing:-0.5px}
+.stat-sub{font-size:11px;color:var(--txd);margin-top:3px}
+
+.charts-row{display:grid;grid-template-columns:1fr 260px;gap:12px;margin-bottom:2rem}
+@media(max-width:580px){.charts-row{grid-template-columns:1fr}}
+.chart-card{background:#fff;border:1px solid var(--slate2);border-radius:14px;padding:1.25rem}
+.chart-card-title{font-size:12px;color:var(--txm);margin-bottom:1rem;font-weight:600;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:0.3px}
+
+.bar-list{display:flex;flex-direction:column;gap:13px}
+.bar-item{display:flex;align-items:center;gap:9px}
+.bar-name{font-size:12px;color:var(--txm);width:86px;flex-shrink:0;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:24px;background:var(--slate);border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width 1.4s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:flex-end;padding-right:7px}
+.bar-pct{font-size:11px;font-weight:700;color:#fff}
+.bar-votes{font-size:11px;color:var(--txd);width:52px;text-align:right;flex-shrink:0}
+
+.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.donut-svg-w{position:relative;width:130px;height:130px}
+.donut-ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-ctr-val{font-size:17px;font-weight:800;color:var(--tx)}
+.donut-ctr-lbl{font-size:10px;color:var(--txd);font-weight:500}
+.d-legend{width:100%;display:flex;flex-direction:column;gap:6px}
+.d-leg-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--txm)}
+.d-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.seg-anim{stroke-dasharray:0 314;animation:seg-grow 1.5s ease forwards}
+@keyframes seg-grow{to{stroke-dasharray:var(--e)}}
+
+.rankings{display:flex;flex-direction:column;gap:8px;margin-bottom:2rem}
+.rank-card{background:#fff;border:1px solid var(--slate2);border-radius:13px;padding:13px 16px;display:flex;align-items:center;gap:13px;transition:border-color 0.2s}
+.rank-card.leader{border-color:#F59E0B;border-left:4px solid #F59E0B;background:linear-gradient(90deg,#FFFBEB,#fff)}
+.rank-pos{font-size:16px;font-weight:800;color:var(--txd);width:26px;text-align:center;flex-shrink:0}
+.rank-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-size:14px;font-weight:700;color:var(--tx);display:flex;align-items:center;gap:6px}
+.rank-party{font-size:11px;color:var(--txd);margin-top:1px}
+.rank-bar-t{height:4px;background:var(--slate);border-radius:2px;margin-top:7px;overflow:hidden}
+.rank-bar-f{height:100%;border-radius:2px;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+.rank-right{text-align:right;flex-shrink:0}
+.rank-votes{font-size:15px;font-weight:800;color:var(--tx)}
+.rank-pct{font-size:11px;color:var(--txm);margin-top:1px}
+.trend{font-size:10px;font-weight:600;border-radius:4px;padding:1px 5px}
+.trend.up{background:var(--teal3);color:var(--teal2)}
+.trend.dn{background:var(--red3);color:#B91C1C}
+.crown-ic{color:var(--gold);font-size:15px}
+
+.turnout-grid{display:grid;grid-template-columns:190px 1fr;gap:12px;margin-bottom:2rem;align-items:start}
+@media(max-width:520px){.turnout-grid{grid-template-columns:1fr}}
+.circle-card{background:#fff;border:1px solid var(--slate2);border-radius:14px;padding:1.5rem;display:flex;flex-direction:column;align-items:center;gap:1rem}
+.circ-svg-w{position:relative;width:120px;height:120px}
+.circ-ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.circ-pct{font-size:20px;font-weight:800;color:var(--tx)}
+.circ-lbl{font-size:10px;color:var(--txd);font-weight:500}
+.tur-table{background:#fff;border:1px solid var(--slate2);border-radius:14px;overflow:hidden}
+.tur-row{display:grid;grid-template-columns:1fr auto;padding:11px 16px;border-bottom:1px solid var(--slate);align-items:center}
+.tur-row:last-child{border-bottom:none}
+.tur-key{font-size:12px;color:var(--txm);display:flex;align-items:center;gap:6px;font-weight:500}
+.tur-val{font-size:13px;font-weight:700;color:var(--tx)}
+
+.feed-card{background:#fff;border:1px solid var(--slate2);border-radius:14px;overflow:hidden;margin-bottom:2rem}
+.feed-hdr{padding:11px 16px;border-bottom:1px solid var(--slate);display:flex;align-items:center;justify-content:space-between;background:var(--slate)}
+.feed-scroll{max-height:210px;overflow-y:auto}
+.feed-item{padding:9px 16px;border-bottom:1px solid var(--slate);display:flex;align-items:center;gap:9px;animation:slide-in 0.35s ease}
+@keyframes slide-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.feed-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.feed-txt{font-size:12px;color:var(--txm);flex:1}
+.feed-time{font-size:10px;color:var(--txd)}
+
+.winner-card{background:#fff;border:2px solid var(--gold);border-radius:16px;padding:2rem;text-align:center;margin-bottom:2rem;position:relative;overflow:hidden}
+.winner-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--purple),var(--gold))}
+.winner-lbl{font-size:10px;font-weight:700;color:var(--gold);letter-spacing:1.5px;margin-bottom:12px}
+.winner-avatar{width:60px;height:60px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;border:3px solid #FDE68A;background:var(--gold3);color:#92400E}
+.winner-name{font-size:19px;font-weight:800;color:var(--tx);margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:8px}
+.winner-pct{font-size:13px;color:var(--purple);font-weight:700;margin-bottom:3px}
+.winner-sub{font-size:12px;color:var(--txd)}
+.winner-tags{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.winner-tag{font-size:11px;font-weight:500;border-radius:6px;padding:4px 10px}
+
+.trans-card{background:#fff;border:1px solid var(--slate2);border-radius:14px;padding:1.5rem;margin-bottom:2rem}
+.verify-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:1rem}
+@media(max-width:480px){.verify-grid{grid-template-columns:1fr}}
+.verify-item{background:var(--teal3);border:1px solid #BBF7D0;border-radius:10px;padding:9px 13px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--teal2);font-weight:500}
+.audit-row{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--slate)}
+.audit-key{font-size:11px;color:var(--txd)}
+.audit-val{font-size:11px;color:var(--teal2);font-weight:600;display:flex;align-items:center;gap:5px}
+
+.share-row{display:flex;gap:8px;margin-bottom:2rem;flex-wrap:wrap}
+.share-btn{background:#fff;border:1px solid var(--slate2);border-radius:8px;padding:7px 13px;font-size:12px;color:var(--txm);cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;font-weight:500;transition:all 0.2s}
+.share-btn:hover{border-color:var(--purple);color:var(--purple)}
+
+footer{border-top:1px solid var(--slate2);padding:1.5rem;text-align:center;background:#fff}
+.ft-inner{max-width:860px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+.ft-links{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+.ft-link{font-size:12px;color:var(--txd);cursor:pointer;text-decoration:none;font-weight:500}
+.ft-link:hover{color:var(--purple)}
+.ft-copy{font-size:11px;color:var(--txd)}
+</style>
+
+<div class="wrap">
+  <h2 class="sr-only">FortressVote — Live election results in light theme</h2>
+
+  <nav>
+    <div class="logo">
+      <div class="logo-icon"><i class="ti ti-shield-check" style="font-size:17px;color:#fff" aria-hidden="true"></i></div>
+      <span class="logo-text">FortressVote</span>
+      <span class="nav-tag">ENTERPRISE</span>
+    </div>
+    <div class="nav-right">
+      <button class="nav-btn"><i class="ti ti-arrow-left" style="font-size:13px" aria-hidden="true"></i> Back</button>
+      <button class="nav-btn"><i class="ti ti-share" style="font-size:13px" aria-hidden="true"></i> Share</button>
+      <button class="nav-btn"><i class="ti ti-download" style="font-size:13px" aria-hidden="true"></i> PDF</button>
+      <button class="nav-btn primary"><i class="ti ti-moon" style="font-size:13px" aria-hidden="true"></i></button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-badge"><div class="live-blink"></div>Live Results</div>
+        <div class="hero-title">Student Council Election 2026</div>
+        <div class="hero-desc">Electing the next student leadership team for academic year 2026–27.</div>
+        <div class="hero-org"><i class="ti ti-building" style="font-size:13px" aria-hidden="true"></i>Organized by COMSATS Student Board</div>
+      </div>
+      <div class="hero-right">
+        <div class="live-pill"><div class="live-dot"></div><span class="live-txt">LIVE</span></div>
+        <div class="countdown-box">
+          <div class="cd-label">VOTING ENDS IN</div>
+          <div class="cd-time" id="cd">02:14:09</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-inner">
+      <div class="status-live"><div class="live-blink"></div>Live counting in progress</div>
+      <div class="status-sep"></div>
+      <div class="status-meta">Updated <span id="upd">3</span>s ago</div>
+      <div class="status-sep"></div>
+      <div class="status-meta"><i class="ti ti-users" style="font-size:12px;vertical-align:-1px;margin-right:3px" aria-hidden="true"></i><span id="viewers">3,542</span> watching</div>
+      <div class="auto-chip"><i class="ti ti-refresh" style="font-size:10px;margin-right:2px;vertical-align:-1px" aria-hidden="true"></i>Auto-refresh on</div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="sec-head">
+      <div class="sec-icon" style="background:#EDE9FE"><i class="ti ti-chart-line" style="color:#6C63FF;font-size:15px" aria-hidden="true"></i></div>
+      <span class="sec-title">Live Statistics</span>
+      <div class="sec-line"></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card" style="--accent:#6C63FF">
+        <div class="stat-lbl"><i class="ti ti-check" style="font-size:12px" aria-hidden="true"></i>Total Votes</div>
+        <div class="stat-val" id="sv1">7,582</div>
+        <div class="stat-sub">Counted so far</div>
+      </div>
+      <div class="stat-card" style="--accent:#22C55E">
+        <div class="stat-lbl"><i class="ti ti-percentage" style="font-size:12px" aria-hidden="true"></i>Turnout</div>
+        <div class="stat-val">72%</div>
+        <div class="stat-sub">Of eligible voters</div>
+      </div>
+      <div class="stat-card" style="--accent:#06B6D4">
+        <div class="stat-lbl"><i class="ti ti-users" style="font-size:12px" aria-hidden="true"></i>Registered</div>
+        <div class="stat-val">10,000</div>
+        <div class="stat-sub">Eligible voters</div>
+      </div>
+      <div class="stat-card" style="--accent:#F59E0B">
+        <div class="stat-lbl"><i class="ti ti-clock" style="font-size:12px" aria-hidden="true"></i>Remaining</div>
+        <div class="stat-val" id="sv3">2,418</div>
+        <div class="stat-sub">Yet to vote</div>
+      </div>
+      <div class="stat-card" style="--accent:#0F1F4B">
+        <div class="stat-lbl"><i class="ti ti-user" style="font-size:12px" aria-hidden="true"></i>Candidates</div>
+        <div class="stat-val">12</div>
+        <div class="stat-sub">On the ballot</div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-icon" style="background:#FEE2E2"><i class="ti ti-chart-bar" style="color:#DC2626;font-size:15px" aria-hidden="true"></i></div>
+      <span class="sec-title">Live Results Chart</span>
+      <div class="sec-line"></div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-title"><i class="ti ti-chart-bar" style="font-size:13px" aria-hidden="true"></i>Vote distribution by candidate</div>
+        <div class="bar-list">
+          <div class="bar-item">
+            <div class="bar-name">Ali Khan</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0%;background:#6C63FF" data-w="75"><span class="bar-pct">45%</span></div></div>
+            <div class="bar-votes">4,210</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-name">Sara Ahmed</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0%;background:#06B6D4" data-w="50"><span class="bar-pct">30%</span></div></div>
+            <div class="bar-votes">2,275</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-name">Usman Tariq</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0%;background:#22C55E" data-w="25"><span class="bar-pct">15%</span></div></div>
+            <div class="bar-votes">1,137</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-name">Fatima Malik</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0%;background:#F59E0B" data-w="17"><span class="bar-pct">7%</span></div></div>
+            <div class="bar-votes">531</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-name">Others</div>
+            <div class="bar-track"><div class="bar-fill" style="width:0%;background:#94A3B8" data-w="5"><span class="bar-pct">3%</span></div></div>
+            <div class="bar-votes">429</div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title"><i class="ti ti-circle-half" style="font-size:13px" aria-hidden="true"></i>Vote share</div>
+        <div class="donut-wrap">
+          <div class="donut-svg-w">
+            <svg viewBox="0 0 120 120" width="130" height="130" role="img" aria-label="Vote share: Ali Khan 45%, Sara Ahmed 30%, Usman 15%, others 10%">
+              <title>Vote share donut chart</title>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#F1F5F9" stroke-width="14"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#6C63FF" stroke-width="14" stroke-linecap="butt" stroke-dasharray="0 314" style="--e:141.3 172.7;animation:seg-grow 1.5s .1s ease forwards;transform:rotate(-90deg);transform-origin:50% 50%"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#06B6D4" stroke-width="14" stroke-linecap="butt" stroke-dasharray="0 314" style="--e:94.2 219.8;animation:seg-grow 1.5s .4s ease forwards;transform:rotate(41.4deg);transform-origin:50% 50%"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#22C55E" stroke-width="14" stroke-linecap="butt" stroke-dasharray="0 314" style="--e:47.1 266.9;animation:seg-grow 1.5s .7s ease forwards;transform:rotate(135.6deg);transform-origin:50% 50%"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#F59E0B" stroke-width="14" stroke-linecap="butt" stroke-dasharray="0 314" style="--e:31.4 282.6;animation:seg-grow 1.5s .9s ease forwards;transform:rotate(170.6deg);transform-origin:50% 50%"/>
+            </svg>
+            <div class="donut-ctr">
+              <div class="donut-ctr-val">7.5K</div>
+              <div class="donut-ctr-lbl">VOTES</div>
+            </div>
+          </div>
+          <div class="d-legend">
+            <div class="d-leg-item"><div class="d-leg-dot" style="background:#6C63FF"></div>Ali Khan — 45%</div>
+            <div class="d-leg-item"><div class="d-leg-dot" style="background:#06B6D4"></div>Sara Ahmed — 30%</div>
+            <div class="d-leg-item"><div class="d-leg-dot" style="background:#22C55E"></div>Usman Tariq — 15%</div>
+            <div class="d-leg-item"><div class="d-leg-dot" style="background:#F59E0B"></div>Fatima Malik — 7%</div>
+            <div class="d-leg-item"><div class="d-leg-dot" style="background:#94A3B8"></div>Others — 3%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-icon" style="background:#FEF3C7"><i class="ti ti-trophy" style="color:#D97706;font-size:15px" aria-hidden="true"></i></div>
+      <span class="sec-title">Candidate Rankings</span>
+      <div class="sec-line"></div>
+    </div>
+    <div class="rankings">
+      <div class="rank-card leader">
+        <div class="rank-pos"><i class="ti ti-crown crown-ic" aria-hidden="true"></i></div>
+        <div class="rank-avatar" style="background:#EDE9FE;color:#4C1D95">AK</div>
+        <div class="rank-info">
+          <div class="rank-name">Ali Khan <span class="trend up">+2.1%</span></div>
+          <div class="rank-party">President Candidate · COMSATS</div>
+          <div class="rank-bar-t"><div class="rank-bar-f" style="width:0%;background:#6C63FF" data-w="75"></div></div>
+        </div>
+        <div class="rank-right"><div class="rank-votes">4,210</div><div class="rank-pct">45%</div></div>
+      </div>
+      <div class="rank-card">
+        <div class="rank-pos" style="font-size:14px;font-weight:700;color:var(--txd)">#2</div>
+        <div class="rank-avatar" style="background:#CFFAFE;color:#0E7490">SA</div>
+        <div class="rank-info">
+          <div class="rank-name">Sara Ahmed <span class="trend up">+0.8%</span></div>
+          <div class="rank-party">VP Candidate · COMSATS</div>
+          <div class="rank-bar-t"><div class="rank-bar-f" style="width:0%;background:#06B6D4" data-w="50"></div></div>
+        </div>
+        <div class="rank-right"><div class="rank-votes">2,275</div><div class="rank-pct">30%</div></div>
+      </div>
+      <div class="rank-card">
+        <div class="rank-pos" style="font-size:14px;font-weight:700;color:var(--txd)">#3</div>
+        <div class="rank-avatar" style="background:#DCFCE7;color:#166534">UT</div>
+        <div class="rank-info">
+          <div class="rank-name">Usman Tariq <span class="trend dn">-0.3%</span></div>
+          <div class="rank-party">Secretary Candidate · COMSATS</div>
+          <div class="rank-bar-t"><div class="rank-bar-f" style="width:0%;background:#22C55E" data-w="25"></div></div>
+        </div>
+        <div class="rank-right"><div class="rank-votes">1,137</div><div class="rank-pct">15%</div></div>
+      </div>
+      <div class="rank-card">
+        <div class="rank-pos" style="font-size:14px;font-weight:700;color:var(--txd)">#4</div>
+        <div class="rank-avatar" style="background:#FEF3C7;color:#92400E">FM</div>
+        <div class="rank-info">
+          <div class="rank-name">Fatima Malik <span class="trend up">+0.4%</span></div>
+          <div class="rank-party">Treasurer Candidate · COMSATS</div>
+          <div class="rank-bar-t"><div class="rank-bar-f" style="width:0%;background:#F59E0B" data-w="17"></div></div>
+        </div>
+        <div class="rank-right"><div class="rank-votes">531</div><div class="rank-pct">7%</div></div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-icon" style="background:#DCFCE7"><i class="ti ti-users" style="color:#16A34A;font-size:15px" aria-hidden="true"></i></div>
+      <span class="sec-title">Turnout & Participation</span>
+      <div class="sec-line"></div>
+    </div>
+    <div class="turnout-grid">
+      <div class="circle-card">
+        <div class="circ-svg-w">
+          <svg viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="72% voter turnout circular indicator">
+            <title>72% voter turnout</title>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#E2E8F0" stroke-width="12"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#6C63FF" stroke-width="12" stroke-linecap="round" stroke-dasharray="0 314" style="--e:226.1 87.9;animation:seg-grow 1.8s .2s ease forwards;transform:rotate(-90deg);transform-origin:50% 50%"/>
+          </svg>
+          <div class="circ-ctr"><div class="circ-pct">72%</div><div class="circ-lbl">Turnout</div></div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:11px;color:var(--txd)">Peak: 2:00–3:00 PM</div>
+          <div style="font-size:11px;color:var(--teal2);margin-top:3px;font-weight:500"><i class="ti ti-trending-up" style="font-size:11px;margin-right:2px" aria-hidden="true"></i>Above average</div>
+        </div>
+      </div>
+      <div class="tur-table">
+        <div class="tur-row"><div class="tur-key"><i class="ti ti-users" style="font-size:13px" aria-hidden="true"></i>Registered voters</div><div class="tur-val">10,000</div></div>
+        <div class="tur-row"><div class="tur-key"><i class="ti ti-check" style="font-size:13px" aria-hidden="true"></i>Votes cast</div><div class="tur-val" style="color:#6C63FF">7,582</div></div>
+        <div class="tur-row"><div class="tur-key"><i class="ti ti-percentage" style="font-size:13px" aria-hidden="true"></i>Turnout rate</div><div class="tur-val" style="color:var(--teal2)">72%</div></div>
+        <div class="tur-row"><div class="tur-key"><i class="ti ti-clock" style="font-size:13px" aria-hidden="true"></i>Remaining</div><div class="tur-val" style="color:var(--txm)">2,418</div></div>
+        <div class="tur-row"><div class="tur-key"><i class="ti ti-trending-up" style="font-size:13px" aria-hidden="true"></i>Vote growth rate</div><div class="tur-val" style="color:var(--teal2)">+38/min</div></div>
+        <div class="tur-row"><div class="tur-key"><i class="ti ti-star" style="font-size:13px" aria-hidden="true"></i>Peak voting hour</div><div class="tur-val">2:00–3:00 PM</div></div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-icon" style="background:#CFFAFE"><i class="ti ti-activity" style="color:#0E7490;font-size:15px" aria-hidden="true"></i></div>
+      <span class="sec-title">Live Activity Feed</span>
+      <div class="sec-line"></div>
+    </div>
+    <div class="feed-card">
+      <div class="feed-hdr">
+        <div style="font-size:12px;color:var(--txm);font-weight:600;display:flex;align-items:center;gap:6px"><div class="live-blink"></div>Real-time updates</div>
+        <div style="font-size:10px;color:var(--txd)">Auto-updating every 5s</div>
+      </div>
+      <div class="feed-scroll" id="feedScroll">
+        <div class="feed-item"><div class="feed-dot" style="background:#6C63FF"></div><div class="feed-txt">+24 votes added to total count</div><div class="feed-time">just now</div></div>
+        <div class="feed-item"><div class="feed-dot" style="background:#22C55E"></div><div class="feed-txt">Turnout crossed 72% milestone</div><div class="feed-time">12s ago</div></div>
+        <div class="feed-item"><div class="feed-dot" style="background:#06B6D4"></div><div class="feed-txt">1,200 new viewers joined stream</div><div class="feed-time">45s ago</div></div>
+        <div class="feed-item"><div class="feed-dot" style="background:#F59E0B"></div><div class="feed-txt">Election audit checkpoint verified</div><div class="feed-time">1m ago</div></div>
+        <div class="feed-item"><div class="feed-dot" style="background:#6C63FF"></div><div class="feed-txt">+18 votes added to total count</div><div class="feed-time">2m ago</div></div>
+        <div class="feed-item"><div class="feed-dot" style="background:#22C55E"></div><div class="feed-txt">Blockchain hash updated successfully</div><div class="feed-time">3m ago</div></div>
+        <div class="feed-item"><div class="feed-dot" style="background:#94A3B8"></div><div class="feed-txt">Duplicate vote attempt blocked</div><div class="feed-time">8m ago</div></div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-icon" style="background:#FEF3C7"><i class="ti ti-crown" style="color:#D97706;font-size:15px" aria-hidden="true"></i></div>
+      <span class="sec-title">Current Leader</span>
+      <div class="sec-line"></div>
+    </div>
+    <div class="winner-card">
+      <div class="winner-lbl">CURRENT LEADING CANDIDATE</div>
+      <div class="winner-avatar">AK</div>
+      <div class="winner-name"><i class="ti ti-crown" style="color:var(--gold);font-size:16px" aria-hidden="true"></i>Ali Khan</div>
+      <div class="winner-pct">45% of total votes</div>
+      <div class="winner-sub">4,210 votes · Leading by 1,935 votes</div>
+      <div class="winner-tags">
+        <span class="winner-tag" style="background:var(--purple3);color:#4C1D95">President Candidate</span>
+        <span class="winner-tag" style="background:var(--teal3);color:var(--teal2)"><i class="ti ti-trending-up" style="font-size:11px;margin-right:3px" aria-hidden="true"></i>+2.1% momentum</span>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-icon" style="background:#EDE9FE"><i class="ti ti-share" style="color:#6C63FF;font-size:15px" aria-hidden="true"></i></div>
+      <span class="sec-title">Share Results</span>
+      <div class="sec-line"></div>
+    </div>
+    <div class="share-row">
+      <button class="share-btn"><i class="ti ti-brand-whatsapp" aria-hidden="true" style="color:#25D366"></i>WhatsApp</button>
+      <button class="share-btn"><i class="ti ti-brand-facebook" aria-hidden="true" style="color:#1877F2"></i>Facebook</button>
+      <button class="share-btn"><i class="ti ti-brand-x" aria-hidden="true"></i>X (Twitter)</button>
+      <button class="share-btn" onclick="this.innerHTML='<i class=\'ti ti-check\' style=\'color:#16A34A\'></i> Copied!';setTimeout(()=>this.innerHTML='<i class=\'ti ti-copy\'></i> Copy Link',1500)"><i class="ti ti-copy" aria-hidden="true"></i>Copy Link</button>
+    </div>
+
+    <div class="sec-head">
+      <div class="sec-icon" style="background:#DCFCE7"><i class="ti ti-shield-check" style="color:#16A34A;font-size:15px" aria-hidden="true"></i></div>
+      <span class="sec-title">Transparency & Security</span>
+      <div class="sec-line"></div>
+    </div>
+    <div class="trans-card">
+      <div style="font-size:13px;color:var(--txm)">All votes are cryptographically verified and stored on an immutable blockchain audit trail.</div>
+      <div class="verify-grid">
+        <div class="verify-item"><i class="ti ti-user-off" style="font-size:15px;flex-shrink:0" aria-hidden="true"></i>Anonymous voting enabled</div>
+        <div class="verify-item"><i class="ti ti-shield" style="font-size:15px;flex-shrink:0" aria-hidden="true"></i>Duplicate vote protection active</div>
+        <div class="verify-item"><i class="ti ti-cube" style="font-size:15px;flex-shrink:0" aria-hidden="true"></i>Blockchain audit verified</div>
+        <div class="verify-item"><i class="ti ti-lock" style="font-size:15px;flex-shrink:0" aria-hidden="true"></i>End-to-end encryption active</div>
+      </div>
+      <div class="audit-row">
+        <div class="audit-key">Last blockchain verification</div>
+        <div class="audit-val"><div class="live-blink"></div><span id="auditT">2 seconds ago</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="ft-inner">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+        <div style="width:26px;height:26px;border-radius:7px;background:var(--purple);display:flex;align-items:center;justify-content:center"><i class="ti ti-shield-check" style="font-size:13px;color:#fff" aria-hidden="true"></i></div>
+        <span style="font-size:14px;font-weight:700;color:var(--tx)">FortressVote</span>
+      </div>
+      <div class="ft-links">
+        <a class="ft-link" href="#">Privacy Policy</a>
+        <a class="ft-link" href="#">Contact</a>
+        <a class="ft-link" href="#">GitHub</a>
+        <a class="ft-link" href="#">Help</a>
+      </div>
+      <div class="ft-copy">© 2026 FortressVote · Secure, Transparent, Verified</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  let s=2*3600+14*60+9;
+  const el=document.getElementById('cd');
+  setInterval(()=>{if(s<=0)return;s--;const h=String(Math.floor(s/3600)).padStart(2,'0'),m=String(Math.floor((s%3600)/60)).padStart(2,'0'),sc=String(s%60).padStart(2,'0');el.textContent=h+':'+m+':'+sc},1000);
+})();
+(function(){let t=3;const el=document.getElementById('upd');setInterval(()=>{t++;el.textContent=t},1000);setInterval(()=>{t=0},7000)})();
+(function(){let v=3542;const el=document.getElementById('viewers');setInterval(()=>{v+=Math.floor(Math.random()*6)-1;el.textContent=v.toLocaleString()},3000)})();
+(function(){let t=2;const el=document.getElementById('auditT');setInterval(()=>{t++;if(t>12){t=0;el.textContent='just now'}else el.textContent=t+' seconds ago'},1000)})();
+setTimeout(()=>{
+  document.querySelectorAll('.bar-fill[data-w]').forEach(el=>{el.style.width=el.dataset.w+'%'});
+  document.querySelectorAll('.rank-bar-f[data-w]').forEach(el=>{el.style.width=el.dataset.w+'%'});
+},300);
+const feedItems=[
+  {color:'#6C63FF',text:'+31 votes added to total count'},
+  {color:'#06B6D4',text:'Ali Khan widens lead by 12 votes'},
+  {color:'#22C55E',text:'New viewer milestone: 3,600 watching'},
+  {color:'#F59E0B',text:'Audit checkpoint verified successfully'},
+  {color:'#6C63FF',text:'Turnout rate ticked up to 72.4%'},
+  {color:'#22C55E',text:'+19 votes added to total count'},
+];
+let fi=0;const feed=document.getElementById('feedScroll');
+setInterval(()=>{
+  const item=feedItems[fi%feedItems.length];fi++;
+  const div=document.createElement('div');div.className='feed-item';
+  div.innerHTML=`<div class="feed-dot" style="background:${item.color}"></div><div class="feed-txt">${item.text}</div><div class="feed-time">just now</div>`;
+  feed.insertBefore(div,feed.firstChild);
+  feed.querySelectorAll('.feed-time').forEach((el,i)=>{if(i===0)return;const secs=[12,45,60,120,180,240,300];const sec=secs[Math.min(i-1,secs.length-1)];el.textContent=sec<60?sec+'s ago':Math.floor(sec/60)+'m ago'});
+  while(feed.children.length>9)feed.removeChild(feed.lastChild);
+},5000);
+</script>

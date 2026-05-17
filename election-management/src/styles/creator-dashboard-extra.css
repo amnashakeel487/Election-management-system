@@ -10,6 +10,123 @@
 .wiz-label{font-size:10px;font-weight:600;color:var(--subtle);white-space:nowrap;}
 .wiz-label.active{color:var(--navy2);}
 
+/* Compact create/edit election wizard (embedded in creator layout) */
+.creator-wizard-wrap {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.creator-wizard-wrap .wizard-steps {
+  margin-bottom: 16px;
+  gap: 2px;
+}
+
+.creator-wizard-wrap .wiz-circle {
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+}
+
+.creator-wizard-wrap .wiz-connector {
+  margin: 0 4px 14px;
+  min-width: 10px;
+}
+
+.creator-wizard-wrap .wiz-label {
+  font-size: 9px;
+  max-width: 68px;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.creator-wizard-wrap .card-elevated {
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(15, 35, 71, 0.06);
+}
+
+.creator-wizard-wrap .card-body {
+  padding: 16px 18px 18px;
+}
+
+.creator-wizard-wrap .creator-wizard-step h2 {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.2px;
+}
+
+.creator-wizard-wrap .creator-wizard-step h2 .material-symbols-outlined {
+  font-size: 20px;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.creator-wizard-wrap .creator-wizard-step .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 14px;
+}
+
+.creator-wizard-wrap .creator-wizard-step .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 16px;
+}
+
+.creator-wizard-wrap .creator-wizard-step label {
+  font-size: 11px;
+}
+
+.creator-wizard-wrap .creator-wizard-step input,
+.creator-wizard-wrap .creator-wizard-step textarea,
+.creator-wizard-wrap .creator-wizard-step select {
+  padding: 10px 12px !important;
+  font-size: 13px !important;
+  border-radius: 10px !important;
+}
+
+.creator-wizard-wrap .creator-wizard-step textarea {
+  min-height: 72px;
+}
+
+.creator-wizard-wrap .creator-wizard-step .mb-8 {
+  margin-bottom: 14px !important;
+}
+
+.creator-wizard-wrap .creator-wizard-step .mb-6 {
+  margin-bottom: 12px !important;
+}
+
+.creator-wizard-wrap .creator-wizard-step .mt-6 {
+  margin-top: 14px !important;
+}
+
+.creator-wizard-wrap .creator-wizard-step .p-5 {
+  padding: 12px !important;
+}
+
+.creator-wizard-wrap .creator-wizard-step .p-6 {
+  padding: 14px !important;
+}
+
+.creator-wizard-wrap .creator-wizard-step .rounded-2xl.border.border-primary\/20 {
+  padding: 12px 14px !important;
+  margin-bottom: 14px !important;
+}
+
+.creator-wizard-wrap .creator-wizard-step .grid.gap-6 {
+  gap: 12px !important;
+}
+
+.creator-wizard-wrap .creator-wizard-step .font-body-md {
+  font-size: 12px;
+}
+
+.creator-wizard-wrap .creator-wizard-step .font-headline-md {
+  font-size: 15px;
+}
+
 .control-panel{background:linear-gradient(135deg,#0F2347,#1B3A6B 60%,#2D1B69);border-radius:16px;padding:24px;color:#fff;position:relative;overflow:hidden;}
 .control-panel::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(108,63,197,0.2);filter:blur(60px);top:-100px;right:-60px;pointer-events:none;}
 .control-timer{font-family:'IBM Plex Mono',monospace;font-size:42px;font-weight:700;color:#fff;letter-spacing:2px;margin:16px 0;}
