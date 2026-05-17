@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import '@/styles/admin-dashboard.css'
@@ -30,6 +30,15 @@ function CreatorLayoutInner() {
   const { t, i18n } = useTranslation('creator')
   const [mobileOpen, setMobileOpen] = useState(false)
   const pageKey = resolvePageKey(pathname)
+
+  useEffect(() => {
+    document.body.classList.toggle('dashboard-sidebar-open', mobileOpen)
+    return () => document.body.classList.remove('dashboard-sidebar-open')
+  }, [mobileOpen])
+
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
   const meta = useCreatorPageMeta(pageKey)
 
   const dateLocale = i18n.language === 'ur' ? 'ur-PK' : undefined

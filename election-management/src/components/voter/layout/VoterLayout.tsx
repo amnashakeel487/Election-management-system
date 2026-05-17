@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import '@/styles/voter-dashboard.css'
 import { VoterSidebar } from '@/components/voter/layout/VoterSidebar'
@@ -29,6 +29,15 @@ function VoterLayoutInner() {
   const { profile } = useAuth()
   const { notificationCount } = useVoterDashboard()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  useEffect(() => {
+    document.body.classList.toggle('dashboard-sidebar-open', mobileOpen)
+    return () => document.body.classList.remove('dashboard-sidebar-open')
+  }, [mobileOpen])
+
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
 
   const meta = useMemo(() => voterTopMeta(pathname), [pathname])
 

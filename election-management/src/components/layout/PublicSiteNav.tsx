@@ -10,11 +10,8 @@ import '@/styles/public-site-nav.css'
 export type PublicNavActive = 'elections' | 'browse' | 'results'
 
 export interface PublicSiteNavProps {
-  /** Highlight the current section; inferred from the URL when omitted. */
   active?: PublicNavActive
-  /** `landing` uses a fixed bar on the home page; other public pages use sticky. */
   variant?: 'landing' | 'default'
-  /** Extra controls before auth buttons (e.g. live pill, share, PDF). */
   trailing?: ReactNode
 }
 
@@ -53,6 +50,11 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
     setMobileOpen(false)
   }, [location.pathname, location.hash])
 
+  useEffect(() => {
+    document.body.classList.toggle('public-nav-open', mobileOpen)
+    return () => document.body.classList.remove('public-nav-open')
+  }, [mobileOpen])
+
   const signedIn = Boolean(session && profile && !mfaRequired)
   const dashboardPath = getDashboardPath() ?? '/'
 
@@ -74,6 +76,7 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
     'navbar',
     variant === 'landing' ? 'navbar--landing' : '',
     navScrolled ? 'scrolled' : '',
+    mobileOpen ? 'mobile-nav-open' : '',
   ]
     .filter(Boolean)
     .join(' ')
@@ -85,90 +88,87 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
     return `nav-link${isActive ? ' active' : ''}`
   }
 
-  const mobileMenuStyle = mobileOpen
-    ? {
-        display: 'flex' as const,
-        position: 'absolute' as const,
-        top: 68,
-        left: 0,
-        right: 0,
-        flexDirection: 'column' as const,
-        gap: 16,
-        padding: '20px 24px',
-        background: 'rgba(9,21,45,0.98)',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
-      }
-    : undefined
+  const authButtons = signedIn ? (
+    <button type="button" className="btn-primary-nav" onClick={() => navigate(dashboardPath)}>
+      {t('dashboard')}
+    </button>
+  ) : (
+    <>
+      <button type="button" className="btn-ghost-nav" onClick={() => navigate('/login')}>
+        {t('logIn')}
+      </button>
+      <button type="button" className="btn-primary-nav" onClick={() => navigate('/register')}>
+        {t('getStarted')}
+      </button>
+    </>
+  )
 
   return (
-    <nav className={navClass}>
-      <Link to="/" className="nav-brand">
-        <div className="nav-icon">
-          <ShieldIcon className="h-5 w-5 text-white" />
-        </div>
-        <span className="nav-name">FortressVote</span>
-        <span className="nav-tag">{t('enterprise')}</span>
-      </Link>
+    <>
+      <nav className={navClass}>
+        <Link to="/" className="nav-brand" onClick={() => setMobileOpen(false)}>
+          <div className="nav-icon">
+            <ShieldIcon className="h-5 w-5 text-white" />
+          </div>
+          <span className="nav-name">FortressVote</span>
+          <span className="nav-tag">{t('enterprise')}</span>
+        </Link>
 
-      <div className="nav-links" style={mobileMenuStyle}>
-        {links.map((l) =>
-          l.route ? (
-            <Link
-              key={l.key}
-              className={linkClass(l.key)}
-              to={l.href}
-              onClick={() => setMobileOpen(false)}
-            >
-              {l.label}
-            </Link>
-          ) : (
-            <a
-              key={l.key}
-              className={linkClass(l.key)}
-              href={l.href}
-              onClick={() => setMobileOpen(false)}
-            >
-              {l.label}
-            </a>
-          ),
-        )}
-        {mobileOpen ? (
+        <div className="nav-links">
+          {links.map((l) =>
+            l.route ? (
+              <Link
+                key={l.key}
+                className={linkClass(l.key)}
+                to={l.href}
+                onClick={() => setMobileOpen(false)}
+              >
+                {l.label}
+              </Link>
+            ) : (
+              <a
+                key={l.key}
+                className={linkClass(l.key)}
+                href={l.href}
+                onClick={() => setMobileOpen(false)}
+              >
+                {l.label}
+              </a>
+            ),
+          )}
           <div className="nav-lang-mobile">
             <LanguageSwitcher variant="nav" locales={PUBLIC_LOCALES} />
           </div>
-        ) : null}
-      </div>
+          {trailing ? <div className="nav-trailing nav-trailing--mobile">{trailing}</div> : null}
+          <div className="nav-mobile-actions">{authButtons}</div>
+        </div>
 
-      <div className="nav-actions">
-        <LanguageSwitcher variant="nav" className="nav-lang" locales={PUBLIC_LOCALES} />
-        {trailing ? <div className="nav-trailing">{trailing}</div> : null}
-        {signedIn ? (
-          <button type="button" className="btn-primary-nav" onClick={() => navigate(dashboardPath)}>
-            {t('dashboard')}
-          </button>
-        ) : (
-          <>
-            <button type="button" className="btn-ghost-nav" onClick={() => navigate('/login')}>
-              {t('logIn')}
-            </button>
-            <button type="button" className="btn-primary-nav" onClick={() => navigate('/register')}>
-              {t('getStarted')}
-            </button>
-          </>
-        )}
-      </div>
+        <div className="nav-actions">
+          <LanguageSwitcher variant="nav" className="nav-lang" locales={PUBLIC_LOCALES} />
+          {trailing ? <div className="nav-trailing">{trailing}</div> : null}
+          {authButtons}
+        </div>
 
-      <button
-        type="button"
-        className="nav-hamburger"
-        aria-label={mobileOpen ? t('closeMenu') : t('openMenu')}
-        aria-expanded={mobileOpen}
-        onClick={() => setMobileOpen((o) => !o)}
-      >
-        <span />
-        <span />
-        <span />
-      </button>
-    </nav>
+        <button
+          type="button"
+          className="nav-hamburger"
+          aria-label={mobileOpen ? t('closeMenu') : t('openMenu')}
+          aria-expanded={mobileOpen}
+          onClick={() => setMobileOpen((o) => !o)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </nav>
+      {mobileOpen ? (
+        <button
+          type="button"
+          className="public-nav-backdrop"
+          aria-label={t('closeMenu')}
+          onClick={() => setMobileOpen(false)}
+        />
+      ) : null}
+    </>
   )
 }

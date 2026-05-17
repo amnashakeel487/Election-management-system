@@ -7,8 +7,8 @@ interface AuthLayoutProps {
 /** Auth pages: light page shell + branded footer. */
 export function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-background font-body-md text-on-background">
-      <main className="relative flex flex-grow items-center justify-center overflow-hidden px-md py-xl">
+    <div className="auth-layout flex min-h-screen flex-col bg-background font-body-md text-on-background">
+      <main className="relative flex flex-grow items-center justify-center overflow-hidden px-4 py-8 sm:px-md sm:py-xl">
         <div className="absolute inset-0 z-0">
           <div className="absolute right-[-5%] top-[-10%] h-[500px] w-[500px] rounded-full bg-primary/12 blur-[120px]" />
           <div className="absolute bottom-[-10%] left-[-5%] h-[400px] w-[400px] rounded-full bg-secondary/12 blur-[100px]" />

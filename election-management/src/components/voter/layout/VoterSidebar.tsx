@@ -136,15 +136,8 @@ export function VoterSidebar({ mobileOpen = false, onMobileClose }: VoterSidebar
       {mobileOpen ? (
         <button
           type="button"
+          className="sidebar-backdrop"
           aria-label="Close menu"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 99,
-            background: 'rgba(0,0,0,0.4)',
-            border: 'none',
-            cursor: 'pointer',
-          }}
           onClick={() => onMobileClose?.()}
         />
       ) : null}

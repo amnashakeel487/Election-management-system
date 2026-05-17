@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import '@/i18n/config'
 import App from './App'
 import './styles/index.css'
+import './styles/responsive-global.css'
 import './styles/language-switcher.css'
 import './styles/rtl.css'
 

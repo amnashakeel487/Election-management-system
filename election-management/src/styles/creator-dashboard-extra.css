@@ -216,11 +216,16 @@
 @media (max-width:1200px){
   .creator-dashboard-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
 }
-@media (max-width:640px){
+@media (max-width:768px){
+  .creator-dashboard-live-grid{grid-template-columns:1fr !important;}
   .creator-dashboard-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
+@media (max-width:640px){
+  .creator-dashboard-stats-grid{grid-template-columns:1fr;}
+}
 
-.creator-mobile-menu-btn{display:none;}
+.creator-mobile-menu-btn{display:none;align-items:center;justify-content:center;flex-shrink:0;}
+.sidebar-backdrop{position:fixed;inset:0;z-index:99;background:rgba(0,0,0,0.45);border:none;cursor:pointer;padding:0;}
 @media (max-width:900px){
   .creator-mobile-menu-btn{display:flex;margin-right:4px;}
 }

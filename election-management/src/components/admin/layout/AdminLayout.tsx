@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import '@/styles/admin-dashboard.css'
 import '@/styles/admin-dashboard-dark.css'
@@ -19,8 +20,18 @@ export function AdminLayout() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { profile } = useAuth()
+  const [mobileOpen, setMobileOpen] = useState(false)
   const pageKey = resolvePageKey(pathname)
   const meta = ADMIN_PAGE_META[pageKey] ?? ADMIN_PAGE_META.dashboard
+
+  useEffect(() => {
+    document.body.classList.toggle('dashboard-sidebar-open', mobileOpen)
+    return () => document.body.classList.remove('dashboard-sidebar-open')
+  }, [mobileOpen])
+
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
 
   const welcomeDate = new Date().toLocaleDateString(undefined, {
     weekday: 'long',
@@ -32,10 +43,22 @@ export function AdminLayout() {
   return (
     <div className="admin-app">
       <div className="app">
-        <AdminSidebar />
+        <AdminSidebar mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
         <main className="main">
           <div className="topbar">
-            <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <button
+              type="button"
+              className="icon-btn admin-mobile-menu-btn"
+              aria-label="Open menu"
+              onClick={() => setMobileOpen(true)}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden style={{ width: 15, height: 15 }}>
+                <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="2" />
+                <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" strokeWidth="2" />
+                <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
               <div className="topbar-title">{meta.topTitle}</div>
               <div className="topbar-subtitle">
                 {meta.topSub ?? `Welcome back${profile?.full_name ? `, ${profile.full_name}` : ''} · ${welcomeDate}`}

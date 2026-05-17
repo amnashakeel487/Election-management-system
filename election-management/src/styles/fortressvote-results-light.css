@@ -1037,3 +1037,38 @@
   border-radius: 6px;
   margin-bottom: 6px;
 }
+
+@media (max-width: 768px) {
+  .fv-results-light .fv-hero-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .fv-results-light .fv-hero-right {
+    width: 100%;
+  }
+
+  .fv-results-light .fv-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fv-results-light .fv-rank-list {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 480px) {
+  .fv-results-light .fv-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fv-results-light .fv-hero {
+    padding: 1.25rem 1rem;
+  }
+
+  .fv-results-light .fv-hero-title {
+    font-size: clamp(1.35rem, 6vw, 1.75rem);
+  }
+}

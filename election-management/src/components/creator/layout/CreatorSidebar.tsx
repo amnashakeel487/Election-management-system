@@ -109,15 +109,8 @@ export function CreatorSidebar({ mobileOpen = false, onMobileClose }: CreatorSid
       {mobileOpen ? (
         <button
           type="button"
+          className="sidebar-backdrop"
           aria-label={t('topbar.closeMenu')}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 99,
-            background: 'rgba(0,0,0,0.4)',
-            border: 'none',
-            cursor: 'pointer',
-          }}
           onClick={() => onMobileClose?.()}
         />
       ) : null}

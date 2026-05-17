@@ -1,0 +1,224 @@
+/**
+ * Site-wide responsive utilities — dashboards, tables, modals, public pages.
+ * Desktop layouts unchanged; mobile/tablet adjustments only.
+ */
+
+html {
+  overflow-x: clip;
+}
+
+body {
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+}
+
+#root {
+  overflow-x: clip;
+  min-width: 0;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Scrollable data tables (admin / creator / voter) */
+.admin-app .table-wrap,
+.creator-app .table-wrap,
+.voter-app .table-wrap,
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.admin-app table,
+.creator-app table,
+.voter-app table {
+  min-width: 520px;
+}
+
+/* Page headers stack on narrow screens */
+.admin-app .page-header,
+.creator-app .page-header,
+.voter-app .page-header,
+.page-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-app .page-header-actions,
+.creator-app .page-header-actions,
+.voter-app .page-header-actions,
+.page-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .admin-app .page-header-actions,
+  .creator-app .page-header-actions,
+  .voter-app .page-header-actions,
+  .page-header-actions {
+    width: auto;
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+}
+
+/* Touch-friendly controls */
+@media (max-width: 768px) {
+  .admin-app .btn,
+  .creator-app .btn,
+  .voter-app .btn,
+  .admin-app .icon-btn,
+  .creator-app .icon-btn,
+  .voter-app .icon-btn,
+  .public-nav-root .btn-ghost-nav,
+  .public-nav-root .btn-primary-nav {
+    min-height: 44px;
+  }
+
+  .admin-app .content,
+  .creator-app .content,
+  .voter-app .content {
+    padding: 16px;
+  }
+
+  .admin-app .topbar,
+  .creator-app .topbar,
+  .voter-app .topbar {
+    padding: 0 12px;
+    gap: 8px;
+    min-height: 56px;
+    height: auto;
+    flex-wrap: wrap;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .admin-app .topbar-title,
+  .creator-app .topbar-title,
+  .voter-app .topbar-title {
+    font-size: 14px;
+  }
+
+  .admin-app .topbar-subtitle,
+  .creator-app .topbar-subtitle,
+  .voter-app .topbar-sub {
+    font-size: 10px;
+  }
+
+  .admin-app .stat-grid,
+  .creator-app .stat-grid,
+  .voter-app .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .voter-app .topbar-right .btn-success {
+    display: none;
+  }
+
+  .donut-wrap {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-app .stat-grid,
+  .creator-app .stat-grid,
+  .voter-app .stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Modals */
+.modal-panel,
+.modal-content,
+[role='dialog'] .modal-box {
+  max-width: min(100vw - 24px, 560px);
+  max-height: min(90vh, 720px);
+  overflow-y: auto;
+}
+
+@media (max-width: 640px) {
+  .modal-panel,
+  .modal-content {
+    width: calc(100vw - 20px) !important;
+    margin: 10px;
+  }
+}
+
+/* Auth pages */
+@media (max-width: 640px) {
+  .auth-layout main {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* Chart containers */
+.chart-wrap,
+.line-chart-wrap,
+.results-chart-wrap,
+.creator-results-chart {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.chart-wrap canvas,
+.results-chart-wrap canvas {
+  max-width: 100% !important;
+}
+
+/* Filter toolbars */
+.filter-row,
+.toolbar-row,
+.candidates-toolbar,
+.participants-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.filter-row > *,
+.toolbar-row > * {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .filter-row .search-input,
+  .filter-row input[type='search'],
+  .toolbar-row .search-input {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+/* Wizard / multi-column forms */
+@media (max-width: 900px) {
+  .wizard-layout,
+  .election-wizard-grid,
+  .create-election-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Public mobile menu body lock */
+body.public-nav-open {
+  overflow: hidden;
+}
+
+body.dashboard-sidebar-open {
+  overflow: hidden;
+}
