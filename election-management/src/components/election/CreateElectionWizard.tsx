@@ -1,7 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { CreatorWizardShell } from '@/components/creator/CreatorWizardShell'
-import { ELECTION_CATEGORY_OPTIONS } from '@/constants/electionWizard'
+import {
+  ELECTION_CATEGORY_OPTIONS,
+  WIZARD_FEATURE_TOGGLES,
+  WIZARD_PRIVACY_OPTIONS,
+} from '@/constants/electionWizard'
 import { useAuth } from '@/hooks/useAuth'
 import {
   addCandidate,
@@ -29,13 +33,6 @@ interface CreateElectionWizardProps {
 
 const CATEGORY_CUSTOM = '__custom__'
 
-const ELIGIBILITY_OPTIONS = [
-  { value: 'verified_voters', label: 'Verified Registered Voters Only (Default)' },
-  { value: 'national_id', label: 'Any Citizen with Valid National ID' },
-  { value: 'whitelist', label: 'Whitelist-Only Access (Invite Required)' },
-  { value: 'public', label: 'Public Open Access (Community Poll)' },
-]
-
 function persistedCategory(slug: string, customDetail: string): string {
   if (slug === CATEGORY_CUSTOM) return customDetail.trim()
   return slug
@@ -61,7 +58,6 @@ export function CreateElectionWizard({ electionId: initialElectionId, embedded =
 
   const [maxVoters, setMaxVoters] = useState(1000)
   const [secretIdPrefix, setSecretIdPrefix] = useState(DEFAULT_SECRET_VOTER_ID_PREFIX)
-  const [eligibilityRule, setEligibilityRule] = useState('verified_voters')
   const [privacyTier, setPrivacyTier] = useState('zero_knowledge')
   const [realTimeResults, setRealTimeResults] = useState(false)
   const [allowWriteIns, setAllowWriteIns] = useState(true)
@@ -99,7 +95,6 @@ export function CreateElectionWizard({ electionId: initialElectionId, embedded =
 
         setMaxVoters(data.max_voters)
         setSecretIdPrefix(data.secret_voter_id_prefix || DEFAULT_SECRET_VOTER_ID_PREFIX)
-        setEligibilityRule(data.eligibility_rule)
         setPrivacyTier(data.privacy_tier)
         setRealTimeResults(data.real_time_results)
         setAllowWriteIns(data.allow_write_ins)
@@ -240,7 +235,6 @@ export function CreateElectionWizard({ electionId: initialElectionId, embedded =
       await updateElection(id, {
         max_voters: maxVoters,
         secret_voter_id_prefix: normalizeSecretVoterIdPrefix(secretIdPrefix),
-        eligibility_rule: eligibilityRule,
         privacy_tier: privacyTier,
         real_time_results: realTimeResults,
         allow_write_ins: allowWriteIns,
@@ -506,82 +500,52 @@ export function CreateElectionWizard({ electionId: initialElectionId, embedded =
             </div>
             <div className="flex flex-col gap-2">
               <label className="ml-1 font-label-md text-label-md text-on-surface-variant">
-                Voting eligibility rule
+                How private should votes be?
               </label>
-              <div className="relative">
-                <select
-                  value={eligibilityRule}
-                  onChange={(e) => setEligibilityRule(e.target.value)}
-                  className="w-full cursor-pointer appearance-none rounded-xl border border-outline-variant bg-surface-container-low p-4 pr-10 text-on-surface outline-none transition-all focus:border-transparent focus:ring-2 focus:ring-primary"
-                >
-                  {ELIGIBILITY_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-                <span className="material-symbols-outlined pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
-                  expand_more
-                </span>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="flex flex-col gap-2">
-                <label className="ml-1 font-label-md text-label-md text-on-surface-variant">Privacy tier</label>
-                <button
-                  type="button"
-                  onClick={() => setPrivacyTier('zero_knowledge')}
-                  className={
-                    privacyTier === 'zero_knowledge'
-                      ? 'flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-primary bg-primary/5 p-5 transition-all'
-                      : 'flex cursor-pointer flex-col gap-2 rounded-xl border border-outline-variant bg-surface-container p-5 transition-all hover:bg-surface-container-high'
-                  }
-                >
-                  <div className="flex items-center justify-between">
+              <p className="mb-1 text-[12px] leading-relaxed text-on-surface-variant">
+                Pick one. You can change this later from election controls.
+              </p>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {WIZARD_PRIVACY_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setPrivacyTier(opt.value)}
+                    className={
+                      privacyTier === opt.value
+                        ? 'flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-primary bg-primary/5 p-5 text-left transition-all'
+                        : 'flex cursor-pointer flex-col gap-2 rounded-xl border border-outline-variant bg-surface-container p-5 text-left transition-all hover:bg-surface-container-high'
+                    }
+                  >
                     <span
                       className={
-                        privacyTier === 'zero_knowledge'
+                        privacyTier === opt.value
                           ? 'font-body-md font-bold text-primary'
                           : 'font-body-md font-bold text-on-surface'
                       }
                     >
-                      Zero-Knowledge
+                      {opt.title}
                     </span>
-                  </div>
-                  <p className="text-label-sm text-on-surface-variant">
-                    Strong voter anonymity posture for ballots.
-                  </p>
-                </button>
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="ml-1 font-label-md text-label-md text-on-surface-variant">&nbsp;</label>
-                <button
-                  type="button"
-                  onClick={() => setPrivacyTier('pseudonymous')}
-                  className={
-                    privacyTier === 'pseudonymous'
-                      ? 'flex cursor-pointer flex-col gap-2 rounded-xl border-2 border-primary bg-primary/5 p-5 transition-all'
-                      : 'flex cursor-pointer flex-col gap-2 rounded-xl border border-outline-variant bg-surface-container p-5 transition-all hover:bg-surface-container-high'
-                  }
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-body-md font-bold text-on-surface">Pseudonymous</span>
-                  </div>
-                  <p className="text-label-sm text-on-surface-variant">
-                    Audit-focused with pseudonymous identifiers.
-                  </p>
-                </button>
+                    <p className="text-label-sm text-on-surface-variant">{opt.description}</p>
+                  </button>
+                ))}
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="flex items-center justify-between rounded-2xl border border-line bg-surface-container-low/50 p-5">
-                <div className="flex gap-4">
-                  <span className="material-symbols-outlined rounded-lg bg-secondary/10 p-2 text-secondary">
-                    visibility_off
+                <div className="flex min-w-0 flex-1 gap-4 pr-3">
+                  <span className="material-symbols-outlined shrink-0 rounded-lg bg-secondary/10 p-2 text-secondary">
+                    {realTimeResults ? 'visibility' : 'visibility_off'}
                   </span>
-                  <div>
-                    <p className="font-label-md text-label-md font-bold text-on-surface">Live results</p>
-                    <p className="text-[11px] text-on-surface-variant">Show tallies during voting.</p>
+                  <div className="min-w-0">
+                    <p className="font-label-md text-label-md font-bold text-on-surface">
+                      {WIZARD_FEATURE_TOGGLES.liveResults.title}
+                    </p>
+                    <p className="text-[11px] leading-relaxed text-on-surface-variant">
+                      {realTimeResults
+                        ? WIZARD_FEATURE_TOGGLES.liveResults.descriptionOn
+                        : WIZARD_FEATURE_TOGGLES.liveResults.descriptionOff}
+                    </p>
                   </div>
                 </div>
                 <label className="relative inline-flex cursor-pointer items-center">
@@ -595,11 +559,19 @@ export function CreateElectionWizard({ electionId: initialElectionId, embedded =
                 </label>
               </div>
               <div className="flex items-center justify-between rounded-2xl border border-line bg-surface-container-low/50 p-5">
-                <div className="flex gap-4">
-                  <span className="material-symbols-outlined rounded-lg bg-tertiary/10 p-2 text-tertiary">history_edu</span>
-                  <div>
-                    <p className="font-label-md text-label-md font-bold text-on-surface">Write-ins</p>
-                    <p className="text-[11px] text-on-surface-variant">Allow provisional write-in nominees.</p>
+                <div className="flex min-w-0 flex-1 gap-4 pr-3">
+                  <span className="material-symbols-outlined shrink-0 rounded-lg bg-tertiary/10 p-2 text-tertiary">
+                    history_edu
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-label-md text-label-md font-bold text-on-surface">
+                      {WIZARD_FEATURE_TOGGLES.writeIns.title}
+                    </p>
+                    <p className="text-[11px] leading-relaxed text-on-surface-variant">
+                      {allowWriteIns
+                        ? WIZARD_FEATURE_TOGGLES.writeIns.descriptionOn
+                        : WIZARD_FEATURE_TOGGLES.writeIns.descriptionOff}
+                    </p>
                   </div>
                 </div>
                 <label className="relative inline-flex cursor-pointer items-center">
