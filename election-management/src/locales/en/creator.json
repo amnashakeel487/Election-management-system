@@ -1,0 +1,179 @@
+{
+  "brand": {
+    "creatorTag": "Creator"
+  },
+  "role": {
+    "signedInAs": "Signed in as",
+    "electionCreator": "Election Creator"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "myElections": "My Elections",
+    "createElection": "Create Election",
+    "candidates": "Candidates",
+    "participants": "Participants",
+    "results": "Results",
+    "notifications": "Notifications",
+    "reports": "Reports",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "sections": {
+      "overview": "Overview",
+      "elections": "Elections",
+      "management": "Management",
+      "tools": "Tools",
+      "account": "Account"
+    }
+  },
+  "topbar": {
+    "searchPlaceholder": "Search elections…",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "welcomeBack": "Welcome back",
+    "welcomeBackNamed": "Welcome back, {{name}}"
+  },
+  "pages": {
+    "dashboard": {
+      "topTitle": "Creator Dashboard",
+      "topSub": "Your election platform summary and live stats",
+      "eyebrow": "Overview",
+      "title": "Creator Dashboard",
+      "subtitle": "Your election platform summary and live stats"
+    },
+    "elections": {
+      "topTitle": "My Elections",
+      "topSub": "All elections you have created and manage",
+      "eyebrow": "Elections",
+      "title": "My Elections",
+      "subtitle": "All elections you have created and manage"
+    },
+    "create": {
+      "topTitle": "Create Election",
+      "topSub": "Set up your election step by step",
+      "eyebrow": "Create",
+      "title": "Create New Election",
+      "subtitle": "Set up your election step by step",
+      "editTitle": "Edit draft election"
+    },
+    "candidates": {
+      "topTitle": "Candidate Management",
+      "topSub": "Add, edit and manage election candidates",
+      "eyebrow": "Management",
+      "title": "Candidate Management",
+      "subtitle": "Manage candidates for your selected election"
+    },
+    "participants": {
+      "topTitle": "Participants",
+      "topSub": "Voter registrations, waitlists and stats",
+      "eyebrow": "Voters",
+      "title": "Participants",
+      "subtitle": "Voter registrations and waitlist for your election"
+    },
+    "results": {
+      "topTitle": "Election Results",
+      "topSub": "Live vote counting and analytics",
+      "eyebrow": "Analytics",
+      "title": "Election Results",
+      "subtitle": "Live results and export for your election"
+    },
+    "notifications": {
+      "topTitle": "Notifications",
+      "topSub": "System alerts, email logs and reminders",
+      "eyebrow": "Communications",
+      "title": "Notifications",
+      "subtitle": "Email logs and election notification status"
+    },
+    "reports": {
+      "topTitle": "Reports",
+      "topSub": "Export election data and analytics",
+      "eyebrow": "Data",
+      "title": "Reports",
+      "subtitle": "Download participants, results and audit data"
+    },
+    "settings": {
+      "topTitle": "Creator Settings",
+      "topSub": "Organisation info and preferences",
+      "eyebrow": "Configuration",
+      "title": "Creator Settings",
+      "subtitle": "Appearance, language and notification preferences",
+      "accountSecurity": "Account security",
+      "accountSecurityDesc": "Password, MFA, and session security.",
+      "openAccountSecurity": "Open account security",
+      "electionDefaults": "Election defaults",
+      "comingSoon": "Coming soon",
+      "electionDefaultsDesc": "Default titles, categories, and real-time results preferences will be saved here."
+    },
+    "profile": {
+      "topTitle": "My Profile",
+      "topSub": "Manage your creator account",
+      "eyebrow": "Account",
+      "title": "My Profile",
+      "subtitle": "Your account details and approval status"
+    },
+    "electionDetail": {
+      "topTitle": "Election Details",
+      "topSub": "Manage invite, waitlist and voter roll",
+      "title": "Election Details"
+    }
+  },
+  "stats": {
+    "totalElections": "Total Elections",
+    "activeElections": "Active Elections",
+    "totalParticipants": "Total Participants",
+    "totalVotesCast": "Total Votes Cast",
+    "onWaitlist": "On Waitlist",
+    "avgTurnout": "Avg Turnout",
+    "live": "Live",
+    "waiting": "Waiting"
+  },
+  "live": {
+    "overviewTitle": "Live Elections Overview",
+    "overviewSub": "Real-time turnout tracking",
+    "loading": "Loading live results…",
+    "noPolling": "No elections are actively polling right now.",
+    "viewAllElections": "View all elections",
+    "monthlyVotes": "Monthly Votes",
+    "electionStatus": "Election Status",
+    "quickActions": "Quick Actions",
+    "createElection": "Create Election",
+    "addCandidate": "Add Candidate",
+    "viewResults": "View Results",
+    "endsIn": "Ends in {{time}}",
+    "voted": "{{cast}} / {{total}} voted",
+    "statusActive": "Active",
+    "statusUpcoming": "Upcoming",
+    "statusCompleted": "Completed"
+  },
+  "activity": {
+    "recent": "Recent Activity",
+    "loading": "Loading…",
+    "none": "No activity yet.",
+    "updated": "{{status}} · updated {{date}}"
+  },
+  "approval": {
+    "pendingTitle": "Pending admin approval",
+    "pendingBody": "Your election creator access request is under review. You can create elections once approved.",
+    "rejected": "Your creator application was rejected. Contact support if you believe this is an error."
+  },
+  "elections": {
+    "createButton": "+ Create Election",
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "draft": "Draft",
+      "completed": "Completed"
+    },
+    "loading": "Loading elections…",
+    "emptyTitle": "No elections yet",
+    "emptyBody": "Create your first election to get started.",
+    "createFirst": "Create Election",
+    "emptyView": "No elections in this view.",
+    "createFirstLink": "Create your first election"
+  },
+  "errors": {
+    "statsMigration": "{{error}} — apply migrations 025_creator_dashboard_stats.sql and 026_creator_dashboard_live.sql in Supabase if this persists."
+  }
+}

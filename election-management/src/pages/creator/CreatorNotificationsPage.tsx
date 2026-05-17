@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader'
-import { CREATOR_PAGE_META } from '@/config/creatorNav'
+import { useCreatorPageMeta } from '@/hooks/useCreatorI18n'
 import { fetchNotificationLogs, fetchNotificationSummary } from '@/services/notificationService'
 import type { NotificationLogRow } from '@/types/notification'
 import { formatRelativeTime, formatSubmissionDate } from '@/utils/formatDate'
 import { NOTIFICATION_STATUS_LABELS, NOTIFICATION_TYPE_LABELS, notificationStatusClass } from '@/utils/notificationPresentation'
 
-const meta = CREATOR_PAGE_META.notifications
-
 export function CreatorNotificationsPage() {
+  const meta = useCreatorPageMeta('notifications')
   const [summary, setSummary] = useState({ total: 0, sent: 0, failed: 0 })
   const [logs, setLogs] = useState<NotificationLogRow[]>([])
   const [loading, setLoading] = useState(true)

@@ -2,14 +2,13 @@ import { CreatorElectionPicker } from '@/components/creator/CreatorElectionPicke
 import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader'
 import { CreatorResultsView } from '@/components/creator/results/CreatorResultsView'
 import { shortElectionCode } from '@/components/creator/results/creatorResultsUtils'
-import { CREATOR_PAGE_META } from '@/config/creatorNav'
 import { useCreatorElection } from '@/context/CreatorElectionContext'
+import { useCreatorPageMeta } from '@/hooks/useCreatorI18n'
 import { useElectionResults } from '@/hooks/useElectionResults'
 import '@/styles/creator-results.css'
 
-const meta = CREATOR_PAGE_META.results
-
 export function CreatorResultsPage() {
+  const meta = useCreatorPageMeta('results')
   const { selectedId, selectedElection } = useCreatorElection()
   const { results, loading, error, isLive, refresh } = useElectionResults(selectedId ?? undefined)
 

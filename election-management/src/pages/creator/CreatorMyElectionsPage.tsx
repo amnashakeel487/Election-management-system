@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CreatorApprovalBanner } from '@/components/creator/CreatorApprovalBanner'
 import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader'
-import { CREATOR_PAGE_META } from '@/config/creatorNav'
+import { useTranslation } from 'react-i18next'
+import { useCreatorPageMeta } from '@/hooks/useCreatorI18n'
 import { useCreatorElection } from '@/context/CreatorElectionContext'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
 import { canCreatorDeleteElection, deleteCreatorElection } from '@/services/electionService'
@@ -10,9 +11,9 @@ import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import { creatorPhaseBadge, electionShortCode } from '@/utils/creatorDisplay'
 import { formatSubmissionDate } from '@/utils/formatDate'
 
-const meta = CREATOR_PAGE_META.elections
-
 export function CreatorMyElectionsPage() {
+  const { t } = useTranslation('creator')
+  const meta = useCreatorPageMeta('elections')
   const { elections, loading, refreshElections, setSelectedId } = useCreatorElection()
   const [tab, setTab] = useState<'all' | 'active' | 'draft' | 'completed'>('all')
   const [finalizingId, setFinalizingId] = useState<string | null>(null)
@@ -73,8 +74,8 @@ export function CreatorMyElectionsPage() {
         title={meta.title}
         subtitle={meta.subtitle}
         actions={
-          <Link to="/creator/elections/new" className="btn btn-primary">
-            + Create Election
+          <Link to="/creator/elections/new" className="btn btn-sm btn-primary">
+            {t('elections.createButton')}
           </Link>
         }
       />
@@ -82,26 +83,26 @@ export function CreatorMyElectionsPage() {
       {message ? <div className="alert-banner alert-banner--success">{message}</div> : null}
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
-        {(['all', 'active', 'draft', 'completed'] as const).map((t) => (
+        {(['all', 'active', 'draft', 'completed'] as const).map((tabKey) => (
           <button
-            key={t}
+            key={tabKey}
             type="button"
-            className={`btn btn-sm${tab === t ? ' btn-primary' : ' btn-ghost'}`}
-            onClick={() => setTab(t)}
+            className={`btn btn-sm${tab === tabKey ? ' btn-primary' : ' btn-ghost'}`}
+            onClick={() => setTab(tabKey)}
           >
-            {t.charAt(0).toUpperCase() + t.slice(1)}
+            {t(`elections.tabs.${tabKey}`)}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <p style={{ color: 'var(--subtle)', fontSize: 13 }}>Loading elections…</p>
+        <p style={{ color: 'var(--subtle)', fontSize: 13 }}>{t('elections.loading')}</p>
       ) : filtered.length === 0 ? (
         <div className="card-elevated">
           <div className="card-body">
             <p style={{ fontSize: 13, color: 'var(--subtle)' }}>
-              No elections in this view.{' '}
-              <Link to="/creator/elections/new">Create your first election</Link>.
+              {t('elections.emptyView')}{' '}
+              <Link to="/creator/elections/new">{t('elections.createFirstLink')}</Link>.
             </p>
           </div>
         </div>

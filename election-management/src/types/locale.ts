@@ -23,6 +23,9 @@ export const LOCALE_OPTIONS: LocaleOption[] = [
   { code: 'hi', label: 'हिन्दी', englishName: 'Hindi' },
 ]
 
+/** Creator dashboard: English and Urdu only */
+export const CREATOR_LOCALES: readonly AppLocale[] = ['en', 'ur']
+
 export function isAppLocale(value: unknown): value is AppLocale {
   return typeof value === 'string' && (SUPPORTED_LOCALES as readonly string[]).includes(value)
 }

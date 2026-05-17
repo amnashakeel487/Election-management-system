@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader'
-import { CREATOR_PAGE_META } from '@/config/creatorNav'
 import { useAuth } from '@/hooks/useAuth'
+import { useCreatorPageMeta } from '@/hooks/useCreatorI18n'
 import { supabase } from '@/lib/supabase'
 import { avatarGradient, userInitials } from '@/utils/dashboardDisplay'
 import { formatSubmissionDate } from '@/utils/formatDate'
 
-const meta = CREATOR_PAGE_META.profile
-
 export function CreatorProfilePage() {
+  const meta = useCreatorPageMeta('profile')
   const { profile, refreshProfile } = useAuth()
   const [fullName, setFullName] = useState(profile?.full_name ?? '')
   const [phone, setPhone] = useState(profile?.phone ?? '')

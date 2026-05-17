@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import '@/styles/admin-dashboard.css'
 import '@/styles/admin-dashboard-dark.css'
 import '@/styles/creator-dashboard-extra.css'
 import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
-import { CREATOR_PAGE_META } from '@/config/creatorNav'
 import { CreatorElectionProvider } from '@/context/CreatorElectionContext'
 import { CreatorSidebar } from '@/components/creator/layout/CreatorSidebar'
 import { useAuth } from '@/hooks/useAuth'
+import { useCreatorPageMeta } from '@/hooks/useCreatorI18n'
+import { CREATOR_LOCALES } from '@/types/locale'
 import { userInitials } from '@/utils/dashboardDisplay'
 
 function resolvePageKey(pathname: string): string {
@@ -25,16 +27,24 @@ function CreatorLayoutInner() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { profile } = useAuth()
+  const { t, i18n } = useTranslation('creator')
   const [mobileOpen, setMobileOpen] = useState(false)
   const pageKey = resolvePageKey(pathname)
-  const meta = CREATOR_PAGE_META[pageKey] ?? CREATOR_PAGE_META.dashboard
+  const meta = useCreatorPageMeta(pageKey)
 
-  const welcomeDate = new Date().toLocaleDateString(undefined, {
+  const dateLocale = i18n.language === 'ur' ? 'ur-PK' : undefined
+  const welcomeDate = new Date().toLocaleDateString(dateLocale, {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
     year: 'numeric',
   })
+
+  const welcomeSubtitle = meta.topSub
+    ? meta.topSub
+    : profile?.full_name
+      ? t('topbar.welcomeBackNamed', { name: profile.full_name })
+      : `${t('topbar.welcomeBack')} · ${welcomeDate}`
 
   return (
     <div className="admin-app creator-app">
@@ -45,15 +55,12 @@ function CreatorLayoutInner() {
             <button
               type="button"
               className="icon-btn creator-mobile-menu-btn"
-              aria-label="Open menu"
+              aria-label={t('topbar.openMenu')}
               onClick={() => setMobileOpen(true)}
             />
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
               <div className="topbar-title">{meta.topTitle}</div>
-              <div className="topbar-subtitle">
-                {meta.topSub ??
-                  `Welcome back${profile?.full_name ? `, ${profile.full_name}` : ''} · ${welcomeDate}`}
-              </div>
+              <div className="topbar-subtitle">{welcomeSubtitle}</div>
             </div>
             <div className="topbar-right">
               <div className="topbar-search">
@@ -61,14 +68,18 @@ function CreatorLayoutInner() {
                   <circle cx="11" cy="11" r="8" fill="none" strokeWidth="2" />
                   <line x1="21" y1="21" x2="16.65" y2="16.65" strokeWidth="2" />
                 </svg>
-                <input type="search" placeholder="Search elections…" aria-label="Search" />
+                <input
+                  type="search"
+                  placeholder={t('topbar.searchPlaceholder')}
+                  aria-label={t('topbar.searchPlaceholder')}
+                />
               </div>
-              <LanguageSwitcher variant="admin" />
+              <LanguageSwitcher variant="admin" locales={CREATOR_LOCALES} />
               <ThemeToggle variant="icon-btn" />
               <button
                 type="button"
                 className="icon-btn"
-                aria-label="Notifications"
+                aria-label={t('topbar.notifications')}
                 onClick={() => navigate('/creator/notifications')}
               >
                 <svg viewBox="0 0 24 24" aria-hidden>
@@ -85,7 +96,7 @@ function CreatorLayoutInner() {
               <button
                 type="button"
                 className="avatar"
-                aria-label="Profile"
+                aria-label={t('topbar.profile')}
                 onClick={() => navigate('/creator/profile')}
               >
                 {userInitials(profile?.full_name, profile?.email)}

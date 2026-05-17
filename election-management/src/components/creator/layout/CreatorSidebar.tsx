@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { CREATOR_NAV, type CreatorNavItem } from '@/config/creatorNav'
 import { CreatorNavIcon, ShieldBrandIcon } from '@/components/creator/layout/CreatorIcons'
 import { useAuth } from '@/hooks/useAuth'
@@ -30,6 +31,7 @@ export function CreatorSidebar({ mobileOpen = false, onMobileClose }: CreatorSid
   const { signOut } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const { t } = useTranslation('creator')
 
   let lastSection: string | undefined
 
@@ -44,25 +46,25 @@ export function CreatorSidebar({ mobileOpen = false, onMobileClose }: CreatorSid
             <ShieldBrandIcon />
           </div>
           <span className="sb-name">VoteSecure</span>
-          <span className="sb-tag">Creator</span>
+          <span className="sb-tag">{t('brand.creatorTag')}</span>
         </div>
 
         <div className="sb-role-badge">
           <div className="sb-role-dot" />
           <div className="sb-role-text">
-            <span className="sb-role-sub">Signed in as</span>
-            <span className="sb-role-val">Election Creator</span>
+            <span className="sb-role-sub">{t('role.signedInAs')}</span>
+            <span className="sb-role-val">{t('role.electionCreator')}</span>
           </div>
         </div>
 
         {CREATOR_NAV.map((item) => {
-          const section = item.section
+          const section = item.sectionKey
           const showSection = section && section !== lastSection
           if (section) lastSection = section
 
           return (
             <div key={item.id}>
-              {showSection ? <div className="sb-section-label">{section}</div> : null}
+              {showSection ? <div className="sb-section-label">{t(section)}</div> : null}
               <NavLink
                 to={item.path}
                 end={item.end ?? true}
@@ -72,7 +74,7 @@ export function CreatorSidebar({ mobileOpen = false, onMobileClose }: CreatorSid
                 onClick={() => onMobileClose?.()}
               >
                 <CreatorNavIcon icon={item.icon} />
-                <span className="sb-label">{item.label}</span>
+                <span className="sb-label">{t(item.labelKey)}</span>
               </NavLink>
             </div>
           )
@@ -89,7 +91,7 @@ export function CreatorSidebar({ mobileOpen = false, onMobileClose }: CreatorSid
           }}
         >
           <CreatorNavIcon icon="logout" />
-          <span className="sb-label">Logout</span>
+          <span className="sb-label">{t('nav.logout')}</span>
         </div>
 
         <div
@@ -107,7 +109,7 @@ export function CreatorSidebar({ mobileOpen = false, onMobileClose }: CreatorSid
       {mobileOpen ? (
         <button
           type="button"
-          aria-label="Close menu"
+          aria-label={t('topbar.closeMenu')}
           style={{
             position: 'fixed',
             inset: 0,

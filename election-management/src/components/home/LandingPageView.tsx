@@ -4,6 +4,7 @@ import { ShieldIcon } from '@/components/auth/AuthSplitChrome'
 import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
 import { useAuth } from '@/hooks/useAuth'
 import { LandingElectionsSection } from './LandingElectionsSection'
+import { LandingLiveResultsSection } from './LandingLiveResultsSection'
 import { useLandingCounter, useLandingReveal } from './useLandingReveal'
 import './landing-page.css'
 
@@ -57,6 +58,7 @@ const FEATURES = [
     iconBg: '#ECFDF5',
     iconStroke: '#10B981',
     link: '#10B981',
+    href: '/results',
     delay: '0.3s',
     title: 'Live countdown & results',
     desc: 'Real-time tallies when enabled, progress indicators, and published results after polls close.',
@@ -343,6 +345,8 @@ export function LandingPageView() {
 
       <LandingElectionsSection />
 
+      <LandingLiveResultsSection />
+
       <section className="features-section section" id="features">
         <div className="section-inner">
           <div style={{ maxWidth: 560 }} className="reveal">
@@ -368,8 +372,8 @@ export function LandingPageView() {
                 </div>
                 <div className="feat-title">{f.title}</div>
                 <div className="feat-desc">{f.desc}</div>
-                <Link to="/register" className="feat-link" style={{ color: f.link }}>
-                  Learn more <ArrowIcon />
+                <Link to={'href' in f && f.href ? f.href : '/register'} className="feat-link" style={{ color: f.link }}>
+                  {'href' in f && f.href ? 'View live results' : 'Learn more'} <ArrowIcon />
                 </Link>
               </div>
             ))}
@@ -577,6 +581,7 @@ function NavLinks({
 }) {
   const links = [
     { href: '/browse-elections', label: 'Elections' },
+    { href: '/results', label: 'Live results' },
     { href: '#features', label: 'Features' },
     { href: '#how', label: 'How it works' },
     { href: '#testimonials', label: 'Reviews' },

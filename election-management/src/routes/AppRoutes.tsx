@@ -54,22 +54,8 @@ export function AppRoutes() {
       <Route path="/browse-elections" element={<BrowseElectionsPage />} />
       <Route path="/elections/:id" element={<ElectionDetailsPage />} />
       <Route path="/elections/:id/join" element={<ElectionJoinPage />} />
-      <Route
-        path="/results"
-        element={
-          <ProtectedRoute>
-            <ResultsIndexPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/elections/:id/results"
-        element={
-          <ProtectedRoute>
-            <ElectionResultsPage />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/results" element={<ResultsIndexPage />} />
+      <Route path="/elections/:id/results" element={<ElectionResultsPage />} />
       <Route
         path="/elections/:id/vote"
         element={

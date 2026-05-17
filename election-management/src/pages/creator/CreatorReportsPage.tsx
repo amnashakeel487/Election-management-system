@@ -2,13 +2,12 @@ import { Link } from 'react-router-dom'
 import { CreatorElectionPicker } from '@/components/creator/CreatorElectionPicker'
 import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader'
 import { ResultsExportToolbar } from '@/components/results/ResultsExportToolbar'
-import { CREATOR_PAGE_META } from '@/config/creatorNav'
 import { useCreatorElection } from '@/context/CreatorElectionContext'
+import { useCreatorPageMeta } from '@/hooks/useCreatorI18n'
 import { useElectionResults } from '@/hooks/useElectionResults'
 
-const meta = CREATOR_PAGE_META.reports
-
 export function CreatorReportsPage() {
+  const meta = useCreatorPageMeta('reports')
   const { selectedId, selectedElection } = useCreatorElection()
   const { results, loading } = useElectionResults(selectedId ?? undefined)
 

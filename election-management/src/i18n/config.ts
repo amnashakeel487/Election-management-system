@@ -14,6 +14,7 @@ import enDashboard from '@/locales/en/dashboard.json'
 import enWaitlist from '@/locales/en/waitlist.json'
 import enSettings from '@/locales/en/settings.json'
 import enAdmin from '@/locales/en/admin.json'
+import enCreator from '@/locales/en/creator.json'
 
 import urCommon from '@/locales/ur/common.json'
 import urNav from '@/locales/ur/nav.json'
@@ -22,6 +23,7 @@ import urDashboard from '@/locales/ur/dashboard.json'
 import urWaitlist from '@/locales/ur/waitlist.json'
 import urSettings from '@/locales/ur/settings.json'
 import urAdmin from '@/locales/ur/admin.json'
+import urCreator from '@/locales/ur/creator.json'
 
 import arCommon from '@/locales/ar/common.json'
 import arNav from '@/locales/ar/nav.json'
@@ -38,6 +40,7 @@ import hiDashboard from '@/locales/hi/dashboard.json'
 import hiWaitlist from '@/locales/hi/waitlist.json'
 import hiSettings from '@/locales/hi/settings.json'
 import hiAdmin from '@/locales/hi/admin.json'
+import enCreatorFallback from '@/locales/en/creator.json'
 
 export const I18N_NAMESPACES = [
   'common',
@@ -47,6 +50,7 @@ export const I18N_NAMESPACES = [
   'waitlist',
   'settings',
   'admin',
+  'creator',
 ] as const
 
 function readStoredLocale(): AppLocale {
@@ -68,6 +72,7 @@ const resources = {
     waitlist: enWaitlist,
     settings: enSettings,
     admin: enAdmin,
+    creator: enCreator,
   },
   ur: {
     common: urCommon,
@@ -77,6 +82,7 @@ const resources = {
     waitlist: urWaitlist,
     settings: urSettings,
     admin: urAdmin,
+    creator: urCreator,
   },
   ar: {
     common: arCommon,
@@ -86,6 +92,7 @@ const resources = {
     waitlist: arWaitlist,
     settings: arSettings,
     admin: arAdmin,
+    creator: enCreatorFallback,
   },
   hi: {
     common: hiCommon,
@@ -95,6 +102,7 @@ const resources = {
     waitlist: hiWaitlist,
     settings: hiSettings,
     admin: hiAdmin,
+    creator: enCreatorFallback,
   },
 } as const
 

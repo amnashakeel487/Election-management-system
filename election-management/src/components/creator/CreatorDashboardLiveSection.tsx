@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { Election } from '@/types/election'
 import type { CreatorDashboardLivePayload, CreatorLiveElectionRow } from '@/types/creatorDashboardLive'
 import { useCreatorDashboardLive } from '@/hooks/useCreatorDashboardLive'
@@ -8,11 +9,17 @@ import { formatTimeRemaining } from '@/utils/electionTime'
 
 const LIVE_ACCENT = ['#10B981', '#3B82F6', '#06B6D4', '#6C3FC5'] as const
 
-function ElectionStatusDonut({ live }: { live: CreatorDashboardLivePayload }) {
+function ElectionStatusDonut({
+  live,
+  labels,
+}: {
+  live: CreatorDashboardLivePayload
+  labels: { active: string; upcoming: string; completed: string }
+}) {
   const segments = [
-    { value: live.status_active, color: '#10B981', label: 'Active' },
-    { value: live.status_upcoming, color: '#3B82F6', label: 'Upcoming' },
-    { value: live.status_completed, color: '#6C3FC5', label: 'Completed' },
+    { value: live.status_active, color: '#10B981', label: labels.active },
+    { value: live.status_upcoming, color: '#3B82F6', label: labels.upcoming },
+    { value: live.status_completed, color: '#6C3FC5', label: labels.completed },
   ]
   const total = segments.reduce((s, seg) => s + seg.value, 0) || 1
   const r = 35
@@ -94,10 +101,21 @@ function MonthlyVotesChart({ points }: { points: { label: string; count: number 
   )
 }
 
-function LiveElectionRow({ row, index }: { row: CreatorLiveElectionRow; index: number }) {
+function LiveElectionRow({
+  row,
+  index,
+  t,
+}: {
+  row: CreatorLiveElectionRow
+  index: number
+  t: (key: string, opts?: Record<string, string>) => string
+}) {
   const accent = LIVE_ACCENT[index % LIVE_ACCENT.length]
   const denom = row.max_voters > 0 ? row.max_voters : row.registered
-  const votedLabel = `${formatDashboardNumber(row.ballots_cast)} / ${formatDashboardNumber(denom)} voted`
+  const votedLabel = t('live.voted', {
+    cast: formatDashboardNumber(row.ballots_cast),
+    total: formatDashboardNumber(denom),
+  })
 
   return (
     <Link
@@ -109,11 +127,12 @@ function LiveElectionRow({ row, index }: { row: CreatorLiveElectionRow; index: n
         <div>
           <div className="live-election-row-title">{row.title}</div>
           <div className="live-election-row-meta">
-            {electionShortCode(row.election_id)} · Ends in {formatTimeRemaining(row.end_date)}
+            {electionShortCode(row.election_id)} ·{' '}
+            {t('live.endsIn', { time: formatTimeRemaining(row.end_date) })}
           </div>
         </div>
         <span className="badge b-active">
-          <span className="b-dot" /> Active
+          <span className="b-dot" /> {t('live.statusActive')}
         </span>
       </div>
       <div className="live-election-row-stats">
@@ -144,41 +163,48 @@ export function CreatorDashboardLiveSection({
   elections,
   enabled,
 }: CreatorDashboardLiveSectionProps) {
+  const { t } = useTranslation('creator')
   const { live, loading } = useCreatorDashboardLive(creatorId, elections, enabled)
   const hasLive = live.live_elections.length > 0
+
+  const statusLabels = {
+    active: t('live.statusActive'),
+    upcoming: t('live.statusUpcoming'),
+    completed: t('live.statusCompleted'),
+  }
 
   return (
     <div className="grid-7-3 creator-dashboard-live-grid" style={{ marginBottom: 16 }}>
       <div className="card-elevated">
         <div className="card-header">
           <div>
-            <div className="card-title">Live Elections Overview</div>
-            <div className="card-subtitle">Real-time turnout tracking</div>
+            <div className="card-title">{t('live.overviewTitle')}</div>
+            <div className="card-subtitle">{t('live.overviewSub')}</div>
           </div>
           {hasLive ? (
             <span className="badge b-live">
-              <span className="b-dot" /> Live
+              <span className="b-dot" /> {t('stats.live')}
             </span>
           ) : null}
         </div>
         <div className="card-body">
           {loading ? (
-            <p style={{ fontSize: 13, color: 'var(--subtle)' }}>Loading live results…</p>
+            <p style={{ fontSize: 13, color: 'var(--subtle)' }}>{t('live.loading')}</p>
           ) : hasLive ? (
             <div className="live-election-list">
               {live.live_elections.map((row, i) => (
-                <LiveElectionRow key={row.election_id} row={row} index={i} />
+                <LiveElectionRow key={row.election_id} row={row} index={i} t={t} />
               ))}
             </div>
           ) : (
             <p style={{ fontSize: 13, color: 'var(--subtle)', marginBottom: 16 }}>
-              No elections are actively polling right now.{' '}
-              <Link to="/creator/elections">View all elections</Link>.
+              {t('live.noPolling')}{' '}
+              <Link to="/creator/elections">{t('live.viewAllElections')}</Link>.
             </p>
           )}
 
           <div className="live-monthly-votes">
-            <div className="live-monthly-votes-label">Monthly Votes</div>
+            <div className="live-monthly-votes-label">{t('live.monthlyVotes')}</div>
             <MonthlyVotesChart points={live.monthly_votes} />
           </div>
         </div>
@@ -187,16 +213,16 @@ export function CreatorDashboardLiveSection({
       <div className="creator-dashboard-live-side">
         <div className="card-elevated">
           <div className="card-header">
-            <div className="card-title">Election Status</div>
+            <div className="card-title">{t('live.electionStatus')}</div>
           </div>
           <div className="card-body">
-            <ElectionStatusDonut live={live} />
+            <ElectionStatusDonut live={live} labels={statusLabels} />
           </div>
         </div>
 
         <div className="card-elevated">
           <div className="card-header">
-            <div className="card-title">Quick Actions</div>
+            <div className="card-title">{t('live.quickActions')}</div>
           </div>
           <div className="card-body creator-quick-actions">
             <Link to="/creator/elections/new" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
@@ -204,14 +230,14 @@ export function CreatorDashboardLiveSection({
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              Create Election
+              {t('live.createElection')}
             </Link>
             <Link to="/creator/candidates" className="btn btn-ghost" style={{ width: '100%', justifyContent: 'center' }}>
               <svg viewBox="0 0 24 24" aria-hidden>
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
               </svg>
-              Add Candidate
+              {t('live.addCandidate')}
             </Link>
             <Link to="/creator/results" className="btn btn-ghost" style={{ width: '100%', justifyContent: 'center' }}>
               <svg viewBox="0 0 24 24" aria-hidden>
@@ -219,7 +245,7 @@ export function CreatorDashboardLiveSection({
                 <line x1="12" y1="20" x2="12" y2="4" />
                 <line x1="6" y1="20" x2="6" y2="14" />
               </svg>
-              View Results
+              {t('live.viewResults')}
             </Link>
           </div>
         </div>

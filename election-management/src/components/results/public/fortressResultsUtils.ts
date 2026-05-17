@@ -108,14 +108,6 @@ export interface FeedItem {
   at: number
 }
 
-const FEED_TEMPLATES = [
-  (n: number) => `+${n} votes added to total count`,
-  (name: string) => `${name} holds the current lead`,
-  () => 'Turnout milestone updated',
-  () => 'Audit checkpoint verified',
-  () => 'Ballot count refreshed from secure tally',
-]
-
 export function buildFeedFromDelta(
   prevVotes: number,
   current: ElectionResultsPayload,
@@ -127,7 +119,7 @@ export function buildFeedFromDelta(
     return {
       id: `${now}-votes`,
       color: FV_BAR_COLORS[0],
-      text: FEED_TEMPLATES[0](delta),
+      text: `+${delta} votes added to total count`,
       at: now,
     }
   }
@@ -135,14 +127,14 @@ export function buildFeedFromDelta(
     return {
       id: `${now}-lead`,
       color: FV_BAR_COLORS[1],
-      text: FEED_TEMPLATES[1](leaderName),
+      text: `${leaderName} holds the current lead`,
       at: now,
     }
   }
   return {
     id: `${now}-audit`,
     color: FV_BAR_COLORS[2],
-    text: FEED_TEMPLATES[3](),
+    text: 'Audit checkpoint verified',
     at: now,
   }
 }

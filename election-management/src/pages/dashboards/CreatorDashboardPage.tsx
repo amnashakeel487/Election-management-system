@@ -1,18 +1,19 @@
+import { useTranslation } from 'react-i18next'
 import { CreatorApprovalBanner } from '@/components/creator/CreatorApprovalBanner'
 import { CreatorDashboardLiveSection } from '@/components/creator/CreatorDashboardLiveSection'
 import { CreatorDashboardStatsGrid } from '@/components/creator/CreatorDashboardStatsGrid'
 import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader'
 import { useCreatorDashboardStats } from '@/hooks/useCreatorDashboardStats'
-import { CREATOR_PAGE_META } from '@/config/creatorNav'
+import { useCreatorPageMeta } from '@/hooks/useCreatorI18n'
 import { useAuth } from '@/hooks/useAuth'
 import { useCreatorElection } from '@/context/CreatorElectionContext'
 import { formatSubmissionDate } from '@/utils/formatDate'
 
-const meta = CREATOR_PAGE_META.dashboard
-
 export function CreatorDashboardPage() {
   const { profile } = useAuth()
   const { elections, loading } = useCreatorElection()
+  const { t } = useTranslation('creator')
+  const meta = useCreatorPageMeta('dashboard')
 
   const isApproved = profile?.approval_status === 'approved'
   const { stats: dashboardStats, loading: statsLoading, error: statsError } = useCreatorDashboardStats(
@@ -27,8 +28,7 @@ export function CreatorDashboardPage() {
 
       {statsError ? (
         <p style={{ fontSize: 12, color: 'var(--danger)', marginBottom: 12 }}>
-          {statsError} — apply migrations <code>025_creator_dashboard_stats.sql</code> and{' '}
-          <code>026_creator_dashboard_live.sql</code> in Supabase if this persists.
+          {t('errors.statsMigration', { error: statsError })}
         </p>
       ) : null}
 
@@ -40,14 +40,14 @@ export function CreatorDashboardPage() {
 
           <div className="card-elevated">
             <div className="card-header">
-              <div className="card-title">Recent Activity</div>
+              <div className="card-title">{t('activity.recent')}</div>
             </div>
             <div className="card-body" style={{ padding: '16px 20px' }}>
               <div className="timeline">
                 {loading ? (
-                  <p style={{ fontSize: 12, color: 'var(--subtle)' }}>Loading…</p>
+                  <p style={{ fontSize: 12, color: 'var(--subtle)' }}>{t('activity.loading')}</p>
                 ) : elections.length === 0 ? (
-                  <p style={{ fontSize: 12, color: 'var(--subtle)' }}>No activity yet.</p>
+                  <p style={{ fontSize: 12, color: 'var(--subtle)' }}>{t('activity.none')}</p>
                 ) : (
                   elections.slice(0, 5).map((e) => (
                     <div key={e.id} className="tl-item">
@@ -56,7 +56,10 @@ export function CreatorDashboardPage() {
                       </div>
                       <div className="tl-title">{e.title}</div>
                       <div className="tl-sub">
-                        {e.status} · updated {formatSubmissionDate(e.updated_at ?? e.start_date)}
+                        {t('activity.updated', {
+                          status: e.status,
+                          date: formatSubmissionDate(e.updated_at ?? e.start_date),
+                        })}
                       </div>
                       <div className="tl-time">{formatSubmissionDate(e.updated_at ?? e.start_date)}</div>
                     </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { formatDashboardNumber } from '@/utils/dashboardDisplay'
 import type { CreatorDashboardStats } from '@/types/creatorDashboard'
 
@@ -44,13 +45,15 @@ interface CreatorDashboardStatsGridProps {
 }
 
 export function CreatorDashboardStatsGrid({ stats, loading }: CreatorDashboardStatsGridProps) {
+  const { t } = useTranslation('creator')
+
   const electionsBadge =
     stats.elections_created_30d > 0
       ? { text: `+${stats.elections_created_30d}`, className: 'du' }
       : null
 
   const activeBadge =
-    stats.active_elections > 0 ? { text: 'Live', className: 'du' } : null
+    stats.active_elections > 0 ? { text: t('stats.live'), className: 'du' } : null
 
   const participantsBadgeText = formatDeltaPercent(stats.total_participants, stats.registrations_7d)
   const participantsBadge = participantsBadgeText
@@ -64,7 +67,7 @@ export function CreatorDashboardStatsGrid({ stats, loading }: CreatorDashboardSt
 
   const waitlistBadge =
     stats.waitlist_count > 0
-      ? { text: 'Waiting', className: 'dn' }
+      ? { text: t('stats.waiting'), className: 'dn' }
       : null
 
   return (
@@ -74,7 +77,7 @@ export function CreatorDashboardStatsGrid({ stats, loading }: CreatorDashboardSt
         iconBg="#EFF4FF"
         iconColor="#2451A3"
         value={formatDashboardNumber(stats.total_elections)}
-        label="Total Elections"
+        label={t('stats.totalElections')}
         badge={electionsBadge}
         icon={
           <svg viewBox="0 0 24 24" aria-hidden>
@@ -88,7 +91,7 @@ export function CreatorDashboardStatsGrid({ stats, loading }: CreatorDashboardSt
         iconBg="#DCFCE7"
         iconColor="#16A34A"
         value={formatDashboardNumber(stats.active_elections)}
-        label="Active Elections"
+        label={t('stats.activeElections')}
         badge={activeBadge}
         icon={
           <svg viewBox="0 0 24 24" aria-hidden>
@@ -101,7 +104,7 @@ export function CreatorDashboardStatsGrid({ stats, loading }: CreatorDashboardSt
         iconBg="#F5F3FF"
         iconColor="#6C3FC5"
         value={formatDashboardNumber(stats.total_participants)}
-        label="Total Participants"
+        label={t('stats.totalParticipants')}
         badge={participantsBadge}
         icon={
           <svg viewBox="0 0 24 24" aria-hidden>
@@ -115,7 +118,7 @@ export function CreatorDashboardStatsGrid({ stats, loading }: CreatorDashboardSt
         iconBg="#ECFEFF"
         iconColor="#06B6D4"
         value={formatDashboardNumber(stats.total_votes)}
-        label="Total Votes Cast"
+        label={t('stats.totalVotesCast')}
         badge={votesBadge}
         icon={
           <svg viewBox="0 0 24 24" aria-hidden>
@@ -129,7 +132,7 @@ export function CreatorDashboardStatsGrid({ stats, loading }: CreatorDashboardSt
         iconBg="#FEF9C3"
         iconColor="#CA8A04"
         value={formatDashboardNumber(stats.waitlist_count)}
-        label="On Waitlist"
+        label={t('stats.onWaitlist')}
         badge={waitlistBadge}
         icon={
           <svg viewBox="0 0 24 24" aria-hidden>
@@ -143,7 +146,7 @@ export function CreatorDashboardStatsGrid({ stats, loading }: CreatorDashboardSt
         iconBg="#ECFDF5"
         iconColor="#10B981"
         value={loading ? '—' : `${stats.avg_turnout_percent}%`}
-        label="Avg Turnout"
+        label={t('stats.avgTurnout')}
         badge={null}
         icon={
           <svg viewBox="0 0 24 24" aria-hidden>

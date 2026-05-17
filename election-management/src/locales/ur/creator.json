@@ -1,0 +1,179 @@
+{
+  "brand": {
+    "creatorTag": "تخلیق کار"
+  },
+  "role": {
+    "signedInAs": "سائن ان بطور",
+    "electionCreator": "انتخاب تخلیق کار"
+  },
+  "nav": {
+    "dashboard": "ڈیش بورڈ",
+    "myElections": "میرے انتخابات",
+    "createElection": "انتخاب بنائیں",
+    "candidates": "امیدوار",
+    "participants": "شرکاء",
+    "results": "نتائج",
+    "notifications": "اطلاعات",
+    "reports": "رپورٹس",
+    "settings": "ترتیبات",
+    "profile": "پروفائل",
+    "logout": "لاگ آؤٹ",
+    "sections": {
+      "overview": "جائزہ",
+      "elections": "انتخابات",
+      "management": "انتظام",
+      "tools": "اوزار",
+      "account": "اکاؤنٹ"
+    }
+  },
+  "topbar": {
+    "searchPlaceholder": "انتخابات تلاش کریں…",
+    "openMenu": "مینو کھولیں",
+    "closeMenu": "مینو بند کریں",
+    "notifications": "اطلاعات",
+    "profile": "پروفائل",
+    "welcomeBack": "خوش آمدید",
+    "welcomeBackNamed": "خوش آمدید، {{name}}"
+  },
+  "pages": {
+    "dashboard": {
+      "topTitle": "تخلیق کار ڈیش بورڈ",
+      "topSub": "آپ کے انتخابی پلیٹ فارم کا خلاصہ اور لائیو اعداد و شمار",
+      "eyebrow": "جائزہ",
+      "title": "تخلیق کار ڈیش بورڈ",
+      "subtitle": "آپ کے انتخابی پلیٹ فارم کا خلاصہ اور لائیو اعداد و شمار"
+    },
+    "elections": {
+      "topTitle": "میرے انتخابات",
+      "topSub": "وہ تمام انتخابات جو آپ نے بنائے اور منظم کرتے ہیں",
+      "eyebrow": "انتخابات",
+      "title": "میرے انتخابات",
+      "subtitle": "وہ تمام انتخابات جو آپ نے بنائے اور منظم کرتے ہیں"
+    },
+    "create": {
+      "topTitle": "انتخاب بنائیں",
+      "topSub": "اپنا انتخاب مرحلہ وار ترتیب دیں",
+      "eyebrow": "تخلیق",
+      "title": "نیا انتخاب بنائیں",
+      "subtitle": "اپنا انتخاب مرحلہ وار ترتیب دیں",
+      "editTitle": "مسودہ انتخاب میں ترمیم"
+    },
+    "candidates": {
+      "topTitle": "امیدواروں کا انتظام",
+      "topSub": "انتخابی امیدوار شامل، ترمیم اور منظم کریں",
+      "eyebrow": "انتظام",
+      "title": "امیدواروں کا انتظام",
+      "subtitle": "اپنے منتخب انتخاب کے امیدوار منظم کریں"
+    },
+    "participants": {
+      "topTitle": "شرکاء",
+      "topSub": "ووٹر رجسٹریشن، انتظار فہرست اور اعداد و شمار",
+      "eyebrow": "ووٹر",
+      "title": "شرکاء",
+      "subtitle": "آپ کے انتخاب کے لیے ووٹر رجسٹریشن اور انتظار فہرست"
+    },
+    "results": {
+      "topTitle": "انتخابی نتائج",
+      "topSub": "لائیو ووٹ گنتی اور تجزیہ",
+      "eyebrow": "تجزیہ",
+      "title": "انتخابی نتائج",
+      "subtitle": "آپ کے انتخاب کے لائیو نتائج اور برآمد"
+    },
+    "notifications": {
+      "topTitle": "اطلاعات",
+      "topSub": "سسٹم الرٹس، ای میل لاگز اور یاددہانیاں",
+      "eyebrow": "مواصلات",
+      "title": "اطلاعات",
+      "subtitle": "ای میل لاگز اور انتخابی اطلاع کی حیثیت"
+    },
+    "reports": {
+      "topTitle": "رپورٹس",
+      "topSub": "انتخابی ڈیٹا اور تجزیہ برآمد کریں",
+      "eyebrow": "ڈیٹا",
+      "title": "رپورٹس",
+      "subtitle": "شرکاء، نتائج اور آڈٹ ڈیٹا ڈاؤن لوڈ کریں"
+    },
+    "settings": {
+      "topTitle": "تخلیق کار ترتیبات",
+      "topSub": "تنظیم کی معلومات اور ترجیحات",
+      "eyebrow": "ترتیب",
+      "title": "تخلیق کار ترتیبات",
+      "subtitle": "ظاہری شکل، زبان اور اطلاع کی ترجیحات",
+      "accountSecurity": "اکاؤنٹ سیکیورٹی",
+      "accountSecurityDesc": "پاس ورڈ، MFA، اور سیشن سیکیورٹی۔",
+      "openAccountSecurity": "اکاؤنٹ سیکیورٹی کھولیں",
+      "electionDefaults": "انتخابی ڈیفالٹس",
+      "comingSoon": "جلد آ رہا ہے",
+      "electionDefaultsDesc": "ڈیفالٹ عنوانات، زمرے اور لائیو نتائج کی ترجیحات یہاں محفوظ ہوں گی۔"
+    },
+    "profile": {
+      "topTitle": "میرا پروفائل",
+      "topSub": "اپنا تخلیق کار اکاؤنٹ منظم کریں",
+      "eyebrow": "اکاؤنٹ",
+      "title": "میرا پروفائل",
+      "subtitle": "آپ کے اکاؤنٹ کی تفصیلات اور منظوری کی حیثیت"
+    },
+    "electionDetail": {
+      "topTitle": "انتخاب کی تفصیلات",
+      "topSub": "دعوت، انتظار فہرست اور ووٹر فہرست منظم کریں",
+      "title": "انتخاب کی تفصیلات"
+    }
+  },
+  "stats": {
+    "totalElections": "کل انتخابات",
+    "activeElections": "فعال انتخابات",
+    "totalParticipants": "کل شرکاء",
+    "totalVotesCast": "کل ڈالے گئے ووٹ",
+    "onWaitlist": "انتظار فہرست میں",
+    "avgTurnout": "اوسط شرکت",
+    "live": "لائیو",
+    "waiting": "انتظار"
+  },
+  "live": {
+    "overviewTitle": "فعال انتخابات کا جائزہ",
+    "overviewSub": "لائیو شرکت کی نگرانی",
+    "loading": "لائیو نتائج لوڈ ہو رہے ہیں…",
+    "noPolling": "فی الحال کوئی انتخاب ووٹنگ میں نہیں ہے۔",
+    "viewAllElections": "تمام انتخابات دیکھیں",
+    "monthlyVotes": "ماہانہ ووٹ",
+    "electionStatus": "انتخاب کی حیثیت",
+    "quickActions": "فوری اقدامات",
+    "createElection": "انتخاب بنائیں",
+    "addCandidate": "امیدوار شامل کریں",
+    "viewResults": "نتائج دیکھیں",
+    "endsIn": "{{time}} میں ختم",
+    "voted": "{{cast}} / {{total}} ووٹ ڈالے",
+    "statusActive": "فعال",
+    "statusUpcoming": "آنے والے",
+    "statusCompleted": "مکمل"
+  },
+  "activity": {
+    "recent": "حالیہ سرگرمی",
+    "loading": "لوڈ ہو رہا ہے…",
+    "none": "ابھی کوئی سرگرمی نہیں۔",
+    "updated": "{{status}} · اپ ڈیٹ {{date}}"
+  },
+  "approval": {
+    "pendingTitle": "ایڈمن کی منظوری زیر التوا",
+    "pendingBody": "آپ کی تخلیق کار رسائی کی درخواست جائزے میں ہے۔ منظوری کے بعد آپ انتخاب بنا سکیں گے۔",
+    "rejected": "آپ کی تخلیق کار درخواست مسترد ہو گئی۔ اگر یہ غلطی لگے تو سپورٹ سے رابطہ کریں۔"
+  },
+  "elections": {
+    "createButton": "+ انتخاب بنائیں",
+    "tabs": {
+      "all": "سب",
+      "active": "فعال",
+      "draft": "مسودہ",
+      "completed": "مکمل"
+    },
+    "loading": "انتخابات لوڈ ہو رہے ہیں…",
+    "emptyTitle": "ابھی کوئی انتخاب نہیں",
+    "emptyBody": "شروع کرنے کے لیے اپنا پہلا انتخاب بنائیں۔",
+    "createFirst": "انتخاب بنائیں",
+    "emptyView": "اس منظر میں کوئی انتخاب نہیں۔",
+    "createFirstLink": "اپنا پہلا انتخاب بنائیں"
+  },
+  "errors": {
+    "statsMigration": "{{error}} — اگر مسئلہ برقرار رہے تو Supabase میں 025_creator_dashboard_stats.sql اور 026_creator_dashboard_live.sql مائیگریشنز لاگو کریں۔"
+  }
+}
