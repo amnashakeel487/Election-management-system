@@ -31,7 +31,7 @@ import {
   registrationFillPercent,
   votingCountdownLabel,
 } from '@/components/creator/election-detail/creatorElectionDetailUtils'
-import { canCreatorDeleteElection } from '@/services/electionService'
+import { canCreatorDeleteElection, canCreatorEditElectionDetails } from '@/services/electionService'
 
 export interface CreatorElectionDetailViewProps {
   election: ElectionWithCandidates
@@ -91,6 +91,7 @@ export function CreatorElectionDetailView({
   const canManageCandidates =
     election.status === 'draft' || election.status === 'published'
   const canDeleteElection = canCreatorDeleteElection(election.status)
+  const canEditDetails = canCreatorEditElectionDetails(election.status)
   const candidatesManageUrl = `/creator/candidates?election=${election.id}`
   const showInvite = election.status !== 'draft'
   const showRoll =
@@ -206,23 +207,15 @@ export function CreatorElectionDetailView({
             </div>
           </div>
           <div className="eh-actions">
-            {election.status === 'draft' ? (
+            {canEditDetails ? (
               <Link to={`/creator/elections/${election.id}/edit`} className="btn-edit">
                 <svg viewBox="0 0 24 24" aria-hidden>
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
-                Continue wizard
+                {election.status === 'draft' ? 'Continue wizard' : 'Edit schedule'}
               </Link>
-            ) : (
-              <Link to={`/creator/elections/${election.id}/edit`} className="btn-edit">
-                <svg viewBox="0 0 24 24" aria-hidden>
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                </svg>
-                Edit
-              </Link>
-            )}
+            ) : null}
             <Link to={`/elections/${election.id}`} className="btn-publish" target="_blank" rel="noreferrer">
               <svg viewBox="0 0 24 24" aria-hidden>
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -339,9 +332,11 @@ export function CreatorElectionDetailView({
             <div className="panel-sub">Full configuration details</div>
           </div>
           <div className="panel-head-right">
-            <Link to={`/creator/elections/${election.id}/edit`} className="p-btn">
-              Edit details
-            </Link>
+            {canEditDetails ? (
+              <Link to={`/creator/elections/${election.id}/edit`} className="p-btn">
+                Edit details
+              </Link>
+            ) : null}
           </div>
         </div>
         <div className="panel-body">
@@ -602,7 +597,7 @@ export function CreatorElectionDetailView({
                     >
                       {promoteAllBusy ? 'Approving…' : '✓ Approve All Waitlisted'}
                     </button>
-                    {!election.voter_roll_finalized_at ? (
+                    {canEditDetails && !election.voter_roll_finalized_at ? (
                       <Link to={`/creator/elections/${election.id}/edit`} className="reg-btn reg-btn-extend">
                         Extend Deadline
                       </Link>

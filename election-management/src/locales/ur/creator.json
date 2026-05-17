@@ -56,7 +56,9 @@
       "eyebrow": "تخلیق",
       "title": "نیا انتخاب بنائیں",
       "subtitle": "اپنا انتخاب مرحلہ وار ترتیب دیں",
-      "editTitle": "مسودہ انتخاب میں ترمیم"
+      "editTitle": "مسودہ انتخاب میں ترمیم",
+      "editPublishedTitle": "انتخاب کا وقت درست کریں",
+      "editPublishedSubtitle": "تاریخیں، عنوان اور رجسٹریشن کی آخری تاریخ اپ ڈیٹ کریں۔"
     },
     "candidates": {
       "topTitle": "امیدواروں کا انتظام",
@@ -159,6 +161,8 @@
   },
   "elections": {
     "createButton": "+ انتخاب بنائیں",
+    "editButton": "ترمیم",
+    "editTimesButton": "وقت درست کریں",
     "tabs": {
       "all": "سب",
       "active": "فعال",
@@ -170,7 +174,29 @@
     "emptyBody": "شروع کرنے کے لیے اپنا پہلا انتخاب بنائیں۔",
     "createFirst": "انتخاب بنائیں",
     "emptyView": "اس منظر میں کوئی انتخاب نہیں۔",
-    "createFirstLink": "اپنا پہلا انتخاب بنائیں"
+    "createFirstLink": "اپنا پہلا انتخاب بنائیں",
+    "edit": {
+      "formTitle": "انتخاب میں ترمیم",
+      "formSubtitle": "عنوان، ووٹنگ کی مدت اور رجسٹریشن کی آخری تاریخ اپ ڈیٹ کریں۔",
+      "titleLabel": "انتخاب کا عنوان",
+      "descriptionLabel": "تفصیل",
+      "startLabel": "ووٹنگ شروع",
+      "endLabel": "ووٹنگ ختم",
+      "registrationDeadlineLabel": "رجسٹریشن کی آخری تاریخ",
+      "registrationDeadlineHint": "خالی چھوڑیں تو ووٹنگ کے آغاز کا وقت استعمال ہوگا۔",
+      "maxVotersLabel": "زیادہ سے زیادہ ووٹر",
+      "maxVotersLocked": "ووٹر لسٹ حتمی ہونے کے بعد تبدیل نہیں ہو سکتا۔",
+      "save": "محفوظ کریں",
+      "saving": "محفوظ ہو رہا ہے…",
+      "cancel": "منسوخ",
+      "saved": "انتخاب اپ ڈیٹ ہو گیا۔",
+      "saveFailed": "محفوظ نہیں ہو سکا۔",
+      "loadFailed": "انتخاب لوڈ نہیں ہو سکا۔",
+      "completedLocked": "مکمل انتخابات میں ترمیم نہیں ہو سکتی۔",
+      "titleRequired": "عنوان ضروری ہے۔",
+      "maxVotersMin": "کم از کم 1 ووٹر ہونا چاہیے۔",
+      "backToList": "میرے انتخابات پر واپس"
+    }
   },
   "errors": {
     "statsMigration": "{{error}} — اگر مسئلہ برقرار رہے تو Supabase میں 025_creator_dashboard_stats.sql اور 026_creator_dashboard_live.sql مائیگریشنز لاگو کریں۔"

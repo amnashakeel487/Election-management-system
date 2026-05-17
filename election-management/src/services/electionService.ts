@@ -144,6 +144,37 @@ export async function updateElection(
   return data as Election
 }
 
+/** Draft, published, or active — not completed/archived. */
+export function canCreatorEditElectionDetails(status: ElectionStatus): boolean {
+  return status === 'draft' || status === 'published' || status === 'active'
+}
+
+/** Update title, schedule, and caps on published/active elections (and draft via this path). */
+export async function updateCreatorElectionDetails(
+  electionId: string,
+  input: Partial<
+    Pick<
+      CreateElectionInput,
+      'title' | 'description' | 'category' | 'start_date' | 'end_date' | 'registration_deadline' | 'max_voters'
+    >
+  >,
+): Promise<Election> {
+  const { data, error } = await supabase
+    .from(ELECTIONS)
+    .update({
+      ...input,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', electionId)
+    .in('status', ['draft', 'published', 'active'])
+    .select(ELECTION_COLUMNS)
+    .single()
+
+  if (error) throw new Error(error.message)
+  if (!data) throw new Error('Election not found or cannot be edited (completed elections are locked).')
+  return data as Election
+}
+
 function effectiveRegistrationDeadline(election: Election): Date {
   if (election.registration_deadline) return new Date(election.registration_deadline)
   return new Date(election.start_date)

@@ -56,7 +56,9 @@
       "eyebrow": "Create",
       "title": "Create New Election",
       "subtitle": "Set up your election step by step",
-      "editTitle": "Edit draft election"
+      "editTitle": "Edit draft election",
+      "editPublishedTitle": "Edit election schedule",
+      "editPublishedSubtitle": "Fix dates, title, and registration deadline."
     },
     "candidates": {
       "topTitle": "Candidate Management",
@@ -159,6 +161,8 @@
   },
   "elections": {
     "createButton": "+ Create Election",
+    "editButton": "Edit",
+    "editTimesButton": "Edit times",
     "tabs": {
       "all": "All",
       "active": "Active",
@@ -170,7 +174,29 @@
     "emptyBody": "Create your first election to get started.",
     "createFirst": "Create Election",
     "emptyView": "No elections in this view.",
-    "createFirstLink": "Create your first election"
+    "createFirstLink": "Create your first election",
+    "edit": {
+      "formTitle": "Edit election",
+      "formSubtitle": "Update title, voting window, and registration deadline.",
+      "titleLabel": "Election title",
+      "descriptionLabel": "Description",
+      "startLabel": "Voting starts",
+      "endLabel": "Voting ends",
+      "registrationDeadlineLabel": "Registration deadline",
+      "registrationDeadlineHint": "Leave empty to use voting start time. Must be before voting ends.",
+      "maxVotersLabel": "Maximum voters",
+      "maxVotersLocked": "Cannot change after the voter roll is finalized.",
+      "save": "Save changes",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "saved": "Election updated.",
+      "saveFailed": "Could not save changes.",
+      "loadFailed": "Could not load election.",
+      "completedLocked": "Completed elections cannot be edited.",
+      "titleRequired": "Title is required.",
+      "maxVotersMin": "Maximum voters must be at least 1.",
+      "backToList": "Back to My Elections"
+    }
   },
   "errors": {
     "statsMigration": "{{error}} — apply migrations 025_creator_dashboard_stats.sql and 026_creator_dashboard_live.sql in Supabase if this persists."

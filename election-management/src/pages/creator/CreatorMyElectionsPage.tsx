@@ -6,7 +6,11 @@ import { useTranslation } from 'react-i18next'
 import { useCreatorPageMeta } from '@/hooks/useCreatorI18n'
 import { useCreatorElection } from '@/context/CreatorElectionContext'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
-import { canCreatorDeleteElection, deleteCreatorElection } from '@/services/electionService'
+import {
+  canCreatorDeleteElection,
+  canCreatorEditElectionDetails,
+  deleteCreatorElection,
+} from '@/services/electionService'
 import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import { creatorPhaseBadge, electionShortCode } from '@/utils/creatorDisplay'
 import { formatSubmissionDate } from '@/utils/formatDate'
@@ -133,9 +137,9 @@ export function CreatorMyElectionsPage() {
                     <Link to={`/creator/elections/${e.id}`} className="btn btn-sm btn-primary">
                       Manage
                     </Link>
-                    {e.status === 'draft' ? (
+                    {canCreatorEditElectionDetails(e.status) ? (
                       <Link to={`/creator/elections/${e.id}/edit`} className="btn btn-sm btn-ghost">
-                        Edit
+                        {e.status === 'draft' ? t('elections.editButton') : t('elections.editTimesButton')}
                       </Link>
                     ) : null}
                     {!e.voter_roll_finalized_at && e.status !== 'draft' ? (
