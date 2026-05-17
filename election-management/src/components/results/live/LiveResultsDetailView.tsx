@@ -479,7 +479,20 @@ export function LiveResultsDetailView({ electionId }: LiveResultsDetailViewProps
               </div>
             </div>
           </>
-        ) : null}
+        ) : (
+          <div className="panel" style={{ marginBottom: 20 }}>
+            <div className="panel-body" style={{ textAlign: 'center', padding: '32px 22px' }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>
+                {results.candidates.length === 0 ? 'No candidates yet' : 'No votes cast yet'}
+              </p>
+              <p style={{ fontSize: 13, color: 'var(--subtle)', maxWidth: 420, margin: '0 auto' }}>
+                {results.candidates.length === 0
+                  ? 'Candidate rankings and charts will appear once candidates are added to this election.'
+                  : 'Vote counts and charts will update here as soon as the first ballot is cast.'}
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="distribution-grid">
           <div className="panel">

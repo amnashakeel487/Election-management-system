@@ -22,7 +22,7 @@ for (const part of parts) {
   const t = part.trim()
   if (!t) continue
   if (t.startsWith('@media')) {
-    out += t.replace(/\n(\.)/g, '\n.lr-root $1') + '\n'
+    out += t.replace(/([,{])\s*(\.)/g, '$1 .lr-root $2').replace(/\n(\.)/g, '\n.lr-root $1') + '\n'
   } else if (t.startsWith('@keyframes')) {
     out += t + '\n'
   } else {

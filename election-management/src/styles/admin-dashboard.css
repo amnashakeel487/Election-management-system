@@ -283,9 +283,9 @@ td.muted{color:var(--subtle);}
 .toggle-label{font-size:12px;font-weight:600;color:var(--text);}
 .toggle-sub{font-size:11px;color:var(--subtle);}
 
-/* â”€â”€ PAGE TRANSITIONS â”€â”€ */
-.page{display:none;animation:pageIn 0.3s ease;}
-.page.active{display:block;}
+/* â”€â”€ PAGE TRANSITIONS (admin shell only — do not use bare `.page` on public pages) â”€â”€ */
+.admin-app .page{display:none;animation:pageIn 0.3s ease;}
+.admin-app .page.active{display:block;}
 @keyframes pageIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
 /* â”€â”€ RANGE INPUT â”€â”€ */
