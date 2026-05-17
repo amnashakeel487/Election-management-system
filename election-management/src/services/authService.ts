@@ -82,12 +82,36 @@ export async function signUpWithEmail(payload: SignUpPayload) {
   }
 }
 
+/**
+ * Sends a 6-digit recovery code to the email (Supabase "Reset password" template must include {{ .Token }}).
+ * See docs/AUTH_SETUP.md — do not rely on email link / PKCE for in-app reset.
+ */
 export async function requestPasswordReset(email: string) {
   assertSupabaseConfigured()
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/reset-password`,
+  const normalized = email.trim().toLowerCase()
+  const { error } = await supabase.auth.resetPasswordForEmail(normalized)
+  if (error) throw new Error(error.message)
+}
+
+/** Verifies the email recovery code and opens a short-lived session for updatePassword(). */
+export async function verifyPasswordResetOtp(email: string, token: string) {
+  assertSupabaseConfigured()
+  const normalized = email.trim().toLowerCase()
+  const code = token.trim().replace(/\s/g, '')
+  if (!/^\d{6,8}$/.test(code)) {
+    throw new Error('Enter the 6-digit code from your email.')
+  }
+
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: normalized,
+    token: code,
+    type: 'recovery',
   })
   if (error) throw new Error(error.message)
+  if (!data.session) {
+    throw new Error('Code verified but no session was created. Request a new code.')
+  }
+  return data.session
 }
 
 export async function updatePassword(newPassword: string) {
