@@ -572,6 +572,8 @@ function NavLinks({
     { href: '#features', label: t('nav.features') },
     { href: '#how', label: t('nav.howItWorks') },
     { href: '#testimonials', label: t('nav.reviews') },
+    { href: '#contact', label: t('nav.contact') },
+    { href: '#team', label: t('nav.team') },
   ]
 
   return (

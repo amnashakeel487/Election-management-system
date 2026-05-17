@@ -9,7 +9,9 @@
     "liveResults": "Live results",
     "features": "Features",
     "howItWorks": "How it works",
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "contact": "Contact",
+    "team": "Team"
   },
   "hero": {
     "badge": "Elections open for registration",
@@ -148,16 +150,15 @@
     "note": "We typically reply within 1–2 business days. For account security issues, include your registered email and never share passwords."
   },
   "team": {
-    "eyebrow": "Built with care",
-    "title": "Meet our",
-    "titleAccent": "team",
-    "sub": "FortressVote is engineered by a small, focused team committed to secure, transparent elections.",
-    "leaderBadge": "Team leader",
-    "leaderRole": "Team Leader · AI & Software",
-    "leaderBio": "AI automation and custom software developer who believes consistency builds excellence—crafting secure, scalable platforms end to end.",
-    "developerRole": "Developer · Design & Frontend",
-    "developerBio": "Creative designer architecting the web—blending aesthetics with usability to shape polished, impactful digital experiences.",
-    "viewPortfolio": "View portfolio"
+    "eyebrow": "Our team",
+    "title": "Meet the",
+    "titleAccent": "builders",
+    "sub": "The people who designed and built FortressVote — secure election software from the ground up.",
+    "leaderBadge": "👑 Team Leader & Senior Developer",
+    "developerBadge": "💻 Developer & Designer",
+    "leaderBio": "Architect behind FortressVote's core systems. Leads technical strategy, system design, and full-stack development with a focus on security and scale.",
+    "developerBio": "Brings FortressVote's interface to life — focused on user experience, component design, and seamless interactions across the platform.",
+    "viewPortfolio": "View Portfolio"
   },
   "footer": {
     "desc": "A secure election management platform. Built for transparency, designed for trust.",
