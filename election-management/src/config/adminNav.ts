@@ -4,7 +4,7 @@ export interface AdminNavItem {
   label: string
   section?: string
   badgeKey?: 'pending' | 'notifications'
-  icon: 'dashboard' | 'requests' | 'elections' | 'users' | 'voters' | 'audit' | 'reports' | 'notifications' | 'security' | 'settings' | 'profile' | 'logout'
+  icon: 'dashboard' | 'requests' | 'elections' | 'users' | 'voters' | 'audit' | 'reports' | 'notifications' | 'settings' | 'profile' | 'logout'
 }
 
 export const ADMIN_NAV: AdminNavItem[] = [
@@ -16,7 +16,6 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { id: 'audit', path: '/admin/audit-logs', label: 'Audit Logs', section: 'Monitoring', icon: 'audit' },
   { id: 'reports', path: '/admin/reports', label: 'Reports & Exports', section: 'Monitoring', icon: 'reports' },
   { id: 'notifications', path: '/admin/notifications', label: 'Notifications', section: 'Monitoring', icon: 'notifications', badgeKey: 'notifications' },
-  { id: 'security', path: '/admin/security', label: 'Security Center', section: 'Monitoring', icon: 'security' },
   { id: 'settings', path: '/admin/settings', label: 'Settings', section: 'Account', icon: 'settings' },
   { id: 'profile', path: '/admin/profile', label: 'Profile', section: 'Account', icon: 'profile' },
 ]
@@ -85,13 +84,6 @@ export const ADMIN_PAGE_META: Record<
     eyebrow: 'Communications',
     title: 'Notifications Center',
     subtitle: 'System emails, alerts and election reminders',
-  },
-  security: {
-    topTitle: 'Security Center',
-    topSub: 'Platform security monitoring',
-    eyebrow: 'Protection',
-    title: 'Security Center',
-    subtitle: 'Platform security monitoring and configuration',
   },
   settings: {
     topTitle: 'Settings',

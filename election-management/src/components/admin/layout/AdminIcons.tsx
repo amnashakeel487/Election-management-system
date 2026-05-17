@@ -73,12 +73,6 @@ export function AdminNavIcon({ icon }: { icon: AdminNavItem['icon'] }) {
           <path d="M13.73 21a2 2 0 0 1-3.46 0" {...common} />
         </Svg>
       )
-    case 'security':
-      return (
-        <Svg>
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" {...common} />
-        </Svg>
-      )
     case 'settings':
       return (
         <Svg>

@@ -22,7 +22,6 @@ import { AdminNotificationsPage } from '@/pages/admin/AdminNotificationsPage'
 import { AdminProfilePage } from '@/pages/admin/AdminProfilePage'
 import { AdminReportsPage } from '@/pages/admin/AdminReportsPage'
 import { AdminRequestsPage } from '@/pages/admin/AdminRequestsPage'
-import { AdminSecurityPage } from '@/pages/admin/AdminSecurityPage'
 import { AdminSettingsPage } from '@/pages/admin/AdminSettingsPage'
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
 import { AdminVotersPage } from '@/pages/admin/AdminVotersPage'
@@ -155,7 +154,7 @@ export function AppRoutes() {
         <Route path="audit-logs" element={<AdminAuditLogsPage />} />
         <Route path="reports" element={<AdminReportsPage />} />
         <Route path="notifications" element={<AdminNotificationsPage />} />
-        <Route path="security" element={<AdminSecurityPage />} />
+        <Route path="security" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="settings" element={<AdminSettingsPage />} />
         <Route path="profile" element={<AdminProfilePage />} />
       </Route>
