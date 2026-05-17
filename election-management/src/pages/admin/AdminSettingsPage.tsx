@@ -5,6 +5,7 @@ import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader'
 import { ADMIN_PAGE_META } from '@/config/adminNav'
 import { LanguageSettings } from '@/components/i18n/LanguageSettings'
 import { AppearanceSettings } from '@/components/theme/AppearanceSettings'
+import { ADMIN_LOCALES } from '@/types/locale'
 
 const meta = ADMIN_PAGE_META.settings
 
@@ -48,7 +49,7 @@ export function AdminSettingsPage() {
     <>
       <AdminPageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
 
-      <LanguageSettings variant="admin" />
+      <LanguageSettings variant="admin" locales={ADMIN_LOCALES} />
 
       <div style={{ marginTop: 16 }}>
         <AppearanceSettings variant="admin" />

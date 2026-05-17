@@ -5,6 +5,7 @@ import '@/styles/admin-dashboard-dark.css'
 import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { ADMIN_PAGE_META } from '@/config/adminNav'
+import { ADMIN_LOCALES } from '@/types/locale'
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar'
 import { useAuth } from '@/hooks/useAuth'
 import { userInitials } from '@/utils/dashboardDisplay'
@@ -72,7 +73,7 @@ export function AdminLayout() {
                 </svg>
                 <input type="search" placeholder="Search anything…" aria-label="Search admin" />
               </div>
-              <LanguageSwitcher variant="admin" />
+              <LanguageSwitcher variant="admin" locales={ADMIN_LOCALES} />
               <ThemeToggle variant="icon-btn" />
               <button
                 type="button"

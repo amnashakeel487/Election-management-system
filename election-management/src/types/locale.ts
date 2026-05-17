@@ -29,6 +29,9 @@ export const CREATOR_LOCALES: readonly AppLocale[] = ['en', 'ur']
 /** Public site (landing, login, signup): English and Urdu only */
 export const PUBLIC_LOCALES: readonly AppLocale[] = CREATOR_LOCALES
 
+/** Admin dashboard: English and Urdu only */
+export const ADMIN_LOCALES: readonly AppLocale[] = CREATOR_LOCALES
+
 export function isAppLocale(value: unknown): value is AppLocale {
   return typeof value === 'string' && (SUPPORTED_LOCALES as readonly string[]).includes(value)
 }
