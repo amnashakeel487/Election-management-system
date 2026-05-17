@@ -83,7 +83,7 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
             Home
           </Link>
           <Link
-            to="/#elections-catalog"
+            to="/browse-elections"
             className="cursor-pointer text-[12px] font-medium text-white/50 transition-colors hover:text-white"
           >
             Elections

@@ -17,9 +17,9 @@ export function Footer() {
               <h3 className="mb-3 font-label-sm uppercase tracking-wider text-on-nav/50">Product</h3>
               <ul className="space-y-2 font-body-sm text-on-nav/70">
                 <li>
-                  <a className="transition-colors hover:text-on-nav" href="#elections-catalog">
+                  <Link className="transition-colors hover:text-on-nav" to="/browse-elections">
                     Elections
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <Link className="transition-colors hover:text-on-nav" to="/results">

@@ -20,8 +20,6 @@ export function TopNavBar() {
     navigate('/login', { replace: true })
   }
 
-  const onLanding = location.pathname === '/'
-
   return (
     <nav className="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b border-line/80 bg-nav px-4 shadow-md backdrop-blur-md sm:px-8">
       <div className="flex items-center gap-6 md:gap-10">
@@ -30,9 +28,9 @@ export function TopNavBar() {
         </Link>
         <div className="hidden gap-8 md:flex">
           <Link
-            to="/#elections-catalog"
+            to="/browse-elections"
             className={
-              onLanding
+              location.pathname === '/browse-elections'
                 ? 'border-b-2 border-tertiary pb-0.5 font-body-md text-body-md font-medium text-on-nav'
                 : 'font-body-md text-body-md text-on-nav/70 transition-colors hover:text-on-nav'
             }
@@ -45,12 +43,12 @@ export function TopNavBar() {
           >
             {t('nav:results')}
           </Link>
-          <a
+          <Link
+            to="/browse-elections"
             className="font-body-md text-body-md text-on-nav/70 transition-colors hover:text-on-nav"
-            href="#elections-catalog"
           >
             {t('nav:browse')}
-          </a>
+          </Link>
         </div>
       </div>
       <div className="flex items-center gap-2 sm:gap-3">

@@ -43,7 +43,7 @@ function ElectionDetailsHero({
       <div className="ed-hero-orb ed-hero-orb--2" aria-hidden />
       <div className="ed-hero-inner">
         <div className="min-w-0 flex-1">
-          <Link to="/#elections-catalog" className="ed-back">
+          <Link to="/browse-elections" className="ed-back">
             <span className="material-symbols-outlined text-[16px]">arrow_back</span>
             Back to elections
           </Link>

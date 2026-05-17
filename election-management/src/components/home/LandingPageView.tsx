@@ -293,7 +293,7 @@ export function LandingPageView() {
                 <CheckIcon />
                 {signedIn ? 'Go to dashboard' : 'Start free election'}
               </button>
-              <button type="button" className="btn-hero-ghost" onClick={() => navigate('/#elections-catalog')}>
+              <button type="button" className="btn-hero-ghost" onClick={() => navigate('/browse-elections')}>
                 <PlayIcon />
                 Browse elections
               </button>
@@ -517,9 +517,9 @@ export function LandingPageView() {
             </div>
             <div>
               <div className="footer-col-title">Platform</div>
-              <a className="footer-link" href="#elections-catalog">
+              <Link className="footer-link" to="/browse-elections">
                 Elections
-              </a>
+              </Link>
               <Link className="footer-link" to="/results">
                 Results
               </Link>
@@ -576,7 +576,7 @@ function NavLinks({
   showLangInMobile?: boolean
 }) {
   const links = [
-    { href: '#elections-catalog', label: 'Elections' },
+    { href: '/browse-elections', label: 'Elections' },
     { href: '#features', label: 'Features' },
     { href: '#how', label: 'How it works' },
     { href: '#testimonials', label: 'Reviews' },
@@ -602,11 +602,17 @@ function NavLinks({
           : undefined
       }
     >
-      {links.map((l) => (
-        <a key={l.href} className="nav-link" href={l.href} onClick={() => setMobileOpen(false)}>
-          {l.label}
-        </a>
-      ))}
+      {links.map((l) =>
+        l.href.startsWith('/') ? (
+          <Link key={l.href} className="nav-link" to={l.href} onClick={() => setMobileOpen(false)}>
+            {l.label}
+          </Link>
+        ) : (
+          <a key={l.href} className="nav-link" href={l.href} onClick={() => setMobileOpen(false)}>
+            {l.label}
+          </a>
+        ),
+      )}
       {showLangInMobile && mobileOpen ? (
         <div className="nav-lang-mobile">
           <LanguageSwitcher variant="nav" />

@@ -115,7 +115,7 @@ function voterNav(registrations: number, live: number): NavItem[] {
       ),
     },
     {
-      to: '/#elections-catalog',
+      to: '/browse-elections',
       label: 'Browse Elections',
       icon: (
         <svg viewBox="0 0 24 24" aria-hidden>

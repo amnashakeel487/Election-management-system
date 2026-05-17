@@ -4,6 +4,7 @@ import { MfaRoute } from '@/components/auth/MfaRoute'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { RecoveryRoute } from '@/components/auth/RecoveryRoute'
 import { VerifyEmailRoute } from '@/components/auth/VerifyEmailRoute'
+import { BrowseElectionsPage } from '@/pages/BrowseElectionsPage'
 import { HomePage } from '@/pages/HomePage'
 import { LoginPage } from '@/pages/LoginPage'
 import { RegisterPage } from '@/pages/RegisterPage'
@@ -52,6 +53,7 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/browse-elections" element={<BrowseElectionsPage />} />
       <Route path="/elections/:id" element={<ElectionDetailsPage />} />
       <Route path="/elections/:id/join" element={<ElectionJoinPage />} />
       <Route

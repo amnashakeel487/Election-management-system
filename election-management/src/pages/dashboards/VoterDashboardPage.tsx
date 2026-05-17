@@ -161,7 +161,7 @@ export function VoterDashboardPage() {
               <div className="vs-panel-title">My Elections</div>
               <div className="vs-panel-sub">Elections you are enrolled in</div>
             </div>
-            <Link to="/#elections-catalog" className="vs-panel-action">
+            <Link to="/browse-elections" className="vs-panel-action">
               Browse All
             </Link>
           </div>
@@ -171,7 +171,7 @@ export function VoterDashboardPage() {
             ) : registrations.length === 0 ? (
               <p className="vs-empty">
                 You have not joined any elections yet.{' '}
-                <Link to="/#elections-catalog">Browse the catalog</Link> to participate.
+                <Link to="/browse-elections">Browse the catalog</Link> to participate.
               </p>
             ) : (
               registrations.map((reg) => {
