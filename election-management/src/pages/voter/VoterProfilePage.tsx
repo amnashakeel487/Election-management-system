@@ -1,16 +1,15 @@
+import { Link } from 'react-router-dom'
 import { ProfileEditForm } from '@/components/account/ProfileEditForm'
 import { VoterPageHeader } from '@/components/voter/VoterPageHeader'
 import { useAuth } from '@/hooks/useAuth'
 import { useVoterDashboard } from '@/hooks/useVoterDashboard'
 import { userInitials } from '@/utils/dashboardDisplay'
 import { formatElectionCode } from '@/utils/electionTime'
-import { maskSecretVoterId } from '@/utils/maskSecretVoterId'
 
 export function VoterProfilePage() {
   const { profile } = useAuth()
   const { registered, votedCount } = useVoterDashboard()
 
-  const primarySecret = registered.find((r) => r.secret_voter_id)?.secret_voter_id
   const participation =
     registered.length > 0 ? Math.round((votedCount / registered.length) * 1000) / 10 : 100
 
@@ -45,13 +44,21 @@ export function VoterProfilePage() {
             <div style={{ marginTop: 10, display: 'flex', justifyContent: 'center', gap: 8 }}>
               <span className="badge b-active">Verified Voter</span>
             </div>
-            <div className="sid-box" style={{ margin: '14px auto 0', display: 'inline-flex' }}>
-              <svg viewBox="0 0 24 24" aria-hidden>
-                <rect x="3" y="11" width="18" height="11" rx="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-              {primarySecret ? maskSecretVoterId(primarySecret) : 'Issued per election'}
-            </div>
+            <p
+              style={{
+                margin: '14px auto 0',
+                maxWidth: 280,
+                fontSize: 11,
+                lineHeight: 1.5,
+                color: 'var(--subtle)',
+              }}
+            >
+              Secret voter IDs are unique to each election (for example FV-A-0001). Find yours under{' '}
+              <Link to="/voter/elections" style={{ fontWeight: 700, color: 'var(--blue)' }}>
+                My Elections
+              </Link>{' '}
+              after the organizer finalizes the roll.
+            </p>
             <div
               style={{
                 marginTop: 16,
