@@ -43,7 +43,7 @@ export function VotingEligibilityPanel({ election, registration, sessionUserId }
       ) : null}
       {detail.canVote ? (
         <Link
-          to={`/elections/${election.id}/vote`}
+          to={`/voter/vote/${election.id}`}
           className="block w-full rounded-xl bg-gradient-to-br from-[#1B3A6B] to-[#6C3FC5] py-2.5 text-center text-sm font-bold text-white no-underline"
         >
           Open secure ballot

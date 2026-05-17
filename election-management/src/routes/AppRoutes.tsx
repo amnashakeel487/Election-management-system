@@ -40,9 +40,21 @@ import { CreatorSettingsPage } from '@/pages/creator/CreatorSettingsPage'
 import { EditElectionPage } from '@/pages/creator/EditElectionPage'
 import { ElectionJoinPage } from '@/pages/ElectionJoinPage'
 import { CreatorDashboardPage } from '@/pages/dashboards/CreatorDashboardPage'
-import { VoterDashboardPage } from '@/pages/dashboards/VoterDashboardPage'
 import { ElectionDetailsPage } from '@/pages/ElectionDetailsPage'
-import { VotingPage } from '@/pages/VotingPage'
+import { VoterLayout } from '@/components/voter/layout/VoterLayout'
+import { VoterCastVotePage } from '@/pages/voter/VoterCastVotePage'
+import { VoterElectionDetailPage } from '@/pages/voter/VoterElectionDetailPage'
+import { VoterHomePage } from '@/pages/voter/VoterHomePage'
+import { VoterJoinedPollsPage } from '@/pages/voter/VoterJoinedPollsPage'
+import { VoterMyElectionsPage } from '@/pages/voter/VoterMyElectionsPage'
+import { VoterNotificationsPage } from '@/pages/voter/VoterNotificationsPage'
+import { VoterProfilePage } from '@/pages/voter/VoterProfilePage'
+import { VoterResultsDetailPage } from '@/pages/voter/VoterResultsDetailPage'
+import { VoterResultsIndexPage } from '@/pages/voter/VoterResultsIndexPage'
+import { VoterSettingsPage } from '@/pages/voter/VoterSettingsPage'
+import { VoterVoteHubPage } from '@/pages/voter/VoterVoteHubPage'
+import { VoterVoteSuccessPage } from '@/pages/voter/VoterVoteSuccessPage'
+import { RedirectLegacyVoterBallot } from '@/routes/RedirectLegacyVoterBallot'
 import { ElectionResultsPage } from '@/pages/ElectionResultsPage'
 import { ResultsIndexPage } from '@/pages/ResultsIndexPage'
 import { CreatorApprovedRoute } from '@/components/creator/CreatorApprovedRoute'
@@ -60,7 +72,7 @@ export function AppRoutes() {
         path="/elections/:id/vote"
         element={
           <ProtectedRoute allowedRoles={['voter']}>
-            <VotingPage />
+            <RedirectLegacyVoterBallot />
           </ProtectedRoute>
         }
       />
@@ -234,13 +246,27 @@ export function AppRoutes() {
         />
       </Route>
       <Route
-        path="/voter/dashboard"
+        path="/voter"
         element={
           <ProtectedRoute allowedRoles={['voter']}>
-            <VoterDashboardPage />
+            <VoterLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<VoterHomePage />} />
+        <Route path="elections" element={<VoterMyElectionsPage />} />
+        <Route path="elections/:id" element={<VoterElectionDetailPage />} />
+        <Route path="polls" element={<VoterJoinedPollsPage />} />
+        <Route path="vote" element={<VoterVoteHubPage />} />
+        <Route path="vote/success" element={<VoterVoteSuccessPage />} />
+        <Route path="vote/:electionId" element={<VoterCastVotePage />} />
+        <Route path="results" element={<VoterResultsIndexPage />} />
+        <Route path="results/:id" element={<VoterResultsDetailPage />} />
+        <Route path="notifications" element={<VoterNotificationsPage />} />
+        <Route path="profile" element={<VoterProfilePage />} />
+        <Route path="settings" element={<VoterSettingsPage />} />
+      </Route>
     </Routes>
   )
 }

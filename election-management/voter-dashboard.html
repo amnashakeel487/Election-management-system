@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VoteSecure — Voter Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0F2347;--navy2:#1B3A6B;--blue:#2451A3;--purple:#6C3FC5;
+  --cyan:#06B6D4;--success:#10B981;--danger:#EF4444;--warning:#F59E0B;
+  --text:#0F172A;--muted:#475569;--subtle:#94A3B8;--border:#E2E8F0;
+  --bg:#F0F4F9;--card:#FFFFFF;--sidebar:#0A1628;
+}
+html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+.app{display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:224px;flex-shrink:0;background:var(--sidebar);display:flex;flex-direction:column;height:100vh;overflow-y:auto;overflow-x:hidden;border-right:1px solid rgba(255,255,255,0.05);transition:width 0.3s ease;}
+.sidebar.collapsed{width:62px;}
+.sidebar::-webkit-scrollbar{width:0;}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:20px 16px 18px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;}
+.sb-icon{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,#2451A3,#6C3FC5);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(108,63,197,0.4);}
+.sb-icon svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.sb-name{font-size:15px;font-weight:800;color:#fff;white-space:nowrap;}
+.sb-tag{font-size:8px;font-weight:700;color:var(--success);background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.28);border-radius:20px;padding:1px 7px;white-space:nowrap;}
+.collapsed .sb-name,.collapsed .sb-tag{display:none;}
+.sb-voter-card{margin:12px 10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);}
+.collapsed .sb-voter-card{display:none;}
+.sv-top{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.sv-avatar{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.sv-name{font-size:12px;font-weight:700;color:#fff;}
+.sv-email{font-size:10px;color:rgba(255,255,255,0.4);}
+.sv-id{display:flex;align-items:center;gap:5px;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:7px;padding:5px 8px;}
+.sv-id-label{font-size:9px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}
+.sv-id-val{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cyan);font-weight:500;}
+.sb-section-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.22);padding:12px 16px 4px;white-space:nowrap;}
+.collapsed .sb-section-label{padding:8px 0;text-align:center;font-size:7px;color:rgba(255,255,255,0.12);}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;margin:1px 8px;border-radius:9px;cursor:pointer;transition:all 0.2s;position:relative;color:rgba(255,255,255,0.48);font-size:13px;font-weight:500;white-space:nowrap;}
+.collapsed .sb-item{padding:9px;margin:1px 6px;justify-content:center;}
+.sb-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85);}
+.sb-item.active{background:linear-gradient(135deg,rgba(16,185,129,0.35),rgba(6,182,212,0.25));color:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.2);}
+.sb-item svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.sb-label{flex:1;}
+.collapsed .sb-label{display:none;}
+.sb-badge{font-size:9px;font-weight:700;background:#EF4444;color:#fff;padding:1px 6px;border-radius:10px;}
+.collapsed .sb-badge{position:absolute;top:4px;right:4px;font-size:8px;padding:1px 4px;}
+.sb-collapse-btn{display:flex;align-items:center;justify-content:flex-end;padding:10px 14px;cursor:pointer;color:rgba(255,255,255,0.2);transition:color 0.2s;border-top:1px solid rgba(255,255,255,0.06);margin-top:auto;flex-shrink:0;}
+.collapsed .sb-collapse-btn{justify-content:center;}
+.sb-collapse-btn:hover{color:rgba(255,255,255,0.6);}
+.sb-collapse-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.3s;}
+.collapsed .sb-collapse-btn svg{transform:rotate(180deg);}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{height:58px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;}
+.topbar-left{flex:1;display:flex;flex-direction:column;}
+.topbar-title{font-size:15px;font-weight:700;color:var(--text);}
+.topbar-sub{font-size:11px;color:var(--subtle);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;min-width:190px;transition:all 0.2s;}
+.tb-search:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,81,163,0.1);}
+.tb-search svg{width:14px;height:14px;stroke:var(--subtle);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.tb-search input{border:none;outline:none;background:transparent;font-family:'Sora',sans-serif;font-size:12px;color:var(--text);width:100%;}
+.tb-search input::placeholder{color:var(--subtle);}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;position:relative;color:var(--muted);}
+.icon-btn:hover{background:var(--bg);border-color:var(--success);color:var(--success);}
+.icon-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.notif-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:#EF4444;border:2px solid #fff;}
+.avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;}
+.content{flex:1;overflow-y:auto;padding:22px 24px;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-track{background:transparent;}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* PAGE SYSTEM */
+.page{display:none;animation:pageIn 0.3s ease;}
+.page.active{display:block;}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* TYPOGRAPHY */
+.page-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--success);margin-bottom:4px;}
+.page-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
+.page-subtitle{font-size:13px;color:var(--subtle);margin-top:3px;}
+.page-header{margin-bottom:22px;}
+
+/* CARDS */
+.card{background:var(--card);border-radius:14px;border:1px solid var(--border);}
+.card-elevated{background:var(--card);border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,0.05);border:1px solid var(--border);}
+.card-header{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.card-title{font-size:14px;font-weight:700;color:var(--text);}
+.card-body{padding:18px 20px;}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:20px;}
+.stat-card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:18px;transition:all 0.3s;}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.08);}
+.stat-icon-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.stat-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.stat-delta{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.du{background:#DCFCE7;color:#16A34A;}
+.dn{background:#F1F5F9;color:#64748B;}
+.stat-num{font-size:26px;font-weight:800;color:var(--text);line-height:1;font-family:'IBM Plex Mono',monospace;letter-spacing:-1px;}
+.stat-label{font-size:11px;color:var(--subtle);margin-top:4px;font-weight:500;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.4px;}
+.b-active{background:#DCFCE7;color:#16A34A;}
+.b-upcoming{background:#DBEAFE;color:#2563EB;}
+.b-completed{background:#EDE9FE;color:#6D28D9;}
+.b-pending{background:#FEF9C3;color:#CA8A04;}
+.b-voted{background:#DCFCE7;color:#16A34A;}
+.b-notvoted{background:#F1F5F9;color:#64748B;}
+.b-live{background:#DCFCE7;color:#16A34A;animation:blp 2s infinite;}
+@keyframes blp{0%,100%{opacity:1;}50%{opacity:0.6;}}
+.b-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#10B981;animation:ld 1.5s ease-in-out infinite;display:inline-block;}
+@keyframes ld{0%,100%{transform:scale(1);}50%{transform:scale(1.6);opacity:0.5;}}
+
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:9px;border:none;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.25s;}
+.btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.btn-primary{background:linear-gradient(135deg,#1B3A6B,#6C3FC5);color:#fff;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(27,58,107,0.35);}
+.btn-success{background:linear-gradient(135deg,#10B981,#059669);color:#fff;}
+.btn-success:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(16,185,129,0.35);}
+.btn-danger{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;}
+.btn-cyan{background:linear-gradient(135deg,#06B6D4,#0891B2);color:#fff;}
+.btn-cyan:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(6,182,212,0.35);}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{background:var(--bg);border-color:var(--blue);color:var(--blue);}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:7px;}
+.btn-xs{padding:4px 10px;font-size:10px;border-radius:6px;}
+
+/* TABLES */
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;background:var(--card);}
+thead tr{border-bottom:1.5px solid var(--border);}
+th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--subtle);text-transform:uppercase;letter-spacing:0.6px;white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#F8FAFC;}
+td{padding:11px 14px;font-size:12px;color:var(--text);vertical-align:middle;}
+td.mono{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blue);}
+td.muted{color:var(--subtle);}
+.td-actions{display:flex;gap:6px;align-items:center;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--bg);border-radius:10px;padding:3px;width:fit-content;margin-bottom:16px;}
+.tab-btn{padding:7px 16px;border-radius:8px;border:none;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--subtle);}
+.tab-btn.active{background:var(--card);color:var(--navy2);box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+
+/* FORM */
+.form-group{margin-bottom:16px;}
+.form-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:6px;display:block;}
+.form-input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);background:var(--card);outline:none;transition:all 0.2s;}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,81,163,0.1);}
+.form-input::placeholder{color:#CBD5E1;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");background-position:right 10px center;background-repeat:no-repeat;background-size:14px;padding-right:32px;}
+
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-7-3{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;}
+
+/* PROGRESS */
+.progress-wrap{height:8px;background:var(--border);border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(0.4,0,0.2,1);}
+
+/* ALERTS */
+.alert{padding:11px 14px;border-radius:10px;font-size:12px;display:flex;align-items:flex-start;gap:9px;margin-bottom:12px;}
+.alert svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:1px;}
+.a-success{background:#F0FDF4;border:1px solid #BBF7D0;color:#166534;}
+.a-warning{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;}
+.a-info{background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;}
+.a-danger{background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;}
+
+/* TOGGLE */
+.toggle-wrap{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;cursor:pointer;transition:background 0.25s;flex-shrink:0;}
+.toggle.on{background:var(--success);}
+.toggle-thumb{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:transform 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.toggle.on .toggle-thumb{transform:translateX(18px);}
+.toggle-label{font-size:12px;font-weight:600;color:var(--text);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;animation:mfade 0.2s ease;}
+@keyframes mfade{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--card);border-radius:18px;padding:28px;width:92%;max-width:500px;box-shadow:0 32px 80px rgba(0,0,0,0.25);animation:mup 0.3s cubic-bezier(0.4,0,0.2,1);}
+@keyframes mup{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;}
+.modal-title{font-size:17px;font-weight:800;color:var(--text);}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--subtle);}
+.modal-close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.modal-footer{display:flex;gap:10px;margin-top:22px;justify-content:flex-end;}
+
+/* TIMELINE */
+.timeline{padding-left:20px;position:relative;}
+.timeline::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:1.5px;background:linear-gradient(to bottom,var(--success),var(--border));}
+.tl-item{position:relative;padding:0 0 16px 20px;}
+.tl-dot{position:absolute;left:-20px;top:2px;width:14px;height:14px;border-radius:50%;border:2px solid var(--card);display:flex;align-items:center;justify-content:center;}
+.tl-dot-inner{width:6px;height:6px;border-radius:50%;}
+.tl-title{font-size:12px;font-weight:700;color:var(--text);}
+.tl-sub{font-size:11px;color:var(--subtle);margin-top:2px;line-height:1.5;}
+.tl-time{font-size:10px;color:var(--subtle);font-family:'IBM Plex Mono',monospace;margin-top:2px;}
+
+/* ELECTION CARD */
+.el-card{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;transition:all 0.3s;}
+.el-card:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(0,0,0,0.09);}
+.el-accent{height:4px;}
+.el-body{padding:16px 18px;}
+
+/* COUNTDOWN */
+.countdown{display:flex;gap:7px;}
+.cd-unit{background:#F8FAFC;border:1px solid var(--border);border-radius:9px;padding:8px 10px;text-align:center;min-width:50px;}
+.cd-num{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;color:var(--navy2);line-height:1;}
+.cd-label{font-size:9px;color:var(--subtle);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+
+/* VOTE CANDIDATE CARD */
+.vote-cand{border:2px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:all 0.3s;}
+.vote-cand:hover{border-color:var(--success);transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,0.15);}
+.vote-cand.selected{border-color:var(--navy2);background:linear-gradient(135deg,rgba(27,58,107,0.04),rgba(108,63,197,0.04));box-shadow:0 8px 28px rgba(27,58,107,0.18);}
+.vc-radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+.vote-cand.selected .vc-radio{border-color:var(--navy2);background:var(--navy2);}
+
+/* SECRET ID BOX */
+.sid-box{background:#0F2347;border:1px solid rgba(6,182,212,0.3);border-radius:10px;padding:10px 16px;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--cyan);letter-spacing:3px;display:inline-flex;align-items:center;gap:8px;}
+.sid-box svg{width:13px;height:13px;stroke:var(--cyan);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* NOTIF ITEM */
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);}
+.notif-item:last-child{border-bottom:none;}
+.notif-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.notif-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.notif-title{font-size:12px;font-weight:700;color:var(--text);}
+.notif-sub{font-size:11px;color:var(--subtle);margin-top:2px;line-height:1.5;}
+.notif-time{font-size:10px;color:var(--subtle);font-family:'IBM Plex Mono',monospace;white-space:nowrap;margin-left:auto;padding-left:10px;}
+.notif-unread{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:5px;}
+
+/* RESULT BAR */
+.result-row{margin-bottom:14px;}
+.result-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.result-name{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.result-pct{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;}
+.result-bar{height:10px;background:var(--border);border-radius:99px;overflow:hidden;}
+.result-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
+.result-votes{font-size:10px;color:var(--subtle);margin-top:3px;font-family:'IBM Plex Mono',monospace;}
+
+/* SUCCESS PAGE */
+.success-scene{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;}
+.success-icon-wrap{width:80px;height:80px;border-radius:22px;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 16px 40px rgba(16,185,129,0.35);animation:successPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;}
+@keyframes successPop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+.success-icon-wrap svg{width:38px;height:38px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+
+/* HERO BANNER */
+.hero-banner{background:linear-gradient(135deg,#0F2347,#1B3A6B 60%,#2D1B69);border-radius:16px;padding:24px 28px;color:#fff;position:relative;overflow:hidden;margin-bottom:20px;}
+.hero-banner::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:rgba(108,63,197,0.2);filter:blur(60px);top:-100px;right:-60px;pointer-events:none;}
+.hero-banner-content{position:relative;z-index:1;}
+
+/* MINI CHART */
+.mini-chart{display:flex;align-items:flex-end;gap:5px;height:60px;}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;}
+.chart-label{font-size:9px;color:var(--subtle);}
+
+@media(max-width:768px){
+  .grid-2,.grid-3,.grid-7-3,.form-row{grid-template-columns:1fr;}
+  .sidebar{position:fixed;z-index:100;transform:translateX(-100%);transition:transform 0.3s;}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .tb-search{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <span class="sb-name">VoteSecure</span>
+    <span class="sb-tag">Voter</span>
+  </div>
+  <div class="sb-voter-card">
+    <div class="sv-top">
+      <div class="sv-avatar">AJ</div>
+      <div><div class="sv-name">Alex Johnson</div><div class="sv-email">alex@student.edu</div></div>
+    </div>
+    <div class="sv-id">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div><div class="sv-id-label">Voter ID</div><div class="sv-id-val">VOT-8821</div></div>
+    </div>
+  </div>
+
+  <div class="sb-section-label">Main</div>
+  <div class="sb-item active" onclick="nav('home',this)">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="sb-label">Home</span>
+  </div>
+  <div class="sb-item" onclick="nav('my-elections',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span class="sb-label">My Elections</span>
+  </div>
+  <div class="sb-item" onclick="nav('joined-polls',this)">
+    <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+    <span class="sb-label">Joined Polls</span>
+  </div>
+  <div class="sb-item" onclick="nav('vote-now',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+    <span class="sb-label">Vote Now</span>
+    <span class="sb-badge">2</span>
+  </div>
+
+  <div class="sb-section-label">Data</div>
+  <div class="sb-item" onclick="nav('results',this)">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span class="sb-label">Results</span>
+  </div>
+  <div class="sb-item" onclick="nav('notifications',this)">
+    <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="sb-label">Notifications</span>
+    <span class="sb-badge">3</span>
+  </div>
+
+  <div class="sb-section-label">Account</div>
+  <div class="sb-item" onclick="nav('profile',this)">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="sb-label">Profile</span>
+  </div>
+  <div class="sb-item" onclick="nav('settings',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span class="sb-label">Settings</span>
+  </div>
+  <div class="sb-item" style="color:rgba(239,68,68,0.7);" onclick="alert('Logging out…')">
+    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    <span class="sb-label">Logout</span>
+  </div>
+
+  <div class="sb-collapse-btn" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="topbarTitle">Voter Home</div>
+      <div class="topbar-sub" id="topbarSub">Welcome back, Alex Johnson · Saturday May 17, 2026</div>
+    </div>
+    <div class="topbar-right">
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search elections…"/>
+      </div>
+      <div class="icon-btn" onclick="nav('notifications',document.querySelector('[onclick*=notifications]'))">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </div>
+      <button class="btn btn-success btn-sm" onclick="nav('vote-now',document.querySelector('[onclick*=vote-now]'))">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+        Vote Now
+      </button>
+      <div class="avatar">AJ</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- 1. HOME DASHBOARD -->
+    <div class="page active" id="page-home">
+      <div class="page-header">
+        <div class="page-eyebrow">Voter Dashboard</div>
+        <div class="page-title">Welcome back, Alex 👋</div>
+        <div class="page-subtitle">Your democratic journey — all elections in one place</div>
+      </div>
+
+      <!-- Vote Now Banner -->
+      <div class="hero-banner">
+        <div class="hero-banner-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span class="live-dot"></span><span style="font-size:11px;color:#67E8F9;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">2 Active Elections Awaiting Your Vote</span></div>
+              <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:6px;">Your vote is waiting! Don't miss it ⏰</div>
+              <div style="font-size:13px;color:rgba(255,255,255,0.55);">Cast your vote before the deadline. Every vote counts in a democracy.</div>
+            </div>
+            <button class="btn btn-success" style="padding:12px 24px;font-size:14px;white-space:nowrap;" onclick="nav('vote-now',document.querySelector('[onclick*=vote-now]'))">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+              Vote Now →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="stat-delta du">Joined</span></div><div class="stat-num">3</div><div class="stat-label">My Elections</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><span class="stat-delta du">Done</span></div><div class="stat-num">1</div><div class="stat-label">Votes Cast</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="stat-delta" style="background:#FEF9C3;color:#CA8A04;">Urgent</span></div><div class="stat-num">2</div><div class="stat-label">Pending Votes</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#ECFEFF;color:#06B6D4;"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5"/></svg></div><span class="stat-delta du">Active</span></div><div class="stat-num">3</div><div class="stat-label">Secret IDs Issued</div></div>
+      </div>
+
+      <div class="grid-7-3">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">My Active Elections</div><span class="badge b-live"><span class="b-dot"></span>Live</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div style="background:#F8FAFC;border-radius:12px;padding:14px;border:1px solid var(--border);border-left:4px solid #EF4444;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+                  <div><div style="font-size:13px;font-weight:700;">National Student Union Election</div><div style="font-size:11px;color:var(--subtle);">E001 · Ends in 08h 24m</div></div>
+                  <span class="badge" style="background:#FEE2E2;color:#B91C1C;font-size:9px;">⚠ NOT VOTED</span>
+                </div>
+                <div class="countdown" style="margin-bottom:12px;">
+                  <div class="cd-unit"><div class="cd-num" id="c1h">08</div><div class="cd-label">Hrs</div></div>
+                  <div class="cd-unit"><div class="cd-num" id="c1m">24</div><div class="cd-label">Min</div></div>
+                  <div class="cd-unit"><div class="cd-num" id="c1s">11</div><div class="cd-label">Sec</div></div>
+                </div>
+                <button class="btn btn-success btn-sm" onclick="nav('vote-now',document.querySelector('[onclick*=vote-now]'))"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>Cast Your Vote</button>
+              </div>
+              <div style="background:#F8FAFC;border-radius:12px;padding:14px;border:1px solid var(--border);border-left:4px solid #10B981;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+                  <div><div style="font-size:13px;font-weight:700;">Municipal Council By-Election</div><div style="font-size:11px;color:var(--subtle);">E002 · Ends in 02h 45m</div></div>
+                  <span class="badge b-voted">✓ Voted</span>
+                </div>
+                <div style="font-size:11px;color:var(--subtle);">Your vote has been anonymously recorded.</div>
+                <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="nav('results',document.querySelector('[onclick*=results]'))">View Live Results</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card-elevated">
+            <div class="card-header"><div class="card-title">My Secret IDs</div></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px;padding:12px 16px;">
+              <div style="font-size:10px;color:var(--subtle);margin-bottom:4px;">Tap eye icon to reveal</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#F8FAFC;border-radius:9px;border:1px solid var(--border);">
+                <div style="font-size:10px;font-weight:700;color:var(--muted);">E001</div>
+                <div class="sid-box" style="font-size:11px;padding:5px 10px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VS-8821-••••</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#F8FAFC;border-radius:9px;border:1px solid var(--border);">
+                <div style="font-size:10px;font-weight:700;color:var(--muted);">E002</div>
+                <div class="sid-box" style="font-size:11px;padding:5px 10px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VS-3302-••••</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-elevated">
+            <div class="card-header"><div class="card-title">Quick Links</div></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px;padding:12px 16px;">
+              <button class="btn btn-ghost" style="width:100%;justify-content:flex-start;" onclick="nav('joined-polls',document.querySelector('[onclick*=joined-polls]'))"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>My Joined Polls</button>
+              <button class="btn btn-ghost" style="width:100%;justify-content:flex-start;" onclick="nav('results',document.querySelector('[onclick*=results]'))"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>View Live Results</button>
+              <button class="btn btn-ghost" style="width:100%;justify-content:flex-start;" onclick="nav('election-details',document.querySelector('[onclick*=election-details]'))"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Browse Elections</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MY ELECTIONS DASHBOARD -->
+    <div class="page" id="page-my-elections">
+      <div class="page-header"><div class="page-eyebrow">Dashboard</div><div class="page-title">My Elections</div><div class="page-subtitle">All elections you have joined and their status</div></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div></div><div class="stat-num">3</div><div class="stat-label">Joined Elections</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div></div><div class="stat-num">1</div><div class="stat-label">Votes Cast</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div><div class="stat-num">2</div><div class="stat-label">Upcoming Votes</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#F5F3FF;color:#6C3FC5;"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div></div><div class="stat-num">2</div><div class="stat-label">Results Available</div></div>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this)">All (3)</button>
+        <button class="tab-btn" onclick="switchTab(this)">Active (2)</button>
+        <button class="tab-btn" onclick="switchTab(this)">Upcoming (0)</button>
+        <button class="tab-btn" onclick="switchTab(this)">Completed (1)</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <!-- E001 -->
+        <div class="card-elevated" style="border-left:4px solid #EF4444;">
+          <div class="card-body">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+              <div style="flex:1;min-width:220px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="badge b-active"><span class="b-dot"></span>Active</span><span style="background:#FEE2E2;color:#B91C1C;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;">⚠ YOU HAVEN'T VOTED</span></div>
+                <div style="font-size:15px;font-weight:700;margin-bottom:4px;">National Student Union Presidential Election</div>
+                <div style="font-size:11px;color:var(--subtle);margin-bottom:12px;">E001 · 4 candidates · 45,230 voters registered</div>
+                <div class="countdown">
+                  <div class="cd-unit"><div class="cd-num">08</div><div class="cd-label">Hrs</div></div>
+                  <div class="cd-unit"><div class="cd-num">24</div><div class="cd-label">Min</div></div>
+                  <div class="cd-unit"><div class="cd-num">11</div><div class="cd-label">Sec</div></div>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:10px;color:var(--subtle);font-weight:700;margin-bottom:6px;">YOUR SECRET ID</div>
+                <div class="sid-box" style="font-size:12px;margin-bottom:12px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VS-8821-••••-••••</div>
+                <button class="btn btn-success" onclick="nav('vote-now',document.querySelector('[onclick*=vote-now]'))"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>Vote Now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- E002 -->
+        <div class="card-elevated" style="border-left:4px solid #10B981;">
+          <div class="card-body">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+              <div style="flex:1;min-width:220px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="badge b-active"><span class="b-dot"></span>Active</span><span class="badge b-voted">✓ Voted</span></div>
+                <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Municipal Council District 7 By-Election</div>
+                <div style="font-size:11px;color:var(--subtle);">E002 · 3 candidates · 12,800 voters · Ends in 2h 45m</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="sid-box" style="font-size:12px;margin-bottom:12px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VS-3302-WXYZ-1187</div>
+                <button class="btn btn-ghost btn-sm" onclick="nav('results',document.querySelector('[onclick*=results]'))">View Results</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- E003 completed -->
+        <div class="card-elevated" style="border-left:4px solid #6C3FC5;opacity:0.85;">
+          <div class="card-body">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+              <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="badge b-completed">Completed</span><span class="badge b-voted">✓ Voted</span></div><div style="font-size:15px;font-weight:700;margin-bottom:4px;">Regional Committee Chairperson Election</div><div style="font-size:11px;color:var(--subtle);">E004 · Ended Oct 10 · Turnout 83%</div></div>
+              <button class="btn btn-ghost btn-sm" onclick="nav('results',document.querySelector('[onclick*=results]'))">Final Results</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. ELECTION DETAILS -->
+    <div class="page" id="page-election-details">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;"><button class="btn btn-ghost btn-sm" onclick="nav('home',document.querySelector('[onclick*=home]'))">← Back</button></div>
+      <div class="hero-banner" style="margin-bottom:20px;">
+        <div class="hero-banner-content">
+          <span class="badge b-active" style="margin-bottom:10px;"><span class="b-dot"></span>Active</span>
+          <div style="font-size:clamp(16px,2.5vw,24px);font-weight:800;color:#fff;margin-bottom:8px;line-height:1.3;">National Student Union Presidential Election 2025</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:16px;">Vote for the next National Student Union President. All registered students may participate.</div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:16px;">
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);">👥 45,230 voters</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);">🏛 4 candidates</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);">📊 62% turnout</div>
+          </div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Time Remaining</div>
+          <div class="countdown">
+            <div class="cd-unit" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.15);"><div class="cd-num" style="color:#fff;">08</div><div class="cd-label" style="color:rgba(255,255,255,0.5);">Hrs</div></div>
+            <div class="cd-unit" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.15);"><div class="cd-num" style="color:#fff;">24</div><div class="cd-label" style="color:rgba(255,255,255,0.5);">Min</div></div>
+            <div class="cd-unit" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.15);"><div class="cd-num" style="color:#fff;">11</div><div class="cd-label" style="color:rgba(255,255,255,0.5);">Sec</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-7-3">
+        <div>
+          <div class="section-title" style="font-size:15px;font-weight:700;margin-bottom:14px;">Candidates</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;">
+            <div class="card" style="padding:16px;border-top:4px solid #1B3A6B;"><div style="font-size:28px;margin-bottom:8px;">👩🏾‍💼</div><div style="font-size:13px;font-weight:700;">Dr. Amara Osei-Bonsu</div><div style="font-size:10px;color:var(--subtle);margin-top:2px;">Progressive Alliance</div><div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">Education reform, digital infrastructure, student welfare.</div></div>
+            <div class="card" style="padding:16px;border-top:4px solid #6C3FC5;"><div style="font-size:28px;margin-bottom:8px;">👨🏼‍💼</div><div style="font-size:13px;font-weight:700;">Prof. James Whitfield</div><div style="font-size:10px;color:var(--subtle);margin-top:2px;">Reform Coalition</div><div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">Economic stability, research funding, campus development.</div></div>
+            <div class="card" style="padding:16px;border-top:4px solid #06B6D4;"><div style="font-size:28px;margin-bottom:8px;">👩🏽‍💼</div><div style="font-size:13px;font-weight:700;">Eng. Priya Sharma</div><div style="font-size:10px;color:var(--subtle);margin-top:2px;">Innovation Party</div><div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">Tech modernisation, renewable energy, student startups.</div></div>
+            <div class="card" style="padding:16px;border-top:4px solid #10B981;"><div style="font-size:28px;margin-bottom:8px;">👨🏿‍💼</div><div style="font-size:13px;font-weight:700;">Dr. Marcus Cole</div><div style="font-size:10px;color:var(--subtle);margin-top:2px;">Independent</div><div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">Transparency, anti-corruption, grassroots leadership.</div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card-elevated">
+            <div class="card-header"><div class="card-title">Voter Participation</div></div>
+            <div class="card-body">
+              <div style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px;font-family:'IBM Plex Mono',monospace;">62%</div>
+              <div style="font-size:11px;color:var(--subtle);margin-bottom:10px;">28,140 of 45,230 voted</div>
+              <div class="progress-wrap"><div class="progress-fill" style="width:62%;background:linear-gradient(90deg,#10B981,#059669);"></div></div>
+            </div>
+          </div>
+          <div class="card-elevated">
+            <div class="card-header"><div class="card-title">Join This Election</div></div>
+            <div class="card-body">
+              <div style="font-size:12px;color:var(--subtle);margin-bottom:14px;line-height:1.6;">Register to participate. You will receive a secret voter ID upon approval.</div>
+              <button class="btn btn-success" style="width:100%;justify-content:center;" onclick="nav('join-election',document.querySelector('[onclick*=join-election]'))">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                I Want to Participate
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. JOIN ELECTION PAGE -->
+    <div class="page" id="page-join-election">
+      <div style="max-width:560px;margin:0 auto;">
+        <button class="btn btn-ghost btn-sm" style="margin-bottom:20px;" onclick="nav('election-details',null)">← Back to Details</button>
+        <div class="page-header"><div class="page-eyebrow">Join Election</div><div class="page-title">Register to Vote</div><div class="page-subtitle">National Student Union Presidential Election 2025</div></div>
+        <div class="card-elevated" style="margin-bottom:16px;">
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:14px;padding:14px;background:#F0FDF4;border-radius:12px;border:1px solid #BBF7D0;margin-bottom:20px;">
+              <div style="width:44px;height:44px;border-radius:12px;background:#DCFCE7;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">✅</div>
+              <div><div style="font-size:13px;font-weight:700;color:#166534;">Eligibility Check Passed</div><div style="font-size:11px;color:#16A34A;">You are eligible to participate in this election.</div></div>
+            </div>
+            <div class="form-group"><label class="form-label">Your Name</label><input class="form-input" value="Alex Johnson" readonly/></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" value="alex@student.edu" readonly/></div>
+            <div class="form-group"><label class="form-label">Student / Member ID (optional)</label><input class="form-input" placeholder="Enter your institution ID"/></div>
+            <div style="background:#F8FAFC;border-radius:12px;padding:16px;border:1px solid var(--border);margin-bottom:16px;max-height:150px;overflow-y:auto;">
+              <div style="font-size:12px;font-weight:700;margin-bottom:8px;">Terms & Conditions</div>
+              <div style="font-size:11px;color:var(--subtle);line-height:1.7;">
+                By joining this election you agree that: (1) You have the right to vote in this election. (2) You will cast only one vote. (3) Your vote is anonymous and encrypted. (4) False information may lead to disqualification. (5) You consent to secure electronic processing of your participation data.
+              </div>
+            </div>
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:18px;">
+              <input type="checkbox" id="termsCheck" style="width:16px;height:16px;margin-top:2px;accent-color:var(--success);"/>
+              <span style="font-size:12px;color:var(--text);font-weight:500;">I have read and accept the Terms & Conditions and Privacy Policy.</span>
+            </label>
+            <button class="btn btn-success" style="width:100%;justify-content:center;padding:13px;" onclick="nav('home',document.querySelector('[onclick*=home]'))">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Confirm Registration
+            </button>
+          </div>
+        </div>
+        <div class="a-info alert"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>After approval you will receive your Secret Voter ID by email within minutes.</div>
+      </div>
+    </div>
+
+    <!-- 5. JOINED POLLS -->
+    <div class="page" id="page-joined-polls">
+      <div class="page-header"><div class="page-eyebrow">My Polls</div><div class="page-title">Joined Polls</div><div class="page-subtitle">All elections you have registered to participate in</div></div>
+      <div class="tabs"><button class="tab-btn active" onclick="switchTab(this)">All (3)</button><button class="tab-btn" onclick="switchTab(this)">Active</button><button class="tab-btn" onclick="switchTab(this)">Completed</button></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Election</th><th>Status</th><th>Joined On</th><th>Voting Status</th><th>Secret ID</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td><div style="font-size:12px;font-weight:700;max-width:220px;">National Student Union Election</div><div style="font-size:10px;color:var(--subtle);">E001 · Ends Oct 20</div></td><td><span class="badge b-active"><span class="b-dot"></span>Active</span></td><td class="muted">Oct 10, 2025</td><td><span class="badge" style="background:#FEE2E2;color:#B91C1C;">⚠ Not Voted</span></td><td><div class="sid-box" style="font-size:10px;padding:4px 10px;letter-spacing:2px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VS-8821-••••</div></td><td><div class="td-actions"><button class="btn btn-success btn-xs" onclick="nav('vote-now',document.querySelector('[onclick*=vote-now]'))">Vote</button><button class="btn btn-ghost btn-xs">Details</button></div></td></tr>
+            <tr><td><div style="font-size:12px;font-weight:700;max-width:220px;">Municipal Council By-Election</div><div style="font-size:10px;color:var(--subtle);">E002 · Ends Oct 18</div></td><td><span class="badge b-active"><span class="b-dot"></span>Active</span></td><td class="muted">Oct 11, 2025</td><td><span class="badge b-voted">✓ Voted</span></td><td><div class="sid-box" style="font-size:10px;padding:4px 10px;letter-spacing:2px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VS-3302-WXYZ</div></td><td><div class="td-actions"><button class="btn btn-ghost btn-xs" onclick="nav('results',document.querySelector('[onclick*=results]'))">Results</button></div></td></tr>
+            <tr><td><div style="font-size:12px;font-weight:700;max-width:220px;">Regional Committee Chairperson Election</div><div style="font-size:10px;color:var(--subtle);">E004 · Ended Oct 10</div></td><td><span class="badge b-completed">Completed</span></td><td class="muted">Oct 5, 2025</td><td><span class="badge b-voted">✓ Voted</span></td><td><div class="sid-box" style="font-size:10px;padding:4px 10px;letter-spacing:2px;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VS-7741-ABCD</div></td><td><div class="td-actions"><button class="btn btn-ghost btn-xs" onclick="nav('results',document.querySelector('[onclick*=results]'))">Results</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 6. VOTE NOW (VOTING PAGE) -->
+    <div class="page" id="page-vote-now">
+      <div style="max-width:600px;margin:0 auto;">
+        <div class="page-header">
+          <div class="page-eyebrow">Secure Voting</div>
+          <div class="page-title">Cast Your Vote</div>
+          <div class="page-subtitle">National Student Union Presidential Election 2025</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:5px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:20px;padding:4px 12px;font-size:10px;font-weight:600;color:#166534;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>AES-256 Encrypted</div>
+          <div style="display:flex;align-items:center;gap:5px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:20px;padding:4px 12px;font-size:10px;font-weight:600;color:#166534;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Anonymous Vote</div>
+          <div style="display:flex;align-items:center;gap:5px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:20px;padding:4px 12px;font-size:10px;font-weight:600;color:#166534;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Tamper-Proof</div>
+        </div>
+        <!-- Step 1: Verify ID -->
+        <div id="vStep1">
+          <div class="card-elevated" style="margin-bottom:16px;">
+            <div class="card-body">
+              <div style="text-align:center;margin-bottom:20px;">
+                <div style="font-size:36px;margin-bottom:8px;">🔑</div>
+                <div style="font-size:16px;font-weight:700;">Verify Your Identity</div>
+                <div style="font-size:12px;color:var(--subtle);margin-top:4px;">Enter your Secret Voter ID to access the ballot</div>
+              </div>
+              <div class="form-group"><label class="form-label">Secret Voter ID</label><input class="form-input" id="sidInput" placeholder="VS-XXXX-XXXX-XXXX" style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:16px;letter-spacing:3px;"/></div>
+              <button class="btn btn-success" style="width:100%;justify-content:center;padding:12px;" onclick="verifyVote()">Verify & Continue →</button>
+            </div>
+          </div>
+          <div class="a-warning alert"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Your vote is anonymous. Once submitted it cannot be changed.</div>
+        </div>
+        <!-- Step 2: Select Candidate -->
+        <div id="vStep2" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:10px 14px;margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:700;color:#166534;">✓ Identity Verified — VS-8821-WXYZ-4492</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;color:#EF4444;" id="vTimer">08:24:11</div>
+          </div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;">Select your candidate:</div>
+          <div style="display:flex;flex-direction:column;gap:10px;" id="candidateList">
+            <div class="vote-cand" onclick="selectCand(this,'amara')" data-cand="amara"><div style="display:flex;align-items:center;gap:14px;"><div style="font-size:32px;">👩🏾‍💼</div><div style="flex:1;"><div style="font-size:14px;font-weight:700;">Dr. Amara Osei-Bonsu</div><div style="font-size:11px;color:var(--subtle);">Progressive Alliance</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Education reform, digital infrastructure, student welfare.</div></div><div class="vc-radio"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;" class="check-icon"><polyline points="20 6 9 17 4 12"/></svg></div></div></div>
+            <div class="vote-cand" onclick="selectCand(this,'james')" data-cand="james"><div style="display:flex;align-items:center;gap:14px;"><div style="font-size:32px;">👨🏼‍💼</div><div style="flex:1;"><div style="font-size:14px;font-weight:700;">Prof. James Whitfield</div><div style="font-size:11px;color:var(--subtle);">Reform Coalition</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Economic stability, research funding, campus development.</div></div><div class="vc-radio"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;" class="check-icon"><polyline points="20 6 9 17 4 12"/></svg></div></div></div>
+            <div class="vote-cand" onclick="selectCand(this,'priya')" data-cand="priya"><div style="display:flex;align-items:center;gap:14px;"><div style="font-size:32px;">👩🏽‍💼</div><div style="flex:1;"><div style="font-size:14px;font-weight:700;">Eng. Priya Sharma</div><div style="font-size:11px;color:var(--subtle);">Innovation Party</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Tech modernisation, renewable energy, student startups.</div></div><div class="vc-radio"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;" class="check-icon"><polyline points="20 6 9 17 4 12"/></svg></div></div></div>
+            <div class="vote-cand" onclick="selectCand(this,'marcus')" data-cand="marcus"><div style="display:flex;align-items:center;gap:14px;"><div style="font-size:32px;">👨🏿‍💼</div><div style="flex:1;"><div style="font-size:14px;font-weight:700;">Dr. Marcus Cole</div><div style="font-size:11px;color:var(--subtle);">Independent</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Transparency, anti-corruption, grassroots leadership.</div></div><div class="vc-radio"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;" class="check-icon"><polyline points="20 6 9 17 4 12"/></svg></div></div></div>
+          </div>
+          <button class="btn btn-success" id="voteSubmitBtn" style="width:100%;justify-content:center;padding:13px;margin-top:16px;display:none;" onclick="openModal('voteConfirmModal')">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Submit My Vote
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. VOTE SUCCESS -->
+    <div class="page" id="page-vote-success">
+      <div class="success-scene">
+        <div class="success-icon-wrap">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:8px;">Vote Recorded! 🎉</div>
+        <div style="font-size:14px;color:var(--subtle);line-height:1.7;max-width:440px;margin-bottom:24px;">Your vote has been anonymously encrypted and permanently recorded on the blockchain. Thank you for participating in democracy.</div>
+        <div style="background:#0F2347;border:1px solid rgba(6,182,212,0.25);border-radius:12px;padding:14px 20px;margin-bottom:24px;text-align:center;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Transaction Hash</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--cyan);letter-spacing:1px;">0x8f3a1b92c4d...e7f2a3b4</div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button class="btn btn-primary" onclick="nav('results',document.querySelector('[onclick*=results]'))">View Live Results →</button>
+          <button class="btn btn-ghost" onclick="nav('home',document.querySelector('[onclick*=home]'))">Back to Dashboard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. RESULTS -->
+    <div class="page" id="page-results">
+      <div class="page-header"><div class="page-eyebrow">Analytics</div><div class="page-title">Election Results</div><div class="page-subtitle">Live results — National Student Union Presidential Election E001</div></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><span class="stat-delta du">Live</span></div><div class="stat-num">28,140</div><div class="stat-label">Total Votes</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><span class="stat-delta du">+4%</span></div><div class="stat-num">62%</div><div class="stat-label">Turnout</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#FEF9C3;color:#CA8A04;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div><div class="stat-num">08:24</div><div class="stat-label">Time Remaining</div></div>
+        <div class="stat-card"><div class="stat-icon-row"><div class="stat-icon" style="background:#F5F3FF;color:#6C3FC5;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div></div><div class="stat-num">45,230</div><div class="stat-label">Registered</div></div>
+      </div>
+      <!-- Winner -->
+      <div style="background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:2px solid #F59E0B;border-radius:16px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden;">
+        <div style="position:absolute;right:-10px;top:-10px;font-size:72px;opacity:0.1;">🏆</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#92400E;margin-bottom:8px;">🏆 Current Leader</div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <div style="font-size:40px;">👩🏾‍💼</div>
+          <div style="flex:1;"><div style="font-size:20px;font-weight:800;color:#78350F;">Dr. Amara Osei-Bonsu</div><div style="font-size:13px;color:#92400E;">Progressive Alliance · 11,240 votes</div></div>
+          <div style="text-align:center;"><div style="font-size:38px;font-weight:900;color:#78350F;font-family:'IBM Plex Mono',monospace;line-height:1;">40%</div><div style="font-size:11px;color:#92400E;">of votes</div></div>
+        </div>
+      </div>
+      <div class="grid-7-3">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Full Results</div><span class="badge b-live"><span class="b-dot"></span>Live</span></div>
+          <div class="card-body">
+            <div class="mini-chart" style="height:80px;margin-bottom:16px;">
+              <div class="chart-col"><div style="font-size:9px;color:var(--subtle);margin-bottom:3px;">40%</div><div class="chart-bar" style="height:100%;background:#1B3A6B;border-radius:5px 5px 0 0;"></div><div class="chart-label">Amara</div></div>
+              <div class="chart-col"><div style="font-size:9px;color:var(--subtle);margin-bottom:3px;">35%</div><div class="chart-bar" style="height:87%;background:#6C3FC5;border-radius:5px 5px 0 0;"></div><div class="chart-label">James</div></div>
+              <div class="chart-col"><div style="font-size:9px;color:var(--subtle);margin-bottom:3px;">16%</div><div class="chart-bar" style="height:40%;background:#06B6D4;border-radius:5px 5px 0 0;"></div><div class="chart-label">Priya</div></div>
+              <div class="chart-col"><div style="font-size:9px;color:var(--subtle);margin-bottom:3px;">9%</div><div class="chart-bar" style="height:22%;background:#10B981;border-radius:5px 5px 0 0;"></div><div class="chart-label">Marcus</div></div>
+            </div>
+            <div class="result-row"><div class="result-meta"><div class="result-name"><span style="font-size:16px;">👩🏾‍💼</span>Dr. Amara Osei-Bonsu</div><div class="result-pct" style="color:#1B3A6B;">40%</div></div><div class="result-bar"><div class="result-fill" style="width:40%;background:linear-gradient(90deg,#1B3A6B,#2451A3);"></div></div><div class="result-votes">11,240 votes</div></div>
+            <div class="result-row"><div class="result-meta"><div class="result-name"><span style="font-size:16px;">👨🏼‍💼</span>Prof. James Whitfield</div><div class="result-pct" style="color:#6C3FC5;">35%</div></div><div class="result-bar"><div class="result-fill" style="width:35%;background:linear-gradient(90deg,#6C3FC5,#7C3AED);"></div></div><div class="result-votes">9,820 votes</div></div>
+            <div class="result-row"><div class="result-meta"><div class="result-name"><span style="font-size:16px;">👩🏽‍💼</span>Eng. Priya Sharma</div><div class="result-pct" style="color:#06B6D4;">16%</div></div><div class="result-bar"><div class="result-fill" style="width:16%;background:linear-gradient(90deg,#06B6D4,#0891B2);"></div></div><div class="result-votes">4,480 votes</div></div>
+            <div class="result-row"><div class="result-meta"><div class="result-name"><span style="font-size:16px;">👨🏿‍💼</span>Dr. Marcus Cole</div><div class="result-pct" style="color:#10B981;">9%</div></div><div class="result-bar"><div class="result-fill" style="width:9%;background:linear-gradient(90deg,#10B981,#059669);"></div></div><div class="result-votes">2,600 votes</div></div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Turnout Stats</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;"><span style="color:var(--muted);">Voted</span><span style="font-weight:700;color:#10B981;">28,140</span></div><div class="progress-wrap"><div class="progress-fill" style="width:62%;background:#10B981;"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;"><span style="color:var(--muted);">Pending</span><span style="font-weight:700;color:#F59E0B;">17,090</span></div><div class="progress-wrap"><div class="progress-fill" style="width:38%;background:#F59E0B;"></div></div></div>
+              <div style="margin-top:8px;padding-top:10px;border-top:1px solid var(--border);">
+                <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Your Vote Status</div>
+                <div class="a-success alert" style="margin-bottom:0;padding:8px 12px;"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Your vote in E002 is recorded</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. NOTIFICATIONS -->
+    <div class="page" id="page-notifications">
+      <div class="page-header"><div class="page-eyebrow">Alerts</div><div class="page-title">Notifications</div><div class="page-subtitle">Election reminders, ID delivery and voting alerts</div></div>
+      <div class="tabs"><button class="tab-btn active" onclick="switchTab(this)">All <span style="background:#DBEAFE;color:#2563EB;font-size:9px;padding:1px 6px;border-radius:10px;margin-left:3px;">3</span></button><button class="tab-btn" onclick="switchTab(this)">Reminders</button><button class="tab-btn" onclick="switchTab(this)">Secret IDs</button><button class="tab-btn" onclick="switchTab(this)">Alerts</button></div>
+      <div class="card-elevated">
+        <div class="card-body" style="padding:8px 16px;">
+          <div class="notif-item"><div class="notif-unread"></div><div class="notif-icon" style="background:#FEE2E2;color:#EF4444;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div style="flex:1;"><div class="notif-title">⚠ Vote Now — Election Ends in 8 Hours</div><div class="notif-sub">National Student Union Election E001 closes at 6pm today. You haven't voted yet!</div></div><span class="notif-time">1h ago</span></div>
+          <div class="notif-item"><div class="notif-unread"></div><div class="notif-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5"/></svg></div><div style="flex:1;"><div class="notif-title">Your Secret ID for E001 has been delivered</div><div class="notif-sub">VS-8821-WXYZ-4492 sent to alex@student.edu. Use it to cast your vote.</div></div><span class="notif-time">Yesterday</span></div>
+          <div class="notif-item"><div class="notif-unread"></div><div class="notif-icon" style="background:#DCFCE7;color:#16A34A;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div><div style="flex:1;"><div class="notif-title">Vote confirmed in E002</div><div class="notif-sub">Your anonymous vote in Municipal Council Election has been encrypted and recorded.</div></div><span class="notif-time">2 days ago</span></div>
+          <div class="notif-item"><div class="notif-icon" style="background:#EFF4FF;color:#2451A3;"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div style="flex:1;"><div class="notif-title">Results now available for E004</div><div class="notif-sub">Regional Committee Election results are now public. Dr. Ngozi Adeyemi won with 61%.</div></div><span class="notif-time">3 days ago</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. PROFILE -->
+    <div class="page" id="page-profile">
+      <div class="page-header"><div class="page-eyebrow">Account</div><div class="page-title">My Profile</div><div class="page-subtitle">Manage your voter account and history</div></div>
+      <div class="grid-2">
+        <div class="card-elevated">
+          <div class="card-body" style="text-align:center;padding:28px;">
+            <div style="width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;margin:0 auto 14px;">AJ</div>
+            <div style="font-size:18px;font-weight:800;">Alex Johnson</div>
+            <div style="font-size:12px;color:var(--subtle);margin-top:3px;">alex@student.edu</div>
+            <div style="margin-top:10px;display:flex;justify-content:center;gap:8px;"><span class="badge b-active">Verified Voter</span></div>
+            <div class="sid-box" style="margin:14px auto 0;display:inline-flex;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>VOT-8821</div>
+            <div style="margin-top:16px;display:flex;gap:20px;justify-content:center;text-align:center;padding-top:14px;border-top:1px solid var(--border);">
+              <div><div style="font-size:20px;font-weight:800;">3</div><div style="font-size:11px;color:var(--subtle);">Elections</div></div>
+              <div style="width:1px;background:var(--border);"></div>
+              <div><div style="font-size:20px;font-weight:800;">2</div><div style="font-size:11px;color:var(--subtle);">Votes Cast</div></div>
+              <div style="width:1px;background:var(--border);"></div>
+              <div><div style="font-size:20px;font-weight:800;">100%</div><div style="font-size:11px;color:var(--subtle);">Participation</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card-elevated">
+            <div class="card-header"><div class="card-title">Edit Profile</div></div>
+            <div class="card-body">
+              <div class="form-row"><div class="form-group"><label class="form-label">First Name</label><input class="form-input" value="Alex"/></div><div class="form-group"><label class="form-label">Last Name</label><input class="form-input" value="Johnson"/></div></div>
+              <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" value="alex@student.edu"/></div>
+              <div class="form-group"><label class="form-label">Phone</label><input class="form-input" placeholder="+1 (555) 000-0000"/></div>
+              <button class="btn btn-success">Save Changes</button>
+            </div>
+          </div>
+          <div class="card-elevated">
+            <div class="card-header"><div class="card-title">Change Password</div></div>
+            <div class="card-body">
+              <div class="form-group"><label class="form-label">Current Password</label><input class="form-input" type="password" placeholder="••••••••"/></div>
+              <div class="form-group"><label class="form-label">New Password</label><input class="form-input" type="password" placeholder="Min 8 characters"/></div>
+              <button class="btn btn-ghost">Update Password</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Voting History -->
+      <div class="card-elevated" style="margin-top:16px;">
+        <div class="card-header"><div class="card-title">Voting History</div></div>
+        <div class="table-wrap" style="border:none;border-radius:0;">
+          <table>
+            <thead><tr><th>Election</th><th>Voted On</th><th>Status</th><th>Tx Hash</th></tr></thead>
+            <tbody>
+              <tr><td style="font-size:12px;font-weight:600;">Municipal Council By-Election E002</td><td class="muted">Oct 15, 2025 at 14:32</td><td><span class="badge b-voted">✓ Recorded</span></td><td class="mono">0x8f3a1b...</td></tr>
+              <tr><td style="font-size:12px;font-weight:600;">Regional Committee Chairperson E004</td><td class="muted">Oct 8, 2025 at 11:20</td><td><span class="badge b-voted">✓ Recorded</span></td><td class="mono">0x3c9d2e...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="page-header"><div class="page-eyebrow">Configuration</div><div class="page-title">Settings</div><div class="page-subtitle">Notification and privacy preferences</div></div>
+      <div class="grid-2">
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Notification Settings</div></div>
+          <div class="card-body">
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Election reminders</div><div style="font-size:11px;color:var(--subtle);">Reminded 24h and 2h before deadlines</div></div></div>
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Secret ID delivery alerts</div><div style="font-size:11px;color:var(--subtle);">Notified when IDs are sent to you</div></div></div>
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Results announcements</div><div style="font-size:11px;color:var(--subtle);">When election results are published</div></div></div>
+            <div class="toggle-wrap"><div class="toggle" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Marketing emails</div><div style="font-size:11px;color:var(--subtle);">Platform updates and news</div></div></div>
+          </div>
+        </div>
+        <div class="card-elevated">
+          <div class="card-header"><div class="card-title">Privacy & Security</div></div>
+          <div class="card-body">
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Two-factor authentication</div><div style="font-size:11px;color:var(--subtle);">Extra security for your account</div></div></div>
+            <div class="toggle-wrap"><div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div><div><div class="toggle-label">Login activity alerts</div><div style="font-size:11px;color:var(--subtle);">Email when new device logs in</div></div></div>
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+              <button class="btn btn-ghost" style="width:100%;justify-content:center;color:#EF4444;border-color:#FECACA;margin-bottom:8px;">Delete Account</button>
+              <button class="btn btn-ghost" style="width:100%;justify-content:center;">Download My Data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<!-- VOTE CONFIRM MODAL -->
+<div class="modal-overlay" id="voteConfirmModal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Confirm Your Vote</div>
+      <button class="modal-close" onclick="closeModal('voteConfirmModal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="a-warning alert"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>This action is irreversible. You cannot change your vote after submission.</div>
+    <div style="background:#F8FAFC;border-radius:12px;padding:18px;text-align:center;margin-bottom:16px;border:1px solid var(--border);">
+      <div style="font-size:40px;margin-bottom:8px;" id="confirmEmoji">👩🏾‍💼</div>
+      <div style="font-size:16px;font-weight:800;" id="confirmName">Dr. Amara Osei-Bonsu</div>
+      <div style="font-size:12px;color:var(--subtle);margin-top:4px;" id="confirmParty">Progressive Alliance</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('voteConfirmModal')">← Change</button>
+      <button class="btn btn-success" onclick="submitVote()">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Confirm Vote
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const titles={home:'Voter Home','my-elections':'My Elections','election-details':'Election Details','join-election':'Join Election','joined-polls':'Joined Polls','vote-now':'Vote Now','vote-success':'Vote Confirmed','results':'Live Results','notifications':'Notifications','profile':'My Profile','settings':'Settings'};
+const subs={home:'Your democratic journey at a glance','my-elections':'All elections you have joined','election-details':'National Student Union Election E001','join-election':'Register to participate','joined-polls':'All your joined elections and status','vote-now':'Cast your secure anonymous vote','vote-success':'Your vote has been recorded','results':'Live vote counting and analytics','notifications':'Election reminders and alerts','profile':'Manage your account and history','settings':'Notification and privacy preferences'};
+function nav(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const t=document.getElementById('page-'+page);
+  if(t)t.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('topbarTitle').textContent=titles[page]||page;
+  document.getElementById('topbarSub').textContent=subs[page]||'';
+}
+function switchTab(btn){btn.closest('.tabs').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+
+// Voting flow
+let selectedCandidateData={name:'',party:'',emoji:''};
+function verifyVote(){
+  const val=document.getElementById('sidInput').value;
+  if(val.length>4){
+    document.getElementById('vStep1').style.display='none';
+    document.getElementById('vStep2').style.display='block';
+  }else{alert('Please enter a valid Secret Voter ID');}
+}
+const candData={amara:{name:'Dr. Amara Osei-Bonsu',party:'Progressive Alliance',emoji:'👩🏾‍💼'},james:{name:'Prof. James Whitfield',party:'Reform Coalition',emoji:'👨🏼‍💼'},priya:{name:'Eng. Priya Sharma',party:'Innovation Party',emoji:'👩🏽‍💼'},marcus:{name:'Dr. Marcus Cole',party:'Independent',emoji:'👨🏿‍💼'}};
+function selectCand(el,key){
+  document.querySelectorAll('.vote-cand').forEach(c=>{c.classList.remove('selected');c.querySelector('.vc-radio').style.background='transparent';c.querySelector('.check-icon').style.display='none';});
+  el.classList.add('selected');
+  el.querySelector('.vc-radio').style.background='var(--navy2)';
+  el.querySelector('.check-icon').style.display='block';
+  selectedCandidateData=candData[key];
+  document.getElementById('voteSubmitBtn').style.display='flex';
+  document.getElementById('confirmName').textContent=selectedCandidateData.name;
+  document.getElementById('confirmParty').textContent=selectedCandidateData.party;
+  document.getElementById('confirmEmoji').textContent=selectedCandidateData.emoji;
+}
+function submitVote(){
+  closeModal('voteConfirmModal');
+  const btn=document.querySelector('#vStep2 .btn-success');
+  btn.innerHTML='<div style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;"></div> Encrypting…';
+  const s=document.createElement('style');s.textContent='@keyframes spin{to{transform:rotate(360deg)}}';document.head.appendChild(s);
+  setTimeout(()=>{nav('vote-success',null);document.getElementById('vStep1').style.display='block';document.getElementById('vStep2').style.display='none';document.querySelectorAll('.vote-cand').forEach(c=>{c.classList.remove('selected');c.querySelector('.vc-radio').style.background='transparent';c.querySelector('.check-icon').style.display='none';});document.getElementById('voteSubmitBtn').style.display='none';document.getElementById('sidInput').value='';btn.innerHTML='<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Submit My Vote';},2000);
+}
+// Countdown
+let ch=8,cm=24,cs=11;
+setInterval(()=>{cs--;if(cs<0){cs=59;cm--;if(cm<0){cm=59;ch--;if(ch<0){ch=0;cm=0;cs=0;}}}['c1h','c1m','c1s'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=String([ch,cm,cs][i]).padStart(2,'0');});},1000);
+</script>
+</body>
+</html>

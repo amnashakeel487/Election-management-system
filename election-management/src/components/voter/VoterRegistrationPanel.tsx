@@ -212,7 +212,7 @@ export function VoterRegistrationPanel({
             )}
             {canCastVote && userRegistration?.secret_voter_id && !userRegistration.voted_at ? (
               <Link
-                to={`/elections/${election.id}/vote`}
+                to={`/voter/vote/${election.id}`}
                 className="mt-4 inline-block w-full rounded-xl bg-gradient-to-br from-[#1B3A6B] to-[#6C3FC5] py-2.5 text-center text-sm font-bold text-white no-underline"
               >
                 Cast secure ballot
@@ -321,7 +321,7 @@ export function VoterRegistrationPanel({
         ) : null}
 
         <Link
-          to="/voter/dashboard"
+          to="/voter/elections"
           className="vr-btn-secondary mt-3 inline-block text-center no-underline"
         >
           My registrations

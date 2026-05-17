@@ -127,7 +127,7 @@ function voterNav(registrations: number, live: number): NavItem[] {
       ),
     },
     {
-      to: '/voter/dashboard',
+      to: '/voter/elections',
       label: 'My Elections',
       badge: registrations > 0 ? String(registrations) : undefined,
       icon: (
@@ -140,7 +140,7 @@ function voterNav(registrations: number, live: number): NavItem[] {
     ...(live > 0
       ? [
           {
-            to: '/voter/dashboard',
+            to: '/voter/vote',
             label: 'Vote Now',
             badge: `${live} Live`,
             badgeVariant: 'live' as const,
