@@ -129,19 +129,20 @@
 
 .creator-candidates-page .ccm-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 22px;
 }
 
 .creator-candidates-page .ccm-card {
   background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 18px;
+  border: 1px solid #e8edf4;
+  border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: transform 0.28s, box-shadow 0.28s;
   position: relative;
+  box-shadow: 0 4px 20px rgba(15, 35, 71, 0.06);
 }
 
 .creator-candidates-page .ccm-card::before {
@@ -150,74 +151,108 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 5px;
   background: var(--ccm-accent, #2451a3);
+  border-radius: 16px 16px 0 0;
 }
 
 .creator-candidates-page .ccm-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 40px rgba(15, 35, 71, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(15, 35, 71, 0.1);
 }
 
 .creator-candidates-page .ccm-card-body {
-  padding: 22px 20px 18px;
+  padding: 20px 20px 16px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
 }
 
-.creator-candidates-page .ccm-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
-  object-fit: cover;
-  margin-bottom: 14px;
-  border: 2px solid #f1f5f9;
-  background: #f8fafc;
-}
-
-.creator-candidates-page .ccm-avatar-fallback {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
+.creator-candidates-page .ccm-avatar-wrap {
+  width: 88px;
+  height: 88px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  margin-bottom: 14px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.creator-candidates-page .ccm-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+}
+
+.creator-candidates-page .ccm-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
   font-weight: 800;
   color: #fff;
-  margin-bottom: 14px;
+}
+
+.creator-candidates-page .ccm-card-identity {
+  width: 100%;
+  margin-bottom: 16px;
 }
 
 .creator-candidates-page .ccm-name {
-  font-size: 16px;
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0 0 4px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 17px;
   font-weight: 800;
   color: #0f172a;
-  letter-spacing: -0.2px;
-  margin-bottom: 4px;
+  letter-spacing: -0.3px;
   line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.creator-candidates-page .ccm-name:hover {
+  color: var(--ccm-accent, #2451a3);
 }
 
 .creator-candidates-page .ccm-party {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   color: #94a3b8;
+  margin: 0;
+}
+
+.creator-candidates-page .ccm-stats {
+  width: 100%;
   margin-bottom: 14px;
 }
 
 .creator-candidates-page .ccm-votes {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 800;
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
   color: var(--ccm-accent, #2451a3);
   letter-spacing: -0.5px;
   margin-bottom: 10px;
+  line-height: 1;
 }
 
 .creator-candidates-page .ccm-votes-label {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   color: #94a3b8;
   font-family: Sora, system-ui, sans-serif;
@@ -225,11 +260,11 @@
 
 .creator-candidates-page .ccm-bar-track {
   width: 100%;
-  height: 8px;
-  background: #f0f4f9;
+  height: 10px;
+  background: #eef2f7;
   border-radius: 99px;
   overflow: hidden;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .creator-candidates-page .ccm-bar-fill {
@@ -237,26 +272,23 @@
   border-radius: 99px;
   background: var(--ccm-bar, linear-gradient(90deg, #2451a3, #1b3a6b));
   transition: width 0.6s ease;
+  min-width: 0;
 }
 
 .creator-candidates-page .ccm-pct {
-  font-size: 11px;
-  font-weight: 700;
-  color: #64748b;
-  margin-bottom: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #94a3b8;
+  margin: 0;
 }
 
 .creator-candidates-page .ccm-bio {
-  font-size: 12px;
+  font-size: 13px;
   color: #64748b;
-  line-height: 1.65;
+  line-height: 1.6;
   text-align: left;
   width: 100%;
-  padding: 12px 14px;
-  background: #f8fafc;
-  border-radius: 10px;
-  border-left: 3px solid #e2e8f0;
-  margin-bottom: 0;
+  margin: 0;
   flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -266,33 +298,48 @@
 
 .creator-candidates-page .ccm-card-footer {
   display: flex;
-  gap: 8px;
-  padding: 0 16px 16px;
+  gap: 10px;
+  padding: 0 20px 18px;
   margin-top: auto;
+  align-items: center;
 }
 
 .creator-candidates-page .ccm-edit-btn {
-  flex: 1;
-  padding: 9px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
   border-radius: 10px;
   border: 1.5px solid #e2e8f0;
   background: #fff;
   font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   color: #475569;
   cursor: pointer;
   transition: all 0.2s;
 }
 
+.creator-candidates-page .ccm-edit-btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
 .creator-candidates-page .ccm-edit-btn:hover {
-  border-color: #2451a3;
-  color: #2451a3;
+  border-color: #cbd5e1;
+  color: #0f172a;
+  background: #f8fafc;
 }
 
 .creator-candidates-page .ccm-del-btn {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 10px;
   border: none;
   background: #ef4444;
@@ -485,24 +532,6 @@
   background: rgba(16, 185, 129, 0.08);
   border: 1px solid rgba(16, 185, 129, 0.2);
   color: #047857;
-}
-
-.creator-candidates-page .ccm-card-footer .ccm-view-btn {
-  flex: 1;
-  padding: 9px 14px;
-  border-radius: 10px;
-  border: 1.5px solid #e2e8f0;
-  background: #fff;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  color: #2451a3;
-  cursor: pointer;
-}
-
-.creator-candidates-page .ccm-card-footer .ccm-view-btn:hover {
-  border-color: #2451a3;
-  background: rgba(36, 81, 163, 0.04);
 }
 
 .creator-candidates-page .ccm-list-wrap {

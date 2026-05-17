@@ -21,10 +21,10 @@ import { formatElectionCode } from '@/utils/electionTime'
 type EditorOpen = { mode: 'add' } | { mode: 'edit'; candidate: Candidate }
 
 const CARD_THEMES = [
-  { accent: '#2451a3', bar: 'linear-gradient(90deg,#2451A3,#1B3A6B)' },
-  { accent: '#6c3fc5', bar: 'linear-gradient(90deg,#6C3FC5,#9333ea)' },
-  { accent: '#0891b2', bar: 'linear-gradient(90deg,#06B6D4,#0891b2)' },
-  { accent: '#059669', bar: 'linear-gradient(90deg,#10B981,#059669)' },
+  { accent: '#2451a3', bar: 'linear-gradient(90deg,#2451A3,#1B3A6B)', soft: 'rgba(36, 81, 163, 0.1)' },
+  { accent: '#6c3fc5', bar: 'linear-gradient(90deg,#6C3FC5,#9333ea)', soft: 'rgba(108, 63, 197, 0.1)' },
+  { accent: '#0891b2', bar: 'linear-gradient(90deg,#06B6D4,#0891b2)', soft: 'rgba(8, 145, 178, 0.1)' },
+  { accent: '#059669', bar: 'linear-gradient(90deg,#10B981,#059669)', soft: 'rgba(5, 150, 105, 0.1)' },
 ] as const
 
 function electionTabLabel(ev: Election, index: number): string {
@@ -507,52 +507,62 @@ export function CandidateManager({
                           {
                             '--ccm-accent': theme.accent,
                             '--ccm-bar': theme.bar,
+                            '--ccm-soft': theme.soft,
                           } as CSSProperties
                         }
                       >
                         <div className="ccm-card-body">
-                          {hasPhoto ? (
-                            <img src={photo} alt="" className="ccm-avatar" />
-                          ) : (
-                            <div
-                              className="ccm-avatar-fallback"
-                              style={{ background: avatarGradient(candidate.name) }}
+                          <div className="ccm-avatar-wrap" style={{ background: theme.soft }}>
+                            {hasPhoto ? (
+                              <img src={photo} alt="" className="ccm-avatar" />
+                            ) : (
+                              <div
+                                className="ccm-avatar-fallback"
+                                style={{ background: avatarGradient(candidate.name) }}
+                              >
+                                {candidateInitial(candidate.name)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="ccm-card-identity">
+                            <button
+                              type="button"
+                              className="ccm-name"
+                              onClick={() => setViewCandidate(candidate)}
                             >
-                              {candidateInitial(candidate.name)}
-                            </div>
-                          )}
-                          <h3 className="ccm-name">{candidate.name}</h3>
-                          <p className="ccm-party">{candidate.designation?.trim() || 'Candidate'}</p>
+                              {candidate.name}
+                            </button>
+                            <p className="ccm-party">{candidate.designation?.trim() || 'Candidate'}</p>
+                          </div>
 
-                          {totalVotes > 0 ? (
-                            <>
-                              <div className="ccm-votes">
-                                {votes.toLocaleString()}
-                                <span className="ccm-votes-label"> votes</span>
-                              </div>
-                              <div className="ccm-bar-track">
-                                <div className="ccm-bar-fill" style={{ width: `${Math.min(100, pct)}%` }} />
-                              </div>
-                              <p className="ccm-pct">{pct}% of total</p>
-                            </>
-                          ) : (
-                            <p className="ccm-pct" style={{ marginBottom: 14 }}>
-                              {electionDetail.status === 'draft'
-                                ? 'Votes appear after publishing'
-                                : 'No votes cast yet'}
+                          <div className="ccm-stats">
+                            <div className="ccm-votes">
+                              {votes.toLocaleString()}
+                              <span className="ccm-votes-label"> votes</span>
+                            </div>
+                            <div className="ccm-bar-track">
+                              <div className="ccm-bar-fill" style={{ width: `${Math.min(100, pct)}%` }} />
+                            </div>
+                            <p className="ccm-pct">
+                              {totalVotes > 0
+                                ? `${pct}% of total`
+                                : electionDetail.status === 'draft'
+                                  ? 'Votes appear after publishing'
+                                  : '0% of total'}
                             </p>
-                          )}
+                          </div>
 
                           <p className="ccm-bio">{clampBio(candidate.description ?? '')}</p>
                         </div>
 
                         <footer className="ccm-card-footer">
-                          <button type="button" className="ccm-view-btn" onClick={() => setViewCandidate(candidate)}>
-                            View
-                          </button>
                           {canManageCandidates ? (
                             <>
                               <button type="button" className="ccm-edit-btn" onClick={() => openEdit(candidate)}>
+                                <svg viewBox="0 0 24 24" aria-hidden>
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>
                                 Edit
                               </button>
                               <button
@@ -567,7 +577,11 @@ export function CandidateManager({
                                 </svg>
                               </button>
                             </>
-                          ) : null}
+                          ) : (
+                            <button type="button" className="ccm-edit-btn" onClick={() => setViewCandidate(candidate)}>
+                              View details
+                            </button>
+                          )}
                         </footer>
                       </article>
                     )
