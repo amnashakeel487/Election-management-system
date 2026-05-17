@@ -1,26 +1,27 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
-import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader'
-import { CREATOR_PAGE_META } from '@/config/creatorNav'
-import { ElectionQrInvitePanel } from '@/components/election/ElectionQrInvitePanel'
-import { VoterRollLockPanel } from '@/components/election/VoterRollLockPanel'
-import { ElectionWaitlistPanel } from '@/components/waitlist/ElectionWaitlistPanel'
+import '@/styles/creator-election-detail.css'
+import { CreatorElectionDetailView } from '@/components/creator/election-detail/CreatorElectionDetailView'
+import { useCreatorElection } from '@/context/CreatorElectionContext'
 import { useAuth } from '@/hooks/useAuth'
+import { fetchFilteredAuditLogs } from '@/services/auditService'
 import { fetchElectionById } from '@/services/electionService'
+import { fetchElectionResults } from '@/services/resultsService'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
 import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
+import type { AuditLogEntry } from '@/types/auth'
 import type { ElectionWithCandidates } from '@/types/election'
+import type { ElectionResultsPayload } from '@/types/electionResults'
 import type { ElectionRegistrationStats } from '@/types/voterRegistration'
-import { electionDisplayStatus, statusBadgeClass } from '@/utils/dashboardDisplay'
-import { formatElectionCode, formatTimeRemaining } from '@/utils/electionTime'
-import { getElectionJoinUrl } from '@/utils/electionInvite'
-import { formatSubmissionDate } from '@/utils/formatDate'
 
 export function CreatorElectionDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { profile } = useAuth()
+  const { setSelectedId } = useCreatorElection()
   const [election, setElection] = useState<ElectionWithCandidates | null>(null)
   const [stats, setStats] = useState<ElectionRegistrationStats | null>(null)
+  const [results, setResults] = useState<ElectionResultsPayload | null>(null)
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [finalizingId, setFinalizingId] = useState<string | null>(null)
@@ -43,17 +44,33 @@ export function CreatorElectionDetailPage() {
         return
       }
       setElection(data)
+      setSelectedId(data.id)
+
       if (data.status !== 'draft') {
-        setStats(await fetchElectionRegistrationStats(id))
+        const [regStats, auditPage] = await Promise.all([
+          fetchElectionRegistrationStats(id),
+          fetchFilteredAuditLogs({ limit: 80, offset: 0 }),
+        ])
+        setStats(regStats)
+        setAuditLogs(auditPage.logs)
+
+        try {
+          const res = await fetchElectionResults(id)
+          setResults(res)
+        } catch {
+          setResults(null)
+        }
       } else {
         setStats(null)
+        setResults(null)
+        setAuditLogs([])
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load election')
     } finally {
       setLoading(false)
     }
-  }, [id, profile?.id, profile?.role])
+  }, [id, profile?.id, profile?.role, setSelectedId])
 
   useEffect(() => {
     void load()
@@ -78,133 +95,39 @@ export function CreatorElectionDetailPage() {
     return <Navigate to="/creator/dashboard" replace />
   }
 
-  const phase = election
-    ? electionDisplayStatus(election.status, election.start_date, election.end_date)
-    : null
-  const showInvite = election && election.status !== 'draft'
-  const showRoll =
-    election &&
-    (election.status === 'published' || election.status === 'active' || election.voter_roll_finalized_at)
+  if (loading) {
+    return (
+      <div className="creator-election-detail">
+        <p style={{ padding: 24, fontSize: 14, color: 'var(--ced-muted)' }}>Loading election details…</p>
+      </div>
+    )
+  }
 
-  const detailMeta = CREATOR_PAGE_META['election-detail']
-
-  return (
-    <>
-      <CreatorPageHeader
-        title={election?.title ?? detailMeta.title}
-        subtitle={
-          election
-            ? `${formatElectionCode(election.id)} · ${phase ?? election.status}`
-            : detailMeta.topSub
-        }
-        actions={
-          <Link to="/creator/elections" className="btn btn-sm btn-ghost">
-            All elections
-          </Link>
-        }
-      />
-      {loading ? (
-        <p className="vs-empty">Loading election details…</p>
-      ) : error ? (
-        <div className="vs-panel">
-          <div className="vs-panel-body">
-            <p style={{ color: 'var(--vs-danger, #dc2626)' }}>{error}</p>
-            <Link to="/creator/dashboard" className="vs-panel-action" style={{ display: 'inline-block', marginTop: 12 }}>
-              Return to dashboard
+  if (error || !election) {
+    return (
+      <div className="creator-election-detail">
+        <div className="panel">
+          <div className="panel-body">
+            <p style={{ color: 'var(--ced-danger)' }}>{error ?? 'Election not found'}</p>
+            <Link to="/creator/elections" className="p-btn primary" style={{ marginTop: 12, display: 'inline-flex' }}>
+              Back to elections
             </Link>
           </div>
         </div>
-      ) : election ? (
-        <div className="space-y-6" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div className="vs-panel">
-            <div className="vs-panel-head">
-              <div>
-                <div className="vs-panel-title">{election.title}</div>
-                <div className="vs-panel-sub">{election.description?.trim() || 'No description'}</div>
-              </div>
-              {phase ? (
-                <span className={`vs-t-badge ${statusBadgeClass(phase)}`}>{phase}</span>
-              ) : null}
-            </div>
-            <div className="vs-panel-body">
-              <div className="vs-quick-strip">
-                <div className="vs-quick-stat">
-                  <div className="vs-quick-num">{formatSubmissionDate(election.start_date)}</div>
-                  <div className="vs-quick-lbl">Voting starts</div>
-                </div>
-                <div className="vs-quick-stat">
-                  <div className="vs-quick-num">{formatTimeRemaining(election.end_date)}</div>
-                  <div className="vs-quick-lbl">Time left</div>
-                </div>
-                {stats ? (
-                  <div className="vs-quick-stat">
-                    <div className="vs-quick-num">{stats.registered_count}</div>
-                    <div className="vs-quick-lbl">Registered</div>
-                  </div>
-                ) : null}
-              </div>
-              <div className="vs-t-actions" style={{ marginTop: 16, flexWrap: 'wrap' }}>
-                {election.status === 'draft' ? (
-                  <Link to={`/creator/elections/${election.id}/edit`} className="vs-t-btn vs-t-btn--primary">
-                    Continue wizard
-                  </Link>
-                ) : null}
-                <Link to={`/elections/${election.id}`} className="vs-t-btn" target="_blank" rel="noreferrer">
-                  Public page
-                </Link>
-                {election.status !== 'draft' ? (
-                  <Link to={`/elections/${election.id}/results`} className="vs-t-btn">
-                    Results
-                  </Link>
-                ) : null}
-                {showInvite ? (
-                  <a href={getElectionJoinUrl(election.id)} className="vs-t-btn" target="_blank" rel="noreferrer">
-                    Open join link
-                  </a>
-                ) : null}
-              </div>
-              {finalizeMessage ? (
-                <p style={{ marginTop: 12, fontSize: 12, color: 'var(--vs-muted)' }}>{finalizeMessage}</p>
-              ) : null}
-            </div>
-          </div>
+      </div>
+    )
+  }
 
-          {showInvite ? (
-            <ElectionQrInvitePanel electionId={election.id} electionTitle={election.title} />
-          ) : (
-            <div className="vs-panel">
-              <div className="vs-panel-body">
-                <p style={{ fontSize: 13, color: 'var(--vs-muted)' }}>
-                  Publish this election to generate an invite link and QR code for voters.
-                </p>
-                <Link
-                  to={`/creator/elections/${election.id}/edit`}
-                  className="vs-panel-action"
-                  style={{ display: 'inline-block', marginTop: 12 }}
-                >
-                  Open creation wizard
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {showRoll ? (
-            <>
-              <ElectionWaitlistPanel
-                electionId={election.id}
-                voterRollFinalized={election.voter_roll_finalized_at}
-                onChanged={() => void load()}
-              />
-              <VoterRollLockPanel
-                election={election}
-                finalizingId={finalizingId}
-                onFinalize={() => void handleFinalize()}
-                onChanged={() => void load()}
-              />
-            </>
-          ) : null}
-        </div>
-      ) : null}
-    </>
+  return (
+    <CreatorElectionDetailView
+      election={election}
+      stats={stats}
+      results={results}
+      auditLogs={auditLogs}
+      finalizingId={finalizingId}
+      finalizeMessage={finalizeMessage}
+      onReload={() => void load()}
+      onFinalize={() => void handleFinalize()}
+    />
   )
 }

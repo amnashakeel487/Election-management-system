@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>VoteSecure — Election Detail</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0F2347;--navy2:#1B3A6B;--blue:#2451A3;--purple:#6C3FC5;
+  --cyan:#06B6D4;--success:#10B981;--danger:#EF4444;--warning:#F59E0B;
+  --text:#0F172A;--muted:#475569;--subtle:#94A3B8;--border:#E2E8F0;--bg:#F0F4F9;
+  --sidebar-w:252px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden;}
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════ */
+.sidebar{
+  width:var(--sidebar-w);min-height:100vh;
+  background:linear-gradient(180deg,#080f1e 0%,#0F2347 40%,#1a1040 100%);
+  display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;
+  border-right:1px solid rgba(255,255,255,0.06);
+}
+.sb-brand{padding:22px 20px 18px;display:flex;align-items:center;gap:11px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.sb-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2451A3,#6C3FC5);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(108,63,197,0.45);animation:iconGlow 3s ease-in-out infinite;flex-shrink:0;}
+@keyframes iconGlow{0%,100%{box-shadow:0 6px 20px rgba(108,63,197,0.45);}50%{box-shadow:0 6px 32px rgba(108,63,197,0.7);}}
+.sb-icon svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.sb-name{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;}
+.sb-tag{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.28);border-radius:20px;padding:2px 7px;display:block;}
+.sb-role{margin:16px 20px;background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:9px;}
+.sb-role-icon{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:livePulse 1.5s ease-in-out infinite;flex-shrink:0;}
+@keyframes livePulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.6);opacity:0.5;}}
+.sb-role-text{font-size:11px;font-weight:700;color:#67E8F9;letter-spacing:0.3px;}
+.sb-section{padding:8px 20px 4px;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.22);margin-top:8px;}
+.sb-nav{flex:1;padding:0 12px;overflow-y:auto;}
+.sb-nav::-webkit-scrollbar{width:3px;}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all 0.22s;margin-bottom:2px;position:relative;text-decoration:none;}
+.nav-item:hover{background:rgba(255,255,255,0.06);}
+.nav-item.active{background:linear-gradient(135deg,rgba(36,81,163,0.35),rgba(108,63,197,0.25));border:1px solid rgba(108,63,197,0.25);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,var(--cyan),var(--purple));}
+.nav-item svg{width:16px;height:16px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.nav-item span{font-size:13px;font-weight:500;flex:1;}
+.nav-item svg,.nav-item span{color:rgba(255,255,255,0.45);transition:color 0.22s;}
+.nav-item:hover svg,.nav-item:hover span,.nav-item.active svg,.nav-item.active span{color:#fff;}
+.nav-badge{font-size:9px;font-weight:700;background:var(--cyan);color:#0F172A;border-radius:20px;padding:2px 7px;font-family:'IBM Plex Mono',monospace;}
+.nav-badge.live{background:var(--success);color:#fff;}
+.sb-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.06);}
+.sb-user{display:flex;align-items:center;gap:10px;}
+.sb-avatar{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#0369a1,#06B6D4);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.sb-user-info{flex:1;min-width:0;}
+.sb-user-name{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-user-role{font-size:10px;color:rgba(255,255,255,0.35);}
+.sb-user-btn{width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+.sb-user-btn svg{width:13px;height:13px;stroke:rgba(255,255,255,0.4);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ═══════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════ */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 32px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.tb-back{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+.tb-back:hover{border-color:var(--blue);background:rgba(36,81,163,0.05);}
+.tb-back svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;}
+.breadcrumb-link{color:var(--subtle);cursor:pointer;transition:color 0.2s;}
+.breadcrumb-link:hover{color:var(--blue);}
+.breadcrumb-sep{color:var(--border);}
+.breadcrumb-current{color:var(--text);font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.tb-btn{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.22s;position:relative;}
+.tb-btn:hover{border-color:var(--blue);}
+.tb-btn svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tb-notif-dot{background:var(--danger);color:#fff;width:16px;height:16px;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;position:absolute;top:-4px;right:-4px;border:2px solid #fff;}
+
+/* ═══════════════════════════════════════
+   CONTENT WRAPPER
+═══════════════════════════════════════ */
+.content{padding:28px 32px 48px;flex:1;max-width:1400px;width:100%;}
+
+/* ═══════════════════════════════════════
+   1. ELECTION HEADER
+═══════════════════════════════════════ */
+.election-header{
+  background:linear-gradient(135deg,#080f1e 0%,#0F2347 50%,#2D1B69 100%);
+  border-radius:22px;padding:32px 36px;margin-bottom:24px;
+  position:relative;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.eh-grid-bg{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;
+}
+.eh-orb1{position:absolute;width:400px;height:400px;border-radius:50%;background:rgba(108,63,197,0.12);top:-150px;right:-100px;filter:blur(80px);pointer-events:none;}
+.eh-orb2{position:absolute;width:280px;height:280px;border-radius:50%;background:rgba(6,182,212,0.07);bottom:-80px;left:30%;filter:blur(60px);pointer-events:none;}
+.eh-inner{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.eh-left{}
+.eh-meta-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.eh-category{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);border-radius:20px;padding:3px 11px;}
+.eh-status{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;}
+.eh-status.active{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#34D399;}
+.eh-status.upcoming{background:rgba(36,81,163,0.2);border:1px solid rgba(36,81,163,0.4);color:#93C5FD;}
+.eh-status.draft{background:rgba(148,163,184,0.15);border:1px solid rgba(148,163,184,0.25);color:#94A3B8;}
+.eh-status.completed{background:rgba(108,63,197,0.2);border:1px solid rgba(108,63,197,0.35);color:#C4B5FD;}
+.eh-status.suspended{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#FCA5A5;}
+.eh-status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:livePulse 1.5s infinite;}
+.eh-title{font-size:clamp(22px,3vw,34px);font-weight:800;color:#fff;letter-spacing:-0.8px;margin-bottom:10px;line-height:1.2;}
+.eh-desc{font-size:14px;color:rgba(255,255,255,0.48);line-height:1.7;max-width:580px;margin-bottom:16px;}
+.eh-deadline{display:inline-flex;align-items:center;gap:7px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.22);border-radius:10px;padding:7px 14px;font-size:12px;font-weight:600;color:#FCD34D;}
+.eh-deadline svg{width:13px;height:13px;stroke:#F59E0B;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.eh-actions{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;}
+.btn-edit{padding:10px 20px;border-radius:11px;border:1.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85);font-family:'Sora',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:7px;backdrop-filter:blur(8px);}
+.btn-edit:hover{background:rgba(255,255,255,0.13);border-color:rgba(255,255,255,0.35);}
+.btn-edit svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.btn-publish{padding:10px 22px;border-radius:11px;border:none;background:linear-gradient(135deg,var(--navy2),var(--purple));color:#fff;font-family:'Sora',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;gap:7px;position:relative;overflow:hidden;}
+.btn-publish::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0),rgba(255,255,255,0.1));opacity:0;transition:opacity 0.3s;}
+.btn-publish:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(108,63,197,0.5);}
+.btn-publish:hover::after{opacity:1;}
+.btn-publish svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.btn-more{width:42px;height:42px;border-radius:11px;border:1.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7);cursor:pointer;transition:all 0.25s;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.btn-more:hover{background:rgba(255,255,255,0.13);}
+.btn-more svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* Election ID chip */
+.eh-id-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:8px;padding:5px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,0.35);margin-top:12px;}
+
+/* ═══════════════════════════════════════
+   2. QUICK STATS STRIP
+═══════════════════════════════════════ */
+.quick-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
+.qs-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;transition:all 0.3s;position:relative;overflow:hidden;cursor:default;}
+.qs-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 16px 16px;}
+.qs-card.blue::after{background:linear-gradient(90deg,var(--blue),var(--navy2));}
+.qs-card.purple::after{background:linear-gradient(90deg,var(--purple),#9333ea);}
+.qs-card.green::after{background:linear-gradient(90deg,var(--success),#059669);}
+.qs-card.orange::after{background:linear-gradient(90deg,var(--warning),#d97706);}
+.qs-card.cyan::after{background:linear-gradient(90deg,var(--cyan),#0891b2);}
+.qs-card:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,0.08);}
+.qs-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.qs-icon svg{width:17px;height:17px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.qs-icon.blue{background:rgba(36,81,163,0.1);}  .qs-icon.blue svg{stroke:var(--blue);}
+.qs-icon.purple{background:rgba(108,63,197,0.1);}  .qs-icon.purple svg{stroke:var(--purple);}
+.qs-icon.green{background:rgba(16,185,129,0.1);}  .qs-icon.green svg{stroke:var(--success);}
+.qs-icon.orange{background:rgba(245,158,11,0.1);}  .qs-icon.orange svg{stroke:var(--warning);}
+.qs-icon.cyan{background:rgba(6,182,212,0.1);}  .qs-icon.cyan svg{stroke:var(--cyan);}
+.qs-num{font-size:24px;font-weight:800;color:var(--text);font-family:'IBM Plex Mono',monospace;letter-spacing:-0.5px;line-height:1;}
+.qs-sub{font-size:10px;color:var(--subtle);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.qs-extra{font-size:11px;color:var(--success);font-weight:600;margin-top:6px;}
+.qs-extra.warn{color:var(--warning);}
+
+/* Countdown timer display */
+.qs-timer{font-size:20px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--warning);letter-spacing:-0.5px;line-height:1;}
+
+/* ═══════════════════════════════════════
+   SHARED PANEL
+═══════════════════════════════════════ */
+.panel{background:#fff;border-radius:18px;border:1px solid var(--border);overflow:hidden;margin-bottom:20px;}
+.panel-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.panel-head-left{}
+.panel-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.2px;}
+.panel-sub{font-size:11px;color:var(--subtle);margin-top:2px;}
+.panel-head-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.panel-body{padding:22px;}
+.p-btn{padding:7px 15px;border-radius:9px;border:1.5px solid var(--border);background:transparent;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.22s;display:flex;align-items:center;gap:6px;}
+.p-btn:hover{border-color:var(--blue);color:var(--blue);}
+.p-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.p-btn.primary{border-color:var(--blue);background:var(--blue);color:#fff;}
+.p-btn.primary:hover{background:var(--navy2);border-color:var(--navy2);}
+.p-btn.success{border-color:var(--success);background:rgba(16,185,129,0.06);color:var(--success);}
+.p-btn.danger{border-color:rgba(239,68,68,0.3);color:var(--danger);}
+.p-btn.danger:hover{background:rgba(239,68,68,0.06);}
+
+/* ═══════════════════════════════════════
+   3. ELECTION INFO GRID
+═══════════════════════════════════════ */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.info-item{padding:14px 0;border-bottom:1px solid var(--bg);display:flex;align-items:flex-start;gap:14px;}
+.info-item:nth-child(odd){padding-right:24px;border-right:1px solid var(--border);}
+.info-item:nth-child(even){padding-left:24px;}
+.info-item:nth-last-child(-n+2){border-bottom:none;}
+.info-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.info-icon svg{width:14px;height:14px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.info-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;color:var(--subtle);margin-bottom:3px;}
+.info-value{font-size:13px;font-weight:700;color:var(--text);}
+.info-value.mono{font-family:'IBM Plex Mono',monospace;}
+.visibility-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--success);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:20px;padding:3px 10px;}
+.visibility-badge svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ═══════════════════════════════════════
+   4. CANDIDATES SECTION
+═══════════════════════════════════════ */
+.candidates-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.candidate-card{border:1.5px solid var(--border);border-radius:16px;padding:20px;transition:all 0.3s;position:relative;overflow:hidden;background:#fff;}
+.candidate-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.candidate-card.c1::before{background:linear-gradient(90deg,#F59E0B,#d97706);}
+.candidate-card.c2::before{background:linear-gradient(90deg,var(--blue),var(--navy2));}
+.candidate-card.c3::before{background:linear-gradient(90deg,var(--purple),#9333ea);}
+.candidate-card.c4::before{background:linear-gradient(90deg,var(--success),#059669);}
+.candidate-card:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(0,0,0,0.09);border-color:rgba(36,81,163,0.22);}
+.candidate-photo{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;margin-bottom:14px;flex-shrink:0;}
+.candidate-rank-badge{position:absolute;top:18px;right:16px;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;font-family:'IBM Plex Mono',monospace;}
+.candidate-rank-badge.gold{background:#FEF3C7;color:#92400E;}
+.candidate-rank-badge.silver{background:#F1F5F9;color:#475569;}
+.candidate-rank-badge.bronze{background:#FEF3C7;color:#B45309;}
+.candidate-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px;letter-spacing:-0.2px;}
+.candidate-designation{font-size:11px;font-weight:600;color:var(--subtle);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
+.candidate-manifesto{font-size:12px;color:var(--muted);line-height:1.6;font-style:italic;padding:10px 12px;background:var(--bg);border-radius:10px;border-left:3px solid var(--border);margin-bottom:14px;}
+.candidate-vote-bar{margin-bottom:14px;}
+.cvb-header{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;}
+.cvb-label{color:var(--muted);font-weight:600;}
+.cvb-pct{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--text);}
+.cvb-bar{height:6px;background:var(--bg);border-radius:99px;overflow:hidden;}
+.cvb-fill{height:100%;border-radius:99px;}
+.candidate-footer{display:flex;gap:8px;}
+.c-btn{flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--border);background:transparent;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.22s;}
+.c-btn:hover{border-color:var(--blue);color:var(--blue);}
+.c-btn.del:hover{border-color:var(--danger);color:var(--danger);}
+
+/* ═══════════════════════════════════════
+   5. PARTICIPANTS SECTION
+═══════════════════════════════════════ */
+.participants-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.pstat{border-radius:12px;padding:16px;text-align:center;border:1.5px solid transparent;}
+.pstat.registered{background:rgba(36,81,163,0.05);border-color:rgba(36,81,163,0.15);}
+.pstat.approved{background:rgba(16,185,129,0.05);border-color:rgba(16,185,129,0.15);}
+.pstat.waitlisted{background:rgba(245,158,11,0.05);border-color:rgba(245,158,11,0.15);}
+.pstat.rejected{background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.12);}
+.pstat-num{font-size:26px;font-weight:800;font-family:'IBM Plex Mono',monospace;line-height:1;}
+.pstat.registered .pstat-num{color:var(--blue);}
+.pstat.approved .pstat-num{color:var(--success);}
+.pstat.waitlisted .pstat-num{color:var(--warning);}
+.pstat.rejected .pstat-num{color:var(--danger);}
+.pstat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--subtle);margin-top:4px;}
+
+/* Participant table */
+.p-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+table.p-table{width:100%;border-collapse:collapse;}
+table.p-table thead tr{background:var(--bg);border-bottom:1px solid var(--border);}
+table.p-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--subtle);padding:11px 14px;text-align:left;}
+table.p-table td{padding:13px 14px;font-size:13px;color:var(--text);border-bottom:1px solid var(--bg);}
+table.p-table tr:last-child td{border-bottom:none;}
+table.p-table tr:hover td{background:rgba(240,244,249,0.6);}
+.p-name-cell{display:flex;align-items:center;gap:10px;}
+.p-mini-avatar{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.p-name-text{font-weight:700;font-size:13px;}
+.p-email{font-size:11px;color:var(--subtle);}
+.p-status-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:0.3px;}
+.p-status-badge.approved{background:#DCFCE7;color:#16A34A;}
+.p-status-badge.waitlisted{background:#FEF3C7;color:#92400E;}
+.p-status-badge.pending{background:#DBEAFE;color:#1D4ED8;}
+.p-status-badge.rejected{background:#FEE2E2;color:#991B1B;}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--subtle);}
+.t-actions{display:flex;gap:6px;}
+.t-btn-sm{padding:4px 10px;border-radius:7px;border:1.5px solid var(--border);background:transparent;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.t-btn-sm:hover{border-color:var(--blue);color:var(--blue);}
+.t-btn-sm.danger:hover{border-color:var(--danger);color:var(--danger);}
+
+/* ═══════════════════════════════════════
+   6. REGISTRATION STATUS
+═══════════════════════════════════════ */
+.reg-status-inner{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;}
+.reg-progress-section{}
+.reg-progress-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+.reg-pct-big{font-size:36px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--text);letter-spacing:-1px;}
+.reg-count{font-size:13px;color:var(--subtle);}
+.reg-bar-track{height:16px;background:var(--bg);border-radius:99px;overflow:hidden;border:1px solid var(--border);}
+.reg-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--purple));position:relative;overflow:hidden;}
+.reg-bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);animation:shimmer 2s ease-in-out infinite;}
+@keyframes shimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
+.reg-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.reg-info-item{background:var(--bg);border-radius:10px;padding:12px 14px;border:1px solid var(--border);}
+.reg-info-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--subtle);margin-bottom:3px;}
+.reg-info-value{font-size:13px;font-weight:700;color:var(--text);}
+.reg-info-value.warn{color:var(--warning);}
+.reg-alert{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px;}
+.reg-alert svg{width:16px;height:16px;stroke:var(--warning);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:1px;}
+.reg-alert-text{font-size:12px;color:var(--muted);line-height:1.6;}
+.reg-alert-text strong{color:var(--text);}
+.reg-alert-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.reg-tag{font-size:10px;font-weight:700;padding:4px 11px;border-radius:20px;border:1px solid;}
+.reg-tag.active{border-color:rgba(16,185,129,0.25);color:var(--success);background:rgba(16,185,129,0.07);}
+.reg-tag.warn{border-color:rgba(245,158,11,0.25);color:var(--warning);background:rgba(245,158,11,0.07);}
+
+/* ═══════════════════════════════════════
+   7. QR INVITE MODULE
+═══════════════════════════════════════ */
+.qr-module{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+.qr-left{}
+.qr-link-box{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;margin-bottom:14px;transition:border-color 0.2s;}
+.qr-link-box:focus-within{border-color:var(--blue);}
+.qr-link-icon svg{width:15px;height:15px;stroke:var(--subtle);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.qr-link-text{flex:1;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.qr-link-btns{display:flex;gap:8px;margin-bottom:16px;}
+.qr-stat-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px;}
+.qr-stat{background:linear-gradient(135deg,rgba(36,81,163,0.04),rgba(108,63,197,0.04));border:1px solid rgba(108,63,197,0.12);border-radius:12px;padding:14px 16px;text-align:center;}
+.qr-stat-num{font-size:22px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--text);}
+.qr-stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--subtle);margin-top:3px;}
+.qr-right{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.qr-preview{
+  width:200px;height:200px;border-radius:16px;background:#fff;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,0.08);
+}
+/* Actual QR code drawn with SVG-like CSS grid */
+.qr-code-svg{width:164px;height:164px;}
+.qr-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.qr-logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#2451A3,#6C3FC5);display:flex;align-items:center;justify-content:center;border:3px solid #fff;}
+.qr-logo svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.qr-btns{display:flex;gap:8px;}
+
+/* ═══════════════════════════════════════
+   8. VOTING CONTROLS
+═══════════════════════════════════════ */
+.voting-controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.vc-buttons{display:flex;flex-direction:column;gap:10px;}
+.vc-btn{padding:14px 20px;border-radius:12px;border:none;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;}
+.vc-btn svg{width:17px;height:17px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.vc-btn.start{background:linear-gradient(135deg,var(--navy2),var(--purple));color:#fff;}
+.vc-btn.start:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(108,63,197,0.42);}
+.vc-btn.start svg{stroke:#fff;}
+.vc-btn.pause{background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.25);color:var(--warning);}
+.vc-btn.pause:hover{background:rgba(245,158,11,0.14);}
+.vc-btn.pause svg{stroke:var(--warning);}
+.vc-btn.end{background:rgba(239,68,68,0.06);border:1.5px solid rgba(239,68,68,0.2);color:var(--danger);}
+.vc-btn.end:hover{background:rgba(239,68,68,0.12);}
+.vc-btn.end svg{stroke:var(--danger);}
+.vc-btn.restart{background:rgba(6,182,212,0.07);border:1.5px solid rgba(6,182,212,0.2);color:var(--cyan);}
+.vc-btn.restart:hover{background:rgba(6,182,212,0.13);}
+.vc-btn.restart svg{stroke:var(--cyan);}
+.vc-btn.lock{background:var(--bg);border:1.5px solid var(--border);color:var(--muted);}
+.vc-btn.lock:hover{border-color:var(--blue);color:var(--blue);}
+.vc-btn.lock svg{stroke:currentColor;}
+.vc-status-panel{display:flex;flex-direction:column;gap:12px;}
+.vc-status-card{background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;}
+.vcs-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.vcs-label{font-size:13px;font-weight:700;color:var(--text);}
+.vcs-state{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.4px;}
+.vcs-state.on{background:#DCFCE7;color:#16A34A;}
+.vcs-state.off{background:#F1F5F9;color:#64748B;}
+.vcs-state.paused{background:#FEF3C7;color:#92400E;}
+.vcs-desc{font-size:11px;color:var(--subtle);line-height:1.6;}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
+.toggle{width:44px;height:26px;border-radius:13px;border:none;cursor:pointer;position:relative;transition:all 0.3s;flex-shrink:0;}
+.toggle.on{background:linear-gradient(90deg,var(--success),#059669);}
+.toggle.off{background:#CBD5E1;}
+.toggle::after{content:'';position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform 0.3s;box-shadow:0 2px 6px rgba(0,0,0,0.2);}
+.toggle.on::after{transform:translateX(18px);}
+.vc-warning{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px;}
+.vc-warning svg{width:16px;height:16px;stroke:var(--danger);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:1px;}
+.vc-warning-text{font-size:12px;color:var(--muted);line-height:1.6;}
+.vc-warning-text strong{color:var(--danger);}
+
+/* ═══════════════════════════════════════
+   9. LIVE STATISTICS
+═══════════════════════════════════════ */
+.live-stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
+.live-stat-mini{background:var(--bg);border-radius:14px;padding:18px;border:1px solid var(--border);text-align:center;}
+.lsm-num{font-size:28px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--text);letter-spacing:-1px;}
+.lsm-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--subtle);margin-top:4px;}
+.lsm-delta{font-size:11px;font-weight:700;color:var(--success);margin-top:6px;}
+
+.chart-section{margin-top:20px;}
+.chart-label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.chart-title{font-size:12px;font-weight:700;color:var(--text);}
+.chart-legend{display:flex;gap:14px;}
+.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.legend-text{font-size:11px;color:var(--subtle);}
+/* Bar chart */
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px;}
+.bar-chart-bar{flex:1;border-radius:5px 5px 0 0;transition:opacity 0.2s;cursor:pointer;position:relative;}
+.bar-chart-bar:hover{opacity:0.8;}
+.bar-chart-labels{display:flex;gap:6px;margin-top:4px;}
+.bar-chart-label{flex:1;text-align:center;font-size:9px;color:var(--subtle);font-family:'IBM Plex Mono',monospace;}
+/* Donut */
+.donut-row{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;margin-top:20px;}
+.donut-legend{display:flex;flex-direction:column;gap:10px;}
+.dl-item{display:flex;align-items:center;gap:8px;}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dl-label{font-size:12px;color:var(--muted);}
+.dl-val{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--text);margin-left:auto;font-size:12px;}
+
+/* ═══════════════════════════════════════
+   10. RESULTS PREVIEW
+═══════════════════════════════════════ */
+.results-list{}
+.result-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--bg);}
+.result-item:last-child{border-bottom:none;}
+.result-rank{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;width:24px;text-align:center;flex-shrink:0;}
+.result-rank.gold{color:#F59E0B;}
+.result-rank.silver{color:#94A3B8;}
+.result-rank.bronze{color:#B45309;}
+.result-avatar{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
+.result-info{flex:1;}
+.result-name{font-size:14px;font-weight:800;color:var(--text);}
+.result-party{font-size:11px;color:var(--subtle);margin-top:1px;}
+.result-bar-wrap{flex:2;display:flex;align-items:center;gap:12px;}
+.result-bar-track{flex:1;height:10px;background:var(--bg);border-radius:99px;overflow:hidden;}
+.result-bar-fill{height:100%;border-radius:99px;transition:width 1.5s cubic-bezier(0.4,0,0.2,1);}
+.result-pct{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:800;color:var(--text);min-width:38px;text-align:right;}
+.result-votes{font-size:11px;color:var(--subtle);font-family:'IBM Plex Mono',monospace;min-width:60px;text-align:right;}
+.winner-tag{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;color:var(--success);background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:20px;padding:2px 8px;margin-left:8px;vertical-align:middle;}
+.results-footer{display:flex;gap:10px;margin-top:18px;padding-top:18px;border-top:1px solid var(--border);}
+
+/* ═══════════════════════════════════════
+   11. AUDIT ACTIVITY TIMELINE
+═══════════════════════════════════════ */
+.audit-timeline{position:relative;padding-left:28px;}
+.audit-timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--blue),rgba(108,63,197,0.3));}
+.audit-item{position:relative;margin-bottom:22px;}
+.audit-item:last-child{margin-bottom:0;}
+.audit-dot{position:absolute;left:-23px;top:5px;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px var(--border);}
+.audit-dot.blue{background:var(--blue);}
+.audit-dot.green{background:var(--success);}
+.audit-dot.orange{background:var(--warning);}
+.audit-dot.red{background:var(--danger);}
+.audit-dot.purple{background:var(--purple);}
+.audit-dot.cyan{background:var(--cyan);}
+.audit-content{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:13px 16px;}
+.audit-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.audit-action{font-size:13px;font-weight:700;color:var(--text);}
+.audit-time{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--subtle);}
+.audit-detail{font-size:11px;color:var(--muted);line-height:1.5;}
+.audit-user{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--blue);background:rgba(36,81,163,0.07);border-radius:20px;padding:2px 9px;margin-top:6px;}
+.audit-user svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ═══════════════════════════════════════
+   SECTION ANCHOR LINKS (sticky nav)
+═══════════════════════════════════════ */
+.section-nav{background:#fff;border:1px solid var(--border);border-radius:14px;padding:8px;display:flex;gap:4px;flex-wrap:wrap;margin-bottom:24px;position:sticky;top:63px;z-index:40;}
+.sn-link{padding:7px 14px;border-radius:9px;font-size:12px;font-weight:600;color:var(--subtle);cursor:pointer;transition:all 0.22s;text-decoration:none;white-space:nowrap;}
+.sn-link:hover{background:var(--bg);color:var(--text);}
+.sn-link.active{background:linear-gradient(135deg,var(--navy2),var(--purple));color:#fff;}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:1200px){
+  .quick-stats{grid-template-columns:repeat(3,1fr);}
+  .candidates-grid{grid-template-columns:repeat(2,1fr);}
+  .live-stats-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:900px){
+  :root{--sidebar-w:0px;}
+  .sidebar{display:none;}
+  .main{margin-left:0;}
+  .quick-stats{grid-template-columns:repeat(2,1fr);}
+  .info-grid{grid-template-columns:1fr;}
+  .info-item:nth-child(odd){border-right:none;padding-right:0;}
+  .info-item:nth-child(even){padding-left:0;}
+  .candidates-grid{grid-template-columns:1fr;}
+  .qr-module{grid-template-columns:1fr;}
+  .voting-controls-grid{grid-template-columns:1fr;}
+  .live-stats-grid{grid-template-columns:1fr;}
+  .reg-status-inner{grid-template-columns:1fr;}
+  .content{padding:20px 16px 40px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <div>
+      <div class="sb-name">VoteSecure</div>
+      <span class="sb-tag">Enterprise</span>
+    </div>
+  </div>
+  <div class="sb-role"><div class="sb-role-icon"></div><div class="sb-role-text">Election Creator</div></div>
+  <nav class="sb-nav">
+    <div class="sb-section">Overview</div>
+    <a class="nav-item" href="#"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg><span>Dashboard</span></a>
+    <a class="nav-item active" href="#"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>My Elections</span><span class="nav-badge">6</span></a>
+    <a class="nav-item" href="#"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Create Election</span></a>
+    <div class="sb-section">Election Tools</div>
+    <a class="nav-item" href="#"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Candidates</span></a>
+    <a class="nav-item" href="#"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Participants</span></a>
+    <a class="nav-item" href="#"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg><span>Voting Control</span></a>
+    <div class="sb-section">Analytics</div>
+    <a class="nav-item" href="#"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Results</span><span class="nav-badge live">Live</span></a>
+    <a class="nav-item" href="#"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Reports</span></a>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">MR</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name">Maria Rashid</div>
+        <div class="sb-user-role">Creator · Pro Plan</div>
+      </div>
+      <button class="sb-user-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════
+     MAIN
+═══════════════════════════════════════ -->
+<main class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="tb-back"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="breadcrumb">
+        <span class="breadcrumb-link">Dashboard</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-link">My Elections</span>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Student Council 2026</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-btn"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="tb-notif-dot">5</span></button>
+      <button class="tb-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── 1. ELECTION HEADER ── -->
+    <div class="election-header" id="sec-header">
+      <div class="eh-grid-bg"></div>
+      <div class="eh-orb1"></div>
+      <div class="eh-orb2"></div>
+      <div class="eh-inner">
+        <div class="eh-left">
+          <div class="eh-meta-row">
+            <span class="eh-category">University Election</span>
+            <span class="eh-status active"><span class="eh-status-dot"></span>Active</span>
+          </div>
+          <h1 class="eh-title">Student Council Election 2026</h1>
+          <p class="eh-desc">Annual election for the University Student Council leadership positions including President, Vice President, Secretary, and Treasurer for the academic year 2026–27.</p>
+          <div class="eh-deadline">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Registration closes in <strong style="margin-left:4px;">2 Days · 14 Hours</strong>
+          </div>
+          <div class="eh-id-chip">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            Election ID: E-2026-SCU-001
+          </div>
+        </div>
+        <div class="eh-actions">
+          <button class="btn-edit">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit
+          </button>
+          <button class="btn-publish">
+            <svg viewBox="0 0 24 24"><polyline points="22 2 11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Publish Update
+          </button>
+          <button class="btn-more">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section sticky nav -->
+    <div class="section-nav">
+      <a class="sn-link active" href="#sec-stats">Stats</a>
+      <a class="sn-link" href="#sec-info">Info</a>
+      <a class="sn-link" href="#sec-candidates">Candidates</a>
+      <a class="sn-link" href="#sec-participants">Participants</a>
+      <a class="sn-link" href="#sec-registration">Registration</a>
+      <a class="sn-link" href="#sec-qr">QR Invite</a>
+      <a class="sn-link" href="#sec-controls">Controls</a>
+      <a class="sn-link" href="#sec-live">Live Stats</a>
+      <a class="sn-link" href="#sec-results">Results</a>
+      <a class="sn-link" href="#sec-audit">Audit</a>
+    </div>
+
+    <!-- ── 2. QUICK STATS CARDS ── -->
+    <div class="quick-stats" id="sec-stats">
+      <div class="qs-card blue">
+        <div class="qs-icon blue"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="qs-num">728</div>
+        <div class="qs-sub">Participants</div>
+        <div class="qs-extra">of 1,000 max</div>
+      </div>
+      <div class="qs-card purple">
+        <div class="qs-icon purple"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="qs-num">12</div>
+        <div class="qs-sub">Candidates</div>
+        <div class="qs-extra">4 positions</div>
+      </div>
+      <div class="qs-card green">
+        <div class="qs-icon green"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="qs-num">512</div>
+        <div class="qs-sub">Votes Cast</div>
+        <div class="qs-extra">70.3% turnout</div>
+      </div>
+      <div class="qs-card orange">
+        <div class="qs-icon orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="qs-timer" id="countdown">02:15:09</div>
+        <div class="qs-sub">Time Remaining</div>
+        <div class="qs-extra warn">Closing soon</div>
+      </div>
+      <div class="qs-card cyan">
+        <div class="qs-icon cyan"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="21" x2="23" y2="19"/><line x1="19" y1="21" x2="19" y2="15"/></svg></div>
+        <div class="qs-num">34</div>
+        <div class="qs-sub">Waitlisted</div>
+        <div class="qs-extra">Approve or reject</div>
+      </div>
+    </div>
+
+    <!-- ── 3. ELECTION INFORMATION ── -->
+    <div class="panel" id="sec-info">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-title">Election Information</div>
+          <div class="panel-sub">Full configuration details</div>
+        </div>
+        <div class="panel-head-right">
+          <button class="p-btn"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit Details</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-icon" style="background:rgba(36,81,163,0.1);"><svg viewBox="0 0 24 24" stroke="var(--blue)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div><div class="info-label">Title</div><div class="info-value">Student Council Election 2026</div></div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon" style="background:rgba(108,63,197,0.1);"><svg viewBox="0 0 24 24" stroke="var(--purple)"><path d="M4 6h16M4 12h16M4 18h7"/></svg></div>
+            <div><div class="info-label">Category</div><div class="info-value">University Election</div></div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon" style="background:rgba(16,185,129,0.1);"><svg viewBox="0 0 24 24" stroke="var(--success)"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div><div class="info-label">Start Date</div><div class="info-value">May 12, 2026 · 09:00 AM</div></div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon" style="background:rgba(239,68,68,0.1);"><svg viewBox="0 0 24 24" stroke="var(--danger)"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div><div class="info-label">End Date</div><div class="info-value">May 15, 2026 · 05:00 PM</div></div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon" style="background:rgba(245,158,11,0.1);"><svg viewBox="0 0 24 24" stroke="var(--warning)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div><div class="info-label">Registration Deadline</div><div class="info-value">May 10, 2026 · 11:59 PM</div></div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon" style="background:rgba(36,81,163,0.1);"><svg viewBox="0 0 24 24" stroke="var(--blue)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+            <div><div class="info-label">Max Voters</div><div class="info-value mono">1,000 Registered · 728 Joined</div></div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon" style="background:rgba(16,185,129,0.1);"><svg viewBox="0 0 24 24" stroke="var(--success)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div><div class="info-label">Visibility</div><div class="info-value"><span class="visibility-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Public</span></div></div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon" style="background:rgba(6,182,212,0.1);"><svg viewBox="0 0 24 24" stroke="var(--cyan)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div><div class="info-label">Voting Method</div><div class="info-value">Anonymous · ZK-Proof Enabled</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. CANDIDATES ── -->
+    <div class="panel" id="sec-candidates">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-title">Candidates</div>
+          <div class="panel-sub">12 candidates across 4 positions</div>
+        </div>
+        <div class="panel-head-right">
+          <button class="p-btn"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Candidate</button>
+          <button class="p-btn primary">Manage All</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div style="margin-bottom:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--subtle);">President Candidates</div>
+        <div class="candidates-grid">
+          <!-- Candidate 1 -->
+          <div class="candidate-card c1">
+            <span class="candidate-rank-badge gold">#1</span>
+            <div class="candidate-photo" style="background:linear-gradient(135deg,#1B3A6B,#2451A3);">AK</div>
+            <div class="candidate-name">Ali Khan</div>
+            <div class="candidate-designation">President Candidate</div>
+            <div class="candidate-manifesto">"Transparency, better student activities, and stronger academic support for all."</div>
+            <div class="candidate-vote-bar">
+              <div class="cvb-header"><span class="cvb-label">Live Vote Share</span><span class="cvb-pct">41.2%</span></div>
+              <div class="cvb-bar"><div class="cvb-fill" style="width:41%;background:linear-gradient(90deg,#F59E0B,#d97706);"></div></div>
+            </div>
+            <div class="candidate-footer">
+              <button class="c-btn">Edit</button>
+              <button class="c-btn del">Delete</button>
+            </div>
+          </div>
+          <!-- Candidate 2 -->
+          <div class="candidate-card c2">
+            <span class="candidate-rank-badge silver">#2</span>
+            <div class="candidate-photo" style="background:linear-gradient(135deg,#065f46,#10B981);">SR</div>
+            <div class="candidate-name">Sara Raza</div>
+            <div class="candidate-designation">President Candidate</div>
+            <div class="candidate-manifesto">"Inclusive campus, digital student services, and stronger women representation."</div>
+            <div class="candidate-vote-bar">
+              <div class="cvb-header"><span class="cvb-label">Live Vote Share</span><span class="cvb-pct">32.7%</span></div>
+              <div class="cvb-bar"><div class="cvb-fill" style="width:33%;background:linear-gradient(90deg,#2451A3,#1B3A6B);"></div></div>
+            </div>
+            <div class="candidate-footer">
+              <button class="c-btn">Edit</button>
+              <button class="c-btn del">Delete</button>
+            </div>
+          </div>
+          <!-- Candidate 3 -->
+          <div class="candidate-card c3">
+            <span class="candidate-rank-badge bronze">#3</span>
+            <div class="candidate-photo" style="background:linear-gradient(135deg,#6C3FC5,#9333ea);">MF</div>
+            <div class="candidate-name">M. Farhan</div>
+            <div class="candidate-designation">President Candidate</div>
+            <div class="candidate-manifesto">"Reforming student governance with data-driven decisions and radical transparency."</div>
+            <div class="candidate-vote-bar">
+              <div class="cvb-header"><span class="cvb-label">Live Vote Share</span><span class="cvb-pct">26.1%</span></div>
+              <div class="cvb-bar"><div class="cvb-fill" style="width:26%;background:linear-gradient(90deg,#6C3FC5,#9333ea);"></div></div>
+            </div>
+            <div class="candidate-footer">
+              <button class="c-btn">Edit</button>
+              <button class="c-btn del">Delete</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:18px;padding:12px 16px;background:var(--bg);border-radius:10px;border:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;">
+          <span>Showing President candidates · <strong style="color:var(--text);">9 more candidates</strong> in other positions</span>
+          <button class="p-btn" style="font-size:11px;padding:5px 12px;">View All Positions →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. PARTICIPANTS ── -->
+    <div class="panel" id="sec-participants">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-title">Participants</div>
+          <div class="panel-sub">Voter registration data</div>
+        </div>
+        <div class="panel-head-right">
+          <button class="p-btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+          <button class="p-btn primary"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Manually</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="participants-stats">
+          <div class="pstat registered"><div class="pstat-num">728</div><div class="pstat-label">Registered</div></div>
+          <div class="pstat approved"><div class="pstat-num">700</div><div class="pstat-label">Approved</div></div>
+          <div class="pstat waitlisted"><div class="pstat-num">28</div><div class="pstat-label">Waitlisted</div></div>
+          <div class="pstat rejected"><div class="pstat-num">4</div><div class="pstat-label">Rejected</div></div>
+        </div>
+
+        <!-- Search + filter -->
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:200px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:9px 13px;transition:all 0.2s;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--subtle)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search participants…" style="border:none;outline:none;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);background:transparent;flex:1;"/>
+          </div>
+          <select style="background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:9px 13px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);outline:none;cursor:pointer;">
+            <option>All Status</option>
+            <option>Approved</option>
+            <option>Waitlisted</option>
+            <option>Rejected</option>
+          </select>
+        </div>
+
+        <div class="p-table-wrap">
+          <table class="p-table">
+            <thead>
+              <tr>
+                <th>Participant</th>
+                <th>Status</th>
+                <th>Vote Cast</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="p-name-cell">
+                    <div class="p-mini-avatar" style="background:linear-gradient(135deg,#1B3A6B,#2451A3);">AK</div>
+                    <div><div class="p-name-text">Ayesha Kamran</div><div class="p-email">ayesha.kamran@uni.edu</div></div>
+                  </div>
+                </td>
+                <td><span class="p-status-badge approved">✓ Approved</span></td>
+                <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--success);font-weight:700;">Voted</span></td>
+                <td><span class="mono">May 08, 2026</span></td>
+                <td><div class="t-actions"><button class="t-btn-sm">View</button><button class="t-btn-sm danger">Remove</button></div></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="p-name-cell">
+                    <div class="p-mini-avatar" style="background:linear-gradient(135deg,#065f46,#10B981);">HR</div>
+                    <div><div class="p-name-text">Hassan Rauf</div><div class="p-email">hassan.rauf@uni.edu</div></div>
+                  </div>
+                </td>
+                <td><span class="p-status-badge approved">✓ Approved</span></td>
+                <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--success);font-weight:700;">Voted</span></td>
+                <td><span class="mono">May 09, 2026</span></td>
+                <td><div class="t-actions"><button class="t-btn-sm">View</button><button class="t-btn-sm danger">Remove</button></div></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="p-name-cell">
+                    <div class="p-mini-avatar" style="background:linear-gradient(135deg,#92400E,#F59E0B);">NA</div>
+                    <div><div class="p-name-text">Nadia Anwar</div><div class="p-email">nadia.anwar@uni.edu</div></div>
+                  </div>
+                </td>
+                <td><span class="p-status-badge waitlisted">⏳ Waitlisted</span></td>
+                <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--subtle);">Pending</span></td>
+                <td><span class="mono">May 10, 2026</span></td>
+                <td><div class="t-actions"><button class="t-btn-sm">Approve</button><button class="t-btn-sm danger">Reject</button></div></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="p-name-cell">
+                    <div class="p-mini-avatar" style="background:linear-gradient(135deg,#6C3FC5,#9333ea);">ZM</div>
+                    <div><div class="p-name-text">Zaid Mirza</div><div class="p-email">zaid.mirza@uni.edu</div></div>
+                  </div>
+                </td>
+                <td><span class="p-status-badge approved">✓ Approved</span></td>
+                <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--subtle);font-weight:600;">Not Yet</span></td>
+                <td><span class="mono">May 07, 2026</span></td>
+                <td><div class="t-actions"><button class="t-btn-sm">View</button><button class="t-btn-sm danger">Remove</button></div></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="p-name-cell">
+                    <div class="p-mini-avatar" style="background:linear-gradient(135deg,#991B1B,#EF4444);">FI</div>
+                    <div><div class="p-name-text">Fatima Iqbal</div><div class="p-email">fatima.iq@uni.edu</div></div>
+                  </div>
+                </td>
+                <td><span class="p-status-badge rejected">✕ Rejected</span></td>
+                <td><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--subtle);">—</span></td>
+                <td><span class="mono">May 09, 2026</span></td>
+                <td><div class="t-actions"><button class="t-btn-sm">Review</button><button class="t-btn-sm">Restore</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12px;color:var(--subtle);">
+          <span>Showing 5 of 728 participants</span>
+          <div style="display:flex;gap:6px;">
+            <button class="t-btn-sm">← Prev</button>
+            <button class="t-btn-sm" style="border-color:var(--blue);color:var(--blue);">1</button>
+            <button class="t-btn-sm">2</button>
+            <button class="t-btn-sm">3</button>
+            <button class="t-btn-sm">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6. REGISTRATION STATUS ── -->
+    <div class="panel" id="sec-registration">
+      <div class="panel-head">
+        <div class="panel-title">Registration Status</div>
+        <div class="panel-sub">Capacity and deadline tracking</div>
+      </div>
+      <div class="panel-body">
+        <div class="reg-status-inner">
+          <div class="reg-progress-section">
+            <div class="reg-progress-header">
+              <div>
+                <div class="reg-pct-big">72.8%</div>
+                <div class="reg-count">728 of 1,000 spots filled</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:12px;font-weight:700;color:var(--warning);">272 spots left</div>
+                <div style="font-size:11px;color:var(--subtle);margin-top:2px;">Closes in 2d 14h</div>
+              </div>
+            </div>
+            <div class="reg-bar-track">
+              <div class="reg-bar-fill" style="width:72.8%;"></div>
+            </div>
+            <div class="reg-info-grid">
+              <div class="reg-info-item">
+                <div class="reg-info-label">Deadline</div>
+                <div class="reg-info-value">May 10, 2026</div>
+              </div>
+              <div class="reg-info-item">
+                <div class="reg-info-label">Time Remaining</div>
+                <div class="reg-info-value warn">1 Day · 14 Hours</div>
+              </div>
+              <div class="reg-info-item">
+                <div class="reg-info-label">Auto-Lock</div>
+                <div class="reg-info-value" style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block;"></span>Enabled</div>
+              </div>
+              <div class="reg-info-item">
+                <div class="reg-info-label">Waitlist</div>
+                <div class="reg-info-value">34 pending</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="reg-alert">
+              <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div>
+                <div class="reg-alert-text"><strong>Registration closes in 1 Day 14 Hours.</strong> Once the deadline passes, the voter list will be automatically locked. Waitlisted participants must be approved or rejected before voting begins.</div>
+                <div class="reg-alert-tags">
+                  <span class="reg-tag active">✓ Auto-lock enabled</span>
+                  <span class="reg-tag warn">⚠ 34 waitlisted</span>
+                  <span class="reg-tag warn">⚠ Closing soon</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px;">
+              <button class="p-btn success" style="flex:1;justify-content:center;"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Approve All Waitlisted</button>
+              <button class="p-btn" style="flex:1;justify-content:center;">Extend Deadline</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7. QR INVITE MODULE ── -->
+    <div class="panel" id="sec-qr">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-title">Invite Participants</div>
+          <div class="panel-sub">Share QR code or invite link to onboard voters</div>
+        </div>
+        <div class="panel-head-right">
+          <button class="p-btn">View Analytics</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="qr-module">
+          <div class="qr-left">
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px;">Invite Link</div>
+            <div class="qr-link-box">
+              <div class="qr-link-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+              <span class="qr-link-text">https://voteapp.com/elections/sce2026/join</span>
+            </div>
+            <div class="qr-link-btns">
+              <button class="p-btn primary" style="flex:1;justify-content:center;"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy Link</button>
+              <button class="p-btn" style="flex:1;justify-content:center;"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Open Link</button>
+            </div>
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px;margin-top:4px;">Invite by Email</div>
+            <div style="display:flex;gap:8px;">
+              <input type="email" placeholder="Enter email address…" style="flex:1;border:1.5px solid var(--border);border-radius:10px;padding:9px 13px;font-family:'Sora',sans-serif;font-size:13px;color:var(--text);outline:none;background:var(--bg);transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"/>
+              <button class="p-btn primary">Send</button>
+            </div>
+            <div class="qr-stat-row" style="margin-top:20px;">
+              <div class="qr-stat">
+                <div class="qr-stat-num">521</div>
+                <div class="qr-stat-label">QR Scans</div>
+              </div>
+              <div class="qr-stat">
+                <div class="qr-stat-num">432</div>
+                <div class="qr-stat-label">Invite Clicks</div>
+              </div>
+            </div>
+          </div>
+          <div class="qr-right">
+            <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px;text-align:center;">QR Code</div>
+            <div class="qr-preview">
+              <!-- SVG QR code simulation -->
+              <svg class="qr-code-svg" viewBox="0 0 41 41" xmlns="http://www.w3.org/2000/svg">
+                <rect width="41" height="41" fill="white"/>
+                <!-- Top-left finder -->
+                <rect x="1" y="1" width="7" height="7" fill="#0F2347"/>
+                <rect x="2" y="2" width="5" height="5" fill="white"/>
+                <rect x="3" y="3" width="3" height="3" fill="#0F2347"/>
+                <!-- Top-right finder -->
+                <rect x="33" y="1" width="7" height="7" fill="#0F2347"/>
+                <rect x="34" y="2" width="5" height="5" fill="white"/>
+                <rect x="35" y="3" width="3" height="3" fill="#0F2347"/>
+                <!-- Bottom-left finder -->
+                <rect x="1" y="33" width="7" height="7" fill="#0F2347"/>
+                <rect x="2" y="34" width="5" height="5" fill="white"/>
+                <rect x="3" y="35" width="3" height="3" fill="#0F2347"/>
+                <!-- Timing dots top -->
+                <rect x="9" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="11" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="13" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="15" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="17" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="19" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="21" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="23" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="25" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="27" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="29" y="6" width="1" height="1" fill="#0F2347"/>
+                <rect x="31" y="6" width="1" height="1" fill="#0F2347"/>
+                <!-- Random data dots -->
+                <rect x="9" y="9" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="12" y="9" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="14" y="10" width="2" height="1" fill="#1B3A6B"/>
+                <rect x="17" y="9" width="3" height="2" fill="#6C3FC5"/>
+                <rect x="21" y="10" width="1" height="2" fill="#1B3A6B"/>
+                <rect x="23" y="9" width="2" height="1" fill="#6C3FC5"/>
+                <rect x="26" y="9" width="1" height="3" fill="#1B3A6B"/>
+                <rect x="28" y="10" width="2" height="1" fill="#6C3FC5"/>
+                <rect x="31" y="9" width="1" height="2" fill="#1B3A6B"/>
+                <rect x="9" y="12" width="3" height="1" fill="#6C3FC5"/>
+                <rect x="13" y="12" width="1" height="2" fill="#1B3A6B"/>
+                <rect x="15" y="13" width="2" height="1" fill="#6C3FC5"/>
+                <rect x="18" y="12" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="21" y="13" width="3" height="1" fill="#6C3FC5"/>
+                <rect x="25" y="12" width="1" height="2" fill="#1B3A6B"/>
+                <rect x="27" y="12" width="2" height="1" fill="#6C3FC5"/>
+                <rect x="30" y="13" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="9" y="15" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="11" y="15" width="3" height="1" fill="#1B3A6B"/>
+                <rect x="15" y="16" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="17" y="15" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="20" y="16" width="3" height="1" fill="#6C3FC5"/>
+                <rect x="24" y="15" width="1" height="2" fill="#1B3A6B"/>
+                <rect x="26" y="16" width="2" height="1" fill="#6C3FC5"/>
+                <rect x="29" y="15" width="1" height="3" fill="#1B3A6B"/>
+                <rect x="31" y="16" width="1" height="1" fill="#6C3FC5"/>
+                <!-- More data rows -->
+                <rect x="9" y="18" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="12" y="19" width="3" height="1" fill="#6C3FC5"/>
+                <rect x="16" y="18" width="1" height="2" fill="#1B3A6B"/>
+                <rect x="18" y="19" width="2" height="2" fill="#6C3FC5"/>
+                <rect x="21" y="18" width="1" height="2" fill="#1B3A6B"/>
+                <rect x="23" y="19" width="3" height="1" fill="#6C3FC5"/>
+                <rect x="27" y="18" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="30" y="19" width="1" height="1" fill="#6C3FC5"/>
+                <rect x="9" y="21" width="3" height="2" fill="#6C3FC5"/>
+                <rect x="13" y="22" width="1" height="1" fill="#1B3A6B"/>
+                <rect x="15" y="21" width="2" height="2" fill="#6C3FC5"/>
+                <rect x="18" y="22" width="3" height="1" fill="#1B3A6B"/>
+                <rect x="22" y="21" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="24" y="22" width="2" height="1" fill="#1B3A6B"/>
+                <rect x="27" y="21" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="29" y="22" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="9" y="24" width="1" height="3" fill="#1B3A6B"/>
+                <rect x="11" y="25" width="2" height="1" fill="#6C3FC5"/>
+                <rect x="14" y="24" width="3" height="2" fill="#1B3A6B"/>
+                <rect x="18" y="25" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="20" y="24" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="23" y="25" width="3" height="1" fill="#6C3FC5"/>
+                <rect x="27" y="24" width="1" height="2" fill="#1B3A6B"/>
+                <rect x="29" y="25" width="2" height="2" fill="#6C3FC5"/>
+                <rect x="9" y="28" width="2" height="1" fill="#6C3FC5"/>
+                <rect x="12" y="27" width="1" height="3" fill="#1B3A6B"/>
+                <rect x="14" y="28" width="3" height="1" fill="#6C3FC5"/>
+                <rect x="18" y="27" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="21" y="28" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="23" y="27" width="2" height="1" fill="#1B3A6B"/>
+                <rect x="26" y="28" width="3" height="1" fill="#6C3FC5"/>
+                <rect x="30" y="27" width="1" height="2" fill="#1B3A6B"/>
+                <!-- Bottom-left timing column -->
+                <rect x="6" y="9" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="11" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="13" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="15" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="17" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="19" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="21" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="23" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="25" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="27" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="29" width="1" height="1" fill="#0F2347"/>
+                <rect x="6" y="31" width="1" height="1" fill="#0F2347"/>
+                <!-- Bottom rows 30-40 -->
+                <rect x="9" y="30" width="3" height="2" fill="#6C3FC5"/>
+                <rect x="13" y="31" width="1" height="1" fill="#1B3A6B"/>
+                <rect x="15" y="30" width="2" height="2" fill="#6C3FC5"/>
+                <rect x="18" y="31" width="3" height="1" fill="#1B3A6B"/>
+                <rect x="22" y="30" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="24" y="31" width="2" height="1" fill="#1B3A6B"/>
+                <rect x="27" y="30" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="29" y="31" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="32" y="30" width="1" height="1" fill="#6C3FC5"/>
+                <rect x="9" y="33" width="2" height="2" fill="#1B3A6B"/>
+                <rect x="12" y="34" width="3" height="1" fill="#6C3FC5"/>
+                <rect x="16" y="33" width="1" height="2" fill="#1B3A6B"/>
+                <rect x="18" y="34" width="2" height="2" fill="#6C3FC5"/>
+                <rect x="21" y="33" width="3" height="1" fill="#1B3A6B"/>
+                <rect x="25" y="34" width="2" height="2" fill="#6C3FC5"/>
+                <rect x="28" y="33" width="1" height="2" fill="#1B3A6B"/>
+                <rect x="30" y="34" width="2" height="1" fill="#6C3FC5"/>
+                <rect x="9" y="36" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="11" y="37" width="3" height="1" fill="#1B3A6B"/>
+                <rect x="15" y="36" width="2" height="2" fill="#6C3FC5"/>
+                <rect x="18" y="37" width="1" height="1" fill="#1B3A6B"/>
+                <rect x="20" y="36" width="3" height="2" fill="#6C3FC5"/>
+                <rect x="24" y="37" width="2" height="1" fill="#1B3A6B"/>
+                <rect x="27" y="36" width="1" height="2" fill="#6C3FC5"/>
+                <rect x="29" y="37" width="3" height="1" fill="#1B3A6B"/>
+                <rect x="33" y="36" width="2" height="2" fill="#6C3FC5"/>
+                <!-- Center white zone for logo -->
+                <rect x="16" y="16" width="9" height="9" fill="white"/>
+              </svg>
+              <div class="qr-overlay">
+                <div class="qr-logo"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              </div>
+            </div>
+            <div class="qr-btns">
+              <button class="p-btn primary" style="flex:1;justify-content:center;"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download QR</button>
+              <button class="p-btn" style="flex:1;justify-content:center;"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share QR</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 8. VOTING CONTROLS ── -->
+    <div class="panel" id="sec-controls">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-title">Voting Controls</div>
+          <div class="panel-sub">Manage the state of this election</div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="vc-warning" style="margin-bottom:20px;">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="vc-warning-text"><strong>Important:</strong> Once the election starts, participants cannot be added or removed. The voter list will be locked automatically. Ending an election is irreversible.</div>
+        </div>
+        <div class="voting-controls-grid">
+          <div class="vc-buttons">
+            <button class="vc-btn start"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start Election</button>
+            <button class="vc-btn pause"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause Voting</button>
+            <button class="vc-btn end"><svg viewBox="0 0 24 24"><square x="3" y="3" width="18" height="18"/><rect x="3" y="3" width="18" height="18"/></svg>End Election</button>
+            <button class="vc-btn restart"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg>Restart Election</button>
+            <button class="vc-btn lock"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Lock Participants</button>
+          </div>
+          <div class="vc-status-panel">
+            <div class="vc-status-card">
+              <div class="vcs-top">
+                <div class="vcs-label">Voting Status</div>
+                <span class="vcs-state on">Active</span>
+              </div>
+              <div class="vcs-desc">Voting is currently open. Approved participants can cast their ballots until the election closes.</div>
+              <div class="toggle-row">
+                <button class="toggle on"></button>
+                <span style="font-size:12px;font-weight:600;color:var(--success);">Voting open — toggle to pause</span>
+              </div>
+            </div>
+            <div class="vc-status-card">
+              <div class="vcs-top">
+                <div class="vcs-label">Anonymous Mode</div>
+                <span class="vcs-state on">Enabled</span>
+              </div>
+              <div class="vcs-desc">ZK-proof anonymity is active. Voter identities are cryptographically hidden from everyone, including the creator.</div>
+              <div class="toggle-row">
+                <button class="toggle on"></button>
+                <span style="font-size:12px;font-weight:600;color:var(--success);">ZK-Proof verified ✓</span>
+              </div>
+            </div>
+            <div class="vc-status-card">
+              <div class="vcs-top">
+                <div class="vcs-label">Public Results</div>
+                <span class="vcs-state off">Hidden</span>
+              </div>
+              <div class="vcs-desc">Live results are currently hidden from participants. Enable to show real-time vote counts publicly.</div>
+              <div class="toggle-row">
+                <button class="toggle off"></button>
+                <span style="font-size:12px;font-weight:600;color:var(--subtle);">Results hidden from voters</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 9. LIVE STATISTICS ── -->
+    <div class="panel" id="sec-live">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-title">Live Statistics</div>
+          <div class="panel-sub" style="display:flex;align-items:center;gap:6px;">
+            <span style="width:6px;height:6px;background:var(--success);border-radius:50%;display:inline-block;animation:livePulse 1.5s infinite;"></span>
+            Updating in real-time
+          </div>
+        </div>
+        <div class="panel-head-right">
+          <button class="p-btn">Export Data</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="live-stats-grid">
+          <div class="live-stat-mini">
+            <div class="lsm-num" style="color:var(--blue);">70.3%</div>
+            <div class="lsm-label">Turnout</div>
+            <div class="lsm-delta">↑ +4.2% last hour</div>
+          </div>
+          <div class="live-stat-mini">
+            <div class="lsm-num">512</div>
+            <div class="lsm-label">Votes Cast</div>
+            <div class="lsm-delta">↑ 28 last 30min</div>
+          </div>
+          <div class="live-stat-mini">
+            <div class="lsm-num" style="color:var(--warning);">216</div>
+            <div class="lsm-label">Remaining Voters</div>
+            <div class="lsm-delta" style="color:var(--warning);">↓ Declining</div>
+          </div>
+        </div>
+
+        <!-- Charts row -->
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:20px;align-items:start;">
+          <div>
+            <div class="chart-label-row">
+              <div class="chart-title">Votes Per Hour</div>
+              <div class="chart-legend">
+                <span><span class="legend-dot" style="background:var(--blue);"></span> <span class="legend-text">Votes</span></span>
+                <span><span class="legend-dot" style="background:var(--purple);"></span> <span class="legend-text">Peak hours</span></span>
+              </div>
+            </div>
+            <div class="bar-chart">
+              <div class="bar-chart-bar" style="height:28%;background:linear-gradient(180deg,rgba(36,81,163,0.7),rgba(36,81,163,0.2));"></div>
+              <div class="bar-chart-bar" style="height:42%;background:linear-gradient(180deg,rgba(36,81,163,0.7),rgba(36,81,163,0.2));"></div>
+              <div class="bar-chart-bar" style="height:58%;background:linear-gradient(180deg,rgba(36,81,163,0.7),rgba(36,81,163,0.2));"></div>
+              <div class="bar-chart-bar" style="height:75%;background:linear-gradient(180deg,rgba(108,63,197,0.85),rgba(108,63,197,0.3));"></div>
+              <div class="bar-chart-bar" style="height:95%;background:linear-gradient(180deg,rgba(108,63,197,0.85),rgba(108,63,197,0.3));"></div>
+              <div class="bar-chart-bar" style="height:88%;background:linear-gradient(180deg,rgba(108,63,197,0.85),rgba(108,63,197,0.3));"></div>
+              <div class="bar-chart-bar" style="height:65%;background:linear-gradient(180deg,rgba(36,81,163,0.7),rgba(36,81,163,0.2));"></div>
+              <div class="bar-chart-bar" style="height:50%;background:linear-gradient(180deg,rgba(36,81,163,0.7),rgba(36,81,163,0.2));"></div>
+              <div class="bar-chart-bar" style="height:38%;background:linear-gradient(180deg,rgba(6,182,212,0.6),rgba(6,182,212,0.2));opacity:0.5;"></div>
+              <div class="bar-chart-bar" style="height:22%;background:linear-gradient(180deg,rgba(6,182,212,0.6),rgba(6,182,212,0.2));opacity:0.4;"></div>
+            </div>
+            <div class="bar-chart-labels">
+              <div class="bar-chart-label">9a</div>
+              <div class="bar-chart-label">10a</div>
+              <div class="bar-chart-label">11a</div>
+              <div class="bar-chart-label">12p</div>
+              <div class="bar-chart-label">1p</div>
+              <div class="bar-chart-label">2p</div>
+              <div class="bar-chart-label">3p</div>
+              <div class="bar-chart-label">4p</div>
+              <div class="bar-chart-label">5p</div>
+              <div class="bar-chart-label">6p</div>
+            </div>
+            <div style="margin-top:16px;padding:12px 14px;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15);border-radius:10px;display:flex;gap:20px;flex-wrap:wrap;">
+              <div><div style="font-size:10px;color:var(--subtle);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;">Peak Hour</div><div style="font-size:14px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--text);">1:00 PM</div></div>
+              <div><div style="font-size:10px;color:var(--subtle);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;">Peak Votes</div><div style="font-size:14px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--text);">87/hr</div></div>
+              <div><div style="font-size:10px;color:var(--subtle);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;">Current Rate</div><div style="font-size:14px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--success);">24/hr</div></div>
+            </div>
+          </div>
+          <!-- Donut chart -->
+          <div>
+            <div class="chart-title" style="margin-bottom:12px;">Vote Distribution</div>
+            <div class="donut-row">
+              <svg width="110" height="110" viewBox="0 0 110 110">
+                <circle cx="55" cy="55" r="42" fill="none" stroke="#F0F4F9" stroke-width="14"/>
+                <circle cx="55" cy="55" r="42" fill="none" stroke="url(#dg1)" stroke-width="14" stroke-dasharray="110 154" stroke-dashoffset="0" stroke-linecap="round"/>
+                <circle cx="55" cy="55" r="42" fill="none" stroke="url(#dg2)" stroke-width="14" stroke-dasharray="87 177" stroke-dashoffset="-110" stroke-linecap="round"/>
+                <circle cx="55" cy="55" r="42" fill="none" stroke="url(#dg3)" stroke-width="14" stroke-dasharray="67 197" stroke-dashoffset="-197" stroke-linecap="round"/>
+                <defs>
+                  <linearGradient id="dg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#d97706"/></linearGradient>
+                  <linearGradient id="dg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#2451A3"/><stop offset="100%" stop-color="#1B3A6B"/></linearGradient>
+                  <linearGradient id="dg3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6C3FC5"/><stop offset="100%" stop-color="#9333ea"/></linearGradient>
+                </defs>
+                <text x="55" y="51" text-anchor="middle" font-size="16" font-weight="800" fill="#0F172A" font-family="IBM Plex Mono">512</text>
+                <text x="55" y="63" text-anchor="middle" font-size="8" fill="#94A3B8" font-family="Sora">Votes</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="dl-item"><div class="dl-dot" style="background:#F59E0B;"></div><div class="dl-label">Ali Khan</div><div class="dl-val" style="margin-left:8px;">41%</div></div>
+                <div class="dl-item"><div class="dl-dot" style="background:#2451A3;"></div><div class="dl-label">Sara Raza</div><div class="dl-val" style="margin-left:8px;">33%</div></div>
+                <div class="dl-item"><div class="dl-dot" style="background:#6C3FC5;"></div><div class="dl-label">M. Farhan</div><div class="dl-val" style="margin-left:8px;">26%</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 10. RESULTS PREVIEW ── -->
+    <div class="panel" id="sec-results">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-title">Results Preview</div>
+          <div class="panel-sub" style="display:flex;align-items:center;gap:6px;">
+            <span style="width:6px;height:6px;background:var(--success);border-radius:50%;display:inline-block;animation:livePulse 1.5s infinite;"></span>
+            Live — Updates every 30 seconds · Hidden from voters
+          </div>
+        </div>
+        <div class="panel-head-right">
+          <button class="p-btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>
+          <button class="p-btn primary">View Full Results</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.18);border-radius:10px;padding:11px 14px;font-size:12px;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Results are preliminary and will change as more votes are cast. Final certified results will be announced after the election closes.
+        </div>
+        <div class="results-list">
+          <div class="result-item">
+            <div class="result-rank gold">#1</div>
+            <div class="result-avatar" style="background:linear-gradient(135deg,#1B3A6B,#2451A3);">AK</div>
+            <div class="result-info">
+              <div class="result-name">Ali Khan <span class="winner-tag">★ Leading</span></div>
+              <div class="result-party">Progress Party · President</div>
+            </div>
+            <div class="result-bar-wrap">
+              <div class="result-bar-track"><div class="result-bar-fill" style="width:41%;background:linear-gradient(90deg,#F59E0B,#d97706);"></div></div>
+            </div>
+            <div class="result-pct">41.2%</div>
+            <div class="result-votes">211 votes</div>
+          </div>
+          <div class="result-item">
+            <div class="result-rank silver">#2</div>
+            <div class="result-avatar" style="background:linear-gradient(135deg,#065f46,#10B981);">SR</div>
+            <div class="result-info">
+              <div class="result-name">Sara Raza</div>
+              <div class="result-party">Unity Alliance · President</div>
+            </div>
+            <div class="result-bar-wrap">
+              <div class="result-bar-track"><div class="result-bar-fill" style="width:33%;background:linear-gradient(90deg,#2451A3,#1B3A6B);"></div></div>
+            </div>
+            <div class="result-pct">32.7%</div>
+            <div class="result-votes">167 votes</div>
+          </div>
+          <div class="result-item">
+            <div class="result-rank bronze">#3</div>
+            <div class="result-avatar" style="background:linear-gradient(135deg,#6C3FC5,#9333ea);">MF</div>
+            <div class="result-info">
+              <div class="result-name">M. Farhan</div>
+              <div class="result-party">Reform Front · President</div>
+            </div>
+            <div class="result-bar-wrap">
+              <div class="result-bar-track"><div class="result-bar-fill" style="width:26%;background:linear-gradient(90deg,#6C3FC5,#9333ea);"></div></div>
+            </div>
+            <div class="result-pct">26.1%</div>
+            <div class="result-votes">134 votes</div>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding:13px 16px;background:linear-gradient(135deg,rgba(36,81,163,0.04),rgba(108,63,197,0.04));border:1px solid rgba(108,63,197,0.1);border-radius:12px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;">
+          <div style="text-align:center;"><div style="font-size:22px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--text);">512</div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--subtle);font-weight:700;">Total Votes</div></div>
+          <div style="width:1px;height:36px;background:var(--border);"></div>
+          <div style="text-align:center;"><div style="font-size:22px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--blue);">70.3%</div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--subtle);font-weight:700;">Turnout</div></div>
+          <div style="width:1px;height:36px;background:var(--border);"></div>
+          <div style="text-align:center;"><div style="font-size:22px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--success);">All Valid</div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--subtle);font-weight:700;">ZK Verified</div></div>
+          <div style="margin-left:auto;"><button class="p-btn success" style="padding:10px 20px;font-size:13px;">Publish Results</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 11. AUDIT ACTIVITY ── -->
+    <div class="panel" id="sec-audit">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-title">Audit Activity</div>
+          <div class="panel-sub">Full transparency log for this election</div>
+        </div>
+        <div class="panel-head-right">
+          <button class="p-btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export Logs</button>
+          <button class="p-btn">View Full Audit</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="audit-timeline">
+
+          <div class="audit-item">
+            <div class="audit-dot green"></div>
+            <div class="audit-content">
+              <div class="audit-top">
+                <div class="audit-action">Voting Started</div>
+                <div class="audit-time">May 12, 2026 · 09:00 AM</div>
+              </div>
+              <div class="audit-detail">Election voting period officially commenced. 728 eligible voters notified by email and SMS.</div>
+              <div class="audit-user"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Maria Rashid</div>
+            </div>
+          </div>
+
+          <div class="audit-item">
+            <div class="audit-dot blue"></div>
+            <div class="audit-content">
+              <div class="audit-top">
+                <div class="audit-action">Election Published</div>
+                <div class="audit-time">May 11, 2026 · 11:45 PM</div>
+              </div>
+              <div class="audit-detail">Election made publicly visible. QR invite link and email invitations distributed to all participants.</div>
+              <div class="audit-user"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Maria Rashid</div>
+            </div>
+          </div>
+
+          <div class="audit-item">
+            <div class="audit-dot purple"></div>
+            <div class="audit-content">
+              <div class="audit-top">
+                <div class="audit-action">Candidate Added — M. Farhan</div>
+                <div class="audit-time">May 10, 2026 · 06:32 PM</div>
+              </div>
+              <div class="audit-detail">Candidate "M. Farhan" added to President position with manifesto uploaded. Candidate now visible on ballot.</div>
+              <div class="audit-user"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Maria Rashid</div>
+            </div>
+          </div>
+
+          <div class="audit-item">
+            <div class="audit-dot orange"></div>
+            <div class="audit-content">
+              <div class="audit-top">
+                <div class="audit-action">Participant Removed — Bilal Siddiqui</div>
+                <div class="audit-time">May 10, 2026 · 03:17 PM</div>
+              </div>
+              <div class="audit-detail">Participant removed due to invalid enrollment number. Access to the election has been revoked.</div>
+              <div class="audit-user"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Maria Rashid</div>
+            </div>
+          </div>
+
+          <div class="audit-item">
+            <div class="audit-dot cyan"></div>
+            <div class="audit-content">
+              <div class="audit-top">
+                <div class="audit-action">Registration Deadline Extended</div>
+                <div class="audit-time">May 09, 2026 · 10:00 AM</div>
+              </div>
+              <div class="audit-detail">Registration deadline extended by 24 hours from May 9 to May 10, 2026. Reason: system maintenance window.</div>
+              <div class="audit-user"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Maria Rashid</div>
+            </div>
+          </div>
+
+          <div class="audit-item">
+            <div class="audit-dot blue"></div>
+            <div class="audit-content">
+              <div class="audit-top">
+                <div class="audit-action">Election Created</div>
+                <div class="audit-time">May 05, 2026 · 02:14 PM</div>
+              </div>
+              <div class="audit-detail">Election "Student Council Election 2026" created in draft mode. Initial configuration set: 1,000 max voters, anonymous voting enabled, ZK-proof activated.</div>
+              <div class="audit-user"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Maria Rashid</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<script>
+// ── Countdown Timer
+(function(){
+  let h=2,m=15,s=9;
+  function tick(){
+    const el=document.getElementById('countdown');
+    if(!el)return;
+    s--;
+    if(s<0){s=59;m--;}
+    if(m<0){m=59;h--;}
+    if(h<0){el.textContent='00:00:00';return;}
+    el.textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+  setInterval(tick,1000);
+})();
+
+// ── Section nav active state on scroll
+(function(){
+  const links=document.querySelectorAll('.sn-link');
+  const sections=['sec-header','sec-stats','sec-info','sec-candidates','sec-participants','sec-registration','sec-qr','sec-controls','sec-live','sec-results','sec-audit'];
+  function onScroll(){
+    let cur='';
+    sections.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el&&el.getBoundingClientRect().top<=140)cur=id;
+    });
+    const sectionNames={'sec-header':'Stats','sec-stats':'Stats','sec-info':'Info','sec-candidates':'Candidates','sec-participants':'Participants','sec-registration':'Registration','sec-qr':'QR Invite','sec-controls':'Controls','sec-live':'Live Stats','sec-results':'Results','sec-audit':'Audit'};
+    links.forEach(l=>{
+      l.classList.remove('active');
+      if(l.textContent.trim()===sectionNames[cur])l.classList.add('active');
+    });
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  // Section nav click scroll
+  links.forEach(l=>{
+    l.addEventListener('click',e=>{
+      e.preventDefault();
+      const map={'Stats':'sec-stats','Info':'sec-info','Candidates':'sec-candidates','Participants':'sec-participants','Registration':'sec-registration','QR Invite':'sec-qr','Controls':'sec-controls','Live Stats':'sec-live','Results':'sec-results','Audit':'sec-audit'};
+      const id=map[l.textContent.trim()];
+      if(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});}
+    });
+  });
+})();
+
+// ── Toggle buttons interaction
+document.querySelectorAll('.toggle').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const isOn=btn.classList.contains('on');
+    btn.classList.toggle('on',!isOn);
+    btn.classList.toggle('off',isOn);
+    const sib=btn.nextElementSibling;
+    if(sib){
+      if(!isOn){sib.style.color='var(--success)';sib.textContent=sib.textContent.replace('hidden','active').replace('paused','active');}
+      else{sib.style.color='var(--subtle)';}
+    }
+    const state=btn.closest('.vc-status-card')?.querySelector('.vcs-state');
+    if(state){
+      if(!isOn){state.className='vcs-state on';state.textContent='Active';}
+      else{state.className='vcs-state off';state.textContent='Off';}
+    }
+  });
+});
+
+// ── Copy link feedback
+document.querySelectorAll('.p-btn').forEach(btn=>{
+  if(btn.textContent.includes('Copy Link')){
+    btn.addEventListener('click',()=>{
+      const orig=btn.innerHTML;
+      btn.textContent='✓ Copied!';
+      btn.style.background='var(--success)';
+      setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';},2000);
+    });
+  }
+});
+</script>
+
+</body>
+</html>
