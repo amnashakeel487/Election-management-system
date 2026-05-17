@@ -1,8 +1,6 @@
 import { useMemo, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
-import { PUBLIC_LOCALES } from '@/types/locale'
 import './signup-page.css'
 
 export function ShieldIcon({ className }: { className?: string }) {
@@ -100,7 +98,6 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
           >
             {t('chrome.security')}
           </Link>
-          <LanguageSwitcher variant="nav" locales={PUBLIC_LOCALES} className="sp-auth-lang" />
         </div>
         {variant === 'register' ? (
           <Link
