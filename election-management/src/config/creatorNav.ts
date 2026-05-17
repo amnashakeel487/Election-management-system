@@ -25,8 +25,15 @@ export interface CreatorNavItem {
 
 export const CREATOR_NAV: CreatorNavItem[] = [
   { id: 'dashboard', path: '/creator/dashboard', label: 'Dashboard', section: 'Overview', icon: 'dashboard', end: true },
-  { id: 'elections', path: '/creator/elections', label: 'My Elections', section: 'Elections', icon: 'elections' },
-  { id: 'create', path: '/creator/elections/new', label: 'Create Election', icon: 'create' },
+  {
+    id: 'elections',
+    path: '/creator/elections',
+    label: 'My Elections',
+    section: 'Elections',
+    icon: 'elections',
+    end: true,
+  },
+  { id: 'create', path: '/creator/elections/new', label: 'Create Election', icon: 'create', end: true },
   { id: 'candidates', path: '/creator/candidates', label: 'Candidates', section: 'Management', icon: 'candidates' },
   { id: 'participants', path: '/creator/participants', label: 'Participants', icon: 'participants' },
   { id: 'control', path: '/creator/control', label: 'Voting Control', icon: 'control' },

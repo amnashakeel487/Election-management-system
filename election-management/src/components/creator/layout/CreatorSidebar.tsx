@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
-import { CREATOR_NAV } from '@/config/creatorNav'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { CREATOR_NAV, type CreatorNavItem } from '@/config/creatorNav'
 import { CreatorNavIcon, ShieldBrandIcon } from '@/components/creator/layout/CreatorIcons'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -9,10 +9,27 @@ interface CreatorSidebarProps {
   onMobileClose?: () => void
 }
 
+/** My Elections vs Create Election share the `/creator/elections` prefix — avoid double-active. */
+function isCreatorNavActive(item: CreatorNavItem, pathname: string, linkActive: boolean): boolean {
+  if (item.id === 'elections') {
+    if (pathname === '/creator/elections') return true
+    if (!pathname.startsWith('/creator/elections/')) return false
+    if (pathname === '/creator/elections/new') return false
+    if (pathname.endsWith('/edit')) return false
+    return true
+  }
+  if (item.id === 'create') {
+    if (pathname === '/creator/elections/new') return true
+    return /\/creator\/elections\/[^/]+\/edit$/.test(pathname)
+  }
+  return linkActive
+}
+
 export function CreatorSidebar({ mobileOpen = false, onMobileClose }: CreatorSidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const { signOut } = useAuth()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
 
   let lastSection: string | undefined
 
@@ -48,8 +65,10 @@ export function CreatorSidebar({ mobileOpen = false, onMobileClose }: CreatorSid
               {showSection ? <div className="sb-section-label">{section}</div> : null}
               <NavLink
                 to={item.path}
-                end={item.end}
-                className={({ isActive }) => `sb-item${isActive ? ' active' : ''}`}
+                end={item.end ?? true}
+                className={({ isActive }) =>
+                  `sb-item${isCreatorNavActive(item, pathname, isActive) ? ' active' : ''}`
+                }
                 onClick={() => onMobileClose?.()}
               >
                 <CreatorNavIcon icon={item.icon} />

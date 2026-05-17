@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import '@/styles/admin-dashboard.css'
 import '@/styles/admin-dashboard-dark.css'
 import '@/styles/creator-dashboard-extra.css'
@@ -35,8 +35,6 @@ function CreatorLayoutInner() {
     day: 'numeric',
     year: 'numeric',
   })
-
-  const isApproved = profile?.approval_status === 'approved'
 
   return (
     <div className="admin-app creator-app">
@@ -84,11 +82,6 @@ function CreatorLayoutInner() {
                   <path d="M13.73 21a2 2 0 0 1-3.46 0" fill="none" strokeWidth="2" />
                 </svg>
               </button>
-              {isApproved ? (
-                <Link to="/creator/elections/new" className="btn btn-primary btn-sm">
-                  + New Election
-                </Link>
-              ) : null}
               <button
                 type="button"
                 className="avatar"

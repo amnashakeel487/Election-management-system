@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { CreatorApprovalBanner } from '@/components/creator/CreatorApprovalBanner'
 import { CreatorDashboardLiveSection } from '@/components/creator/CreatorDashboardLiveSection'
 import { CreatorDashboardStatsGrid } from '@/components/creator/CreatorDashboardStatsGrid'
@@ -24,18 +23,7 @@ export function CreatorDashboardPage() {
   return (
     <>
       <CreatorApprovalBanner />
-      <CreatorPageHeader
-        eyebrow={meta.eyebrow}
-        title={meta.title}
-        subtitle={meta.subtitle}
-        actions={
-          isApproved ? (
-            <Link to="/creator/elections/new" className="btn btn-primary">
-              + New Election
-            </Link>
-          ) : null
-        }
-      />
+      <CreatorPageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
 
       {statsError ? (
         <p style={{ fontSize: 12, color: 'var(--danger)', marginBottom: 12 }}>
