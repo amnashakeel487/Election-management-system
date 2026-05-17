@@ -34,7 +34,9 @@ export function DailyQuote({ variant = 'default', className = '' }: DailyQuotePr
         ) : (
           <>
             <p className="fv-daily-quote__hero-text">&ldquo;{quote?.text}&rdquo;</p>
-            {quote?.author ? <footer className="fv-daily-quote__hero-author">{quote.author}</footer> : null}
+            {quote?.author ? (
+              <cite className="fv-daily-quote__hero-author">{quote.author}</cite>
+            ) : null}
           </>
         )}
       </blockquote>

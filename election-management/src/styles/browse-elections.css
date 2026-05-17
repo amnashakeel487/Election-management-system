@@ -177,14 +177,6 @@
 .be-root .ps-card-num {font-size:30px;font-weight:800;font-family:'IBM Plex Mono',monospace;color:#fff;letter-spacing:-1px;}
 .be-root .ps-card-label {font-size:11px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:0.6px;margin-top:4px;}
 .be-root .ps-card-delta {font-size:11px;font-weight:700;color:var(--success);margin-top:8px;display:flex;align-items:center;gap:4px;}
-.be-root .live-ticker {background:rgba(16,185,129,0.06);border-bottom:1px solid rgba(16,185,129,0.12);padding:0;overflow:hidden;height:38px;display:flex;align-items:center;}
-.be-root .ticker-label {background:linear-gradient(90deg,var(--success),#059669);color:#fff;padding:0 16px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;height:100%;display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.be-root .ticker-label-dot {width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse 1.5s infinite;}
-.be-root .ticker-track {overflow:hidden;flex:1;}
-.be-root .ticker-items {display:flex;gap:48px;animation:tickerScroll 28s linear infinite;white-space:nowrap;padding:0 24px;}
-@keyframes tickerScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-.be-root .ticker-item {font-size:12px;color:var(--success);font-weight:600;display:inline-flex;align-items:center;gap:6px;}
-.be-root .ticker-item::before {content:'';width:4px;height:4px;background:var(--success);border-radius:50%;flex-shrink:0;}
 .be-root .footer {background:#080f1e;border-top:1px solid rgba(255,255,255,0.06);padding:48px 40px 28px;}
 .be-root .footer-inner {max-width:1200px;margin:0 auto;}
 .be-root .footer-top {display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px;}

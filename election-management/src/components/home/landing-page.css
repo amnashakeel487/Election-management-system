@@ -30,7 +30,7 @@ html{scroll-behavior:smooth;}
 .lp-root .particle{position:absolute;border-radius:50%;background:rgba(6,182,212,0.55);animation:rise linear infinite;}
 @keyframes rise{0%{transform:translateY(100vh) translateX(0);opacity:0;}10%{opacity:1;}90%{opacity:0.4;}100%{transform:translateY(-10vh) translateX(var(--dx,0px));opacity:0;}}
 
-.lp-root .hero-inner{position:relative;z-index:1;max-width:1100px;width:100%;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.lp-root .hero-inner{position:relative;z-index:1;max-width:1100px;width:100%;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;}
 
 .lp-root .hero-left{}
 .lp-root .live-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:20px;padding:6px 15px;margin-bottom:26px;animation:fadeDown 0.7s ease both;}
@@ -76,8 +76,16 @@ html{scroll-behavior:smooth;}
   display:flex;
   flex-direction:column;
   align-items:flex-end;
-  gap:20px;
+  justify-content:flex-start;
+  gap:24px;
+  align-self:start;
+  padding-top:4px;
   animation:slideRight 0.9s cubic-bezier(0.4,0,0.2,1) 0.2s both;
+}
+.lp-root .hero-quote-slot{
+  width:100%;
+  display:flex;
+  justify-content:flex-end;
 }
 .lp-root .fv-daily-quote--hero{
   margin:0;
@@ -85,7 +93,7 @@ html{scroll-behavior:smooth;}
   border:none;
   background:transparent;
   box-shadow:none;
-  max-width:min(300px,100%);
+  max-width:min(320px,100%);
   text-align:right;
 }
 .lp-root .fv-daily-quote__hero-text{
@@ -93,16 +101,21 @@ html{scroll-behavior:smooth;}
   font-size:clamp(11px,1.35vw,13px);
   font-weight:400;
   font-style:italic;
-  line-height:1.6;
-  color:rgba(255,255,255,0.88);
+  line-height:1.65;
+  color:#fff;
   overflow-wrap:anywhere;
 }
 .lp-root .fv-daily-quote__hero-author{
-  margin:8px 0 0;
+  display:block;
+  margin:10px 0 0;
+  padding:0;
+  border:none;
+  background:transparent;
+  box-shadow:none;
   font-size:11px;
-  font-weight:500;
+  font-weight:400;
   font-style:normal;
-  color:rgba(255,255,255,0.5);
+  color:rgba(255,255,255,0.72);
 }
 .lp-root .fv-daily-quote__hero-author::before{
   content:'— ';
@@ -524,7 +537,7 @@ html{scroll-behavior:smooth;}
 .lp-root .cta-chip svg{width:11px;height:11px;stroke:#10B981;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
 
 /* â”€â”€â”€ FOOTER â”€â”€â”€ */
-footer{background:#080f1e;padding:60px 48px 28px;border-top:1px solid rgba(255,255,255,0.05);}
+.lp-root > footer{background:#080f1e;padding:60px 48px 28px;border-top:1px solid rgba(255,255,255,0.05);}
 .lp-root .footer-inner{max-width:1100px;margin:0 auto;}
 .lp-root .footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;}
 .lp-root .footer-brand{}
@@ -578,7 +591,7 @@ footer{background:#080f1e;padding:60px 48px 28px;border-top:1px solid rgba(255,2
 .lp-root .contact-card-header{flex-direction:column;align-items:center;text-align:center;}
 .lp-root .how-grid{grid-template-columns:1fr;}
 .lp-root .footer-top{grid-template-columns:1fr;gap:28px;}
-.lp-root footer{padding:40px 20px 20px;}
+.lp-root > footer{padding:40px 20px 20px;}
 .lp-root .elections-grid{grid-template-columns:1fr;}
 .lp-root .cta-section{padding:64px 20px;}
 .lp-root .hero-btns{flex-direction:column;width:100%;max-width:320px;}

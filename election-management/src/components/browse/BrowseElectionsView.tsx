@@ -53,36 +53,6 @@ function sortElections(
   })
 }
 
-function buildTickerItems(
-  elections: Election[],
-  metrics: Map<string, { ballots_cast: number; registered: number }>,
-  nowMs: number,
-): string[] {
-  const items: string[] = []
-  for (const e of elections) {
-    const phase = publicElectionPhase(e, nowMs)
-    if (phase !== 'active') continue
-    const row = metrics.get(e.id)
-    const ballots = row?.ballots_cast ?? 0
-    const reg = row?.registered ?? 0
-    if (ballots > 0) items.push(`${ballots.toLocaleString()} votes cast in ${e.title}`)
-    if (reg > 0 && e.max_voters > 0) {
-      const pct = Math.round((reg / e.max_voters) * 100)
-      if (pct >= 50) items.push(`${e.title} — ${pct}% registered`)
-    }
-  }
-  for (const e of elections) {
-    const phase = publicElectionPhase(e, nowMs)
-    if (phase === 'upcoming' && isRegistrationJoinable(e, phase, nowMs)) {
-      items.push(`Registration open: ${e.title}`)
-    }
-  }
-  if (items.length === 0) {
-    return ['Browse published elections and join when registration is open']
-  }
-  return items
-}
-
 export function BrowseElectionsView() {
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<PublicElectionFilter | ''>('')
@@ -211,27 +181,8 @@ export function BrowseElectionsView() {
     if (page > totalPages) setPage(totalPages)
   }, [page, totalPages])
 
-  const tickerItems = useMemo(() => buildTickerItems(elections, metrics, nowMs), [elections, metrics, nowMs])
-  const tickerDoubled = [...tickerItems, ...tickerItems]
-
   return (
     <div className="be-root">
-      <div className="live-ticker">
-        <div className="ticker-label">
-          <div className="ticker-label-dot" />
-          Live
-        </div>
-        <div className="ticker-track">
-          <div className="ticker-items">
-            {tickerDoubled.map((text, i) => (
-              <span key={`${text}-${i}`} className="ticker-item">
-                {text}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
       <BrowseElectionsNav />
 
       <section className="hero">

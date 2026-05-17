@@ -241,7 +241,9 @@ export function LandingPageView() {
           </div>
 
           <div className="hero-right">
-            <DailyQuote variant="hero" />
+            <div className="hero-quote-slot">
+              <DailyQuote variant="hero" />
+            </div>
             <LandingDashboardPreview
               snapshot={snapshot}
               loading={liveLoading}
