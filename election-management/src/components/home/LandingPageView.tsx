@@ -261,6 +261,7 @@ export function LandingPageView() {
               <br />
               {t('hero.title4')}
             </h1>
+            <p className="hero-tagline">{t('hero.tagline')}</p>
             <p className="hero-sub">{t('hero.sub')}</p>
             <div className="hero-btns">
               <button type="button" className="btn-hero-primary" onClick={() => navigate(signedIn ? dashboardPath : '/register')}>
