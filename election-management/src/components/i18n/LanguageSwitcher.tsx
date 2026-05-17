@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { useLocale } from '@/context/LocaleContext'
-import { LOCALE_OPTIONS, type AppLocale } from '@/types/locale'
+import { LOCALE_OPTIONS, PUBLIC_LOCALES, type AppLocale } from '@/types/locale'
 
 export interface LanguageSwitcherProps {
-  variant?: 'nav' | 'compact' | 'settings' | 'admin'
+  variant?: 'nav' | 'compact' | 'settings' | 'admin' | 'icon-toggle'
   className?: string
   /** When set, only these locales appear (e.g. creator dashboard: en + ur). */
   locales?: readonly AppLocale[]
@@ -14,6 +14,30 @@ export function LanguageSwitcher({ variant = 'nav', className = '', locales }: L
   const { locale, setLocale } = useLocale()
 
   const options = locales ? LOCALE_OPTIONS.filter((o) => locales.includes(o.code)) : LOCALE_OPTIONS
+
+  if (variant === 'icon-toggle') {
+    const toggleCodes = (locales ?? PUBLIC_LOCALES) as AppLocale[]
+    const toggleOptions = LOCALE_OPTIONS.filter((o) => toggleCodes.includes(o.code))
+    const currentIndex = Math.max(
+      0,
+      toggleOptions.findIndex((o) => o.code === locale),
+    )
+    const nextOption = toggleOptions[(currentIndex + 1) % toggleOptions.length]
+
+    return (
+      <button
+        type="button"
+        className={`language-switcher language-switcher--icon-toggle ${className}`.trim()}
+        onClick={() => nextOption && setLocale(nextOption.code)}
+        aria-label={t('toggleLanguage', { language: nextOption?.englishName ?? 'English' })}
+        title={t('toggleLanguage', { language: nextOption?.englishName ?? 'English' })}
+      >
+        <span className="language-switcher__icon" aria-hidden>
+          🌐
+        </span>
+      </button>
+    )
+  }
 
   const baseClass =
     variant === 'settings'

@@ -8,5 +8,6 @@
   "login": "لاگ ان",
   "register": "رجسٹر",
   "getStarted": "شروع کریں",
-  "languageSwitcherLabel": "زبان منتخب کریں"
+  "languageSwitcherLabel": "زبان منتخب کریں",
+  "toggleLanguage": "{{language}} میں تبدیل کریں"
 }

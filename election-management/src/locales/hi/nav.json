@@ -8,5 +8,6 @@
   "login": "Login",
   "register": "Register",
   "getStarted": "Get started",
-  "languageSwitcherLabel": "Choose language"
+  "languageSwitcherLabel": "Choose language",
+  "toggleLanguage": "Switch to {{language}}"
 }

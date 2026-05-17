@@ -72,6 +72,8 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
     [onLanding, t, tNav],
   )
 
+  const langSwitcherVariant = variant === 'landing' ? 'icon-toggle' : 'nav'
+
   const navClass = [
     'public-nav-root',
     'navbar',
@@ -143,7 +145,7 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
               <nav className="public-nav-drawer-links">{navLinkItems}</nav>
               {trailing ? <div className="public-nav-drawer-trailing">{trailing}</div> : null}
               <div className="public-nav-drawer-lang">
-                <LanguageSwitcher variant="nav" locales={PUBLIC_LOCALES} />
+                <LanguageSwitcher variant={langSwitcherVariant} locales={PUBLIC_LOCALES} />
               </div>
               <div className="public-nav-drawer-actions">{authButtons}</div>
             </div>
@@ -166,7 +168,7 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
         <div className="nav-links nav-links--desktop">{navLinkItems}</div>
 
         <div className="nav-actions nav-actions--desktop">
-          <LanguageSwitcher variant="nav" className="nav-lang" locales={PUBLIC_LOCALES} />
+          <LanguageSwitcher variant={langSwitcherVariant} className="nav-lang" locales={PUBLIC_LOCALES} />
           {trailing ? <div className="nav-trailing">{trailing}</div> : null}
           {authButtons}
         </div>

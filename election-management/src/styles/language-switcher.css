@@ -5,6 +5,29 @@
   font-size: 12px;
 }
 
+.language-switcher--icon-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  margin: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgb(255 255 255 / 0.75);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.language-switcher--icon-toggle:hover {
+  color: #fff;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.language-switcher--icon-toggle .language-switcher__icon {
+  font-size: 16px;
+}
+
 .language-switcher--nav {
   color: inherit;
 }
