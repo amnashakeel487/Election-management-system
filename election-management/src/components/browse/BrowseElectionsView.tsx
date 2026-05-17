@@ -11,12 +11,10 @@ import {
   BROWSE_CATEGORIES,
   categorySlugFromElection,
   formatCompactNum,
-  formatCountdownHms,
   isRegistrationJoinable,
-  organizationLine,
   type BrowseCategorySlug,
 } from '@/utils/browseElectionUi'
-import { publicElectionPhase, shouldShowPublicBallotCount } from '@/utils/publicElectionLanding'
+import { publicElectionPhase } from '@/utils/publicElectionLanding'
 import '@/styles/browse-elections.css'
 
 const PAGE_SIZE = 6
@@ -28,32 +26,6 @@ function SearchIcon() {
     <svg viewBox="0 0 24 24" aria-hidden>
       <circle cx="11" cy="11" r="8" />
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
-  )
-}
-
-function UsersIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-    </svg>
-  )
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  )
-}
-
-function UserIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
     </svg>
   )
 }
@@ -239,35 +211,8 @@ export function BrowseElectionsView() {
     if (page > totalPages) setPage(totalPages)
   }, [page, totalPages])
 
-  const featured = useMemo(() => {
-    const active = elections
-      .filter((e) => publicElectionPhase(e, nowMs) === 'active')
-      .sort((a, b) => new Date(a.end_date).getTime() - new Date(b.end_date).getTime())
-    return active[0] ?? elections[0] ?? null
-  }, [elections, nowMs])
-
   const tickerItems = useMemo(() => buildTickerItems(elections, metrics, nowMs), [elections, metrics, nowMs])
   const tickerDoubled = [...tickerItems, ...tickerItems]
-
-  const featuredPhase = featured ? publicElectionPhase(featured, nowMs) : null
-  const featuredMetrics = featured ? metrics.get(featured.id) : undefined
-  const featuredBallots = featuredMetrics?.ballots_cast ?? 0
-  const featuredReg = featuredMetrics?.registered ?? 0
-  const featuredCandidates = featured ? (candidateCounts.get(featured.id) ?? 0) : 0
-  const featuredShowBallots = featured && featuredPhase ? shouldShowPublicBallotCount(featured, featuredPhase, nowMs) : false
-  const featuredTurnout =
-    featured && featured.max_voters > 0 && featuredShowBallots
-      ? Math.min(100, Math.round((featuredBallots / featured.max_voters) * 100))
-      : 0
-
-  const featuredPrimary =
-    featured && featuredPhase === 'completed'
-      ? { to: `/elections/${featured.id}/results`, label: 'View Results' }
-      : featured && featuredPhase === 'active'
-        ? { to: `/elections/${featured.id}`, label: 'Vote Now' }
-        : featured
-          ? { to: `/elections/${featured.id}/join`, label: 'Register' }
-          : null
 
   return (
     <div className="be-root">

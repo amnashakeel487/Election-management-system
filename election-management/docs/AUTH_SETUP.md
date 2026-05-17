@@ -78,6 +78,26 @@ Open your project in the [Supabase dashboard](https://supabase.com/dashboard).
 
 **Authentication** → **Providers** → **Email** → keep **Confirm email** enabled if voters must verify before login.
 
+### Password reset (6-digit code — required)
+
+The app resets passwords with a **code entered on the website**, not by clicking a link in email (avoids PKCE / wrong-browser errors on mobile).
+
+1. Supabase dashboard → **Authentication** → **Email templates** → **Reset password**.
+2. Replace the body with a message that shows the token, for example:
+
+```html
+<h2>Reset your FortressVote password</h2>
+<p>Your verification code is:</p>
+<p style="font-size:28px;font-weight:bold;letter-spacing:0.2em">{{ .Token }}</p>
+<p>Enter this code on the forgot password page. It expires in about an hour.</p>
+<p>If you did not request a reset, you can ignore this email.</p>
+```
+
+3. Remove or de-emphasize the “reset link” button so users are not sent to `/reset-password?code=…` in the mail app.
+4. Save the template.
+
+**User flow:** `/forgot-password` → email → enter code → `/reset-password` → new password + confirm.
+
 ---
 
 ## Part 3 — Edge function secrets (Brevo API)
@@ -120,6 +140,13 @@ Or from the `election-management` folder use `npx supabase@latest login`, `npx s
 
 ## Part 4 — Test
 
+### Password reset (code)
+
+1. Open `/forgot-password`, enter your email, click **Send verification code**.
+2. Check inbox for a **6-digit code** (not a link).
+3. Enter the code on the same page → you should land on **Set new password**.
+4. Save a new password and sign in.
+
 ### Auth (sign-up)
 
 1. Register a new voter with a real inbox.
@@ -151,6 +178,9 @@ Or from the `election-management` folder use `npx supabase@latest login`, `npx s
 | API `400` | Brevo response body in function logs; often unverified sender or blocked recipient |
 | Email in spam | Complete domain authentication (SPF/DKIM) in Brevo |
 | `email rate limit exceeded` | Custom SMTP fixes Auth limits; wait if you hit Supabase default limits before SMTP was enabled |
+| `PKCE code verifier not found` | User opened the **email link** in another browser. Use the **6-digit code** flow and update the Reset password template (see above) |
+| No code in reset email | Reset password template must include `{{ .Token }}` |
+| `Invalid or expired` OTP | Code expired (~1h) or typo — use **Resend code** on forgot password |
 
 Check sends in Brevo: **Transactional** → **Email** (or **Logs**).
 

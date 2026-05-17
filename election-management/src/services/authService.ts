@@ -123,7 +123,7 @@ export async function updatePassword(newPassword: string) {
     session = await establishRecoverySession()
   }
   if (!session) {
-    throw new Error('Your reset link has expired or was already used. Request a new password reset email.')
+    throw new Error('Your reset session has expired. Request a new code on the forgot password page.')
   }
 
   const { error } = await supabase.auth.updateUser({ password: newPassword })

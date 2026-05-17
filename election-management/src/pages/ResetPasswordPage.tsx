@@ -36,7 +36,7 @@ export function ResetPasswordPage() {
           return
         }
 
-        if (session && (isRecoverySession || session)) {
+        if (session) {
           if (!cancelled) setSessionReady(true)
           return
         }
