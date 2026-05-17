@@ -100,8 +100,7 @@
       "title": "Creator Settings",
       "subtitle": "Appearance, language and notification preferences",
       "accountSecurity": "Account security",
-      "accountSecurityDesc": "Password, MFA, and session security.",
-      "openAccountSecurity": "Open account security",
+      "accountSecurityDesc": "Change your password and set up authenticator 2FA.",
       "electionDefaults": "Election defaults",
       "comingSoon": "Coming soon",
       "electionDefaultsDesc": "Default titles, categories, and real-time results preferences will be saved here."

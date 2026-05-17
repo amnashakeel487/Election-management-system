@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { AccountMfaSettings } from '@/components/account/AccountMfaSettings'
+import { ChangePasswordSettings } from '@/components/account/ChangePasswordSettings'
 import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader'
 import { ADMIN_PAGE_META } from '@/config/adminNav'
 import { LanguageSettings } from '@/components/i18n/LanguageSettings'
@@ -59,12 +60,10 @@ export function AdminSettingsPage() {
             <div className="card-title">Account</div>
           </div>
           <div className="card-body">
-            <p style={{ fontSize: 12, color: 'var(--subtle)', marginBottom: 12 }}>
-              Change your password and multi-factor authentication in account security.
-            </p>
-            <Link to="/account/security" className="btn btn-primary">
-              Open account security
-            </Link>
+            <ChangePasswordSettings variant="embedded" />
+            <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid var(--border)' }}>
+              <AccountMfaSettings variant="embedded" />
+            </div>
           </div>
         </div>
 

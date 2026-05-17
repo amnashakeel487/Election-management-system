@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { AccountMfaSettings } from '@/components/account/AccountMfaSettings'
+import { ChangePasswordSettings } from '@/components/account/ChangePasswordSettings'
 import { VoterPageHeader } from '@/components/voter/VoterPageHeader'
 import { useAuth } from '@/hooks/useAuth'
 import { useVoterDashboard } from '@/hooks/useVoterDashboard'
@@ -87,12 +88,10 @@ export function VoterProfilePage() {
               <div className="card-title">Security</div>
             </div>
             <div className="card-body">
-              <p style={{ fontSize: 12, color: 'var(--subtle)', marginBottom: 12, lineHeight: 1.6 }}>
-                Update your password and manage multi-factor authentication from account security.
-              </p>
-              <Link to="/account/security" className="btn btn-success btn-sm">
-                Open Account Security
-              </Link>
+              <ChangePasswordSettings variant="embedded" />
+              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+                <AccountMfaSettings variant="embedded" />
+              </div>
             </div>
           </div>
         </div>

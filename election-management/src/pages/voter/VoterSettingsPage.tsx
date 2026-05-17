@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { AccountMfaSettings } from '@/components/account/AccountMfaSettings'
+import { ChangePasswordSettings } from '@/components/account/ChangePasswordSettings'
 import { VoterPageHeader } from '@/components/voter/VoterPageHeader'
 
 export function VoterSettingsPage() {
@@ -87,12 +88,10 @@ export function VoterSettingsPage() {
             <div className="card-title">Privacy & Security</div>
           </div>
           <div className="card-body">
-            <p style={{ fontSize: 12, color: 'var(--subtle)', marginBottom: 14, lineHeight: 1.6 }}>
-              Multi-factor authentication is managed from account security.
-            </p>
-            <Link to="/account/security" className="btn btn-success btn-sm" style={{ marginBottom: 14 }}>
-              Configure MFA
-            </Link>
+            <ChangePasswordSettings variant="embedded" />
+            <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid var(--border)' }}>
+              <AccountMfaSettings variant="embedded" />
+            </div>
             <div className="toggle-wrap">
               <button
                 type="button"

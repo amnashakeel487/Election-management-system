@@ -100,8 +100,7 @@
       "title": "تخلیق کار ترتیبات",
       "subtitle": "ظاہری شکل، زبان اور اطلاع کی ترجیحات",
       "accountSecurity": "اکاؤنٹ سیکیورٹی",
-      "accountSecurityDesc": "پاس ورڈ، MFA، اور سیشن سیکیورٹی۔",
-      "openAccountSecurity": "اکاؤنٹ سیکیورٹی کھولیں",
+      "accountSecurityDesc": "پاس ورڈ تبدیل کریں اور authenticator 2FA سیٹ کریں۔",
       "electionDefaults": "انتخابی ڈیفالٹس",
       "comingSoon": "جلد آ رہا ہے",
       "electionDefaultsDesc": "ڈیفالٹ عنوانات، زمرے اور لائیو نتائج کی ترجیحات یہاں محفوظ ہوں گی۔"

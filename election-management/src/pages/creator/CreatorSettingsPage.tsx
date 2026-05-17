@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { AccountMfaSettings } from '@/components/account/AccountMfaSettings'
+import { ChangePasswordSettings } from '@/components/account/ChangePasswordSettings'
 import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader'
 import { LanguageSettings } from '@/components/i18n/LanguageSettings'
 import { AppearanceSettings } from '@/components/theme/AppearanceSettings'
@@ -25,12 +26,10 @@ export function CreatorSettingsPage() {
             <div className="card-title">{t('pages.settings.accountSecurity')}</div>
           </div>
           <div className="card-body">
-            <p style={{ fontSize: 12, color: 'var(--subtle)', marginBottom: 12 }}>
-              {t('pages.settings.accountSecurityDesc')}
-            </p>
-            <Link to="/account/security" className="btn btn-primary">
-              {t('pages.settings.openAccountSecurity')}
-            </Link>
+            <ChangePasswordSettings variant="embedded" />
+            <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid var(--border)' }}>
+              <AccountMfaSettings variant="embedded" />
+            </div>
           </div>
         </div>
         <div className="card-elevated">
