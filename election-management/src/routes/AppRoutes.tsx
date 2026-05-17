@@ -29,7 +29,6 @@ import { AdminVotersPage } from '@/pages/admin/AdminVotersPage'
 import { CreatorLayout } from '@/components/creator/layout/CreatorLayout'
 import { CreateElectionPage } from '@/pages/creator/CreateElectionPage'
 import { CreatorCandidatesPage } from '@/pages/creator/CreatorCandidatesPage'
-import { CreatorControlPage } from '@/pages/creator/CreatorControlPage'
 import { CreatorElectionDetailPage } from '@/pages/creator/CreatorElectionDetailPage'
 import { CreatorMyElectionsPage } from '@/pages/creator/CreatorMyElectionsPage'
 import { CreatorNotificationsPage } from '@/pages/creator/CreatorNotificationsPage'
@@ -37,7 +36,6 @@ import { CreatorParticipantsPage } from '@/pages/creator/CreatorParticipantsPage
 import { CreatorProfilePage } from '@/pages/creator/CreatorProfilePage'
 import { CreatorReportsPage } from '@/pages/creator/CreatorReportsPage'
 import { CreatorResultsPage } from '@/pages/creator/CreatorResultsPage'
-import { CreatorSecretIdsPage } from '@/pages/creator/CreatorSecretIdsPage'
 import { CreatorSettingsPage } from '@/pages/creator/CreatorSettingsPage'
 import { EditElectionPage } from '@/pages/creator/EditElectionPage'
 import { ElectionJoinPage } from '@/pages/ElectionJoinPage'
@@ -195,22 +193,6 @@ export function AppRoutes() {
           element={
             <CreatorApprovedRoute>
               <CreatorParticipantsPage />
-            </CreatorApprovedRoute>
-          }
-        />
-        <Route
-          path="control"
-          element={
-            <CreatorApprovedRoute>
-              <CreatorControlPage />
-            </CreatorApprovedRoute>
-          }
-        />
-        <Route
-          path="secret-ids"
-          element={
-            <CreatorApprovedRoute>
-              <CreatorSecretIdsPage />
             </CreatorApprovedRoute>
           }
         />

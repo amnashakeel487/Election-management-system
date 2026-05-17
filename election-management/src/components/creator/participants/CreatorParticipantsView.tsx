@@ -335,10 +335,16 @@ export function CreatorParticipantsView({
               </div>
             ) : tab === 'final' && !rollFinalized ? (
               <div className="cp-panel-head">
-                <p>Finalize the voter roll on the Secret IDs page to lock the final list.</p>
-                <Link to="/creator/secret-ids" className="cp-promote-btn" style={{ textDecoration: 'none' }}>
-                  Secret IDs
-                </Link>
+                <p>Finalize the voter roll on the election details page to lock the final list.</p>
+                {selectedId ? (
+                  <Link
+                    to={`/creator/elections/${selectedId}#sec-registration`}
+                    className="cp-promote-btn"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    Election details
+                  </Link>
+                ) : null}
               </div>
             ) : null}
 
@@ -419,9 +425,12 @@ export function CreatorParticipantsView({
                                   Promote
                                 </button>
                               ) : null}
-                              {tab !== 'waitlist' && sid === 'pending' && !rollFinalized ? (
-                                <Link to="/creator/secret-ids" className="cp-act issue">
-                                  Issue ID
+                              {tab !== 'waitlist' && sid === 'pending' && !rollFinalized && selectedId ? (
+                                <Link
+                                  to={`/creator/elections/${selectedId}#sec-registration`}
+                                  className="cp-act issue"
+                                >
+                                  Finalize roll
                                 </Link>
                               ) : null}
                               {tab !== 'waitlist' && sid === 'issued' ? (

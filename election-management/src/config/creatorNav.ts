@@ -4,8 +4,6 @@ export type CreatorNavIcon =
   | 'create'
   | 'candidates'
   | 'participants'
-  | 'control'
-  | 'secretIds'
   | 'results'
   | 'notifications'
   | 'reports'
@@ -36,8 +34,6 @@ export const CREATOR_NAV: CreatorNavItem[] = [
   { id: 'create', path: '/creator/elections/new', label: 'Create Election', icon: 'create', end: true },
   { id: 'candidates', path: '/creator/candidates', label: 'Candidates', section: 'Management', icon: 'candidates' },
   { id: 'participants', path: '/creator/participants', label: 'Participants', icon: 'participants' },
-  { id: 'control', path: '/creator/control', label: 'Voting Control', icon: 'control' },
-  { id: 'secretIds', path: '/creator/secret-ids', label: 'Secret IDs', icon: 'secretIds' },
   { id: 'results', path: '/creator/results', label: 'Results', icon: 'results' },
   {
     id: 'notifications',
@@ -90,20 +86,6 @@ export const CREATOR_PAGE_META: Record<
     eyebrow: 'Voters',
     title: 'Participants',
     subtitle: 'Voter registrations and waitlist for your election',
-  },
-  control: {
-    topTitle: 'Voting Control',
-    topSub: 'Start, stop and control your active election',
-    eyebrow: 'Control',
-    title: 'Voting Control Panel',
-    subtitle: 'Manage polling window and registration locks',
-  },
-  secretIds: {
-    topTitle: 'Secret ID Management',
-    topSub: 'Cryptographic voter ID generation and delivery',
-    eyebrow: 'Security',
-    title: 'Secret ID Management',
-    subtitle: 'Finalize roll and email secret voter IDs',
   },
   results: {
     topTitle: 'Election Results',
