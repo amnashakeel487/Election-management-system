@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { VOTER_SIDEBAR_NAV, type VoterNavItem } from '@/config/voterNav'
-import { LockMiniIcon, LogoutIcon, ShieldBrandIcon, VoterNavIcon } from '@/components/voter/layout/VoterIcons'
+import { LogoutIcon, ShieldBrandIcon, VoterNavIcon } from '@/components/voter/layout/VoterIcons'
 import { useAuth } from '@/hooks/useAuth'
 import { useVoterDashboard } from '@/hooks/useVoterDashboard'
-import { maskSecretVoterId } from '@/utils/maskSecretVoterId'
 import { userInitials } from '@/utils/dashboardDisplay'
 
 interface VoterSidebarProps {
@@ -33,12 +32,9 @@ export function VoterSidebar({ mobileOpen = false, onMobileClose }: VoterSidebar
   const { signOut, profile } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const { pendingVoteCount, notificationCount, registered } = useVoterDashboard()
+  const { pendingVoteCount, notificationCount } = useVoterDashboard()
 
   let lastSection: string | undefined
-
-  const primarySecret = registered.find((r) => r.secret_voter_id)?.secret_voter_id
-  const maskedPrimary = primarySecret ? maskSecretVoterId(primarySecret) : 'Per election'
 
   return (
     <>
@@ -57,16 +53,13 @@ export function VoterSidebar({ mobileOpen = false, onMobileClose }: VoterSidebar
         <div className="sb-voter-card">
           <div className="sv-top">
             <div className="sv-avatar">{userInitials(profile?.full_name, profile?.email)}</div>
-            <div>
+            <div className="sv-meta">
               <div className="sv-name">{profile?.full_name?.trim() || 'Voter'}</div>
-              <div className="sv-email">{profile?.email ?? ''}</div>
-            </div>
-          </div>
-          <div className="sv-id">
-            <LockMiniIcon />
-            <div>
-              <div className="sv-id-label">Voter ID</div>
-              <div className="sv-id-val">{maskedPrimary}</div>
+              {profile?.email ? (
+                <div className="sv-email" title={profile.email}>
+                  {profile.email}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
