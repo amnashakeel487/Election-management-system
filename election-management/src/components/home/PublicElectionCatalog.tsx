@@ -25,6 +25,10 @@ function splitCountdown(targetIso: string, nowMs: number) {
   }
 }
 
+function formatClosedDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 function PhaseBadge({ phase }: { phase: PublicElectionPhase }) {
   if (phase === 'active') {
     return (
@@ -101,6 +105,9 @@ function PublicElectionCard({
   const targetIso = phase === 'upcoming' ? election.start_date : election.end_date
   const countdown = phase !== 'completed' ? splitCountdown(targetIso, nowMs) : null
   const desc = election.description?.trim() || 'No description provided.'
+  const showTurnoutBar = (phase === 'active' && showBallots) || phase === 'completed'
+  const turnoutBarColor =
+    phase === 'completed' ? 'linear-gradient(90deg,#6C3FC5,#9333ea)' : `linear-gradient(90deg,${color},${color}bb)`
 
   return (
     <article className="e-card" style={{ animationDelay: `${index * 0.1}s` }}>
@@ -113,37 +120,51 @@ function PublicElectionCard({
         <div className="e-title">{election.title}</div>
         <div className="e-desc">{desc}</div>
 
-        {phase === 'active' && showBallots ? (
-          <>
-            <div className="e-progress-label">
-              <span>Voter turnout</span>
-              <span>
-                {ballotCount.toLocaleString()} votes · {turnout}%
-              </span>
-            </div>
-            <div className="e-bar-wrap">
-              <div
-                className="e-bar-fill"
-                style={{ width: `${turnout}%`, background: `linear-gradient(90deg,${color},${color}bb)` }}
-              />
-            </div>
-          </>
-        ) : null}
-
-        {countdown ? (
-          <div className="e-countdown">
-            {[
-              { v: countdown.hours, l: 'Hrs' },
-              { v: countdown.minutes, l: 'Min' },
-              { v: countdown.seconds, l: 'Sec' },
-            ].map((u) => (
-              <div key={u.l} className="e-count-unit">
-                <div className="e-count-num">{String(u.v).padStart(2, '0')}</div>
-                <div className="e-count-label">{u.l}</div>
+        <div className="e-metrics">
+          {showTurnoutBar ? (
+            <>
+              <div className="e-progress-label">
+                <span>{phase === 'completed' ? 'Final turnout' : 'Voter turnout'}</span>
+                <span>
+                  {ballotCount.toLocaleString()} votes · {turnout}%
+                </span>
               </div>
-            ))}
-          </div>
-        ) : null}
+              <div className="e-bar-wrap">
+                <div className="e-bar-fill" style={{ width: `${turnout}%`, background: turnoutBarColor }} />
+              </div>
+            </>
+          ) : null}
+
+          {countdown ? (
+            <div className="e-countdown">
+              {[
+                { v: countdown.hours, l: 'Hrs' },
+                { v: countdown.minutes, l: 'Min' },
+                { v: countdown.seconds, l: 'Sec' },
+              ].map((u) => (
+                <div key={u.l} className="e-count-unit">
+                  <div className="e-count-num">{String(u.v).padStart(2, '0')}</div>
+                  <div className="e-count-label">{u.l}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="e-countdown e-countdown--ended" aria-label="Election closed">
+              <div className="e-count-unit">
+                <div className="e-count-num e-count-num--sm">{formatClosedDate(election.end_date)}</div>
+                <div className="e-count-label">Closed</div>
+              </div>
+              <div className="e-count-unit">
+                <div className="e-count-num">{ballotCount.toLocaleString()}</div>
+                <div className="e-count-label">Votes</div>
+              </div>
+              <div className="e-count-unit">
+                <div className="e-count-num">{turnout}%</div>
+                <div className="e-count-label">Turnout</div>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="e-meta">
           <span>

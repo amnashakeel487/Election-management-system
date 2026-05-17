@@ -7,6 +7,7 @@ import { PUBLIC_LOCALES } from '@/types/locale'
 import { useAuth } from '@/hooks/useAuth'
 import { LandingElectionsSection } from './LandingElectionsSection'
 import { LandingLiveResultsSection } from './LandingLiveResultsSection'
+import { LandingTeamSection } from './LandingTeamSection'
 import { useLandingCounter, useLandingReveal } from './useLandingReveal'
 import './landing-page.css'
 
@@ -478,6 +479,8 @@ export function LandingPageView() {
           </div>
         </div>
       </section>
+
+      <LandingTeamSection />
 
       <footer>
         <div className="footer-inner">

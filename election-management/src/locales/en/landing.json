@@ -124,6 +124,18 @@
     "signIn": "Sign in",
     "chips": ["Free to register", "Setup in minutes", "Email verification", "Cancel anytime"]
   },
+  "team": {
+    "eyebrow": "Built with care",
+    "title": "Meet our",
+    "titleAccent": "team",
+    "sub": "FortressVote is engineered by a small, focused team committed to secure, transparent elections.",
+    "leaderBadge": "Team leader",
+    "leaderRole": "Team Leader · AI & Software",
+    "leaderBio": "AI automation and custom software developer who believes consistency builds excellence—crafting secure, scalable platforms end to end.",
+    "developerRole": "Developer · Design & Frontend",
+    "developerBio": "Creative designer architecting the web—blending aesthetics with usability to shape polished, impactful digital experiences.",
+    "viewPortfolio": "View portfolio"
+  },
   "footer": {
     "desc": "A secure election management platform. Built for transparency, designed for trust.",
     "platform": "Platform",
