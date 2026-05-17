@@ -1,12 +1,15 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { safeReturnPathForRole } from '@/utils/safeReturnPath'
 import { AuthLayout } from '@/components/auth/AuthLayout'
 import { useAuth } from '@/hooks/useAuth'
 import { challengeAndVerifyMfa, getVerifiedTotpFactor } from '@/services/mfaService'
 
 export function MfaVerifyPage() {
   const navigate = useNavigate()
-  const { mfaRequired, refreshSession, getDashboardPath, emailVerified } = useAuth()
+  const location = useLocation()
+  const { mfaRequired, refreshSession, profile, emailVerified } = useAuth()
+  const returnFrom = (location.state as { from?: string } | null)?.from
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -24,7 +27,7 @@ export function MfaVerifyPage() {
         navigate('/verify-email', { replace: true })
         return
       }
-      const path = getDashboardPath() ?? '/'
+      const path = profile ? safeReturnPathForRole(returnFrom, profile.role) : '/'
       navigate(path, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid verification code')
@@ -34,7 +37,7 @@ export function MfaVerifyPage() {
   }
 
   if (!mfaRequired) {
-    const path = getDashboardPath() ?? '/'
+    const path = profile ? safeReturnPathForRole(returnFrom, profile.role) : '/'
     return <Navigate to={path} replace />
   }
 

@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom'
+import { AuthSessionLoading } from '@/components/auth/AuthSessionLoading'
 import { useAuth } from '@/hooks/useAuth'
 import type { UserRole } from '@/types/auth'
 
@@ -17,11 +18,7 @@ export function ProtectedRoute({
   const location = useLocation()
 
   if (!authReady) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-surface text-on-surface">
-        <span className="font-body-md text-body-md text-on-surface-variant">Loading secure session…</span>
-      </div>
-    )
+    return <AuthSessionLoading />
   }
 
   if (initError) {
@@ -32,12 +29,17 @@ export function ProtectedRoute({
     )
   }
 
+  if (session && !profile) {
+    return <AuthSessionLoading message="Loading your profile…" />
+  }
+
   if (!session || !profile) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />
+    const returnPath = `${location.pathname}${location.search}${location.hash}`
+    return <Navigate to="/login" replace state={{ from: returnPath }} />
   }
 
   if (mfaRequired) {
-    return <Navigate to="/mfa-verify" replace />
+    return <Navigate to="/mfa-verify" replace state={{ from: `${location.pathname}${location.search}` }} />
   }
 
   if (requireVerifiedEmail && !emailVerified) {

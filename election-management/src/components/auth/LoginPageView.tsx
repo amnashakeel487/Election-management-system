@@ -7,6 +7,7 @@ import { parseOrThrow, signInSchema } from '@/lib/validation/schemas'
 import { TurnstileCaptcha } from '@/components/security/TurnstileCaptcha'
 import { turnstileConfigured, verifyCaptchaToken } from '@/services/securityService'
 import type { UserRole } from '@/types/auth'
+import { safeReturnPathForRole } from '@/utils/safeReturnPath'
 import { AuthRoleCards, type AuthRoleOption } from './AuthRoleCards'
 import { AuthSplitChrome } from './AuthSplitChrome'
 import { AUTH_CAPTCHA_LOGO } from '@/constants/authAssets'
@@ -73,7 +74,7 @@ export function LoginPageView() {
 
         setSubmitting(true)
         const dashboardPath = await signIn({ ...credentials, loginAsRole })
-        navigate(returnTo ?? dashboardPath, { replace: true })
+        navigate(safeReturnPathForRole(returnTo ?? dashboardPath, loginAsRole), { replace: true })
       } catch (err) {
         if (isRoleMismatchError(err)) {
           setError(

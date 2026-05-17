@@ -1,5 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom'
+import { AuthSessionLoading } from '@/components/auth/AuthSessionLoading'
 import { useAuth } from '@/hooks/useAuth'
+import { safeReturnPathForRole } from '@/utils/safeReturnPath'
 
 interface VerifyEmailRouteProps {
   children: React.ReactNode
@@ -11,7 +13,7 @@ type VerifyEmailLocationState = {
 
 /** Allows pending signup (no session) or authenticated unverified users. */
 export function VerifyEmailRoute({ children }: VerifyEmailRouteProps) {
-  const { session, profile, authReady, emailVerified, getDashboardPath } = useAuth()
+  const { session, profile, authReady, emailVerified } = useAuth()
   const location = useLocation()
   const pendingEmail = (location.state as VerifyEmailLocationState | null)?.email
 
@@ -20,11 +22,7 @@ export function VerifyEmailRoute({ children }: VerifyEmailRouteProps) {
   }
 
   if (!authReady) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-on-background">
-        <span className="font-body-md text-body-md text-on-surface-variant">Loading…</span>
-      </div>
-    )
+    return <AuthSessionLoading />
   }
 
   if (!session && !pendingEmail) {
@@ -32,8 +30,8 @@ export function VerifyEmailRoute({ children }: VerifyEmailRouteProps) {
   }
 
   if (session && emailVerified && profile) {
-    const dashboard = getDashboardPath()
-    if (dashboard) return <Navigate to={dashboard} replace />
+    const from = (location.state as { from?: string } | null)?.from
+    return <Navigate to={safeReturnPathForRole(from, profile.role)} replace />
   }
 
   return <>{children}</>

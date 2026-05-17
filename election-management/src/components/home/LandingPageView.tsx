@@ -8,7 +8,10 @@ import { LandingElectionsSection } from './LandingElectionsSection'
 import { LandingLiveResultsSection } from './LandingLiveResultsSection'
 import { LandingContactSection } from './LandingContactSection'
 import { LandingTeamSection } from './LandingTeamSection'
-import { useLandingCounter, useLandingReveal } from './useLandingReveal'
+import { LandingDashboardPreview } from './LandingDashboardPreview'
+import { LandingStatsStrip } from './LandingStatsStrip'
+import { useLandingLiveData } from '@/hooks/useLandingLiveData'
+import { useLandingReveal } from './useLandingReveal'
 import './landing-page.css'
 
 const PARTICLE_COUNT = 32
@@ -143,6 +146,7 @@ export function LandingPageView() {
   const ctaChips = t('cta.chips', { returnObjects: true }) as string[]
   const footerBadges = t('footer.badges', { returnObjects: true }) as string[]
   const [barsReady, setBarsReady] = useState(false)
+  const { snapshot, loading: liveLoading, formatCompactNum } = useLandingLiveData()
 
   const particles = useMemo(
     () =>
@@ -159,7 +163,6 @@ export function LandingPageView() {
   )
 
   useLandingReveal(true)
-  useLandingCounter(true)
 
   useEffect(() => {
     const t = window.setTimeout(() => setBarsReady(true), 800)
@@ -236,37 +239,20 @@ export function LandingPageView() {
           </div>
 
           <div className="hero-right">
-            <DashboardPreview barsReady={barsReady} />
+            <LandingDashboardPreview
+              snapshot={snapshot}
+              loading={liveLoading}
+              barsReady={barsReady}
+            />
           </div>
         </div>
       </section>
 
-      <div className="stats-strip">
-        <div className="stats-inner">
-          <div className="stat-col reveal">
-            <div className="stat-num-big" data-target="2847">
-              0
-            </div>
-            <div className="stat-label-big">{t('stats.electionsConducted')}</div>
-            <div className="stat-delta">{t('stats.platformScale')}</div>
-          </div>
-          <div className="stat-col reveal" style={{ transitionDelay: '0.1s' }}>
-            <div className="stat-num-big">1.2M+</div>
-            <div className="stat-label-big">{t('stats.registeredVoters')}</div>
-            <div className="stat-delta">{t('stats.growingCommunity')}</div>
-          </div>
-          <div className="stat-col reveal" style={{ transitionDelay: '0.2s' }}>
-            <div className="stat-num-big">99.9%</div>
-            <div className="stat-label-big">{t('stats.uptimeFocus')}</div>
-            <div className="stat-delta">{t('stats.reliableInfra')}</div>
-          </div>
-          <div className="stat-col reveal" style={{ transitionDelay: '0.3s' }}>
-            <div className="stat-num-big">Zero</div>
-            <div className="stat-label-big">{t('stats.knownBreaches')}</div>
-            <div className="stat-delta">{t('stats.securityFirst')}</div>
-          </div>
-        </div>
-      </div>
+      <LandingStatsStrip
+        snapshot={snapshot}
+        loading={liveLoading}
+        formatCompact={formatCompactNum}
+      />
 
       <LandingElectionsSection />
 
@@ -501,102 +487,6 @@ export function LandingPageView() {
           </div>
         </div>
       </footer>
-    </div>
-  )
-}
-
-function DashboardPreview({ barsReady }: { barsReady: boolean }) {
-  const { t } = useTranslation('landing')
-  const chartBars = [
-    { h: '30%', bg: '#E0E7FF', delay: '0.2s' },
-    { h: '55%', bg: '#C7D2FE', delay: '0.3s' },
-    { h: '40%', bg: '#A5B4FC', delay: '0.4s' },
-    { h: '75%', bg: '#818CF8', delay: '0.5s' },
-    { h: '60%', bg: '#6366F1', delay: '0.6s' },
-    { h: '90%', bg: '#4F46E5', delay: '0.7s' },
-    { h: '80%', bg: '#4338CA', delay: '0.8s' },
-  ]
-
-  return (
-    <div className="dashboard-preview">
-      <div className="dp-topbar">
-        <div className="dp-dots">
-          <div className="dp-dot" style={{ background: '#EF4444' }} />
-          <div className="dp-dot" style={{ background: '#F59E0B' }} />
-          <div className="dp-dot" style={{ background: '#10B981' }} />
-        </div>
-        <span className="dp-title">{t('preview.title')}</span>
-        <div className="dp-live">
-          <div className="dp-live-dot" />
-          {t('preview.live')}
-        </div>
-      </div>
-      <div className="dp-body">
-        <div className="dp-stat-row">
-          <div className="dp-stat">
-            <div className="dp-stat-num">12</div>
-            <div className="dp-stat-label">{t('preview.active')}</div>
-          </div>
-          <div className="dp-stat">
-            <div className="dp-stat-num">84K</div>
-            <div className="dp-stat-label">{t('preview.voters')}</div>
-          </div>
-          <div className="dp-stat">
-            <div className="dp-stat-num">99.9%</div>
-            <div className="dp-stat-label">{t('preview.uptime')}</div>
-          </div>
-        </div>
-        <div className="dp-election" style={{ borderLeftColor: '#10B981' }}>
-          <div className="dp-el-top">
-            <span className="dp-el-title">{t('preview.election1')}</span>
-            <span className="dp-badge active">{t('preview.statusActive')}</span>
-          </div>
-          <div className="dp-bar-wrap">
-            <div
-              className="dp-bar-fill"
-              style={{
-                ['--w' as string]: '62%',
-                width: barsReady ? '62%' : 0,
-                background: 'linear-gradient(90deg,#10B981,#059669)',
-              }}
-            />
-          </div>
-          <div className="dp-bar-meta">
-            <span>{t('preview.voted')}</span>
-            <span>62%</span>
-          </div>
-        </div>
-        <div className="dp-election" style={{ borderLeftColor: '#2563EB' }}>
-          <div className="dp-el-top">
-            <span className="dp-el-title">{t('preview.election2')}</span>
-            <span className="dp-badge upcoming">{t('preview.statusUpcoming')}</span>
-          </div>
-          <div className="dp-bar-wrap">
-            <div
-              className="dp-bar-fill"
-              style={{
-                ['--w' as string]: '46%',
-                width: barsReady ? '46%' : 0,
-                background: 'linear-gradient(90deg,#2563EB,#1D4ED8)',
-                transitionDelay: '0.3s',
-              }}
-            />
-          </div>
-          <div className="dp-bar-meta">
-            <span>{t('preview.registered')}</span>
-            <span>{t('preview.opensSoon')}</span>
-          </div>
-        </div>
-        <div className="dp-chart-row">
-          {chartBars.map((b) => (
-            <div
-              key={b.delay}
-              className="dp-chart-bar"
-              style={{ height: b.h, background: b.bg, ['--delay' as string]: b.delay }}
-            />
-          ))}
-        </div>
-      </div>
     </div>
   )
 }

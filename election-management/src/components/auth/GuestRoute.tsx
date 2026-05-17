@@ -1,26 +1,35 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
+import { AuthSessionLoading } from '@/components/auth/AuthSessionLoading'
 import { useAuth } from '@/hooks/useAuth'
+import { safeReturnPathForRole } from '@/utils/safeReturnPath'
 
 interface GuestRouteProps {
   children: React.ReactNode
 }
 
-/** Login/register: always show the form; redirect only when session is known. */
+/** Login/register: show form for guests; restore prior dashboard URL after session loads. */
 export function GuestRoute({ children }: GuestRouteProps) {
-  const { session, profile, authReady, initError, emailVerified, mfaRequired, isRecoverySession, getDashboardPath } =
+  const location = useLocation()
+  const { session, profile, authReady, initError, emailVerified, mfaRequired, isRecoverySession } =
     useAuth()
 
   const showConnectionBanner = Boolean(initError)
 
-  if (authReady && session && profile && !isRecoverySession) {
+  if (!authReady) {
+    return <AuthSessionLoading />
+  }
+
+  if (session && profile && !isRecoverySession) {
     if (mfaRequired) {
-      return <Navigate to="/mfa-verify" replace />
+      const from = (location.state as { from?: string } | null)?.from
+      return <Navigate to="/mfa-verify" replace state={from ? { from } : undefined} />
     }
     if (!emailVerified) {
       return <Navigate to="/verify-email" replace />
     }
-    const dashboard = getDashboardPath()
-    if (dashboard) return <Navigate to={dashboard} replace />
+    const from = (location.state as { from?: string } | null)?.from
+    const target = safeReturnPathForRole(from, profile.role)
+    return <Navigate to={target} replace />
   }
 
   return (

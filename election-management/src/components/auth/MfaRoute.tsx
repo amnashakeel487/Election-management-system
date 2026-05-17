@@ -1,19 +1,18 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
+import { AuthSessionLoading } from '@/components/auth/AuthSessionLoading'
 import { useAuth } from '@/hooks/useAuth'
+import { safeReturnPathForRole } from '@/utils/safeReturnPath'
 
 interface MfaRouteProps {
   children: React.ReactNode
 }
 
 export function MfaRoute({ children }: MfaRouteProps) {
-  const { session, authReady, mfaRequired, initError } = useAuth()
+  const location = useLocation()
+  const { session, profile, authReady, mfaRequired, initError } = useAuth()
 
   if (!authReady) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-surface">
-        <span className="font-body-md text-on-surface-variant">Loading…</span>
-      </div>
-    )
+    return <AuthSessionLoading />
   }
 
   if (initError) {
@@ -29,6 +28,10 @@ export function MfaRoute({ children }: MfaRouteProps) {
   }
 
   if (!mfaRequired) {
+    const from = (location.state as { from?: string } | null)?.from
+    if (profile) {
+      return <Navigate to={safeReturnPathForRole(from, profile.role)} replace />
+    }
     return <Navigate to="/" replace />
   }
 

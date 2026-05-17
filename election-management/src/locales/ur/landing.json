@@ -30,10 +30,10 @@
     "platformScale": "پلیٹ فارم پیمانہ",
     "registeredVoters": "رجسٹرڈ ووٹرز",
     "growingCommunity": "بڑتی کمیونٹی",
-    "uptimeFocus": "اپ ٹائم فوکس",
-    "reliableInfra": "قابل اعتماد انفراسٹرکچر",
-    "knownBreaches": "معروف خلاف ورزیاں",
-    "securityFirst": "سیکیورٹی پہلے"
+    "votesCast": "ڈالے گئے ووٹ",
+    "votesCastDelta": "شائع شدہ انتخابات میں",
+    "liveElections": "لائیو انتخابات",
+    "liveElectionsDelta": "ابھی ووٹنگ جاری"
   },
   "liveResults": {
     "eyebrow": "لائیو شفافیت",
@@ -178,15 +178,13 @@
   "preview": {
     "title": "فورٹریس ووٹ ڈیش بورڈ",
     "live": "لائیو",
+    "synced": "ہم آہنگ",
     "active": "فعال",
     "voters": "ووٹرز",
-    "uptime": "اپ ٹائم",
-    "election1": "طلبہ یونین انتخاب",
-    "election2": "کونسل ضمنی انتخاب",
+    "votes": "ووٹ",
     "statusActive": "فعال",
     "statusUpcoming": "آنے والا",
-    "voted": "28,140 ووٹ ڈالے",
-    "registered": "5,920 رجسٹرڈ",
-    "opensSoon": "جلد کھلے گا"
+    "noElections": "ابھی کوئی شائع شدہ انتخاب نہیں",
+    "browseLink": "انتخابات دیکھیں"
   }
 }

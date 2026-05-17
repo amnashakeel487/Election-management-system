@@ -61,9 +61,7 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
   const links = useMemo(
     () => [
       { key: 'elections', href: sectionHref('#elections'), label: tNav('elections'), route: false as const },
-      { key: 'browse', href: '/browse-elections', label: t('nav.browseElections'), route: true as const },
       { key: 'results', href: '/results', label: t('nav.liveResults'), route: true as const },
-      { key: 'features', href: sectionHref('#features'), label: t('nav.features'), route: false as const },
       { key: 'how', href: sectionHref('#how'), label: t('nav.howItWorks'), route: false as const },
       { key: 'team', href: sectionHref('#team'), label: t('nav.team'), route: false as const },
       { key: 'contact', href: sectionHref('#contact'), label: t('nav.contact'), route: false as const },
@@ -83,7 +81,6 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
   const linkClass = (key: string) => {
     const isActive =
       (key === 'elections' && active === 'elections') ||
-      (key === 'browse' && active === 'browse') ||
       (key === 'results' && active === 'results')
     return `nav-link${isActive ? ' active' : ''}`
   }

@@ -30,10 +30,10 @@
     "platformScale": "Platform scale",
     "registeredVoters": "Registered voters",
     "growingCommunity": "Growing community",
-    "uptimeFocus": "Uptime focus",
-    "reliableInfra": "Reliable infrastructure",
-    "knownBreaches": "Known breaches",
-    "securityFirst": "Security first"
+    "votesCast": "Votes cast",
+    "votesCastDelta": "Across published elections",
+    "liveElections": "Live elections",
+    "liveElectionsDelta": "Open for voting now"
   },
   "liveResults": {
     "eyebrow": "Live transparency",
@@ -178,15 +178,13 @@
   "preview": {
     "title": "FortressVote Dashboard",
     "live": "Live",
+    "synced": "Synced",
     "active": "Active",
     "voters": "Voters",
-    "uptime": "Uptime",
-    "election1": "Student Union Election",
-    "election2": "Council By-Election",
+    "votes": "Votes",
     "statusActive": "Active",
     "statusUpcoming": "Upcoming",
-    "voted": "28,140 voted",
-    "registered": "5,920 registered",
-    "opensSoon": "Opens soon"
+    "noElections": "No published elections yet",
+    "browseLink": "Browse elections"
   }
 }

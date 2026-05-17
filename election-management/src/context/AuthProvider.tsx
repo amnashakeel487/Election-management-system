@@ -140,12 +140,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (nextSession?.user) {
         const needsMfa = await checkMfaRequired()
         if (mounted) setMfaRequired(needsMfa)
-      } else if (mounted) {
-        setMfaRequired(false)
+        await loadProfile(nextSession.user)
+      } else {
+        setProfile(null)
+        if (mounted) setMfaRequired(false)
       }
 
-      markReady()
-      void loadProfile(nextSession?.user ?? null)
+      if (mounted) markReady()
     }
 
     const {
