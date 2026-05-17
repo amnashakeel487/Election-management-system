@@ -5,12 +5,13 @@ import { CreatorElectionDetailView } from '@/components/creator/election-detail/
 import { useCreatorElection } from '@/context/CreatorElectionContext'
 import { useAuth } from '@/hooks/useAuth'
 import { fetchCreatorElectionAuditLogs } from '@/services/auditService'
-import { fetchElectionById } from '@/services/electionService'
+import { removeCandidatePortrait } from '@/services/candidatePhotoService'
+import { fetchElectionById, removeCandidate } from '@/services/electionService'
 import { fetchElectionResults } from '@/services/resultsService'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
 import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import type { AuditLogEntry } from '@/types/auth'
-import type { ElectionWithCandidates } from '@/types/election'
+import type { Candidate, ElectionWithCandidates } from '@/types/election'
 import type { ElectionResultsPayload } from '@/types/electionResults'
 import type { ElectionRegistrationStats } from '@/types/voterRegistration'
 
@@ -26,6 +27,7 @@ export function CreatorElectionDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [finalizingId, setFinalizingId] = useState<string | null>(null)
   const [finalizeMessage, setFinalizeMessage] = useState<string | null>(null)
+  const [deletingCandidateId, setDeletingCandidateId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     if (!id) return
@@ -86,6 +88,25 @@ export function CreatorElectionDetailPage() {
     void load()
   }, [load])
 
+  async function handleDeleteCandidate(candidate: Candidate) {
+    if (!election) return
+    const canManage = election.status === 'draft' || election.status === 'published'
+    if (!canManage) return
+    if (!window.confirm(`Remove candidate "${candidate.name}" from this election?`)) return
+    setDeletingCandidateId(candidate.id)
+    try {
+      if (candidate.photo_url) {
+        await removeCandidatePortrait(candidate.photo_url).catch(() => undefined)
+      }
+      await removeCandidate(candidate.id)
+      await load()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to remove candidate')
+    } finally {
+      setDeletingCandidateId(null)
+    }
+  }
+
   async function handleFinalize() {
     if (!election) return
     setFinalizingId(election.id)
@@ -138,6 +159,8 @@ export function CreatorElectionDetailPage() {
       finalizeMessage={finalizeMessage}
       onReload={() => void load()}
       onFinalize={() => void handleFinalize()}
+      onDeleteCandidate={(c) => void handleDeleteCandidate(c)}
+      deletingCandidateId={deletingCandidateId}
     />
   )
 }

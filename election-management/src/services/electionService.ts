@@ -6,6 +6,7 @@ import type {
   CandidateInput,
   CreateElectionInput,
   Election,
+  ElectionStatus,
   ElectionWithCandidates,
   UpdateCandidateInput,
   UpdateElectionInput,
@@ -145,6 +146,29 @@ export async function updateElection(
 function effectiveRegistrationDeadline(election: Election): Date {
   if (election.registration_deadline) return new Date(election.registration_deadline)
   return new Date(election.start_date)
+}
+
+/** Creator control-panel updates (status, privacy, live results) on non-draft elections. */
+export async function updateCreatorElectionControls(
+  electionId: string,
+  patch: {
+    status?: ElectionStatus
+    real_time_results?: boolean
+    privacy_tier?: string
+  },
+): Promise<Election> {
+  const { data, error } = await supabase
+    .from(ELECTIONS)
+    .update({
+      ...patch,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', electionId)
+    .select(ELECTION_COLUMNS)
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data as Election
 }
 
 export async function publishElection(electionId: string): Promise<Election> {

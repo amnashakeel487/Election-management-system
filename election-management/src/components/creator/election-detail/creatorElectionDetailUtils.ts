@@ -45,6 +45,30 @@ export function formatDeadlineCountdown(iso: string | null | undefined, nowMs = 
   return `${minutes} Min`
 }
 
+/** Compact countdown for progress header, e.g. "2d 14h". */
+export function formatClosesInShort(iso: string | null | undefined, nowMs = Date.now()): string | null {
+  if (!iso) return null
+  const diff = new Date(iso).getTime() - nowMs
+  if (diff <= 0) return 'Closed'
+  const days = Math.floor(diff / 86_400_000)
+  const hours = Math.floor((diff % 86_400_000) / 3_600_000)
+  if (days > 0) return `${days}d ${hours}h`
+  if (hours > 0) return `${hours}h`
+  const minutes = Math.floor((diff % 3_600_000) / 60_000)
+  return `${minutes}m`
+}
+
+export function isRegistrationClosingSoon(
+  iso: string | null | undefined,
+  nowMs = Date.now(),
+  withinHours = 48,
+): boolean {
+  if (!iso) return false
+  const diff = new Date(iso).getTime() - nowMs
+  if (diff <= 0) return false
+  return diff <= withinHours * 3_600_000
+}
+
 export function votingCountdownLabel(election: ElectionWithCandidates, nowMs = Date.now()): string {
   const phase = electionDisplayStatus(election.status, election.start_date, election.end_date, nowMs)
   if (phase === 'upcoming') return `Voting starts in ${formatTimeUntil(election.start_date, nowMs)}`

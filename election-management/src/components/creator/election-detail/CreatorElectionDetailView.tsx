@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { promoteNextWaitlistSlots } from '@/services/waitlistService'
 import { CreatorElectionDetailQrSection } from '@/components/creator/election-detail/CreatorElectionDetailQrSection'
+import { CreatorElectionVotingControls } from '@/components/creator/election-detail/CreatorElectionVotingControls'
 import { ElectionWaitlistPanel } from '@/components/waitlist/ElectionWaitlistPanel'
 import { VoterRollLockPanel } from '@/components/election/VoterRollLockPanel'
+import { CANDIDATE_PLACEHOLDER_IMAGES } from '@/constants/electionDetailsAssets'
 import type { AuditLogEntry } from '@/types/auth'
-import type { ElectionWithCandidates } from '@/types/election'
+import type { Candidate, ElectionWithCandidates } from '@/types/election'
+import { candidateInitial, candidatePortraitOrPlaceholder } from '@/utils/candidateDisplay'
 import type { ElectionResultsPayload } from '@/types/electionResults'
 import type { ElectionRegistrationStats } from '@/types/voterRegistration'
 import { avatarGradient, formatDashboardNumber } from '@/utils/dashboardDisplay'
@@ -19,7 +23,9 @@ import {
   candidateVoteShare,
   ehStatusClass,
   ehStatusLabel,
+  formatClosesInShort,
   formatDeadlineCountdown,
+  isRegistrationClosingSoon,
   registrationFillPercent,
   votingCountdownLabel,
 } from '@/components/creator/election-detail/creatorElectionDetailUtils'
@@ -33,6 +39,8 @@ export interface CreatorElectionDetailViewProps {
   finalizeMessage: string | null
   onReload: () => void
   onFinalize: () => void
+  onDeleteCandidate?: (candidate: Candidate) => void
+  deletingCandidateId?: string | null
 }
 
 const RANK_CLASS = ['gold', 'silver', 'bronze'] as const
@@ -52,9 +60,13 @@ export function CreatorElectionDetailView({
   finalizeMessage,
   onReload,
   onFinalize,
+  onDeleteCandidate,
+  deletingCandidateId = null,
 }: CreatorElectionDetailViewProps) {
   const [activeSection, setActiveSection] = useState<string>('sec-stats')
   const [nowMs, setNowMs] = useState(() => Date.now())
+  const [promoteAllBusy, setPromoteAllBusy] = useState(false)
+  const [regActionMessage, setRegActionMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const id = window.setInterval(() => setNowMs(Date.now()), 30_000)
@@ -62,6 +74,9 @@ export function CreatorElectionDetailView({
   }, [])
 
   const status = ehStatusClass(election, nowMs)
+  const canManageCandidates =
+    election.status === 'draft' || election.status === 'published'
+  const candidatesManageUrl = `/creator/candidates?election=${election.id}`
   const showInvite = election.status !== 'draft'
   const showRoll =
     election.status === 'published' ||
@@ -70,6 +85,34 @@ export function CreatorElectionDetailView({
 
   const regPct = registrationFillPercent(stats)
   const spotsLeft = stats ? Math.max(0, stats.max_voters - stats.registered_count) : 0
+  const waitlistCount = stats?.waitlist_count ?? 0
+  const closesInShort = formatClosesInShort(election.registration_deadline, nowMs)
+  const timeRemaining = formatDeadlineCountdown(election.registration_deadline, nowMs)
+  const closingSoon = isRegistrationClosingSoon(election.registration_deadline, nowMs)
+  const autoLockEnabled = !election.voter_roll_finalized_at
+  const canPromoteWaitlist =
+    !election.voter_roll_finalized_at &&
+    waitlistCount > 0 &&
+    spotsLeft > 0 &&
+    (election.status === 'published' || election.status === 'draft')
+
+  async function handleApproveAllWaitlisted() {
+    if (!canPromoteWaitlist) return
+    setPromoteAllBusy(true)
+    setRegActionMessage(null)
+    try {
+      const result = await promoteNextWaitlistSlots(election.id, Math.min(waitlistCount, spotsLeft, 25))
+      const count = result.promoted_count ?? result.promoted?.length ?? 0
+      setRegActionMessage(
+        count > 0 ? `Approved ${count} waitlisted voter(s).` : 'No waitlisted voters could be promoted.',
+      )
+      onReload()
+    } catch (err) {
+      setRegActionMessage(err instanceof Error ? err.message : 'Promotion failed')
+    } finally {
+      setPromoteAllBusy(false)
+    }
+  }
   const totalVotes = results?.total_votes ?? 0
   const turnout = results?.turnout_percent ?? stats?.participation_percent ?? 0
 
@@ -320,7 +363,7 @@ export function CreatorElectionDetailView({
             </div>
           </div>
           <div className="panel-head-right">
-            <Link to="/creator/candidates" className="p-btn primary">
+            <Link to={candidatesManageUrl} className="p-btn primary">
               Manage all
             </Link>
           </div>
@@ -334,17 +377,23 @@ export function CreatorElectionDetailView({
                 const { pct } = candidateVoteShare(c.id, results)
                 const rank = RANK_CLASS[i] ?? 'bronze'
                 const cardClass = CARD_CLASS[i % 3]
+                const photo = candidatePortraitOrPlaceholder(c, CANDIDATE_PLACEHOLDER_IMAGES)
+                const hasPhoto = Boolean(c.photo_url?.trim())
                 return (
                   <div key={c.id} className={`candidate-card ${cardClass}`}>
                     {results && pct > 0 ? (
                       <span className={`candidate-rank-badge ${rank}`}>#{i + 1}</span>
                     ) : null}
-                    <div
-                      className="candidate-photo"
-                      style={{ background: avatarGradient(c.name) }}
-                    >
-                      {candidateInitials(c.name)}
-                    </div>
+                    {hasPhoto ? (
+                      <img src={photo} alt="" className="candidate-photo-img" />
+                    ) : (
+                      <div
+                        className="candidate-photo"
+                        style={{ background: avatarGradient(c.name) }}
+                      >
+                        {candidateInitial(c.name)}
+                      </div>
+                    )}
                     <div className="candidate-name">{c.name}</div>
                     <div className="candidate-designation">
                       {c.designation?.trim() || 'Candidate'}
@@ -370,9 +419,28 @@ export function CreatorElectionDetailView({
                       </div>
                     ) : null}
                     <div className="candidate-footer">
-                      <Link to="/creator/candidates" className="c-btn">
-                        Edit
-                      </Link>
+                      {canManageCandidates ? (
+                        <>
+                          <Link to={candidatesManageUrl} className="c-btn">
+                            Edit
+                          </Link>
+                          {onDeleteCandidate ? (
+                            <button
+                              type="button"
+                              className="c-btn c-btn-del"
+                              disabled={deletingCandidateId === c.id}
+                              aria-label={`Delete ${c.name}`}
+                              onClick={() => onDeleteCandidate(c)}
+                            >
+                              {deletingCandidateId === c.id ? '…' : 'Delete'}
+                            </button>
+                          ) : null}
+                        </>
+                      ) : (
+                        <Link to={candidatesManageUrl} className="c-btn">
+                          View
+                        </Link>
+                      )}
                     </div>
                   </div>
                 )
@@ -422,34 +490,36 @@ export function CreatorElectionDetailView({
 
       {/* Registration */}
       {showRoll ? (
-        <div className="panel" id="sec-registration">
-          <div className="panel-head">
+        <div className="panel reg-status-panel" id="sec-registration">
+          <div className="panel-head reg-panel-head">
             <div className="panel-title">Registration Status</div>
             <div className="panel-sub">Capacity and deadline tracking</div>
           </div>
           <div className="panel-body">
+            {regActionMessage ? (
+              <p className="reg-action-msg" role="status">
+                {regActionMessage}
+              </p>
+            ) : null}
             <div className="reg-status-inner">
               <div className="reg-progress-section">
                 <div className="reg-progress-header">
                   <div>
                     <div className="reg-pct-big">{regPct.toFixed(1)}%</div>
                     <div className="reg-count">
-                      {stats?.registered_count ?? 0} of {stats?.max_voters ?? election.max_voters} spots filled
+                      {formatDashboardNumber(stats?.registered_count ?? 0)} of{' '}
+                      {formatDashboardNumber(stats?.max_voters ?? election.max_voters)} spots filled
                     </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ced-warning)' }}>
-                      {spotsLeft} spots left
-                    </div>
-                    {election.registration_deadline ? (
-                      <div style={{ fontSize: 11, color: 'var(--ced-subtle)', marginTop: 2 }}>
-                        Closes {formatDeadlineCountdown(election.registration_deadline, nowMs) ?? '—'}
-                      </div>
+                  <div className="reg-spots-meta">
+                    <div className="reg-spots-left">{formatDashboardNumber(spotsLeft)} spots left</div>
+                    {closesInShort && closesInShort !== 'Closed' ? (
+                      <div className="reg-closes-in">Closes in {closesInShort}</div>
                     ) : null}
                   </div>
                 </div>
                 <div className="reg-bar-track">
-                  <div className="reg-bar-fill" style={{ width: `${regPct}%` }} />
+                  <div className="reg-bar-fill" style={{ width: `${Math.min(100, regPct)}%` }} />
                 </div>
                 <div className="reg-info-grid">
                   <div className="reg-info-item">
@@ -461,14 +531,87 @@ export function CreatorElectionDetailView({
                     </div>
                   </div>
                   <div className="reg-info-item">
-                    <div className="reg-info-label">Roll status</div>
+                    <div className="reg-info-label">Time remaining</div>
+                    <div
+                      className={`reg-info-value${timeRemaining && timeRemaining !== 'Closed' ? ' warn' : ''}`}
+                    >
+                      {timeRemaining ?? '—'}
+                    </div>
+                  </div>
+                  <div className="reg-info-item">
+                    <div className="reg-info-label">Auto-lock</div>
                     <div className="reg-info-value">
-                      {election.voter_roll_finalized_at ? 'Finalized' : 'Open'}
+                      {autoLockEnabled ? (
+                        <span className="reg-auto-lock-on">
+                          <span className="reg-dot" aria-hidden /> Enabled
+                        </span>
+                      ) : (
+                        'Finalized'
+                      )}
                     </div>
                   </div>
                   <div className="reg-info-item">
                     <div className="reg-info-label">Waitlist</div>
-                    <div className="reg-info-value">{stats?.waitlist_count ?? 0} pending</div>
+                    <div className="reg-info-value">{waitlistCount} pending</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="reg-alert-section">
+                <div className="reg-alert-box">
+                  <div className="reg-alert-icon" aria-hidden>
+                    <svg viewBox="0 0 24 24">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                      <line x1="12" y1="9" x2="12" y2="13" />
+                      <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                  </div>
+                  <p className="reg-alert-text">
+                    {timeRemaining && timeRemaining !== 'Closed' ? (
+                      <>
+                        <strong>Registration closes in {timeRemaining}.</strong> Once the deadline passes, the
+                        voter list will be automatically locked. Waitlisted participants must be approved or
+                        rejected before voting begins.
+                      </>
+                    ) : election.voter_roll_finalized_at ? (
+                      <>
+                        <strong>Voter roll is finalized.</strong> Registration is closed and the participant list
+                        is locked for this election.
+                      </>
+                    ) : (
+                      <>
+                        <strong>Registration is open.</strong> Monitor capacity and approve waitlisted voters before
+                        the registration deadline or voting starts.
+                      </>
+                    )}
+                  </p>
+                  <div className="reg-alert-tags">
+                    {autoLockEnabled ? <span className="reg-tag active">✓ Auto-lock enabled</span> : null}
+                    {waitlistCount > 0 ? (
+                      <span className="reg-tag warn">⚠ {waitlistCount} waitlisted</span>
+                    ) : null}
+                    {closingSoon && timeRemaining !== 'Closed' ? (
+                      <span className="reg-tag warn">⚠ Closing soon</span>
+                    ) : null}
+                  </div>
+                  <div className="reg-actions">
+                    <button
+                      type="button"
+                      className="reg-btn reg-btn-approve"
+                      disabled={!canPromoteWaitlist || promoteAllBusy}
+                      onClick={() => void handleApproveAllWaitlisted()}
+                    >
+                      {promoteAllBusy ? 'Approving…' : '✓ Approve All Waitlisted'}
+                    </button>
+                    {!election.voter_roll_finalized_at ? (
+                      <Link to={`/creator/elections/${election.id}/edit`} className="reg-btn reg-btn-extend">
+                        Extend Deadline
+                      </Link>
+                    ) : (
+                      <button type="button" className="reg-btn reg-btn-extend" disabled>
+                        Extend Deadline
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -518,56 +661,19 @@ export function CreatorElectionDetailView({
       )}
 
       {/* Controls */}
-      <div className="panel" id="sec-controls">
+      <div className="panel vc-panel" id="sec-controls">
         <div className="panel-head">
           <div className="panel-head-left">
             <div className="panel-title">Voting Controls</div>
             <div className="panel-sub">Manage the state of this election</div>
           </div>
-          <div className="panel-head-right">
-            <Link to="/creator/control" className="p-btn primary">
-              Open voting control
-            </Link>
-          </div>
         </div>
         <div className="panel-body">
-          <div className="voting-controls-grid">
-            <div className="vc-status-panel">
-              <div className="vc-status-card">
-                <div className="vcs-top">
-                  <div className="vcs-label">Election status</div>
-                  <span className={`vcs-state ${status === 'active' ? 'on' : 'off'}`}>{ehStatusLabel(status)}</span>
-                </div>
-                <div className="vcs-desc">Database status: {election.status}</div>
-              </div>
-              <div className="vc-status-card">
-                <div className="vcs-top">
-                  <div className="vcs-label">Public results</div>
-                  <span className={`vcs-state ${election.real_time_results ? 'on' : 'off'}`}>
-                    {election.real_time_results ? 'Enabled' : 'Hidden'}
-                  </span>
-                </div>
-                <div className="vcs-desc">
-                  {election.real_time_results
-                    ? 'Participants may see live counts when voting is open.'
-                    : 'Results stay hidden until you publish them.'}
-                </div>
-              </div>
-              <div className="vc-status-card">
-                <div className="vcs-top">
-                  <div className="vcs-label">Voter roll</div>
-                  <span className={`vcs-state ${election.voter_roll_finalized_at ? 'on' : 'off'}`}>
-                    {election.voter_roll_finalized_at ? 'Locked' : 'Open'}
-                  </span>
-                </div>
-                <div className="vcs-desc">
-                  {election.voter_roll_finalized_at
-                    ? `Finalized ${formatSubmissionDate(election.voter_roll_finalized_at)}`
-                    : 'Roll can still accept registrations until locked.'}
-                </div>
-              </div>
-            </div>
-          </div>
+          <CreatorElectionVotingControls
+            election={election}
+            onReload={onReload}
+            onFinalize={onFinalize}
+          />
         </div>
       </div>
 
