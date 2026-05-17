@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ShieldIcon } from '@/components/auth/AuthSplitChrome'
-import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
-import { PUBLIC_LOCALES } from '@/types/locale'
+import { PublicSiteNav } from '@/components/layout/PublicSiteNav'
 import { useAuth } from '@/hooks/useAuth'
 import { LandingElectionsSection } from './LandingElectionsSection'
 import { LandingLiveResultsSection } from './LandingLiveResultsSection'
@@ -143,8 +142,6 @@ export function LandingPageView() {
   const trustChips = t('hero.trustChips', { returnObjects: true }) as string[]
   const ctaChips = t('cta.chips', { returnObjects: true }) as string[]
   const footerBadges = t('footer.badges', { returnObjects: true }) as string[]
-  const [navScrolled, setNavScrolled] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
   const [barsReady, setBarsReady] = useState(false)
 
   const particles = useMemo(
@@ -165,13 +162,6 @@ export function LandingPageView() {
   useLandingCounter(true)
 
   useEffect(() => {
-    const onScroll = () => setNavScrolled(window.scrollY > 40)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
     const t = window.setTimeout(() => setBarsReady(true), 800)
     return () => window.clearTimeout(t)
   }, [])
@@ -181,47 +171,7 @@ export function LandingPageView() {
 
   return (
     <div className="lp-root">
-      <nav className={`navbar${navScrolled ? ' scrolled' : ''}`}>
-        <Link to="/" className="nav-brand">
-          <div className="nav-icon">
-            <ShieldIcon className="h-5 w-5 text-white" />
-          </div>
-          <span className="nav-name">FortressVote</span>
-          <span className="nav-tag">{t('enterprise')}</span>
-        </Link>
-
-        <NavLinks mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} showLangInMobile />
-
-        <div className="nav-actions">
-          <LanguageSwitcher variant="nav" className="nav-lang" locales={PUBLIC_LOCALES} />
-          {signedIn ? (
-            <button type="button" className="btn-primary-nav" onClick={() => navigate(dashboardPath)}>
-              {t('dashboard')}
-            </button>
-          ) : (
-            <>
-              <button type="button" className="btn-ghost-nav" onClick={() => navigate('/login')}>
-                {t('logIn')}
-              </button>
-              <button type="button" className="btn-primary-nav" onClick={() => navigate('/register')}>
-                {t('getStarted')}
-              </button>
-            </>
-          )}
-        </div>
-
-        <button
-          type="button"
-          className="nav-hamburger"
-          aria-label={mobileOpen ? t('closeMenu') : t('openMenu')}
-          aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((o) => !o)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-      </nav>
+      <PublicSiteNav active="home" variant="landing" />
 
       <section className="hero">
         <div className="hero-bg">
@@ -481,9 +431,9 @@ export function LandingPageView() {
         </div>
       </section>
 
-      <LandingContactSection />
-
       <LandingTeamSection />
+
+      <LandingContactSection />
 
       <footer>
         <div className="footer-inner">
@@ -551,67 +501,6 @@ export function LandingPageView() {
           </div>
         </div>
       </footer>
-    </div>
-  )
-}
-
-function NavLinks({
-  mobileOpen,
-  setMobileOpen,
-  showLangInMobile = false,
-}: {
-  mobileOpen: boolean
-  setMobileOpen: (v: boolean) => void
-  showLangInMobile?: boolean
-}) {
-  const { t } = useTranslation('landing')
-  const { t: tNav } = useTranslation('nav')
-  const links = [
-    { href: '/browse-elections', label: tNav('elections') },
-    { href: '/results', label: t('nav.liveResults') },
-    { href: '#features', label: t('nav.features') },
-    { href: '#how', label: t('nav.howItWorks') },
-    { href: '#testimonials', label: t('nav.reviews') },
-    { href: '#contact', label: t('nav.contact') },
-    { href: '#team', label: t('nav.team') },
-  ]
-
-  return (
-    <div
-      className="nav-links"
-      style={
-        mobileOpen
-          ? {
-              display: 'flex',
-              position: 'absolute',
-              top: 68,
-              left: 0,
-              right: 0,
-              flexDirection: 'column',
-              gap: 16,
-              padding: '20px 24px',
-              background: 'rgba(9,21,45,0.98)',
-              borderBottom: '1px solid rgba(255,255,255,0.07)',
-            }
-          : undefined
-      }
-    >
-      {links.map((l) =>
-        l.href.startsWith('/') ? (
-          <Link key={l.href} className="nav-link" to={l.href} onClick={() => setMobileOpen(false)}>
-            {l.label}
-          </Link>
-        ) : (
-          <a key={l.href} className="nav-link" href={l.href} onClick={() => setMobileOpen(false)}>
-            {l.label}
-          </a>
-        ),
-      )}
-      {showLangInMobile && mobileOpen ? (
-        <div className="nav-lang-mobile">
-          <LanguageSwitcher variant="nav" locales={PUBLIC_LOCALES} />
-        </div>
-      ) : null}
     </div>
   )
 }

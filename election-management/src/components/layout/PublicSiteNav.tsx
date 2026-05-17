@@ -62,8 +62,8 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
       { key: 'features', href: sectionHref('#features'), label: t('nav.features'), route: false as const },
       { key: 'how', href: sectionHref('#how'), label: t('nav.howItWorks'), route: false as const },
       { key: 'reviews', href: sectionHref('#testimonials'), label: t('nav.reviews'), route: false as const },
-      { key: 'contact', href: sectionHref('#contact'), label: t('nav.contact'), route: false as const },
       { key: 'team', href: sectionHref('#team'), label: t('nav.team'), route: false as const },
+      { key: 'contact', href: sectionHref('#contact'), label: t('nav.contact'), route: false as const },
     ],
     [onLanding, t, tNav],
   )
@@ -103,7 +103,7 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
   return (
     <nav className={navClass}>
       <Link to="/" className="nav-brand">
-        <motion.div className="nav-icon">
+        <div className="nav-icon">
           <ShieldIcon className="h-5 w-5 text-white" />
         </div>
         <span className="nav-name">FortressVote</span>
@@ -135,9 +135,9 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
         {mobileOpen ? (
           <div className="nav-lang-mobile">
             <LanguageSwitcher variant="nav" locales={PUBLIC_LOCALES} />
-          </motion.div>
+          </div>
         ) : null}
-      </motion.div>
+      </div>
 
       <div className="nav-actions">
         <LanguageSwitcher variant="nav" className="nav-lang" locales={PUBLIC_LOCALES} />
@@ -156,7 +156,7 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
             </button>
           </>
         )}
-      </motion.div>
+      </div>
 
       <button
         type="button"

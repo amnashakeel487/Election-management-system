@@ -1,13 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
-import { useAuth } from '@/hooks/useAuth'
-
-function ShieldLogo() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden>
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  )
-}
+import { PublicSiteNav } from '@/components/layout/PublicSiteNav'
 
 function ShareIcon() {
   return (
@@ -37,58 +28,29 @@ export interface LiveResultsNavProps {
 }
 
 export function LiveResultsNav({ isLive, onShare }: LiveResultsNavProps) {
-  const location = useLocation()
-  const path = location.pathname
-  const { session, profile, getDashboardPath } = useAuth()
-
   return (
-    <nav className="navbar">
-      <Link className="nav-brand" to="/">
-        <div className="nav-logo">
-          <ShieldLogo />
-        </div>
-        <div className="nav-wordmark">
-          Fortress<span>Vote</span>
-        </div>
-      </Link>
-      <div className="nav-links">
-        <Link className={`nav-link${path === '/' ? ' active' : ''}`} to="/">
-          Home
-        </Link>
-        <Link className={`nav-link${path.startsWith('/browse-elections') ? ' active' : ''}`} to="/browse-elections">
-          Elections
-        </Link>
-        <Link className={`nav-link${path.includes('/results') ? ' active' : ''}`} to="/results">
-          Results
-        </Link>
-      </div>
-      <div className="nav-right">
-        {isLive ? (
-          <div className="live-pill">
-            <div className="live-pill-dot" />
-            Live
-          </div>
-        ) : null}
-        {onShare ? (
-          <button type="button" className="nav-btn ghost" onClick={onShare}>
-            <ShareIcon />
-            Share
+    <PublicSiteNav
+      active="results"
+      trailing={
+        <>
+          {isLive ? (
+            <div className="nav-live-pill">
+              <div className="nav-live-pill-dot" />
+              Live
+            </div>
+          ) : null}
+          {onShare ? (
+            <button type="button" className="btn-ghost-nav" onClick={onShare}>
+              <ShareIcon />
+              Share
+            </button>
+          ) : null}
+          <button type="button" className="btn-accent-nav" onClick={() => window.print()}>
+            <DownloadIcon />
+            PDF
           </button>
-        ) : null}
-        <button type="button" className="nav-btn pdf" onClick={() => window.print()}>
-          <DownloadIcon />
-          PDF
-        </button>
-        {session && profile ? (
-          <Link className="nav-btn ghost" to={getDashboardPath() ?? '/'}>
-            Dashboard
-          </Link>
-        ) : (
-          <Link className="nav-btn ghost" to="/login">
-            Log In
-          </Link>
-        )}
-      </div>
-    </nav>
+        </>
+      }
+    />
   )
 }

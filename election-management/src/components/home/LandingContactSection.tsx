@@ -53,9 +53,7 @@ export function LandingContactSection() {
           <h2 className="section-title">
             {t('contact.title')} <span className="accent">{t('contact.titleAccent')}</span>
           </h2>
-          <p className="section-sub" style={{ fontSize: 14, marginTop: 8, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>
-            {t('contact.sub')}
-          </p>
+          <p className="section-sub">{t('contact.sub')}</p>
         </div>
 
         <div className="contact-card reveal" style={{ transitionDelay: '0.15s' }}>
