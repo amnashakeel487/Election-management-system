@@ -293,63 +293,6 @@ export function BrowseElectionsView() {
         </div>
       </section>
 
-      {featured && featuredPhase ? (
-        <div className="featured-section">
-          <div className="featured-banner">
-            <div className="fb-orb" />
-            <div className="fb-left">
-              {featuredPhase === 'active' ? (
-                <div className="fb-live-badge">
-                  <div className="fb-live-dot" />
-                  Live Now
-                </div>
-              ) : featuredPhase === 'upcoming' ? (
-                <div className="fb-live-badge" style={{ borderColor: 'rgba(36,81,163,0.4)', background: 'rgba(36,81,163,0.15)', color: '#93C5FD' }}>
-                  Upcoming
-                </div>
-              ) : (
-                <div className="fb-live-badge" style={{ borderColor: 'rgba(108,63,197,0.4)', background: 'rgba(108,63,197,0.15)', color: '#C4B5FD' }}>
-                  Completed
-                </div>
-              )}
-              <div className="fb-title">{featured.title}</div>
-              <div className="fb-org">{organizationLine(featured)}</div>
-              <div className="fb-meta">
-                <div className="fb-meta-item">
-                  <UsersIcon />
-                  {featuredReg.toLocaleString()} registered
-                </div>
-                {featuredShowBallots ? (
-                  <div className="fb-meta-item">
-                    <CheckIcon />
-                    {featuredBallots.toLocaleString()} votes · {featuredTurnout}% turnout
-                  </div>
-                ) : null}
-                <div className="fb-meta-item">
-                  <UserIcon />
-                  {featuredCandidates > 0 ? featuredCandidates : '—'} candidates
-                </div>
-              </div>
-            </div>
-            <div className="fb-right">
-              {featuredPhase !== 'completed' ? (
-                <div className="fb-countdown">
-                  <div className="fb-cd-label">{featuredPhase === 'active' ? 'Voting Ends In' : 'Starts In'}</div>
-                  <div className="fb-cd-timer">
-                    {formatCountdownHms(featuredPhase === 'active' ? featured.end_date : featured.start_date, nowMs)}
-                  </div>
-                </div>
-              ) : null}
-              {featuredPrimary ? (
-                <Link className="fb-join-btn" to={featuredPrimary.to}>
-                  <CheckIcon />
-                  {featuredPrimary.label}
-                </Link>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       <div className="search-section">
         <div className="search-bar-wrap">
