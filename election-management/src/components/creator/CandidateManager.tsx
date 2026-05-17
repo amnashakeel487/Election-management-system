@@ -1,4 +1,4 @@
-import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react'
+import { type CSSProperties, type FormEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CANDIDATE_PLACEHOLDER_IMAGES } from '@/constants/electionDetailsAssets'
 import { removeCandidatePortrait, uploadCandidatePortrait } from '@/services/candidatePhotoService'
@@ -9,31 +9,57 @@ import {
   removeCandidate,
   updateCandidate,
 } from '@/services/electionService'
+import { fetchElectionResults } from '@/services/resultsService'
 import type { Candidate, Election, ElectionWithCandidates } from '@/types/election'
-import { candidatePortraitOrPlaceholder } from '@/utils/candidateDisplay'
+import type { ElectionResultsPayload } from '@/types/electionResults'
+import { avatarGradient } from '@/utils/dashboardDisplay'
+import { candidateInitial, candidatePortraitOrPlaceholder } from '@/utils/candidateDisplay'
+import { formatElectionCode } from '@/utils/electionTime'
 
 type EditorOpen = { mode: 'add' } | { mode: 'edit'; candidate: Candidate }
 
 const IMAGE_ACCEPT = 'image/jpeg,image/png,image/webp,image/gif'
 
-function clampText(s: string, max = 140): string {
+const CARD_THEMES = [
+  { accent: '#2451a3', bar: 'linear-gradient(90deg,#2451A3,#1B3A6B)' },
+  { accent: '#6c3fc5', bar: 'linear-gradient(90deg,#6C3FC5,#9333ea)' },
+  { accent: '#0891b2', bar: 'linear-gradient(90deg,#06B6D4,#0891b2)' },
+  { accent: '#059669', bar: 'linear-gradient(90deg,#10B981,#059669)' },
+] as const
+
+function electionTabLabel(ev: Election, index: number): string {
+  const code = `E${String(index + 1).padStart(3, '0')}`
+  const title = ev.title?.trim() || 'Untitled'
+  const short = title.length > 18 ? `${title.slice(0, 16)}…` : title
+  return `${code} — ${short}`
+}
+
+function clampBio(s: string, max = 160): string {
   const t = s.trim()
+  if (!t) return 'No platform statement yet.'
   if (t.length <= max) return t
   return `${t.slice(0, max)}…`
 }
 
 interface CandidateManagerProps {
   creatorId: string
+  eyebrow?: string
+  pageTitle?: string
 }
 
-/** Creator workspace: manage candidates per election (draft = full CRUD). */
-export function CandidateManager({ creatorId }: CandidateManagerProps) {
+/** Creator workspace: card grid for candidates per election. */
+export function CandidateManager({
+  creatorId,
+  eyebrow = 'Management',
+  pageTitle = 'Candidate Management',
+}: CandidateManagerProps) {
   const [searchParams, setSearchParams] = useSearchParams()
   const paramElectionId = searchParams.get('election')
 
   const [elections, setElections] = useState<Election[]>([])
   const [selectedElectionId, setSelectedElectionId] = useState('')
   const [electionDetail, setElectionDetail] = useState<ElectionWithCandidates | null>(null)
+  const [results, setResults] = useState<ElectionResultsPayload | null>(null)
   const [loadingList, setLoadingList] = useState(true)
   const [loadingDetail, setLoadingDetail] = useState(false)
   const [workspaceError, setWorkspaceError] = useState<string | null>(null)
@@ -83,20 +109,21 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
     setSelectedElectionId((prev) => {
       if (prev && elections.some((e) => e.id === prev)) return prev
       const draft = elections.find((e) => e.status === 'draft')
-      const next = (draft ?? elections[0])!.id
-      return next
+      return (draft ?? elections[0])!.id
     })
   }, [elections, loadingList, paramElectionId])
 
   useEffect(() => {
     if (!selectedElectionId) {
       setElectionDetail(null)
+      setResults(null)
       return
     }
     let cancelled = false
     async function load() {
       setLoadingDetail(true)
       setWorkspaceError(null)
+      setResults(null)
       try {
         const row = await fetchElectionById(selectedElectionId)
         if (cancelled) return
@@ -106,6 +133,14 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
           return
         }
         setElectionDetail(row)
+        if (row.status !== 'draft') {
+          try {
+            const res = await fetchElectionResults(selectedElectionId)
+            if (!cancelled) setResults(res)
+          } catch {
+            if (!cancelled) setResults(null)
+          }
+        }
       } catch (err) {
         if (!cancelled) setWorkspaceError(err instanceof Error ? err.message : 'Failed to load election')
       } finally {
@@ -123,6 +158,15 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
     () => (electionDetail?.candidates ?? []).slice().sort((a, b) => a.sort_order - b.sort_order),
     [electionDetail?.candidates],
   )
+
+  const totalVotes = results?.total_votes ?? 0
+
+  function voteStats(candidateId: string): { votes: number; pct: number } {
+    if (!results || totalVotes <= 0) return { votes: 0, pct: 0 }
+    const row = results.candidates.find((c) => c.candidate_id === candidateId)
+    const votes = row?.vote_count ?? 0
+    return { votes, pct: Math.round((votes / totalVotes) * 1000) / 10 }
+  }
 
   function syncElectionQuery(id: string) {
     const next = new URLSearchParams(searchParams)
@@ -230,6 +274,15 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
   async function refreshDetail(id: string) {
     const row = await fetchElectionById(id)
     setElectionDetail(row)
+    if (row && row.status !== 'draft') {
+      try {
+        setResults(await fetchElectionResults(id))
+      } catch {
+        setResults(null)
+      }
+    } else {
+      setResults(null)
+    }
   }
 
   async function handleDelete(candidate: Candidate) {
@@ -247,150 +300,174 @@ export function CandidateManager({ creatorId }: CandidateManagerProps) {
     }
   }
 
-  return (
-    <div className="space-y-gutter font-body-md">
-      <div className="flex flex-col gap-4 rounded-[24px] border border-line bg-surface-container-low p-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h3 className="font-headline-md text-headline-md text-on-surface">Election</h3>
-          <p className="mt-1 max-w-xl font-body-sm text-body-sm text-on-surface-variant">
-            Select a draft poll to add, edit, or remove candidates—including photos and bios. For published or active
-            elections this page is <strong className="text-on-surface">view only</strong>.
-          </p>
-        </div>
-        <div className="flex min-w-[240px] flex-col gap-2">
-          <label className="font-label-sm text-label-sm text-on-surface-variant">Active election</label>
-          <select
-            value={selectedElectionId}
-            onChange={(e) => handleSelectElection(e.target.value)}
-            disabled={loadingList || elections.length === 0}
-            className="rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 font-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary"
-          >
-            {elections.length === 0 ? (
-              <option value="">No elections yet</option>
-            ) : null}
-            {elections.map((ev) => (
-              <option key={ev.id} value={ev.id}>
-                {ev.title || 'Untitled'} · {ev.status}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+  const subtitleElection = electionDetail?.title ?? 'your selected election'
+  const electionCode = electionDetail ? formatElectionCode(electionDetail.id) : ''
 
-      {workspaceError ? (
-        <p className="rounded-xl border border-error/30 bg-error-container/10 px-4 py-3 font-body-sm text-error">
-          {workspaceError}
+  return (
+    <div className="creator-candidates-page">
+      <header className="ccm-intro">
+        <div className="ccm-eyebrow">{eyebrow}</div>
+        <h2 className="ccm-title">{pageTitle}</h2>
+        <p className="ccm-subtitle">
+          Manage candidates for{' '}
+          <strong style={{ color: '#0f172a', fontWeight: 700 }}>
+            {subtitleElection}
+            {electionCode ? ` (${electionCode})` : ''}
+          </strong>
+          {!isDraftElection && electionDetail ? (
+            <span className="ccm-view-badge">View only</span>
+          ) : null}
         </p>
-      ) : null}
+      </header>
+
+      {workspaceError ? <div className="ccm-alert error">{workspaceError}</div> : null}
 
       {!loadingList && elections.length === 0 ? (
-        <div className="rounded-[24px] border border-dashed border-line p-12 text-center">
-          <p className="font-body-md text-on-surface-variant">
-            Create an election first, then return here to add candidates with photos.
-          </p>
-          <Link
-            className="mt-4 inline-block font-label-md font-bold text-primary hover:underline"
-            to="/creator/elections/new"
-          >
-            New election →
+        <div className="ccm-empty">
+          <p>Create an election first, then return here to add candidates with photos and bios.</p>
+          <Link to="/creator/elections/new" className="ccm-add-btn">
+            New election
           </Link>
         </div>
       ) : null}
 
-      {selectedElectionId && electionDetail ? (
-        <div className="rounded-[24px] border border-line bg-surface-container-low p-6">
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h3 className="font-headline-md text-headline-md text-on-surface">{electionDetail.title}</h3>
-              <p className="mt-1 font-label-sm uppercase tracking-wide text-on-surface-variant">
-                Status: {electionDetail.status}
-                {!isDraftElection ? ' · view only' : ''}
-              </p>
-              {loadingDetail ? <p className="mt-2 font-body-sm text-on-surface-variant">Refreshing…</p> : null}
+      {elections.length > 0 ? (
+        <>
+          <div className="ccm-toolbar">
+            <div className="ccm-tabs" role="tablist" aria-label="Elections">
+              {elections.map((ev, index) => (
+                <button
+                  key={ev.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={ev.id === selectedElectionId}
+                  className={`ccm-tab${ev.id === selectedElectionId ? ' active' : ''}`}
+                  onClick={() => handleSelectElection(ev.id)}
+                >
+                  {electionTabLabel(ev, index)}
+                </button>
+              ))}
             </div>
             {isDraftElection ? (
-              <button
-                type="button"
-                onClick={openAdd}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-label-md font-bold text-on-primary shadow-lg shadow-primary/20"
-              >
-                <span className="material-symbols-outlined text-[20px]">person_add</span>
-                Add candidate
+              <button type="button" className="ccm-add-btn" onClick={openAdd}>
+                <svg viewBox="0 0 24 24" aria-hidden>
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Add Candidate
               </button>
             ) : null}
           </div>
 
-          {sortedCandidates.length === 0 ? (
-            <p className="font-body-md text-on-surface-variant">
-              No candidates yet.
-              {isDraftElection ? ' Use “Add candidate” to create your ballot options.' : ''}
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-line font-label-md text-label-sm uppercase tracking-wide text-on-surface-variant">
-                    <th className="py-3 pr-4 font-medium">Photo</th>
-                    <th className="py-3 pr-4 font-medium">Name</th>
-                    <th className="py-3 pr-4 font-medium">Designation</th>
-                    <th className="py-3 pr-4 font-medium">Manifesto</th>
-                    {isDraftElection ? <th className="py-3 pl-4 text-right font-medium">Actions</th> : null}
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedCandidates.map((c) => (
-                    <tr key={c.id} className="border-b border-line last:border-none">
-                      <td className="py-4 pr-4 align-middle">
-                        <img
-                          src={candidatePortraitOrPlaceholder(c, CANDIDATE_PLACEHOLDER_IMAGES)}
-                          alt=""
-                          className="h-14 w-14 rounded-xl object-cover"
-                        />
-                      </td>
-                      <td className="py-4 pr-4 align-middle font-body-md text-on-surface">{c.name}</td>
-                      <td className="max-w-[200px] py-4 pr-4 align-middle font-body-sm text-on-surface-variant">
-                        {c.designation?.trim() || '—'}
-                      </td>
-                      <td className="py-4 pr-4 align-middle font-body-sm text-on-surface-variant">
-                        {clampText(c.description ?? '') || '—'}
-                      </td>
-                      {isDraftElection ? (
-                        <td className="flex justify-end gap-3 py-4 pl-4 align-middle">
-                          <button
-                            type="button"
-                            className="font-label-sm font-bold text-primary hover:underline"
-                            onClick={() => openEdit(c)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="font-label-sm font-bold text-error hover:underline"
-                            onClick={() => void handleDelete(c)}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      ) : null}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {loadingDetail ? <p className="ccm-loading">Loading candidates…</p> : null}
 
-          {isDraftElection ? (
-            <div className="mt-8 flex flex-wrap gap-4 border-t border-line pt-6">
-              <Link
-                to={`/creator/elections/${electionDetail.id}/edit`}
-                className="inline-flex items-center gap-2 font-label-md font-bold text-primary hover:underline"
-              >
-                <span className="material-symbols-outlined text-[18px]">edit_calendar</span>
-                Continuation wizard (timing & publish)
-              </Link>
+          {electionDetail && !loadingDetail ? (
+            <div className="ccm-grid">
+              {sortedCandidates.length === 0 && !isDraftElection ? (
+                <div className="ccm-empty">
+                  <p>No candidates on this ballot yet.</p>
+                </div>
+              ) : null}
+
+              {sortedCandidates.map((candidate, index) => {
+                const theme = CARD_THEMES[index % CARD_THEMES.length]
+                const { votes, pct } = voteStats(candidate.id)
+                const photo = candidatePortraitOrPlaceholder(candidate, CANDIDATE_PLACEHOLDER_IMAGES)
+                const hasPhoto = Boolean(candidate.photo_url?.trim())
+
+                return (
+                  <article
+                    key={candidate.id}
+                    className="ccm-card"
+                    style={
+                      {
+                        '--ccm-accent': theme.accent,
+                        '--ccm-bar': theme.bar,
+                      } as CSSProperties
+                    }
+                  >
+                    <div className="ccm-card-body">
+                      {hasPhoto ? (
+                        <img src={photo} alt="" className="ccm-avatar" />
+                      ) : (
+                        <div
+                          className="ccm-avatar-fallback"
+                          style={{ background: avatarGradient(candidate.name) }}
+                        >
+                          {candidateInitial(candidate.name)}
+                        </div>
+                      )}
+                      <h3 className="ccm-name">{candidate.name}</h3>
+                      <p className="ccm-party">{candidate.designation?.trim() || 'Candidate'}</p>
+
+                      {totalVotes > 0 ? (
+                        <>
+                          <div className="ccm-votes">
+                            {votes.toLocaleString()}
+                            <span className="ccm-votes-label"> votes</span>
+                          </div>
+                          <div className="ccm-bar-track">
+                            <div
+                              className="ccm-bar-fill"
+                              style={{ width: `${Math.min(100, pct)}%` }}
+                            />
+                          </div>
+                          <p className="ccm-pct">{pct}% of total</p>
+                        </>
+                      ) : (
+                        <p className="ccm-pct" style={{ marginBottom: 14 }}>
+                          {isDraftElection ? 'Votes appear after publishing' : 'No votes cast yet'}
+                        </p>
+                      )}
+
+                      <p className="ccm-bio">{clampBio(candidate.description ?? '')}</p>
+                    </div>
+
+                    {isDraftElection ? (
+                      <footer className="ccm-card-footer">
+                        <button type="button" className="ccm-edit-btn" onClick={() => openEdit(candidate)}>
+                          — Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="ccm-del-btn"
+                          aria-label={`Delete ${candidate.name}`}
+                          onClick={() => void handleDelete(candidate)}
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden>
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
+                        </button>
+                      </footer>
+                    ) : null}
+                  </article>
+                )
+              })}
+
+              {isDraftElection ? (
+                <button type="button" className="ccm-add-card" onClick={openAdd}>
+                  <span className="ccm-add-icon" aria-hidden>
+                    +
+                  </span>
+                  <span className="ccm-add-label">Add Candidate</span>
+                  <span className="ccm-add-hint">Click to add a new candidate</span>
+                </button>
+              ) : null}
             </div>
           ) : null}
-        </div>
+
+          {isDraftElection && electionDetail ? (
+            <p style={{ marginTop: 24, fontSize: 13 }}>
+              <Link
+                to={`/creator/elections/${electionDetail.id}/edit`}
+                style={{ color: '#2451a3', fontWeight: 700, textDecoration: 'none' }}
+              >
+                Continue in creation wizard →
+              </Link>
+            </p>
+          ) : null}
+        </>
       ) : null}
 
       {editor && electionDetail && isDraftElection ? (
