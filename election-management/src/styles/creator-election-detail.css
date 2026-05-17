@@ -290,3 +290,39 @@
   color: var(--ced-blue);
   font-weight: 600;
 }
+
+/* Sticky section nav: scroll on .main so position:sticky works (overflow:hidden on .main breaks it) */
+.admin-app.creator-app:has(.creator-election-detail) .main {
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.admin-app.creator-app:has(.creator-election-detail) .content {
+  overflow: visible;
+}
+
+.creator-election-detail .section-nav {
+  position: sticky;
+  top: 66px;
+  z-index: 45;
+  margin-bottom: 24px;
+  background: #fff;
+  border: 1px solid var(--ced-border);
+  border-radius: 14px;
+  padding: 8px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 18px rgba(15, 35, 71, 0.06);
+}
+
+.creator-election-detail .section-nav .sn-link {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+}
+
+.creator-election-detail [id^='sec-'] {
+  scroll-margin-top: 132px;
+}

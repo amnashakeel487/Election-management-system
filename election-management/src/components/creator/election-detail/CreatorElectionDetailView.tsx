@@ -160,7 +160,17 @@ export function CreatorElectionDetailView({
 
   function scrollToSection(id: string) {
     setActiveSection(id)
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const el = document.getElementById(id)
+    if (!el) return
+    const scrollRoot = document.querySelector<HTMLElement>('.creator-app .main')
+    if (scrollRoot) {
+      const nav = document.querySelector<HTMLElement>('.creator-election-detail .section-nav')
+      const offset = (nav?.offsetHeight ?? 52) + 74
+      const top = el.getBoundingClientRect().top - scrollRoot.getBoundingClientRect().top + scrollRoot.scrollTop - offset
+      scrollRoot.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+      return
+    }
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
