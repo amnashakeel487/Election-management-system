@@ -220,6 +220,14 @@
   margin-top: 2px;
 }
 
+/* Public page <main> must not inherit admin dashboard flex/overflow rules */
+.ed-root > main {
+  display: block;
+  overflow: visible;
+  min-width: 0;
+  flex: none;
+}
+
 .ed-main {
   max-width: 72rem;
   margin: 0 auto;
@@ -334,4 +342,245 @@
 .ed-loading-hero {
   min-height: 12rem;
   background: linear-gradient(135deg, #080f1e, #0f2347);
+}
+
+/* Quick stats below hero */
+.ed-quick-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin: -1.25rem auto 1.75rem;
+  max-width: 72rem;
+  padding: 0 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+@media (min-width: 640px) {
+  .ed-quick-stats {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding: 0 2.5rem;
+    margin-top: -1.5rem;
+  }
+}
+
+.ed-qs-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 8px 24px rgba(15, 35, 71, 0.06);
+}
+
+.ed-qs-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+
+.ed-qs-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.ed-qs-value--sm {
+  font-size: 0.85rem;
+}
+
+/* Two-column layout */
+.ed-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .ed-layout {
+    grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr);
+    gap: 2rem;
+  }
+}
+
+.ed-layout-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.ed-layout-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .ed-layout-sidebar {
+    position: sticky;
+    top: 5.5rem;
+  }
+}
+
+.ed-candidates-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .ed-candidates-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ed-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+@media (min-width: 640px) {
+  .ed-info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.ed-info-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ed-info-item:last-child {
+  border-bottom: none;
+}
+
+@media (min-width: 640px) {
+  .ed-info-item:nth-child(odd) {
+    padding-right: 1rem;
+    border-right: 1px solid #f1f5f9;
+  }
+
+  .ed-info-item:nth-child(even) {
+    padding-left: 1rem;
+  }
+
+  .ed-info-item:nth-last-child(-n + 2) {
+    border-bottom: none;
+  }
+}
+
+.ed-info-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(36, 81, 163, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #2451a3;
+}
+
+.ed-info-icon .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.ed-info-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.ed-info-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+.ed-overview-text {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #475569;
+  margin-bottom: 0.75rem;
+}
+
+.ed-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ed-milestone-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.ed-milestone-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0.2rem;
+}
+
+.ed-milestone-line {
+  width: 2px;
+  flex: 1;
+  min-height: 20px;
+  background: #e2e8f0;
+  margin-top: 4px;
+}
+
+.ed-milestone-body {
+  padding-bottom: 1.1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.ed-milestone-row:last-child .ed-milestone-body {
+  padding-bottom: 0;
+}
+
+.ed-milestone-row:last-child .ed-milestone-line {
+  display: none;
+}
+
+.ed-callout {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: rgba(36, 81, 163, 0.06);
+  border: 1px solid rgba(36, 81, 163, 0.12);
+  font-size: 12px;
+  line-height: 1.55;
+  color: #475569;
+}
+
+.ed-callout .material-symbols-outlined {
+  font-size: 18px;
+  color: #2451a3;
+  flex-shrink: 0;
+}
+
+.ed-callout code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #2451a3;
 }

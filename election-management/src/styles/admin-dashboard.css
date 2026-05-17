@@ -78,8 +78,8 @@
 .sb-collapse-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.3s;}
 .collapsed .sb-collapse-btn svg{transform:rotate(180deg);}
 
-/* â”€â”€ MAIN â”€â”€ */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+/* â”€â”€ MAIN (admin shell only — public pages use plain <main>) â”€â”€ */
+.admin-app .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 
 /* â”€â”€ TOPBAR â”€â”€ */
 .topbar{
@@ -102,10 +102,10 @@
 .avatar{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1B3A6B,#6C3FC5);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;}
 
 /* â”€â”€ CONTENT â”€â”€ */
-.content{flex:1;overflow-y:auto;padding:24px;}
-.content::-webkit-scrollbar{width:5px;}
-.content::-webkit-scrollbar-track{background:transparent;}
-.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.admin-app .content{flex:1;overflow-y:auto;padding:24px;}
+.admin-app .content::-webkit-scrollbar{width:5px;}
+.admin-app .content::-webkit-scrollbar-track{background:transparent;}
+.admin-app .content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 
 /* â”€â”€ PAGE HEADER â”€â”€ */
 .page-header{margin-bottom:24px;}

@@ -152,7 +152,7 @@ export function ElectionDetailsPage() {
     return (
       <div className="ed-root">
         <TopNavBar />
-        <main className="pt-16">
+        <main className="ed-page-main pt-16">
           <div className="ed-loading-hero flex items-center justify-center">
             <p className="text-sm font-medium text-white/60">Loading election…</p>
           </div>
@@ -182,32 +182,59 @@ export function ElectionDetailsPage() {
   const startMs = new Date(election.start_date).getTime()
   const endMs = new Date(election.end_date).getTime()
   const isPolling = now >= startMs && now <= endMs
+  const categoryLabel = election.category?.trim().replace(/_/g, ' ') ?? 'General election'
+  const regClosesLabel = election.registration_deadline
+    ? formatMilestoneDate(election.registration_deadline)
+    : formatMilestoneDate(election.start_date)
 
   return (
     <div className="ed-root">
       <TopNavBar />
-      <main className="pt-16">
+      <main className="ed-page-main pt-16">
         <ElectionDetailsHero election={election} stats={stats} isPolling={isPolling} />
 
+        <div className="ed-quick-stats" aria-label="Election summary">
+          <div className="ed-qs-card">
+            <div className="ed-qs-label">Registered</div>
+            <div className="ed-qs-value">{stats.registered_count.toLocaleString()}</div>
+          </div>
+          <div className="ed-qs-card">
+            <div className="ed-qs-label">Capacity</div>
+            <div className="ed-qs-value">{stats.max_voters.toLocaleString()}</div>
+          </div>
+          <div className="ed-qs-card">
+            <div className="ed-qs-label">Candidates</div>
+            <div className="ed-qs-value">{election.candidates.length}</div>
+          </div>
+          <div className="ed-qs-card">
+            <div className="ed-qs-label">Time left</div>
+            <div className="ed-qs-value ed-qs-value--sm">{formatTimeRemaining(election.end_date)}</div>
+          </div>
+        </div>
+
         <div className="ed-main">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-            <div className="space-y-8 lg:col-span-8">
+          <div className="ed-layout">
+            <div className="ed-layout-primary">
               <section>
                 <h2 className="ed-section-title">
                   <span className="material-symbols-outlined">groups</span>
                   Candidates
                 </h2>
                 {election.candidates.length === 0 ? (
-                  <p className="text-sm text-slate-500">No candidates have been added yet.</p>
+                  <div className="ed-panel">
+                    <p className="text-sm text-slate-500">No candidates have been added yet.</p>
+                  </div>
                 ) : (
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="ed-candidates-grid">
                     {election.candidates.map((candidate) => (
                       <article key={candidate.id} className="ed-candidate-card">
                         <CandidateAvatar name={candidate.name} photoUrl={candidate.photo_url} size="md" />
                         <div className="min-w-0 flex-1">
                           <p className="ed-candidate-role">{candidate.designation?.trim() || 'Candidate'}</p>
                           <h3 className="ed-candidate-name">{candidate.name}</h3>
-                          <p className="ed-candidate-bio">{candidate.description ?? 'No manifesto provided.'}</p>
+                          <p className="ed-candidate-bio line-clamp-3">
+                            {candidate.description?.trim() || 'No manifesto provided.'}
+                          </p>
                         </div>
                       </article>
                     ))}
@@ -216,26 +243,116 @@ export function ElectionDetailsPage() {
               </section>
 
               <section className="ed-panel">
-                <h2 className="mb-3 text-base">Election overview</h2>
-                <div className="space-y-3 text-sm leading-relaxed text-slate-600">
-                  <p>
-                    {election.description ??
-                      'This election is hosted on FortressVote with verified voter registration and secure ballot casting.'}
-                  </p>
-                  <p>
-                    Eligible participants must sign in and join before the registration deadline. Registration
-                    auto-locks when capacity is reached; the organizer finalizes the voter roll to freeze the list
-                    and issue secret voter IDs.
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    Capacity: {stats.registered_count.toLocaleString()} / {stats.max_voters.toLocaleString()} voters
-                    {election.real_time_results ? ' · Live results enabled' : ''}
-                  </p>
+                <h2 className="mb-4 text-base font-extrabold tracking-tight text-slate-900">About this election</h2>
+                <p className="ed-overview-text">
+                  {election.description?.trim() ||
+                    'This election is hosted on FortressVote with verified voter registration and secure ballot casting.'}
+                </p>
+                <div className="ed-info-grid">
+                  <div className="ed-info-item">
+                    <div className="ed-info-icon">
+                      <span className="material-symbols-outlined">category</span>
+                    </div>
+                    <div>
+                      <div className="ed-info-label">Category</div>
+                      <div className="ed-info-value" style={{ textTransform: 'capitalize' }}>
+                        {categoryLabel}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ed-info-item">
+                    <div className="ed-info-icon">
+                      <span className="material-symbols-outlined">event</span>
+                    </div>
+                    <div>
+                      <div className="ed-info-label">Registration closes</div>
+                      <div className="ed-info-value">{regClosesLabel}</div>
+                    </div>
+                  </div>
+                  <div className="ed-info-item">
+                    <div className="ed-info-icon">
+                      <span className="material-symbols-outlined">how_to_vote</span>
+                    </div>
+                    <div>
+                      <div className="ed-info-label">Voting window</div>
+                      <div className="ed-info-value">
+                        {formatMilestoneDate(election.start_date)} → {formatMilestoneDate(election.end_date)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ed-info-item">
+                    <div className="ed-info-icon">
+                      <span className="material-symbols-outlined">insights</span>
+                    </div>
+                    <div>
+                      <div className="ed-info-label">Results</div>
+                      <div className="ed-info-value">
+                        {election.real_time_results ? 'Live results when published' : 'Published after close'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="ed-panel">
+                <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-500">Key milestones</h2>
+                <div className="ed-milestones">
+                  <div className="ed-milestone-row">
+                    <div className="ed-milestone-track">
+                      <div className="ed-milestone-dot" />
+                      <div className="ed-milestone-line" />
+                    </div>
+                    <div className="ed-milestone-body">
+                      <p className="text-[11px] text-slate-400">{formatMilestoneDate(election.created_at)}</p>
+                      <p className="text-sm font-medium text-slate-800">Election created</p>
+                    </div>
+                  </div>
+                  <div className="ed-milestone-row">
+                    <div className="ed-milestone-track">
+                      <div className="ed-milestone-dot" />
+                      <div className="ed-milestone-line" />
+                    </div>
+                    <div className="ed-milestone-body">
+                      <p className="text-[11px] text-slate-400">{formatMilestoneDate(election.start_date)}</p>
+                      <p className="text-sm font-medium text-slate-800">Voting opens</p>
+                    </div>
+                  </div>
+                  <div className="ed-milestone-row">
+                    <div className="ed-milestone-track">
+                      <div className="ed-milestone-dot ed-milestone-dot--active flex items-center justify-center">
+                        <span className="material-symbols-outlined text-[10px] text-white">play_arrow</span>
+                      </div>
+                      <div className="ed-milestone-line" />
+                    </div>
+                    <div className="ed-milestone-body">
+                      <p className="text-[11px] font-bold text-[#2451A3]">{isPolling ? 'Now' : 'Current phase'}</p>
+                      <p className="text-sm font-bold text-slate-800">
+                        {isPolling ? 'Active polling' : 'Registration open'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="ed-milestone-row opacity-75">
+                    <div className="ed-milestone-track">
+                      <div className="ed-milestone-dot" />
+                    </div>
+                    <div className="ed-milestone-body">
+                      <p className="text-[11px] text-slate-400">{formatMilestoneDate(election.end_date)}</p>
+                      <p className="text-sm font-medium text-slate-800">Results &amp; close</p>
+                      {election.real_time_results ? (
+                        <Link
+                          to={`/elections/${election.id}/results`}
+                          className="mt-1 inline-block text-xs font-semibold text-[#2451A3] no-underline hover:underline"
+                        >
+                          View results page →
+                        </Link>
+                      ) : null}
+                    </div>
+                  </div>
                 </div>
               </section>
             </div>
 
-            <aside className="space-y-6 lg:col-span-4">
+            <aside className="ed-layout-sidebar">
               <VoterRegistrationPanel
                 className="ed-participation-card"
                 election={election}
@@ -257,65 +374,15 @@ export function ElectionDetailsPage() {
               />
 
               <div className="ed-panel">
-                <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-500">Secret voter IDs</h3>
-                <p className="text-xs leading-relaxed text-slate-600">
-                  This poll issues unique IDs such as{' '}
-                  <span className="font-mono font-semibold text-[#2451A3]">
-                    {election.secret_voter_id_prefix}-0001
-                  </span>
-                  . IDs are emailed after roll finalization and masked in the app (e.g. ****0001). Joining another
-                  election gives you a different ID.
-                </p>
-              </div>
-
-              <div className="ed-panel">
-                <h3 className="mb-5 text-xs font-bold uppercase tracking-widest text-slate-500">Key milestones</h3>
-                <div className="space-y-5">
-                  <div className="flex gap-3">
-                    <div className="flex flex-col items-center pt-1">
-                      <div className="ed-milestone-dot" />
-                      <div className="mt-1 w-px flex-1 bg-slate-200" style={{ minHeight: 24 }} />
-                    </div>
-                    <div className="pb-1">
-                      <p className="text-[11px] text-slate-400">{formatMilestoneDate(election.created_at)}</p>
-                      <p className="text-sm font-medium text-slate-800">Election created</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="flex flex-col items-center pt-1">
-                      <div className="ed-milestone-dot" />
-                      <div className="mt-1 w-px flex-1 bg-slate-200" style={{ minHeight: 24 }} />
-                    </div>
-                    <div className="pb-1">
-                      <p className="text-[11px] text-slate-400">{formatMilestoneDate(election.start_date)}</p>
-                      <p className="text-sm font-medium text-slate-800">Voting opens</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="flex flex-col items-center pt-1">
-                      <div className="ed-milestone-dot ed-milestone-dot--active flex items-center justify-center">
-                        <span className="material-symbols-outlined text-[10px] text-white">play_arrow</span>
-                      </div>
-                      <div className="mt-1 w-px flex-1 bg-slate-200" style={{ minHeight: 24 }} />
-                    </div>
-                    <div className="pb-1">
-                      <p className="text-[11px] font-bold text-[#2451A3]">{isPolling ? 'Now' : 'Upcoming'}</p>
-                      <p className="text-sm font-bold text-slate-800">
-                        {isPolling ? 'Active polling' : 'Registration open'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-3 opacity-60">
-                    <div className="flex flex-col items-center pt-1">
-                      <div className="ed-milestone-dot" />
-                    </div>
-                    <div>
-                      <p className="text-[11px] text-slate-400">{formatMilestoneDate(election.end_date)}</p>
-                      <p className="text-sm font-medium text-slate-800">Results &amp; close</p>
-                    </div>
-                  </div>
+                <div className="ed-callout">
+                  <span className="material-symbols-outlined">badge</span>
+                  <p>
+                    Secret voter IDs look like <code>{election.secret_voter_id_prefix}-0001</code>. They are issued
+                    after the organizer finalizes the roll and are unique per election.
+                  </p>
                 </div>
               </div>
+
             </aside>
           </div>
         </div>
@@ -324,3 +391,4 @@ export function ElectionDetailsPage() {
     </div>
   )
 }
+
