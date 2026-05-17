@@ -182,7 +182,26 @@ export function LiveResultsDetailView({ electionId, embeddedIn }: LiveResultsDet
 
   return (
     <div className={rootClass}>
-      <LiveResultsNav isLive={isLive} onShare={() => void handleShare()} />
+      {!voterEmbed ? <LiveResultsNav isLive={isLive} onShare={() => void handleShare()} /> : null}
+
+      {voterEmbed ? (
+        <div className="lr-voter-toolbar">
+          <Link to="/voter/results" className="lr-voter-toolbar-back">
+            ← My results
+          </Link>
+          <div className="lr-voter-toolbar-actions">
+            {isLive ? (
+              <span className="lr-voter-toolbar-live">
+                <span className="lr-voter-toolbar-live-dot" aria-hidden />
+                Live
+              </span>
+            ) : null}
+            <button type="button" className="lr-voter-toolbar-share" onClick={() => void handleShare()}>
+              {copyOk ? 'Copied' : 'Share'}
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <section className="hero">
         <div className="hero-grid" />

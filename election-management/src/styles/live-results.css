@@ -260,30 +260,103 @@
 .lr-root .page-btn:disabled{opacity:0.4;cursor:not-allowed;}
 
 /* Embedded in voter dashboard (no duplicate public nav) */
+.voter-app .content.content--live-results {
+  padding: 0;
+  overflow-x: hidden;
+}
 .voter-app .content .lr-root--voter-embed {
   min-height: auto;
-  margin: -22px -24px 0;
-  width: calc(100% + 48px);
+  margin: 0;
+  width: 100%;
   max-width: none;
+  display: block;
+}
+.voter-app .content .lr-root--voter-embed .lr-voter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: #0a1628;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+.voter-app .content .lr-root--voter-embed .lr-voter-toolbar-back {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+}
+.voter-app .content .lr-root--voter-embed .lr-voter-toolbar-back:hover {
+  color: #fff;
+}
+.voter-app .content .lr-root--voter-embed .lr-voter-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.voter-app .content .lr-root--voter-embed .lr-voter-toolbar-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 20px;
+  padding: 4px 10px;
+}
+.voter-app .content .lr-root--voter-embed .lr-voter-toolbar-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: livePulse 1.2s infinite;
+}
+.voter-app .content .lr-root--voter-embed .lr-voter-toolbar-share {
+  font-family: 'Sora', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  cursor: pointer;
+}
+.voter-app .content .lr-root--voter-embed .lr-voter-toolbar-share:hover {
+  background: rgba(255, 255, 255, 0.12);
 }
 .voter-app .content .lr-root--voter-embed .hero {
-  padding: 36px 24px 44px;
+  padding: 28px 20px 32px;
+}
+.voter-app .content .lr-root--voter-embed .live-banner {
+  padding: 12px 20px;
 }
 .voter-app .content .lr-root--voter-embed .page {
-  padding: 20px 24px 32px;
+  flex: none;
+  padding: 20px 20px 40px;
+  display: block;
+}
+.voter-app .content .lr-root--voter-embed .hero-title {
+  font-size: clamp(20px, 3.5vw, 32px);
 }
 @media (max-width: 768px) {
-  .voter-app .content .lr-root--voter-embed {
-    margin: -18px -20px 0;
-    width: calc(100% + 40px);
+  .voter-app .content .lr-root--voter-embed .hero {
+    padding: 24px 16px 28px;
+  }
+  .voter-app .content .lr-root--voter-embed .page {
+    padding: 16px 16px 32px;
   }
 }
 @media (max-width: 480px) {
-  .voter-app .content .lr-root--voter-embed {
-    margin: -14px -12px 0;
-    width: calc(100% + 24px);
-  }
   .voter-app .content .lr-root--voter-embed .hero {
-    padding: 28px 16px 36px;
+    padding: 20px 14px 24px;
+  }
+  .voter-app .content .lr-root--voter-embed .lr-voter-toolbar {
+    padding: 10px 14px;
   }
 }

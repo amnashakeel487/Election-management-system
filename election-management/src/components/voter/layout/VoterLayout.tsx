@@ -40,6 +40,8 @@ function VoterLayoutInner() {
   }, [pathname])
 
   const meta = useMemo(() => voterTopMeta(pathname), [pathname])
+  const liveResultsEmbed =
+    pathname.startsWith('/voter/results/') && pathname.length > '/voter/results/'.length
 
   const welcomeDate = new Date().toLocaleDateString(undefined, {
     weekday: 'long',
@@ -110,7 +112,7 @@ function VoterLayoutInner() {
               </button>
             </div>
           </div>
-          <div className="content">
+          <div className={`content${liveResultsEmbed ? ' content--live-results' : ''}`}>
             <Outlet />
           </div>
         </main>
