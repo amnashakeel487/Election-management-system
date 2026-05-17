@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ShieldIcon } from '@/components/auth/AuthSplitChrome'
@@ -103,10 +104,58 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
     </>
   )
 
+  const closeMobile = () => setMobileOpen(false)
+
+  const navLinkItems = links.map((l) =>
+    l.route ? (
+      <Link key={l.key} className={linkClass(l.key)} to={l.href} onClick={closeMobile}>
+        {l.label}
+      </Link>
+    ) : (
+      <a key={l.key} className={linkClass(l.key)} href={l.href} onClick={closeMobile}>
+        {l.label}
+      </a>
+    ),
+  )
+
+  const mobileDrawer =
+    mobileOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <>
+            <button
+              type="button"
+              className="public-nav-backdrop"
+              aria-label={t('closeMenu')}
+              onClick={closeMobile}
+            />
+            <div className="public-nav-drawer" role="dialog" aria-modal="true" aria-label={t('openMenu')}>
+              <div className="public-nav-drawer-head">
+                <span className="public-nav-drawer-title">Menu</span>
+                <button
+                  type="button"
+                  className="public-nav-drawer-close"
+                  aria-label={t('closeMenu')}
+                  onClick={closeMobile}
+                >
+                  ×
+                </button>
+              </div>
+              <nav className="public-nav-drawer-links">{navLinkItems}</nav>
+              {trailing ? <div className="public-nav-drawer-trailing">{trailing}</div> : null}
+              <div className="public-nav-drawer-lang">
+                <LanguageSwitcher variant="nav" locales={PUBLIC_LOCALES} />
+              </div>
+              <div className="public-nav-drawer-actions">{authButtons}</div>
+            </div>
+          </>,
+          document.body,
+        )
+      : null
+
   return (
     <>
       <nav className={navClass}>
-        <Link to="/" className="nav-brand" onClick={() => setMobileOpen(false)}>
+        <Link to="/" className="nav-brand" onClick={closeMobile}>
           <div className="nav-icon">
             <ShieldIcon className="h-5 w-5 text-white" />
           </div>
@@ -114,36 +163,9 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
           <span className="nav-tag">{t('enterprise')}</span>
         </Link>
 
-        <div className="nav-links">
-          {links.map((l) =>
-            l.route ? (
-              <Link
-                key={l.key}
-                className={linkClass(l.key)}
-                to={l.href}
-                onClick={() => setMobileOpen(false)}
-              >
-                {l.label}
-              </Link>
-            ) : (
-              <a
-                key={l.key}
-                className={linkClass(l.key)}
-                href={l.href}
-                onClick={() => setMobileOpen(false)}
-              >
-                {l.label}
-              </a>
-            ),
-          )}
-          <div className="nav-lang-mobile">
-            <LanguageSwitcher variant="nav" locales={PUBLIC_LOCALES} />
-          </div>
-          {trailing ? <div className="nav-trailing nav-trailing--mobile">{trailing}</div> : null}
-          <div className="nav-mobile-actions">{authButtons}</div>
-        </div>
+        <div className="nav-links nav-links--desktop">{navLinkItems}</div>
 
-        <div className="nav-actions">
+        <div className="nav-actions nav-actions--desktop">
           <LanguageSwitcher variant="nav" className="nav-lang" locales={PUBLIC_LOCALES} />
           {trailing ? <div className="nav-trailing">{trailing}</div> : null}
           {authButtons}
@@ -161,14 +183,7 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
           <span />
         </button>
       </nav>
-      {mobileOpen ? (
-        <button
-          type="button"
-          className="public-nav-backdrop"
-          aria-label={t('closeMenu')}
-          onClick={() => setMobileOpen(false)}
-        />
-      ) : null}
+      {mobileDrawer}
     </>
   )
 }
