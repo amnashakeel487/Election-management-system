@@ -109,7 +109,7 @@ export function CandidateEditorModal({
         if (e.target === e.currentTarget && !submitting) onClose()
       }}
     >
-      <motionDiv
+      <div
         role="dialog"
         aria-labelledby="candidate-editor-title"
         className="ccm-modal"
@@ -132,7 +132,7 @@ export function CandidateEditorModal({
         </div>
 
         <form className="ccm-modal-form" onSubmit={handleSubmit}>
-          <motionDiv
+          <div
             className={`ccm-photo-zone${dragOver ? ' drag-over' : ''}`}
             onDragOver={(e) => {
               e.preventDefault()
@@ -170,7 +170,7 @@ export function CandidateEditorModal({
             >
               {previewUrl ? 'Change photo' : 'Choose file'}
             </button>
-          </motionDiv>
+          </div>
 
           {mode === 'edit' && candidate?.photo_url ? (
             <label className="ccm-check-row">
@@ -222,7 +222,7 @@ export function CandidateEditorModal({
             </button>
           </div>
         </form>
-      </motionDiv>
-    </motionDiv>
+      </div>
+    </div>
   )
 }

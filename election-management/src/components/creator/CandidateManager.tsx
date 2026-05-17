@@ -1,5 +1,7 @@
-import { type CSSProperties, type FormEvent, useCallback, useEffect, useMemo, useState } from 'react'
+import { type CSSProperties, useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { CandidateEditorModal } from '@/components/creator/candidates/CandidateEditorModal'
+import { CandidateViewModal } from '@/components/creator/candidates/CandidateViewModal'
 import { CANDIDATE_PLACEHOLDER_IMAGES } from '@/constants/electionDetailsAssets'
 import { removeCandidatePortrait, uploadCandidatePortrait } from '@/services/candidatePhotoService'
 import {
@@ -17,8 +19,6 @@ import { candidateInitial, candidatePortraitOrPlaceholder } from '@/utils/candid
 import { formatElectionCode } from '@/utils/electionTime'
 
 type EditorOpen = { mode: 'add' } | { mode: 'edit'; candidate: Candidate }
-
-const IMAGE_ACCEPT = 'image/jpeg,image/png,image/webp,image/gif'
 
 const CARD_THEMES = [
   { accent: '#2451a3', bar: 'linear-gradient(90deg,#2451A3,#1B3A6B)' },
@@ -65,13 +65,12 @@ export function CandidateManager({
   const [workspaceError, setWorkspaceError] = useState<string | null>(null)
 
   const [editor, setEditor] = useState<EditorOpen | null>(null)
-  const [formName, setFormName] = useState('')
-  const [formDesignation, setFormDesignation] = useState('')
-  const [formManifesto, setFormManifesto] = useState('')
-  const [formFile, setFormFile] = useState<File | null>(null)
-  const [removePhoto, setRemovePhoto] = useState(false)
+  const [viewCandidate, setViewCandidate] = useState<Candidate | null>(null)
+  const [layout, setLayout] = useState<'grid' | 'list'>('grid')
+  const [search, setSearch] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const reloadList = useCallback(async () => {
     const list = await fetchCreatorElections(creatorId)
@@ -153,11 +152,31 @@ export function CandidateManager({
     }
   }, [creatorId, selectedElectionId])
 
-  const isDraftElection = electionDetail?.status === 'draft'
+  useEffect(() => {
+    if (!successMessage) return
+    const t = window.setTimeout(() => setSuccessMessage(null), 4000)
+    return () => window.clearTimeout(t)
+  }, [successMessage])
+
+  const canManageCandidates =
+    electionDetail?.status === 'draft' || electionDetail?.status === 'published'
+  const isLockedElection =
+    electionDetail != null &&
+    (electionDetail.status === 'active' || electionDetail.status === 'completed' || electionDetail.status === 'archived')
+
   const sortedCandidates = useMemo(
     () => (electionDetail?.candidates ?? []).slice().sort((a, b) => a.sort_order - b.sort_order),
     [electionDetail?.candidates],
   )
+
+  const filteredCandidates = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return sortedCandidates
+    return sortedCandidates.filter((c) => {
+      const hay = [c.name, c.designation, c.description].filter(Boolean).join(' ').toLowerCase()
+      return hay.includes(q)
+    })
+  }, [sortedCandidates, search])
 
   const totalVotes = results?.total_votes ?? 0
 
@@ -182,49 +201,36 @@ export function CandidateManager({
 
   function openAdd() {
     setFormError(null)
-    setFormName('')
-    setFormDesignation('')
-    setFormManifesto('')
-    setFormFile(null)
-    setRemovePhoto(false)
+    setViewCandidate(null)
     setEditor({ mode: 'add' })
   }
 
   function openEdit(candidate: Candidate) {
     setFormError(null)
-    setFormName(candidate.name)
-    setFormDesignation(candidate.designation ?? '')
-    setFormManifesto(candidate.description ?? '')
-    setFormFile(null)
-    setRemovePhoto(false)
+    setViewCandidate(null)
     setEditor({ mode: 'edit', candidate })
   }
 
   function closeEditor() {
     if (submitting) return
     setEditor(null)
+    setFormError(null)
   }
 
-  async function handleSubmitModal(e: FormEvent) {
-    e.preventDefault()
+  async function handleSaveCandidate(payload: {
+    name: string
+    designation: string
+    manifesto: string
+    file: File | null
+    removePhoto: boolean
+  }) {
     if (!electionDetail) return
-    const trimmedName = formName.trim()
-    if (!trimmedName) {
+    if (!payload.name) {
       setFormError('Name is required.')
       return
     }
-    const maxMb = 4
-    if (formFile && formFile.size > maxMb * 1024 * 1024) {
-      setFormError(`Photo must be ${maxMb} MB or smaller.`)
-      return
-    }
-    const allowedMime = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-    if (formFile && !allowedMime.includes(formFile.type)) {
-      setFormError('Use JPEG, PNG, WebP, or GIF.')
-      return
-    }
-    if (!isDraftElection) {
-      setFormError('Candidates can only be changed while the election is a draft.')
+    if (!canManageCandidates) {
+      setFormError('Candidates cannot be changed while voting is active or the election has ended.')
       return
     }
 
@@ -237,33 +243,34 @@ export function CandidateManager({
 
       if (editor?.mode === 'add') {
         const inserted = await addCandidate(electionId, {
-          name: trimmedName,
-          designation: formDesignation.trim() || undefined,
-          description: formManifesto.trim() || undefined,
+          name: payload.name,
+          designation: payload.designation || undefined,
+          description: payload.manifesto || undefined,
         })
         candidateId = inserted.id
         previousPhotoUrl = inserted.photo_url
       } else if (editor?.mode === 'edit') {
         const patch: Parameters<typeof updateCandidate>[1] = {
-          name: trimmedName,
-          designation: formDesignation.trim() || null,
-          description: formManifesto.trim() || null,
+          name: payload.name,
+          designation: payload.designation || null,
+          description: payload.manifesto || null,
         }
-        if (removePhoto && !formFile && previousPhotoUrl) {
+        if (payload.removePhoto && !payload.file && previousPhotoUrl) {
           await removeCandidatePortrait(previousPhotoUrl).catch(() => undefined)
           patch.photo_url = null
         }
         await updateCandidate(candidateId, patch)
       }
 
-      if (formFile) {
-        const url = await uploadCandidatePortrait(electionId, candidateId, formFile)
+      if (payload.file) {
+        const url = await uploadCandidatePortrait(electionId, candidateId, payload.file)
         await updateCandidate(candidateId, { photo_url: url })
       }
 
       await refreshDetail(electionDetail.id)
       await reloadList()
       setEditor(null)
+      setSuccessMessage(editor?.mode === 'add' ? 'Candidate added.' : 'Candidate updated.')
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Save failed')
     } finally {
@@ -286,7 +293,7 @@ export function CandidateManager({
   }
 
   async function handleDelete(candidate: Candidate) {
-    if (!electionDetail || !isDraftElection) return
+    if (!electionDetail || !canManageCandidates) return
     const ok = window.confirm(`Remove candidate "${candidate.name}" from this election?`)
     if (!ok) return
     setWorkspaceError(null)
@@ -295,6 +302,8 @@ export function CandidateManager({
       await removeCandidate(candidate.id)
       await refreshDetail(electionDetail.id)
       await reloadList()
+      setViewCandidate(null)
+      setSuccessMessage('Candidate removed.')
     } catch (err) {
       setWorkspaceError(err instanceof Error ? err.message : 'Remove failed')
     }
@@ -302,6 +311,7 @@ export function CandidateManager({
 
   const subtitleElection = electionDetail?.title ?? 'your selected election'
   const electionCode = electionDetail ? formatElectionCode(electionDetail.id) : ''
+  const viewStats = viewCandidate ? voteStats(viewCandidate.id) : { votes: 0, pct: 0 }
 
   return (
     <div className="creator-candidates-page">
@@ -314,13 +324,16 @@ export function CandidateManager({
             {subtitleElection}
             {electionCode ? ` (${electionCode})` : ''}
           </strong>
-          {!isDraftElection && electionDetail ? (
-            <span className="ccm-view-badge">View only</span>
-          ) : null}
+          {isLockedElection ? <span className="ccm-view-badge">View only</span> : null}
         </p>
       </header>
 
       {workspaceError ? <div className="ccm-alert error">{workspaceError}</div> : null}
+      {successMessage ? (
+        <div className="ccm-alert success" role="status">
+          {successMessage}
+        </div>
+      ) : null}
 
       {!loadingList && elections.length === 0 ? (
         <div className="ccm-empty">
@@ -348,7 +361,7 @@ export function CandidateManager({
                 </button>
               ))}
             </div>
-            {isDraftElection ? (
+            {canManageCandidates ? (
               <button type="button" className="ccm-add-btn" onClick={openAdd}>
                 <svg viewBox="0 0 24 24" aria-hidden>
                   <line x1="12" y1="5" x2="12" y2="19" />
@@ -362,102 +375,212 @@ export function CandidateManager({
           {loadingDetail ? <p className="ccm-loading">Loading candidates…</p> : null}
 
           {electionDetail && !loadingDetail ? (
-            <div className="ccm-grid">
-              {sortedCandidates.length === 0 && !isDraftElection ? (
-                <div className="ccm-empty">
-                  <p>No candidates on this ballot yet.</p>
+            <>
+              {isLockedElection ? (
+                <div className="ccm-banner warn">
+                  This election is active or completed. You can view candidates but cannot add, edit, or delete
+                  them.
                 </div>
+              ) : canManageCandidates ? (
+                <div className="ccm-banner">Add members with photo, name, designation, and manifesto.</div>
               ) : null}
 
-              {sortedCandidates.map((candidate, index) => {
-                const theme = CARD_THEMES[index % CARD_THEMES.length]
-                const { votes, pct } = voteStats(candidate.id)
-                const photo = candidatePortraitOrPlaceholder(candidate, CANDIDATE_PLACEHOLDER_IMAGES)
-                const hasPhoto = Boolean(candidate.photo_url?.trim())
+              <div className="ccm-subtoolbar">
+                <label className="ccm-search">
+                  <span aria-hidden>⌕</span>
+                  <input
+                    type="search"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search candidates…"
+                    aria-label="Search candidates"
+                  />
+                </label>
+                <span className="ccm-count">
+                  {filteredCandidates.length} candidate{filteredCandidates.length === 1 ? '' : 's'}
+                </span>
+                <div className="ccm-view-toggle" role="group" aria-label="Layout">
+                  <button type="button" className={layout === 'grid' ? 'active' : ''} onClick={() => setLayout('grid')}>
+                    Grid
+                  </button>
+                  <button type="button" className={layout === 'list' ? 'active' : ''} onClick={() => setLayout('list')}>
+                    List
+                  </button>
+                </div>
+              </div>
 
-                return (
-                  <article
-                    key={candidate.id}
-                    className="ccm-card"
-                    style={
-                      {
-                        '--ccm-accent': theme.accent,
-                        '--ccm-bar': theme.bar,
-                      } as CSSProperties
-                    }
-                  >
-                    <div className="ccm-card-body">
-                      {hasPhoto ? (
-                        <img src={photo} alt="" className="ccm-avatar" />
-                      ) : (
-                        <div
-                          className="ccm-avatar-fallback"
-                          style={{ background: avatarGradient(candidate.name) }}
-                        >
-                          {candidateInitial(candidate.name)}
-                        </div>
-                      )}
-                      <h3 className="ccm-name">{candidate.name}</h3>
-                      <p className="ccm-party">{candidate.designation?.trim() || 'Candidate'}</p>
+              {filteredCandidates.length === 0 ? (
+                <div className="ccm-empty">
+                  <p>
+                    {search.trim()
+                      ? 'No candidates match your search.'
+                      : canManageCandidates
+                        ? 'No candidates yet. Add your first member.'
+                        : 'No candidates on this ballot yet.'}
+                  </p>
+                  {canManageCandidates && !search.trim() ? (
+                    <button type="button" className="ccm-add-btn" onClick={openAdd}>
+                      Add candidate
+                    </button>
+                  ) : null}
+                </div>
+              ) : layout === 'list' ? (
+                <div className="ccm-list-wrap">
+                  <table className="ccm-list-table">
+                    <thead>
+                      <tr>
+                        <th>Photo</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Manifesto</th>
+                        <th style={{ textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredCandidates.map((candidate) => {
+                        const photo = candidatePortraitOrPlaceholder(candidate, CANDIDATE_PLACEHOLDER_IMAGES)
+                        const hasPhoto = Boolean(candidate.photo_url?.trim())
+                        return (
+                          <tr key={candidate.id}>
+                            <td>
+                              {hasPhoto ? (
+                                <img src={photo} alt="" className="ccm-list-photo" />
+                              ) : (
+                                <div
+                                  className="ccm-list-photo-fallback"
+                                  style={{ background: avatarGradient(candidate.name) }}
+                                >
+                                  {candidateInitial(candidate.name)}
+                                </div>
+                              )}
+                            </td>
+                            <td>
+                              <strong>{candidate.name}</strong>
+                            </td>
+                            <td>{candidate.designation?.trim() || '—'}</td>
+                            <td style={{ maxWidth: 280, color: '#64748b', fontSize: 12 }}>
+                              {clampBio(candidate.description ?? '', 80)}
+                            </td>
+                            <td>
+                              <div className="ccm-list-actions">
+                                <button type="button" className="primary" onClick={() => setViewCandidate(candidate)}>
+                                  View
+                                </button>
+                                {canManageCandidates ? (
+                                  <>
+                                    <button type="button" className="primary" onClick={() => openEdit(candidate)}>
+                                      Edit
+                                    </button>
+                                    <button type="button" className="danger" onClick={() => void handleDelete(candidate)}>
+                                      Delete
+                                    </button>
+                                  </>
+                                ) : null}
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="ccm-grid">
+                  {filteredCandidates.map((candidate, index) => {
+                    const theme = CARD_THEMES[index % CARD_THEMES.length]
+                    const { votes, pct } = voteStats(candidate.id)
+                    const photo = candidatePortraitOrPlaceholder(candidate, CANDIDATE_PLACEHOLDER_IMAGES)
+                    const hasPhoto = Boolean(candidate.photo_url?.trim())
 
-                      {totalVotes > 0 ? (
-                        <>
-                          <div className="ccm-votes">
-                            {votes.toLocaleString()}
-                            <span className="ccm-votes-label"> votes</span>
-                          </div>
-                          <div className="ccm-bar-track">
+                    return (
+                      <article
+                        key={candidate.id}
+                        className="ccm-card"
+                        style={
+                          {
+                            '--ccm-accent': theme.accent,
+                            '--ccm-bar': theme.bar,
+                          } as CSSProperties
+                        }
+                      >
+                        <div className="ccm-card-body">
+                          {hasPhoto ? (
+                            <img src={photo} alt="" className="ccm-avatar" />
+                          ) : (
                             <div
-                              className="ccm-bar-fill"
-                              style={{ width: `${Math.min(100, pct)}%` }}
-                            />
-                          </div>
-                          <p className="ccm-pct">{pct}% of total</p>
-                        </>
-                      ) : (
-                        <p className="ccm-pct" style={{ marginBottom: 14 }}>
-                          {isDraftElection ? 'Votes appear after publishing' : 'No votes cast yet'}
-                        </p>
-                      )}
+                              className="ccm-avatar-fallback"
+                              style={{ background: avatarGradient(candidate.name) }}
+                            >
+                              {candidateInitial(candidate.name)}
+                            </div>
+                          )}
+                          <h3 className="ccm-name">{candidate.name}</h3>
+                          <p className="ccm-party">{candidate.designation?.trim() || 'Candidate'}</p>
 
-                      <p className="ccm-bio">{clampBio(candidate.description ?? '')}</p>
-                    </div>
+                          {totalVotes > 0 ? (
+                            <>
+                              <div className="ccm-votes">
+                                {votes.toLocaleString()}
+                                <span className="ccm-votes-label"> votes</span>
+                              </div>
+                              <div className="ccm-bar-track">
+                                <div className="ccm-bar-fill" style={{ width: `${Math.min(100, pct)}%` }} />
+                              </div>
+                              <p className="ccm-pct">{pct}% of total</p>
+                            </>
+                          ) : (
+                            <p className="ccm-pct" style={{ marginBottom: 14 }}>
+                              {electionDetail.status === 'draft'
+                                ? 'Votes appear after publishing'
+                                : 'No votes cast yet'}
+                            </p>
+                          )}
 
-                    {isDraftElection ? (
-                      <footer className="ccm-card-footer">
-                        <button type="button" className="ccm-edit-btn" onClick={() => openEdit(candidate)}>
-                          — Edit
-                        </button>
-                        <button
-                          type="button"
-                          className="ccm-del-btn"
-                          aria-label={`Delete ${candidate.name}`}
-                          onClick={() => void handleDelete(candidate)}
-                        >
-                          <svg viewBox="0 0 24 24" aria-hidden>
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                          </svg>
-                        </button>
-                      </footer>
-                    ) : null}
-                  </article>
-                )
-              })}
+                          <p className="ccm-bio">{clampBio(candidate.description ?? '')}</p>
+                        </div>
 
-              {isDraftElection ? (
-                <button type="button" className="ccm-add-card" onClick={openAdd}>
-                  <span className="ccm-add-icon" aria-hidden>
-                    +
-                  </span>
-                  <span className="ccm-add-label">Add Candidate</span>
-                  <span className="ccm-add-hint">Click to add a new candidate</span>
-                </button>
-              ) : null}
-            </div>
+                        <footer className="ccm-card-footer">
+                          <button type="button" className="ccm-view-btn" onClick={() => setViewCandidate(candidate)}>
+                            View
+                          </button>
+                          {canManageCandidates ? (
+                            <>
+                              <button type="button" className="ccm-edit-btn" onClick={() => openEdit(candidate)}>
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                className="ccm-del-btn"
+                                aria-label={`Delete ${candidate.name}`}
+                                onClick={() => void handleDelete(candidate)}
+                              >
+                                <svg viewBox="0 0 24 24" aria-hidden>
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                </svg>
+                              </button>
+                            </>
+                          ) : null}
+                        </footer>
+                      </article>
+                    )
+                  })}
+
+                  {canManageCandidates ? (
+                    <button type="button" className="ccm-add-card" onClick={openAdd}>
+                      <span className="ccm-add-icon" aria-hidden>
+                        +
+                      </span>
+                      <span className="ccm-add-label">Add Candidate</span>
+                      <span className="ccm-add-hint">Click to add a new candidate</span>
+                    </button>
+                  ) : null}
+                </div>
+              )}
+            </>
           ) : null}
 
-          {isDraftElection && electionDetail ? (
+          {canManageCandidates && electionDetail?.status === 'draft' ? (
             <p style={{ marginTop: 24, fontSize: 13 }}>
               <Link
                 to={`/creator/elections/${electionDetail.id}/edit`}
@@ -470,110 +593,30 @@ export function CandidateManager({
         </>
       ) : null}
 
-      {editor && electionDetail && isDraftElection ? (
-        <div
-          className="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 p-4 sm:items-center"
-          role="presentation"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) closeEditor()
-          }}
-        >
-          <div
-            role="dialog"
-            aria-labelledby="candidate-editor-title"
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-line bg-surface-container p-6 shadow-2xl"
-          >
-            <div className="mb-6 flex items-start justify-between gap-4">
-              <div>
-                <h2 id="candidate-editor-title" className="font-headline-md text-headline-md text-on-surface">
-                  {editor.mode === 'add' ? 'New candidate' : 'Edit candidate'}
-                </h2>
-                <p className="mt-1 font-body-sm text-on-surface-variant">Photo uploads use your Supabase storage bucket.</p>
-              </div>
-              <button
-                type="button"
-                onClick={closeEditor}
-                disabled={submitting}
-                className="rounded-full p-2 hover:bg-elevated/40"
-              >
-                <span className="material-symbols-outlined text-on-surface-variant">close</span>
-              </button>
-            </div>
+      <CandidateEditorModal
+        mode={editor?.mode ?? 'add'}
+        candidate={editor?.mode === 'edit' ? editor.candidate : undefined}
+        open={Boolean(editor && electionDetail && canManageCandidates)}
+        submitting={submitting}
+        error={formError}
+        onClose={closeEditor}
+        onSubmit={(payload) => void handleSaveCandidate(payload)}
+      />
 
-            <form className="space-y-5" onSubmit={(ev) => void handleSubmitModal(ev)}>
-              <div>
-                <label className="ml-1 block font-label-md text-label-md text-on-surface-variant">Portrait</label>
-                <input
-                  type="file"
-                  accept={IMAGE_ACCEPT}
-                  onChange={(e) => setFormFile(e.target.files?.[0] ?? null)}
-                  className="mt-2 block w-full text-sm text-on-surface-variant file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:font-semibold file:text-on-primary"
-                />
-                <p className="mt-1 text-xs text-on-surface-variant">JPEG · PNG · WebP · GIF · max 4 MB</p>
-                {editor.mode === 'edit' && editor.candidate.photo_url ? (
-                  <label className="mt-3 flex cursor-pointer items-center gap-2 font-body-sm text-on-surface">
-                    <input type="checkbox" checked={removePhoto} onChange={(e) => setRemovePhoto(e.target.checked)} />
-                    Remove saved photo
-                  </label>
-                ) : null}
-              </div>
-              <div>
-                <label className="ml-1 block font-label-md text-label-md text-on-surface-variant">Full name</label>
-                <input
-                  required
-                  value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-              <div>
-                <label className="ml-1 block font-label-md text-label-md text-on-surface-variant">Designation / role</label>
-                <input
-                  placeholder="e.g. Chairperson, Slate A"
-                  value={formDesignation}
-                  onChange={(e) => setFormDesignation(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-              <div>
-                <label className="ml-1 block font-label-md text-label-md text-on-surface-variant">
-                  Manifesto / description
-                </label>
-                <textarea
-                  rows={5}
-                  value={formManifesto}
-                  onChange={(e) => setFormManifesto(e.target.value)}
-                  className="mt-2 w-full resize-none rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-on-surface outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              {formError ? (
-                <p className="rounded-xl border border-error/30 bg-error-container/10 px-4 py-3 font-body-sm text-error">
-                  {formError}
-                </p>
-              ) : null}
-
-              <div className="flex flex-wrap justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  disabled={submitting}
-                  className="rounded-xl border border-line px-5 py-3 font-label-md text-on-surface hover:bg-elevated/40"
-                  onClick={closeEditor}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="rounded-xl bg-primary px-6 py-3 font-label-md font-bold text-on-primary disabled:opacity-50"
-                >
-                  {submitting ? 'Saving…' : editor.mode === 'add' ? 'Create candidate' : 'Save changes'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
+      <CandidateViewModal
+        candidate={viewCandidate}
+        voteCount={viewStats.votes}
+        votePct={viewStats.pct}
+        open={viewCandidate != null}
+        canManage={canManageCandidates}
+        onClose={() => setViewCandidate(null)}
+        onEdit={() => {
+          if (viewCandidate) openEdit(viewCandidate)
+        }}
+        onDelete={() => {
+          if (viewCandidate) void handleDelete(viewCandidate)
+        }}
+      />
     </div>
   )
 }
