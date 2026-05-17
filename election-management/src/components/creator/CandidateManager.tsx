@@ -272,7 +272,14 @@ export function CandidateManager({
       setEditor(null)
       setSuccessMessage(editor?.mode === 'add' ? 'Candidate added.' : 'Candidate updated.')
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Save failed')
+      const msg = err instanceof Error ? err.message : 'Save failed'
+      if (msg.toLowerCase().includes('row-level security')) {
+        setFormError(
+          'Permission denied. Candidates can only be edited on draft or published elections. If this is a new deployment, apply Supabase migrations 028 and 029.',
+        )
+      } else {
+        setFormError(msg)
+      }
     } finally {
       setSubmitting(false)
     }
