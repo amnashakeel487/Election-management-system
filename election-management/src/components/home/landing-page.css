@@ -1,4 +1,4 @@
-﻿.lp-root { scroll-behavior: smooth; }
+.lp-root { scroll-behavior: smooth; }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -82,7 +82,6 @@ html{scroll-behavior:smooth;}
 .lp-root .grad-text{background:linear-gradient(90deg,#67E8F9,#A78BFA,#F9A8D4,#67E8F9);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradFlow 5s linear infinite;}
 @keyframes gradFlow{0%{background-position:0%;}100%{background-position:300%;}}
 
-.lp-root .hero-tagline{font-size:clamp(17px,2.2vw,21px);font-weight:600;color:rgba(255,255,255,0.82);line-height:1.55;max-width:520px;margin:-6px 0 14px;letter-spacing:-0.2px;animation:slideUp 0.8s cubic-bezier(0.4,0,0.2,1) 0.15s both;}
 .lp-root .hero-sub{font-size:17px;color:rgba(255,255,255,0.55);line-height:1.8;max-width:480px;margin-bottom:36px;animation:slideUp 0.8s cubic-bezier(0.4,0,0.2,1) 0.2s both;}
 
 .lp-root .hero-btns{display:flex;gap:14px;flex-wrap:wrap;animation:slideUp 0.8s cubic-bezier(0.4,0,0.2,1) 0.3s both;}
@@ -321,7 +320,7 @@ footer{background:#080f1e;padding:60px 48px 28px;border-top:1px solid rgba(255,2
 /* â”€â”€â”€ RESPONSIVE â”€â”€â”€ */
 @media(max-width:1024px){
 .lp-root .hero-inner{grid-template-columns:1fr;gap:40px;text-align:center;}
-.lp-root .hero-tagline,.lp-root .hero-sub,.trust-chips,.hero-btns{margin-left:auto;margin-right:auto;justify-content:center;}
+.lp-root .hero-sub,.trust-chips,.hero-btns{margin-left:auto;margin-right:auto;justify-content:center;}
 .lp-root .hero-right{display:none;}
 .lp-root .features-grid{grid-template-columns:repeat(2,1fr);}
 .lp-root .how-grid{grid-template-columns:repeat(2,1fr);}
