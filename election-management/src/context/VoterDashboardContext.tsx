@@ -1,13 +1,24 @@
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { fetchVoterNotificationLogs } from '@/services/voterNotificationService'
 import { fetchUserRegistrations } from '@/services/voterRegistrationService'
+import type { NotificationLogRow } from '@/types/notification'
 import type { VoterRegistrationWithElection } from '@/types/voterRegistration'
-import { buildVoterNotifications } from '@/utils/voterNotifications'
+import {
+  countUnreadNotifications,
+  mergeVoterInbox,
+  type VoterNotificationItem,
+} from '@/utils/voterNotifications'
 import { canVote } from '@/utils/voterElectionUi'
+
+const INBOX_POLL_MS = 45_000
 
 export interface VoterDashboardContextValue {
   registrations: VoterRegistrationWithElection[]
+  notificationLogs: NotificationLogRow[]
+  notifications: VoterNotificationItem[]
   loading: boolean
+  notificationsLoading: boolean
   error: string | null
   reload: () => Promise<void>
   registered: VoterRegistrationWithElection[]
@@ -23,32 +34,61 @@ export const VoterDashboardContext = createContext<VoterDashboardContextValue | 
 export function VoterDashboardProvider({ children }: { children: ReactNode }) {
   const { session } = useAuth()
   const [registrations, setRegistrations] = useState<VoterRegistrationWithElection[]>([])
+  const [notificationLogs, setNotificationLogs] = useState<NotificationLogRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [notificationsLoading, setNotificationsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const reload = useCallback(async () => {
     const userId = session?.user.id
     if (!userId) {
       setRegistrations([])
+      setNotificationLogs([])
       setLoading(false)
       return
     }
     setLoading(true)
+    setNotificationsLoading(true)
     setError(null)
     try {
-      const data = await fetchUserRegistrations(userId)
-      setRegistrations(data)
+      const [regData, logs] = await Promise.all([
+        fetchUserRegistrations(userId),
+        fetchVoterNotificationLogs(userId).catch(() => [] as NotificationLogRow[]),
+      ])
+      setRegistrations(regData)
+      setNotificationLogs(logs)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load registrations')
+      setError(e instanceof Error ? e.message : 'Failed to load voter dashboard')
       setRegistrations([])
+      setNotificationLogs([])
     } finally {
       setLoading(false)
+      setNotificationsLoading(false)
     }
   }, [session?.user.id])
 
   useEffect(() => {
     void reload()
   }, [reload])
+
+  useEffect(() => {
+    const userId = session?.user.id
+    if (!userId) return
+
+    const poll = window.setInterval(() => {
+      void reload()
+    }, INBOX_POLL_MS)
+
+    const onFocus = () => {
+      void reload()
+    }
+    window.addEventListener('focus', onFocus)
+
+    return () => {
+      window.clearInterval(poll)
+      window.removeEventListener('focus', onFocus)
+    }
+  }, [session?.user.id, reload])
 
   const registered = useMemo(
     () => registrations.filter((r) => r.status === 'registered'),
@@ -76,14 +116,20 @@ export function VoterDashboardProvider({ children }: { children: ReactNode }) {
     [registered],
   )
 
-  const voterNotifications = useMemo(() => buildVoterNotifications(registrations), [registrations])
+  const notifications = useMemo(
+    () => mergeVoterInbox(registrations, notificationLogs),
+    [registrations, notificationLogs],
+  )
 
-  const notificationCount = voterNotifications.length
+  const notificationCount = useMemo(() => countUnreadNotifications(notifications), [notifications])
 
   const value = useMemo(
     (): VoterDashboardContextValue => ({
       registrations,
+      notificationLogs,
+      notifications,
       loading,
+      notificationsLoading,
       error,
       reload,
       registered,
@@ -95,7 +141,10 @@ export function VoterDashboardProvider({ children }: { children: ReactNode }) {
     }),
     [
       registrations,
+      notificationLogs,
+      notifications,
       loading,
+      notificationsLoading,
       error,
       reload,
       registered,

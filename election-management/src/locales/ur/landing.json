@@ -6,11 +6,10 @@
   "openMenu": "مینو کھولیں",
   "closeMenu": "مینو بند کریں",
   "nav": {
-    "home": "ہوم",
     "liveResults": "لائیو نتائج",
+    "browseElections": "انتخابات دیکھیں",
     "features": "خصوصیات",
     "howItWorks": "طریقہ کار",
-    "reviews": "تبصرے",
     "contact": "رابطہ",
     "team": "ٹیم"
   },

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { CandidateAvatar } from '@/components/election/CandidateAvatar'
 import { VotingEligibilityPanel } from '@/components/voting/VotingEligibilityPanel'
@@ -25,6 +25,85 @@ function formatVoterCount(count: number): string {
   if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`
   if (count >= 1_000) return `${(count / 1_000).toFixed(1)}k`
   return count.toLocaleString()
+}
+
+function ElectionQuickStats({
+  stats,
+  candidateCount,
+  endDate,
+}: {
+  stats: ElectionRegistrationStats
+  candidateCount: number
+  endDate: string
+}) {
+  const capacityPct =
+    stats.max_voters > 0
+      ? Math.min(100, Math.round((stats.registered_count / stats.max_voters) * 100))
+      : 0
+
+  const cards = [
+    {
+      key: 'registered',
+      label: 'Registered',
+      icon: 'how_to_reg',
+      tone: 'blue',
+      value: stats.registered_count.toLocaleString(),
+      sub: stats.max_voters > 0 ? `${capacityPct}% of capacity` : undefined,
+      fillPct: capacityPct,
+    },
+    {
+      key: 'capacity',
+      label: 'Capacity',
+      icon: 'groups',
+      tone: 'purple',
+      value: stats.max_voters.toLocaleString(),
+      sub: 'Maximum voters',
+    },
+    {
+      key: 'candidates',
+      label: 'Candidates',
+      icon: 'ballot',
+      tone: 'cyan',
+      value: candidateCount.toLocaleString(),
+      sub: candidateCount === 1 ? '1 on the ballot' : `${candidateCount} on the ballot`,
+    },
+    {
+      key: 'time',
+      label: 'Time left',
+      icon: 'schedule',
+      tone: 'amber',
+      value: formatTimeRemaining(endDate),
+      sub: 'Until voting ends',
+      valueSm: true,
+    },
+  ] as const
+
+  return (
+    <div className="ed-quick-stats" aria-label="Election summary">
+      {cards.map((card, index) => (
+        <article
+          key={card.key}
+          className={`ed-qs-card ed-qs-card--${card.tone}`}
+          style={{ '--ed-qs-delay': `${index * 90}ms` } as CSSProperties}
+        >
+          <div className="ed-qs-accent" aria-hidden />
+          <div className="ed-qs-icon" aria-hidden>
+            <span className="material-symbols-outlined">{card.icon}</span>
+          </div>
+          <div className="ed-qs-label">{card.label}</div>
+          <div className={`ed-qs-value${'valueSm' in card && card.valueSm ? ' ed-qs-value--sm' : ''}`}>
+            {card.value}
+          </div>
+          {card.sub ? <p className="ed-qs-sub">{card.sub}</p> : null}
+          {'fillPct' in card ? (
+            <div className="ed-qs-track" aria-hidden>
+              <div className="ed-qs-track-fill" style={{ width: `${card.fillPct}%` }} />
+            </div>
+          ) : null}
+        </article>
+      ))}
+    </div>
+  )
 }
 
 function ElectionDetailsHero({
@@ -193,24 +272,11 @@ export function ElectionDetailsPage() {
       <main className="ed-page-main pt-16">
         <ElectionDetailsHero election={election} stats={stats} isPolling={isPolling} />
 
-        <div className="ed-quick-stats" aria-label="Election summary">
-          <div className="ed-qs-card">
-            <div className="ed-qs-label">Registered</div>
-            <div className="ed-qs-value">{stats.registered_count.toLocaleString()}</div>
-          </div>
-          <div className="ed-qs-card">
-            <div className="ed-qs-label">Capacity</div>
-            <div className="ed-qs-value">{stats.max_voters.toLocaleString()}</div>
-          </div>
-          <div className="ed-qs-card">
-            <div className="ed-qs-label">Candidates</div>
-            <div className="ed-qs-value">{election.candidates.length}</div>
-          </div>
-          <div className="ed-qs-card">
-            <div className="ed-qs-label">Time left</div>
-            <div className="ed-qs-value ed-qs-value--sm">{formatTimeRemaining(election.end_date)}</div>
-          </div>
-        </div>
+        <ElectionQuickStats
+          stats={stats}
+          candidateCount={election.candidates.length}
+          endDate={election.end_date}
+        />
 
         <div className="ed-main">
           <div className="ed-layout">

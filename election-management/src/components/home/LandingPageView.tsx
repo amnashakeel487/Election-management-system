@@ -171,7 +171,7 @@ export function LandingPageView() {
 
   return (
     <div className="lp-root">
-      <PublicSiteNav active="home" variant="landing" />
+      <PublicSiteNav variant="landing" />
 
       <section className="hero">
         <div className="hero-bg">

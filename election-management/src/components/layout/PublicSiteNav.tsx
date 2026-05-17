@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { PUBLIC_LOCALES } from '@/types/locale'
 import '@/styles/public-site-nav.css'
 
-export type PublicNavActive = 'home' | 'elections' | 'results'
+export type PublicNavActive = 'elections' | 'browse' | 'results'
 
 export interface PublicSiteNavProps {
   /** Highlight the current section; inferred from the URL when omitted. */
@@ -18,11 +18,15 @@ export interface PublicSiteNavProps {
   trailing?: ReactNode
 }
 
-function resolveActive(pathname: string, explicit?: PublicNavActive): PublicNavActive | null {
+function resolveActive(
+  pathname: string,
+  hash: string,
+  explicit?: PublicNavActive,
+): PublicNavActive | null {
   if (explicit) return explicit
-  if (pathname === '/') return 'home'
-  if (pathname.startsWith('/browse-elections')) return 'elections'
+  if (pathname.startsWith('/browse-elections')) return 'browse'
   if (pathname.startsWith('/results') || pathname.includes('/results')) return 'results'
+  if (pathname === '/' && hash === '#elections') return 'elections'
   return null
 }
 
@@ -36,7 +40,7 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const onLanding = location.pathname === '/'
-  const active = resolveActive(location.pathname, activeProp)
+  const active = resolveActive(location.pathname, location.hash, activeProp)
 
   useEffect(() => {
     const onScroll = () => setNavScrolled(window.scrollY > 40)
@@ -56,12 +60,11 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
 
   const links = useMemo(
     () => [
-      { key: 'home', href: '/', label: t('nav.home'), route: true as const },
-      { key: 'elections', href: '/browse-elections', label: tNav('elections'), route: true as const },
+      { key: 'elections', href: sectionHref('#elections'), label: tNav('elections'), route: false as const },
+      { key: 'browse', href: '/browse-elections', label: t('nav.browseElections'), route: true as const },
       { key: 'results', href: '/results', label: t('nav.liveResults'), route: true as const },
       { key: 'features', href: sectionHref('#features'), label: t('nav.features'), route: false as const },
       { key: 'how', href: sectionHref('#how'), label: t('nav.howItWorks'), route: false as const },
-      { key: 'reviews', href: sectionHref('#testimonials'), label: t('nav.reviews'), route: false as const },
       { key: 'team', href: sectionHref('#team'), label: t('nav.team'), route: false as const },
       { key: 'contact', href: sectionHref('#contact'), label: t('nav.contact'), route: false as const },
     ],
@@ -79,8 +82,8 @@ export function PublicSiteNav({ active: activeProp, variant = 'default', trailin
 
   const linkClass = (key: string) => {
     const isActive =
-      (key === 'home' && active === 'home') ||
       (key === 'elections' && active === 'elections') ||
+      (key === 'browse' && active === 'browse') ||
       (key === 'results' && active === 'results')
     return `nav-link${isActive ? ' active' : ''}`
   }

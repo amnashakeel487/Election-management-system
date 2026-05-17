@@ -6,11 +6,10 @@
   "openMenu": "Open menu",
   "closeMenu": "Close menu",
   "nav": {
-    "home": "Home",
     "liveResults": "Live results",
+    "browseElections": "Browse elections",
     "features": "Features",
     "howItWorks": "How it works",
-    "reviews": "Reviews",
     "contact": "Contact",
     "team": "Team"
   },
