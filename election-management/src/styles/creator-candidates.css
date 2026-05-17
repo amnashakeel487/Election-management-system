@@ -307,10 +307,12 @@
 }
 
 .creator-candidates-page .ccm-card-footer {
-  padding: 0 18px 16px;
   margin-top: auto;
   width: 100%;
   box-sizing: border-box;
+  padding: 12px 14px;
+  background: #0f172a;
+  border-radius: 0 0 13px 13px;
 }
 
 .creator-candidates-page .ccm-card-actions {
@@ -325,26 +327,26 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 12px;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: none;
   background: #fff;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: #475569;
+  color: #0f172a;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s, color 0.2s;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: background 0.2s, transform 0.15s;
   flex: 0 0 auto;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 .creator-candidates-page .ccm-card-footer .ccm-edit-btn svg {
-  width: 13px;
-  height: 13px;
-  stroke: currentColor;
+  width: 14px;
+  height: 14px;
+  stroke: #2451a3;
   fill: none;
   stroke-width: 2;
   stroke-linecap: round;
@@ -353,15 +355,17 @@
 }
 
 .creator-candidates-page .ccm-card-footer .ccm-edit-btn:hover {
-  border-color: #cbd5e1;
-  color: #334155;
   background: #f8fafc;
 }
 
+.creator-candidates-page .ccm-card-footer .ccm-edit-btn:active {
+  transform: scale(0.98);
+}
+
 .creator-candidates-page .ccm-card-footer .ccm-del-btn {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
   padding: 0;
   border-radius: 8px;
   border: none;
@@ -373,21 +377,25 @@
   justify-content: center;
   transition: background 0.2s, transform 0.15s;
   flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.35);
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-del-btn:hover {
+.creator-candidates-page .ccm-card-footer .ccm-del-btn:hover:not(:disabled) {
   background: #dc2626;
 }
 
-.creator-candidates-page .ccm-card-footer .ccm-del-btn:active {
+.creator-candidates-page .ccm-card-footer .ccm-del-btn:active:not(:disabled) {
   transform: scale(0.96);
 }
 
+.creator-candidates-page .ccm-card-footer .ccm-del-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .creator-candidates-page .ccm-card-footer .ccm-del-btn svg {
-  width: 14px;
-  height: 14px;
-  stroke: currentColor;
+  width: 16px;
+  height: 16px;
+  stroke: #fff;
   fill: none;
   stroke-width: 2;
   stroke-linecap: round;
