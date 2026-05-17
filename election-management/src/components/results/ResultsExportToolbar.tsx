@@ -9,9 +9,10 @@ import { ResultsExportReport } from './ResultsExportReport'
 
 interface ResultsExportToolbarProps {
   results: ElectionResultsPayload
-  /** `default` for results page; `admin` for admin dashboard styling */
-  variant?: 'default' | 'admin'
+  /** `default` for results page; `admin` for admin dashboard; `creator` for stacked creator results card */
+  variant?: 'default' | 'admin' | 'creator'
   className?: string
+  onShareLink?: () => void
 }
 
 function slugify(title: string): string {
@@ -22,6 +23,7 @@ export function ResultsExportToolbar({
   results,
   variant = 'default',
   className = '',
+  onShareLink,
 }: ResultsExportToolbarProps) {
   const reportRef = useRef<HTMLDivElement>(null)
   const [busy, setBusy] = useState<'pdf' | 'csv' | 'print' | null>(null)
@@ -84,6 +86,70 @@ export function ResultsExportToolbar({
 
   const btnPrimary =
     variant === 'admin' ? 'btn btn-primary btn-sm' : `${btnBase} border-primary/30 bg-primary/10 text-primary`
+
+  if (variant === 'creator') {
+    return (
+      <div className={className}>
+        <div className="creator-results-export-stack">
+          <button
+            type="button"
+            className="btn btn-danger"
+            disabled={busy != null}
+            onClick={() => void runExport('pdf')}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            {busy === 'pdf' ? 'Generating…' : 'Export PDF Report'}
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            disabled={busy != null}
+            onClick={() => void runExport('csv')}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            {busy === 'csv' ? 'Exporting…' : 'Export CSV Data'}
+          </button>
+          {onShareLink ? (
+            <button type="button" className="btn btn-ghost" disabled={busy != null} onClick={onShareLink}>
+              <svg viewBox="0 0 24 24" aria-hidden>
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+              </svg>
+              Share Results Link
+            </button>
+          ) : null}
+        </div>
+        {error ? (
+          <p className="creator-results-share-msg" style={{ color: 'var(--danger)' }} role="alert">
+            {error}
+          </p>
+        ) : null}
+        <div
+          aria-hidden
+          style={{
+            position: 'fixed',
+            left: -10000,
+            top: 0,
+            pointerEvents: 'none',
+            zIndex: -1,
+          }}
+        >
+          <ResultsExportReport ref={reportRef} results={results} meta={reportMeta} outcome={outcome} />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={className}>

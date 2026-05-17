@@ -1,0 +1,149 @@
+/* Creator results page (creator-dashboard.html #page-results) */
+
+.creator-results-page .creator-results-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+
+@media (max-width: 1000px) {
+  .creator-results-page .creator-results-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .creator-results-page .creator-results-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+.creator-results-page .creator-results-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.creator-results-page .winner-card--leader {
+  margin-bottom: 20px;
+}
+
+.creator-results-page .winner-card--leader::after {
+  content: '🏆';
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 64px;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.creator-results-page .winner-leader-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.creator-results-page .winner-leader-photo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f59e0b;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.creator-results-page .winner-leader-photo--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: #92400e;
+  background: #fde68a;
+}
+
+.creator-results-page .winner-leader-pct {
+  font-size: 36px;
+  font-weight: 900;
+  color: #78350f;
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1;
+  text-align: center;
+}
+
+.creator-results-page .creator-results-mini-chart {
+  height: 90px;
+  margin-bottom: 16px;
+}
+
+.creator-results-page .result-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.creator-results-page .result-avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text);
+  background: var(--border);
+}
+
+.creator-results-page .turnout-metric + .turnout-metric {
+  margin-top: 10px;
+}
+
+.creator-results-page .turnout-metric-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.creator-results-page .turnout-metric-head strong.voted {
+  color: #10b981;
+}
+
+.creator-results-page .turnout-metric-head strong.pending {
+  color: #f59e0b;
+}
+
+.creator-results-page .turnout-metric-head strong.invalid {
+  color: #ef4444;
+}
+
+.creator-results-page .creator-results-export-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.creator-results-page .creator-results-export-stack .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.creator-results-page .creator-results-export-stack .btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.creator-results-page .creator-results-share-msg {
+  margin: 0;
+  font-size: 11px;
+  color: var(--success);
+  text-align: center;
+}
