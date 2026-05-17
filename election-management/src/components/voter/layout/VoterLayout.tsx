@@ -16,7 +16,7 @@ function voterTopMeta(pathname: string): { title: string; sub?: string } {
   if (pathname.startsWith('/voter/vote/') && pathname !== '/voter/vote/success') return { title: 'Cast Vote' }
   if (pathname === '/voter/vote/success') return { title: 'Vote Submitted' }
   if (pathname === '/voter/results') return { title: 'Election Results' }
-  if (pathname.startsWith('/voter/results/')) return { title: 'Results Detail' }
+  if (pathname.startsWith('/voter/results/')) return { title: 'Live Results' }
   if (pathname === '/voter/notifications') return { title: 'Notifications' }
   if (pathname === '/voter/profile') return { title: 'My Profile' }
   if (pathname === '/voter/settings') return { title: 'Settings' }

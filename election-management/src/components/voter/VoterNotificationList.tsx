@@ -5,6 +5,7 @@ function iconStyles(kind: VoterNotificationKind): { bg: string; color: string } 
   switch (kind) {
     case 'vote_pending':
       return { bg: '#FEE2E2', color: '#EF4444' }
+    case 'registered':
     case 'secret_id':
     case 'voted':
     case 'promoted':
@@ -37,7 +38,7 @@ function NotificationIcon({ kind }: { kind: VoterNotificationKind }) {
       </svg>
     )
   }
-  if (kind === 'voted') {
+  if (kind === 'voted' || kind === 'registered') {
     return (
       <svg viewBox="0 0 24 24" aria-hidden>
         <rect x="3" y="3" width="18" height="18" rx="2" />

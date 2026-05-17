@@ -21,6 +21,10 @@ export interface EligibilityCheck {
 
 export interface RegistrationEligibility {
   canRegister: boolean
+  /** Election is accepting joins (deadline open, not locked) — ignores sign-in */
+  registrationAvailable: boolean
+  /** Guest may join after sign-in; election side is still open */
+  needsSignIn: boolean
   checks: EligibilityCheck[]
   registrationDeadline: string
   spotsRemaining: number
@@ -137,23 +141,26 @@ export function buildRegistrationEligibility(params: {
     },
   ]
 
+  const registrationAvailable = electionOpen && registrationOpen && beforeDeadline
+  const needsSignIn = !signedIn && registrationAvailable && notDuplicate
+
   const canRegister =
     signedIn &&
     voterRole &&
     approved &&
-    electionOpen &&
-    registrationOpen &&
-    beforeDeadline &&
+    registrationAvailable &&
     notDuplicate
 
   let blockReason: string | null = null
-  if (!canRegister) {
+  if (!canRegister && !needsSignIn) {
     const failed = checks.find((c) => !c.passed)
     blockReason = failed?.detail ?? failed?.label ?? 'Not eligible to register'
   }
 
   return {
     canRegister,
+    registrationAvailable,
+    needsSignIn,
     checks,
     registrationDeadline: deadlineIso,
     spotsRemaining,

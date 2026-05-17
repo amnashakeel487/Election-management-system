@@ -1,5 +1,4 @@
-import { AccountMfaSettings } from '@/components/account/AccountMfaSettings'
-import { ChangePasswordSettings } from '@/components/account/ChangePasswordSettings'
+import { ProfileEditForm } from '@/components/account/ProfileEditForm'
 import { VoterPageHeader } from '@/components/voter/VoterPageHeader'
 import { useAuth } from '@/hooks/useAuth'
 import { useVoterDashboard } from '@/hooks/useVoterDashboard'
@@ -82,18 +81,12 @@ export function VoterProfilePage() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div className="card-elevated">
-            <div className="card-header">
-              <div className="card-title">Security</div>
-            </div>
-            <div className="card-body">
-              <ChangePasswordSettings variant="embedded" />
-              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
-                <AccountMfaSettings variant="embedded" />
-              </div>
-            </div>
+        <div className="card-elevated">
+          <div className="card-header">
+            <div className="card-title">Edit profile</div>
+            <div className="card-subtitle">Update your name and contact details</div>
           </div>
+          <ProfileEditForm />
         </div>
       </div>
 

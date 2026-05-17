@@ -10,6 +10,7 @@ export const NOTIFICATION_TYPE_LABELS: Record<NotificationType, string> = {
   winner: 'Winner announcement',
   waitlist_joined: 'Waitlist joined',
   waitlist_promoted: 'Waitlist promoted',
+  voter_registered: 'Voter registered',
 }
 
 export const NOTIFICATION_STATUS_LABELS: Record<NotificationStatus, string> = {

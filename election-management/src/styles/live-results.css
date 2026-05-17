@@ -258,3 +258,32 @@
 @media(max-width:480px){.lr-root .stats-grid{grid-template-columns:1fr;}.lr-root .hero-title{font-size:clamp(22px,6vw,32px);}}
 .lr-root a.ec-btn,.lr-root a.fb-join-btn,.lr-root a.ws-btn,.lr-root a.nav-btn,.lr-root a.nav-link,.lr-root a.nav-brand,.lr-root a.footer-link,.lr-root a.share-btn,.lr-root a.rank-card{text-decoration:none;}
 .lr-root .page-btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* Embedded in voter dashboard (no duplicate public nav) */
+.voter-app .content .lr-root--voter-embed {
+  min-height: auto;
+  margin: -22px -24px 0;
+  width: calc(100% + 48px);
+  max-width: none;
+}
+.voter-app .content .lr-root--voter-embed .hero {
+  padding: 36px 24px 44px;
+}
+.voter-app .content .lr-root--voter-embed .page {
+  padding: 20px 24px 32px;
+}
+@media (max-width: 768px) {
+  .voter-app .content .lr-root--voter-embed {
+    margin: -18px -20px 0;
+    width: calc(100% + 40px);
+  }
+}
+@media (max-width: 480px) {
+  .voter-app .content .lr-root--voter-embed {
+    margin: -14px -12px 0;
+    width: calc(100% + 24px);
+  }
+  .voter-app .content .lr-root--voter-embed .hero {
+    padding: 28px 16px 36px;
+  }
+}

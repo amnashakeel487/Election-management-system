@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase'
 import type { NotificationLogRow } from '@/types/notification'
 
 const VOTER_INBOX_TYPES = [
+  'voter_registered',
   'secret_voter_id',
   'election_start',
   'election_end',

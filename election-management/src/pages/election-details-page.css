@@ -10,12 +10,12 @@
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, #080f1e 0%, #0f2347 48%, #1a1040 100%);
-  padding: 5.5rem 1.5rem 2rem;
+  padding: 5.5rem 1.5rem 2.75rem;
 }
 
 @media (min-width: 768px) {
   .ed-hero {
-    padding: 5.75rem 2.5rem 2.5rem;
+    padding: 5.75rem 2.5rem 3.25rem;
   }
 }
 
@@ -375,7 +375,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.875rem;
-  margin: -2rem auto 2rem;
+  margin: 1.5rem auto 2rem;
   max-width: 72rem;
   padding: 0 1.5rem;
   position: relative;
@@ -387,7 +387,7 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
     padding: 0 2.5rem;
-    margin-top: -2.25rem;
+    margin-top: 2rem;
   }
 }
 

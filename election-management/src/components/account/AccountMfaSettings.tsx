@@ -1,9 +1,10 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
 import {
   enrollTotpFactor,
-  getVerifiedTotpFactor,
+  getTotpFactorState,
+  removeUnverifiedTotpFactors,
   unenrollMfaFactor,
   verifyTotpEnrollment,
 } from '@/services/mfaService'
@@ -18,6 +19,7 @@ export function AccountMfaSettings({ variant = 'embedded' }: AccountMfaSettingsP
   const { t } = useTranslation('settings')
   const { refreshSession } = useAuth()
   const [factor, setFactor] = useState<Factor | null>(null)
+  const [incompleteCount, setIncompleteCount] = useState(0)
   const [enrolling, setEnrolling] = useState(false)
   const [qrUri, setQrUri] = useState<string | null>(null)
   const [enrollFactorId, setEnrollFactorId] = useState<string | null>(null)
@@ -25,10 +27,25 @@ export function AccountMfaSettings({ variant = 'embedded' }: AccountMfaSettingsP
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  const loadFactors = useCallback(async () => {
+    setLoading(true)
+    try {
+      const { verified, unverified } = await getTotpFactorState()
+      setFactor(verified)
+      setIncompleteCount(unverified.length)
+    } catch {
+      setFactor(null)
+      setIncompleteCount(0)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    void getVerifiedTotpFactor().then(setFactor)
-  }, [])
+    void loadFactors()
+  }, [loadFactors])
 
   async function startEnroll() {
     setError(null)
@@ -39,8 +56,30 @@ export function AccountMfaSettings({ variant = 'embedded' }: AccountMfaSettingsP
       setEnrollFactorId(data.id)
       setQrUri(data.totp.qr_code)
       setEnrolling(true)
+      setIncompleteCount(0)
     } catch (err) {
       setError(err instanceof Error ? err.message : t('mfaEnrollFailed'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function cancelIncompleteSetup() {
+    setBusy(true)
+    setError(null)
+    setMessage(null)
+    try {
+      const removed = await removeUnverifiedTotpFactors()
+      setIncompleteCount(0)
+      setEnrolling(false)
+      setQrUri(null)
+      setEnrollFactorId(null)
+      setCode('')
+      if (removed > 0) {
+        setMessage(t('mfaIncompleteRemoved'))
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('mfaDisableFailed'))
     } finally {
       setBusy(false)
     }
@@ -54,8 +93,7 @@ export function AccountMfaSettings({ variant = 'embedded' }: AccountMfaSettingsP
     try {
       await verifyTotpEnrollment(enrollFactorId, code.trim())
       await refreshSession()
-      const verified = await getVerifiedTotpFactor()
-      setFactor(verified)
+      await loadFactors()
       setEnrolling(false)
       setQrUri(null)
       setCode('')
@@ -73,7 +111,7 @@ export function AccountMfaSettings({ variant = 'embedded' }: AccountMfaSettingsP
     setError(null)
     try {
       await unenrollMfaFactor(factor.id)
-      setFactor(null)
+      await loadFactors()
       await refreshSession()
       setMessage(t('mfaDisabledSuccess'))
     } catch (err) {
@@ -106,7 +144,11 @@ export function AccountMfaSettings({ variant = 'embedded' }: AccountMfaSettingsP
         </p>
       ) : null}
 
-      {factor ? (
+      {loading ? (
+        <p className="appearance-settings__hint" style={{ marginTop: 12 }}>
+          {t('mfaLoading')}
+        </p>
+      ) : factor ? (
         <div className="space-y-3" style={{ marginTop: 12 }}>
           <p className="appearance-settings__hint">
             <strong>{t('mfaStatusOn')}</strong> — {t('mfaStatusOnHint')}
@@ -115,8 +157,16 @@ export function AccountMfaSettings({ variant = 'embedded' }: AccountMfaSettingsP
             type="button"
             disabled={busy}
             onClick={() => void disableMfa()}
-            className={variant === 'embedded' ? 'btn btn-outline btn-sm' : 'rounded-xl border border-error/40 px-lg py-md font-label-md text-error hover:bg-error/10 disabled:opacity-60'}
-            style={variant === 'embedded' ? { color: 'var(--error, #dc2626)', borderColor: 'var(--error, #dc2626)' } : undefined}
+            className={
+              variant === 'embedded'
+                ? 'btn btn-outline btn-sm'
+                : 'rounded-xl border border-error/40 px-lg py-md font-label-md text-error hover:bg-error/10 disabled:opacity-60'
+            }
+            style={
+              variant === 'embedded'
+                ? { color: 'var(--error, #dc2626)', borderColor: 'var(--error, #dc2626)' }
+                : undefined
+            }
           >
             {t('mfaDisable')}
           </button>
@@ -136,16 +186,42 @@ export function AccountMfaSettings({ variant = 'embedded' }: AccountMfaSettingsP
             className="form-input"
             style={{ textAlign: 'center', letterSpacing: '0.35em' }}
           />
-          <button type="submit" disabled={busy || code.length < 6} className="btn btn-primary btn-sm">
-            {t('mfaConfirm')}
-          </button>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button type="submit" disabled={busy || code.length < 6} className="btn btn-primary btn-sm">
+              {t('mfaConfirm')}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              className="btn btn-ghost btn-sm"
+              onClick={() => void cancelIncompleteSetup()}
+            >
+              {t('mfaCancelSetup')}
+            </button>
+          </div>
         </form>
+      ) : incompleteCount > 0 ? (
+        <div className="space-y-3" style={{ marginTop: 12 }}>
+          <p className="appearance-settings__hint">{t('mfaIncompleteHint')}</p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button type="button" disabled={busy} className="btn btn-primary btn-sm" onClick={() => void startEnroll()}>
+              {t('mfaContinueSetup')}
+            </button>
+            <button type="button" disabled={busy} className="btn btn-ghost btn-sm" onClick={() => void cancelIncompleteSetup()}>
+              {t('mfaRemoveIncomplete')}
+            </button>
+          </div>
+        </div>
       ) : (
         <button
           type="button"
           disabled={busy}
           onClick={() => void startEnroll()}
-          className={variant === 'embedded' ? 'btn btn-primary btn-sm' : 'mt-3 rounded-xl bg-primary px-lg py-md font-headline-md text-on-primary disabled:opacity-60'}
+          className={
+            variant === 'embedded'
+              ? 'btn btn-primary btn-sm'
+              : 'mt-3 rounded-xl bg-primary px-lg py-md font-headline-md text-on-primary disabled:opacity-60'
+          }
           style={{ marginTop: variant === 'embedded' ? 12 : undefined }}
         >
           {t('mfaEnable')}

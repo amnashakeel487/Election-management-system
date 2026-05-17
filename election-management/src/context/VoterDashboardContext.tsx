@@ -82,11 +82,16 @@ export function VoterDashboardProvider({ children }: { children: ReactNode }) {
     const onFocus = () => {
       void reload()
     }
+    const onInboxRefresh = () => {
+      void reload()
+    }
     window.addEventListener('focus', onFocus)
+    window.addEventListener('voter-inbox-refresh', onInboxRefresh)
 
     return () => {
       window.clearInterval(poll)
       window.removeEventListener('focus', onFocus)
+      window.removeEventListener('voter-inbox-refresh', onInboxRefresh)
     }
   }, [session?.user.id, reload])
 

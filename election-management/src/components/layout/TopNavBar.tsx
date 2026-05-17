@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { useAuth } from '@/hooks/useAuth'
+import { PUBLIC_LOCALES } from '@/types/locale'
 import type { UserRole } from '@/types/auth'
 
 export function TopNavBar() {
@@ -52,7 +53,7 @@ export function TopNavBar() {
         </div>
       </div>
       <div className="flex items-center gap-2 sm:gap-3">
-        <LanguageSwitcher variant="nav" />
+        <LanguageSwitcher variant="nav" locales={PUBLIC_LOCALES} />
         <ThemeToggle variant="nav" />
         {session && profile && !mfaRequired ? (
           <>

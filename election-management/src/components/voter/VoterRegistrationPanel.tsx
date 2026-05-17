@@ -62,8 +62,11 @@ export function VoterRegistrationPanel({
   const onWaitlist = userRegistration?.status === 'waitlisted'
   const rollStatus = registrationStatusLabel(election)
   const canJoin = eligibility.canRegister
+  const needsSignIn = eligibility.needsSignIn
   const showParticipateForm = !alreadyRegistered && !onWaitlist && canJoin
-  const showRegistrationClosed = !alreadyRegistered && !onWaitlist && !canJoin
+  const showSignInToRegister = !alreadyRegistered && !onWaitlist && needsSignIn
+  const showRegistrationClosed =
+    !alreadyRegistered && !onWaitlist && !canJoin && !needsSignIn
 
   function openConfirm() {
     if (!session) {
@@ -98,7 +101,9 @@ export function VoterRegistrationPanel({
       }
 
       if (result.status === 'registered') {
-        setMessage('You have joined this election. You can vote when polling opens and your secret voter ID is issued.')
+        setMessage(
+          'You are registered for this election. Check Notifications — we will alert you when voting opens.',
+        )
       } else {
         setMessage(formatWaitlist(result.waitlist_position))
       }
@@ -170,7 +175,9 @@ export function VoterRegistrationPanel({
           {eligibilityRuleDescription(election.eligibility_rule)}
         </p>
 
-        {!alreadyRegistered && !onWaitlist && (showParticipateForm || showRegistrationClosed) ? (
+        {!alreadyRegistered &&
+        !onWaitlist &&
+        (showParticipateForm || showSignInToRegister || showRegistrationClosed) ? (
           <ul className="mb-4 space-y-2" aria-label="Eligibility checklist">
             {eligibility.checks.map((check) => (
               <li
@@ -246,6 +253,41 @@ export function VoterRegistrationPanel({
           />
         ) : null}
 
+        {showSignInToRegister ? (
+          <div className="vr-status-box vr-status-box--sign-in mb-4 text-left">
+            <p className="font-bold text-[#1B3A6B]">Registration is open</p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-600">
+              Sign in with your voter account to join this election. We will confirm your registration and notify you
+              when voting opens.
+            </p>
+            {eligibility.willWaitlist ? (
+              <p className="mt-2 text-[11px] text-amber-800">
+                Capacity is full — you may be added to the waitlist after sign-in.
+              </p>
+            ) : eligibility.spotsRemaining > 0 ? (
+              <p className="mt-2 text-[11px] text-emerald-800">
+                {eligibility.spotsRemaining} spot{eligibility.spotsRemaining === 1 ? '' : 's'} remaining.
+              </p>
+            ) : null}
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <Link
+                to="/login"
+                state={{ from: `/elections/${election.id}` }}
+                className="vr-btn-primary inline-block text-center no-underline"
+              >
+                Sign in to participate
+              </Link>
+              <Link
+                to="/register"
+                state={{ from: `/elections/${election.id}` }}
+                className="vr-btn-secondary inline-block text-center no-underline"
+              >
+                Create voter account
+              </Link>
+            </div>
+          </div>
+        ) : null}
+
         {showRegistrationClosed ? (
           <div className="vr-status-box vr-status-box--closed mb-4 text-left">
             <p className="font-bold text-violet-900">Registration is closed</p>
@@ -307,7 +349,7 @@ export function VoterRegistrationPanel({
           </>
         ) : null}
 
-        {!session && !alreadyRegistered && !onWaitlist ? (
+        {!session && !alreadyRegistered && !onWaitlist && !showSignInToRegister ? (
           <p className="mt-3 text-center text-[11px] text-slate-500">
             <Link to="/login" state={{ from: `/elections/${election.id}` }} className="font-bold text-[#2451A3]">
               Sign in
@@ -320,12 +362,14 @@ export function VoterRegistrationPanel({
           </p>
         ) : null}
 
-        <Link
-          to="/voter/elections"
-          className="vr-btn-secondary mt-3 inline-block text-center no-underline"
-        >
-          My registrations
-        </Link>
+        {session ? (
+          <Link
+            to="/voter/elections"
+            className="vr-btn-secondary mt-3 inline-block text-center no-underline"
+          >
+            My registrations
+          </Link>
+        ) : null}
 
         <div className="mt-5 border-t border-[#e2e8f0] pt-4">
           <div className="flex items-center gap-2 text-xs text-slate-500">

@@ -31,9 +31,13 @@ const FEED_ICON_CLASSES = ['green', 'orange', 'blue', 'purple', 'cyan', 'green',
 
 export interface LiveResultsDetailViewProps {
   electionId: string
+  /** When set, hides public nav/footer and uses voter-dashboard links. */
+  embeddedIn?: 'voter'
 }
 
-export function LiveResultsDetailView({ electionId }: LiveResultsDetailViewProps) {
+export function LiveResultsDetailView({ electionId, embeddedIn }: LiveResultsDetailViewProps) {
+  const voterEmbed = embeddedIn === 'voter'
+  const rootClass = voterEmbed ? 'lr-root lr-root--voter-embed' : 'lr-root'
   const { results, loading, error, lastUpdated, isLive, refresh } = useElectionResults(electionId || undefined)
   const [meta, setMeta] = useState<{ description: string | null; category: string | null } | null>(null)
   const [nowMs, setNowMs] = useState(() => Date.now())
@@ -140,11 +144,11 @@ export function LiveResultsDetailView({ electionId }: LiveResultsDetailViewProps
 
   if (!electionId) {
     return (
-      <div className="lr-root">
-        <LiveResultsNav />
-        <div className="page" style={{ paddingTop: 80, textAlign: 'center' }}>
+      <div className={rootClass}>
+        {!voterEmbed ? <LiveResultsNav /> : null}
+        <div className="page" style={{ paddingTop: voterEmbed ? 32 : 80, textAlign: 'center' }}>
           <p>Missing election id.</p>
-          <Link to="/results">Browse all results</Link>
+          <Link to={voterEmbed ? '/voter/results' : '/results'}>Back to results</Link>
         </div>
       </div>
     )
@@ -152,9 +156,9 @@ export function LiveResultsDetailView({ electionId }: LiveResultsDetailViewProps
 
   if (loading) {
     return (
-      <div className="lr-root">
-        <LiveResultsNav isLive />
-        <div className="page" style={{ paddingTop: 80, textAlign: 'center', color: 'var(--subtle)' }}>
+      <div className={rootClass}>
+        {!voterEmbed ? <LiveResultsNav isLive /> : null}
+        <div className="page" style={{ paddingTop: voterEmbed ? 32 : 80, textAlign: 'center', color: 'var(--subtle)' }}>
           Loading live results…
         </div>
       </div>
@@ -163,21 +167,21 @@ export function LiveResultsDetailView({ electionId }: LiveResultsDetailViewProps
 
   if (error || !results) {
     return (
-      <div className="lr-root">
-        <LiveResultsNav />
-        <div className="page" style={{ paddingTop: 80, textAlign: 'center' }}>
+      <div className={rootClass}>
+        {!voterEmbed ? <LiveResultsNav /> : null}
+        <div className="page" style={{ paddingTop: voterEmbed ? 32 : 80, textAlign: 'center' }}>
           <h2 style={{ marginBottom: 8 }}>Results unavailable</h2>
           <p style={{ color: 'var(--muted)', marginBottom: 16 }}>
             {error ?? 'Live results are not published for this election yet.'}
           </p>
-          <Link to="/results">Browse all results</Link>
+          <Link to={voterEmbed ? '/voter/results' : '/results'}>Back to results</Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="lr-root">
+    <div className={rootClass}>
       <LiveResultsNav isLive={isLive} onShare={() => void handleShare()} />
 
       <section className="hero">
@@ -188,13 +192,23 @@ export function LiveResultsDetailView({ electionId }: LiveResultsDetailViewProps
         <div className="hero-inner">
           <div className="hero-top">
             <div className="hero-left">
-              <div className="hero-breadcrumb">
-                <Link to="/browse-elections">Elections</Link>
-                <span className="hero-breadcrumb-sep">/</span>
-                <Link to={`/elections/${electionId}`}>{results.title}</Link>
-                <span className="hero-breadcrumb-sep">/</span>
-                <span>Live Results</span>
-              </div>
+              {voterEmbed ? (
+                <div className="hero-breadcrumb">
+                  <Link to="/voter/results">My results</Link>
+                  <span className="hero-breadcrumb-sep">/</span>
+                  <span>{results.title}</span>
+                  <span className="hero-breadcrumb-sep">/</span>
+                  <span>Live Results</span>
+                </div>
+              ) : (
+                <div className="hero-breadcrumb">
+                  <Link to="/browse-elections">Elections</Link>
+                  <span className="hero-breadcrumb-sep">/</span>
+                  <Link to={`/elections/${electionId}`}>{results.title}</Link>
+                  <span className="hero-breadcrumb-sep">/</span>
+                  <span>Live Results</span>
+                </div>
+              )}
               <div className="hero-badges">
                 <div className="hero-badge live">
                   <div className="bd" />
@@ -210,6 +224,13 @@ export function LiveResultsDetailView({ electionId }: LiveResultsDetailViewProps
               </div>
               {meta?.description ? <div className="hero-desc">{meta.description}</div> : null}
             </div>
+{voterEmbed && !cd ? (
+              <div className="hero-right">
+                <button type="button" className="share-btn link" onClick={() => void handleShare()}>
+                  {copyOk ? '✓ Copied!' : 'Share results'}
+                </button>
+              </div>
+            ) : null}
             {cd ? (
               <div className="hero-right">
                 <div className="countdown-box">
@@ -734,15 +755,15 @@ export function LiveResultsDetailView({ electionId }: LiveResultsDetailViewProps
               <button type="button" className="share-btn link" onClick={() => void handleShare()}>
                 {copyOk ? '✓ Copied!' : 'Copy link'}
               </button>
-              <Link to="/browse-elections" className="share-btn">
-                Browse elections
+              <Link to={voterEmbed ? '/voter/results' : '/browse-elections'} className="share-btn">
+                {voterEmbed ? '← All my results' : 'Browse elections'}
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      <LiveResultsFooter />
+      {!voterEmbed ? <LiveResultsFooter /> : null}
     </div>
   )
 }

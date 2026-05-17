@@ -36,5 +36,11 @@
   "mfaDisabledSuccess": "Two-factor authentication has been disabled.",
   "mfaEnrollFailed": "Could not start 2FA enrollment.",
   "mfaInvalidCode": "Invalid code. Try again.",
-  "mfaDisableFailed": "Could not disable 2FA."
+  "mfaDisableFailed": "Could not disable 2FA.",
+  "mfaLoading": "Checking authenticator status…",
+  "mfaIncompleteHint": "A previous 2FA setup was started but not finished. Continue to get a new QR code, or remove the incomplete setup.",
+  "mfaContinueSetup": "Continue setup",
+  "mfaRemoveIncomplete": "Remove incomplete setup",
+  "mfaIncompleteRemoved": "Incomplete setup removed. You can enable 2FA again.",
+  "mfaCancelSetup": "Cancel setup"
 }

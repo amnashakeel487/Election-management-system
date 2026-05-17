@@ -161,8 +161,11 @@
   },
   "elections": {
     "createButton": "+ انتخاب بنائیں",
+    "manageButton": "منظم کریں",
     "editButton": "ترمیم",
     "editTimesButton": "وقت درست کریں",
+    "finalizeRollButton": "فہرست حتمی کریں",
+    "deleteButton": "انتخاب حذف کریں",
     "tabs": {
       "all": "سب",
       "active": "فعال",

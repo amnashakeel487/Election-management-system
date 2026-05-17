@@ -67,6 +67,9 @@ export async function registerForElection(electionId: string): Promise<RegisterF
   if (error) throw new Error(error.message)
 
   const result = data as RegisterForElectionResult
+  if (!result.duplicate && result.status === 'registered') {
+    window.dispatchEvent(new CustomEvent('voter-inbox-refresh'))
+  }
   if (!result.duplicate && result.status === 'waitlisted' && result.waitlist_position) {
     const {
       data: { user },

@@ -36,7 +36,7 @@ export function VoterResultsIndexPage() {
                     </div>
                   </div>
                   <Link to={`/voter/results/${reg.election.id}`} className="btn btn-primary btn-sm">
-                    View results
+                    View live results
                   </Link>
                 </div>
               </div>

@@ -1,4 +1,7 @@
 import { assertSupabaseConfigured, supabase } from '@/lib/supabase'
+import type { Factor } from '@supabase/supabase-js'
+
+export const MFA_TOTP_FRIENDLY_NAME = 'FortressVote Authenticator'
 
 export async function listMfaFactors() {
   assertSupabaseConfigured()
@@ -7,13 +10,53 @@ export async function listMfaFactors() {
   return data
 }
 
+export async function getTotpFactorState(): Promise<{
+  verified: Factor | null
+  unverified: Factor[]
+}> {
+  const { totp } = await listMfaFactors()
+  return {
+    verified: totp.find((f) => f.status === 'verified') ?? null,
+    unverified: totp.filter((f) => f.status !== 'verified'),
+  }
+}
+
+/** Remove incomplete TOTP enrollments so a fresh QR can be issued. */
+export async function removeUnverifiedTotpFactors(): Promise<number> {
+  const { unverified } = await getTotpFactorState()
+  for (const f of unverified) {
+    await unenrollMfaFactor(f.id)
+  }
+  return unverified.length
+}
+
 export async function enrollTotpFactor() {
   assertSupabaseConfigured()
+  const { verified, unverified } = await getTotpFactorState()
+  if (verified) {
+    throw new Error('Two-factor authentication is already enabled on this account.')
+  }
+  if (unverified.length > 0) {
+    await removeUnverifiedTotpFactors()
+  }
+
   const { data, error } = await supabase.auth.mfa.enroll({
     factorType: 'totp',
-    friendlyName: 'FortressVote Authenticator',
+    friendlyName: MFA_TOTP_FRIENDLY_NAME,
   })
-  if (error) throw new Error(error.message)
+  if (error) {
+    const msg = error.message.toLowerCase()
+    if (msg.includes('already exists')) {
+      await removeUnverifiedTotpFactors()
+      const retry = await supabase.auth.mfa.enroll({
+        factorType: 'totp',
+        friendlyName: MFA_TOTP_FRIENDLY_NAME,
+      })
+      if (retry.error) throw new Error(retry.error.message)
+      return retry.data
+    }
+    throw new Error(error.message)
+  }
   return data
 }
 
@@ -38,8 +81,8 @@ export async function unenrollMfaFactor(factorId: string) {
 }
 
 export async function getVerifiedTotpFactor() {
-  const { totp } = await listMfaFactors()
-  return totp.find((f) => f.status === 'verified') ?? null
+  const { verified } = await getTotpFactorState()
+  return verified
 }
 
 export async function challengeAndVerifyMfa(factorId: string, code: string) {

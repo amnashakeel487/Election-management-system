@@ -161,8 +161,11 @@
   },
   "elections": {
     "createButton": "+ Create Election",
+    "manageButton": "Manage",
     "editButton": "Edit",
     "editTimesButton": "Edit times",
+    "finalizeRollButton": "Finalize roll",
+    "deleteButton": "Delete election",
     "tabs": {
       "all": "All",
       "active": "Active",

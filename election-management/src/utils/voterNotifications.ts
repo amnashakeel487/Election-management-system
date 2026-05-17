@@ -3,6 +3,7 @@ import type { VoterRegistrationWithElection } from '@/types/voterRegistration'
 import { canVote } from '@/utils/voterElectionUi'
 
 export type VoterNotificationKind =
+  | 'registered'
   | 'vote_pending'
   | 'secret_id'
   | 'voted'
@@ -112,6 +113,14 @@ function mapLogToVoterNotification(log: NotificationLogRow): VoterNotificationIt
         sub: 'You are registered. Check for your secret voter ID when issued.',
         dedupeKey: electionId ? `promoted:${electionId}` : undefined,
       }
+    case 'voter_registered':
+      return {
+        ...base,
+        kind: 'registered',
+        title: displayTitle || `Registered — ${title}`,
+        sub: 'You are registered for this election. We will notify you when voting opens.',
+        dedupeKey: electionId ? `registered:${electionId}` : undefined,
+      }
     default:
       return null
   }
@@ -142,6 +151,25 @@ export function buildVoterNotifications(
         unread: true,
       })
       continue
+    }
+
+    if (
+      r.status === 'registered' &&
+      !r.voted_at &&
+      !canVote(r) &&
+      !r.secret_voter_id
+    ) {
+      items.push({
+        id: `reg-${r.id}`,
+        kind: 'registered',
+        title: `Registered — ${title}`,
+        sub: 'You are registered for this election. We will notify you when voting opens.',
+        timeLabel: relTime(r.created_at),
+        sortAt: new Date(r.created_at).getTime(),
+        href: `/voter/elections/${electionId}`,
+        dedupeKey: `registered:${electionId}`,
+        unread: true,
+      })
     }
 
     if (canVote(r)) {
