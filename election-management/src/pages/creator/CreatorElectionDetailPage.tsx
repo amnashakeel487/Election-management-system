@@ -4,7 +4,7 @@ import '@/styles/creator-election-detail.css'
 import { CreatorElectionDetailView } from '@/components/creator/election-detail/CreatorElectionDetailView'
 import { useCreatorElection } from '@/context/CreatorElectionContext'
 import { useAuth } from '@/hooks/useAuth'
-import { fetchFilteredAuditLogs } from '@/services/auditService'
+import { fetchCreatorElectionAuditLogs } from '@/services/auditService'
 import { fetchElectionById } from '@/services/electionService'
 import { fetchElectionResults } from '@/services/resultsService'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
@@ -47,17 +47,27 @@ export function CreatorElectionDetailPage() {
       setSelectedId(data.id)
 
       if (data.status !== 'draft') {
-        const [regStats, auditPage] = await Promise.all([
+        const [regStatsResult, auditResult, resultsResult] = await Promise.allSettled([
           fetchElectionRegistrationStats(id),
-          fetchFilteredAuditLogs({ limit: 80, offset: 0 }),
+          fetchCreatorElectionAuditLogs(id, { limit: 80, offset: 0 }),
+          fetchElectionResults(id),
         ])
-        setStats(regStats)
-        setAuditLogs(auditPage.logs)
 
-        try {
-          const res = await fetchElectionResults(id)
-          setResults(res)
-        } catch {
+        if (regStatsResult.status === 'fulfilled') {
+          setStats(regStatsResult.value)
+        } else {
+          setStats(null)
+        }
+
+        if (auditResult.status === 'fulfilled') {
+          setAuditLogs(auditResult.value.logs)
+        } else {
+          setAuditLogs([])
+        }
+
+        if (resultsResult.status === 'fulfilled') {
+          setResults(resultsResult.value)
+        } else {
           setResults(null)
         }
       } else {

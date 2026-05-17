@@ -90,6 +90,30 @@ export interface AuditLogFilters {
   offset?: number
 }
 
+/** Audit logs for one election — creator of that election or admin. */
+export async function fetchCreatorElectionAuditLogs(
+  electionId: string,
+  options?: { limit?: number; offset?: number },
+): Promise<AuditLogsPage> {
+  const { data, error } = await supabase.rpc('get_creator_election_audit_logs', {
+    p_election_id: electionId,
+    p_limit: options?.limit ?? 50,
+    p_offset: options?.offset ?? 0,
+  })
+
+  if (error) throw new Error(error.message)
+
+  const raw = (data ?? {}) as Record<string, unknown>
+  const logs = ((raw.logs as Record<string, unknown>[]) ?? []).map(mapAuditRow)
+
+  return {
+    total: Number(raw.total ?? 0),
+    limit: Number(raw.limit ?? options?.limit ?? 50),
+    offset: Number(raw.offset ?? options?.offset ?? 0),
+    logs,
+  }
+}
+
 export async function fetchFilteredAuditLogs(filters: AuditLogFilters = {}): Promise<AuditLogsPage> {
   const category = filters.category && filters.category !== 'all' ? filters.category : null
 
