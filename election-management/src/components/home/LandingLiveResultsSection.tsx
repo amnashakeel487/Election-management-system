@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { fetchElectionsWithVisibleResults, type ResultsElectionListItem } from '@/services/resultsService'
 import { formatSubmissionDate } from '@/utils/formatDate'
 import '@/styles/fortressvote-results-light.css'
@@ -12,6 +13,7 @@ function isLiveElection(e: ResultsElectionListItem): boolean {
 
 /** Landing teaser: elections with public live or final results. */
 export function LandingLiveResultsSection() {
+  const { t } = useTranslation('landing')
   const [elections, setElections] = useState<ResultsElectionListItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -38,19 +40,16 @@ export function LandingLiveResultsSection() {
       <div className="section-inner">
         <div className="reveal" style={{ maxWidth: 560, marginBottom: 28 }}>
           <div className="section-eyebrow" style={{ color: '#6C63FF' }}>
-            Live transparency
+            {t('liveResults.eyebrow')}
           </div>
           <h2 className="section-title">
-            Watch <span className="accent">live results</span>
+            {t('liveResults.title')} <span className="accent">{t('liveResults.titleAccent')}</span>
           </h2>
-          <p className="section-sub">
-            Follow vote counts in real time when organizers enable live results — or view certified
-            outcomes after polls close. No login required.
-          </p>
+          <p className="section-sub">{t('liveResults.sub')}</p>
         </div>
 
         {loading ? (
-          <p style={{ fontSize: 13, color: '#64748b' }}>Loading live elections…</p>
+          <p style={{ fontSize: 13, color: '#64748b' }}>{t('liveResults.loading')}</p>
         ) : (
           <div
             style={{
@@ -102,7 +101,7 @@ export function LandingLiveResultsSection() {
                           animation: 'fv-blink 1.2s ease-in-out infinite',
                         }}
                       />
-                      LIVE NOW
+                      {t('liveResults.liveNow')}
                     </span>
                   ) : (
                     <span
@@ -117,7 +116,7 @@ export function LandingLiveResultsSection() {
                         display: 'inline-block',
                       }}
                     >
-                      RESULTS
+                      {t('liveResults.results')}
                     </span>
                   )}
                   <div
@@ -132,7 +131,7 @@ export function LandingLiveResultsSection() {
                     {e.title}
                   </div>
                   <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>
-                    Ends {formatSubmissionDate(e.end_date)}
+                    {t('liveResults.ends', { date: formatSubmissionDate(e.end_date) })}
                   </p>
                 </Link>
               )
@@ -155,7 +154,7 @@ export function LandingLiveResultsSection() {
               fontWeight: 700,
             }}
           >
-            View all live results
+            {t('liveResults.viewAll')}
           </Link>
           <Link
             to="/browse-elections"
@@ -171,7 +170,7 @@ export function LandingLiveResultsSection() {
               color: '#475569',
             }}
           >
-            Browse elections
+            {t('liveResults.browseElections')}
           </Link>
         </div>
       </div>

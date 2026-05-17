@@ -15,6 +15,7 @@ import enWaitlist from '@/locales/en/waitlist.json'
 import enSettings from '@/locales/en/settings.json'
 import enAdmin from '@/locales/en/admin.json'
 import enCreator from '@/locales/en/creator.json'
+import enLanding from '@/locales/en/landing.json'
 
 import urCommon from '@/locales/ur/common.json'
 import urNav from '@/locales/ur/nav.json'
@@ -24,6 +25,7 @@ import urWaitlist from '@/locales/ur/waitlist.json'
 import urSettings from '@/locales/ur/settings.json'
 import urAdmin from '@/locales/ur/admin.json'
 import urCreator from '@/locales/ur/creator.json'
+import urLanding from '@/locales/ur/landing.json'
 
 import arCommon from '@/locales/ar/common.json'
 import arNav from '@/locales/ar/nav.json'
@@ -51,6 +53,7 @@ export const I18N_NAMESPACES = [
   'settings',
   'admin',
   'creator',
+  'landing',
 ] as const
 
 function readStoredLocale(): AppLocale {
@@ -73,6 +76,7 @@ const resources = {
     settings: enSettings,
     admin: enAdmin,
     creator: enCreator,
+    landing: enLanding,
   },
   ur: {
     common: urCommon,
@@ -83,6 +87,7 @@ const resources = {
     settings: urSettings,
     admin: urAdmin,
     creator: urCreator,
+    landing: urLanding,
   },
   ar: {
     common: arCommon,
@@ -93,6 +98,7 @@ const resources = {
     settings: arSettings,
     admin: arAdmin,
     creator: enCreatorFallback,
+    landing: enLanding,
   },
   hi: {
     common: hiCommon,
@@ -103,6 +109,7 @@ const resources = {
     settings: hiSettings,
     admin: hiAdmin,
     creator: enCreatorFallback,
+    landing: enLanding,
   },
 } as const
 

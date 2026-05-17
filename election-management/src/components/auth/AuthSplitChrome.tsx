@@ -1,5 +1,8 @@
 import { useMemo, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
+import { PUBLIC_LOCALES } from '@/types/locale'
 import './signup-page.css'
 
 export function ShieldIcon({ className }: { className?: string }) {
@@ -29,6 +32,8 @@ interface AuthSplitChromeProps {
 }
 
 export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
+  const { t } = useTranslation('auth')
+
   const particles = useMemo(
     () =>
       Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
@@ -43,7 +48,8 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
     [],
   )
 
-  const leftEyebrow = variant === 'login' ? 'Encrypted access' : 'Secure registration'
+  const leftEyebrow = variant === 'login' ? t('chrome.eyebrowLogin') : t('chrome.eyebrowRegister')
+  const trustChips = t('chrome.trustChips', { returnObjects: true }) as string[]
 
   return (
     <div className="sp-root text-slate-900">
@@ -78,36 +84,37 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
           </div>
           <span className="text-[13px] font-extrabold text-white">FortressVote</span>
         </Link>
-        <div className="sp-nav-links flex gap-5">
+        <div className="sp-nav-links flex items-center gap-4">
           <Link to="/" className="cursor-pointer text-[12px] font-medium text-white/50 transition-colors hover:text-white">
-            Home
+            {t('chrome.home')}
           </Link>
           <Link
             to="/browse-elections"
             className="cursor-pointer text-[12px] font-medium text-white/50 transition-colors hover:text-white"
           >
-            Elections
+            {t('chrome.elections')}
           </Link>
           <Link
             to="/account/security"
             className="cursor-pointer text-[12px] font-medium text-white/50 transition-colors hover:text-white"
           >
-            Security
+            {t('chrome.security')}
           </Link>
+          <LanguageSwitcher variant="nav" locales={PUBLIC_LOCALES} className="sp-auth-lang" />
         </div>
         {variant === 'register' ? (
           <Link
             to="/login"
             className="cursor-pointer rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3.5 py-1.5 text-[12px] font-bold text-cyan-300 transition-colors hover:bg-cyan-400/20"
           >
-            Sign in
+            {t('chrome.signIn')}
           </Link>
         ) : (
           <Link
             to="/register"
             className="cursor-pointer rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3.5 py-1.5 text-[12px] font-bold text-cyan-300 transition-colors hover:bg-cyan-400/20"
           >
-            Create account
+            {t('chrome.createAccount')}
           </Link>
         )}
       </nav>
@@ -120,7 +127,7 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
             </div>
             <span className="text-xl font-extrabold tracking-tight text-white">FortressVote</span>
             <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-cyan-300">
-              Enterprise
+              {t('chrome.enterprise')}
             </span>
           </div>
 
@@ -130,33 +137,30 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
               <span className="text-[11px] font-semibold tracking-wide text-emerald-300">{leftEyebrow}</span>
             </div>
             <h1 className="mb-4 text-[42px] font-extrabold leading-[1.15] tracking-tight text-white">
-              Democracy
+              {t('chrome.headline1')}
               <br />
-              powered by
+              {t('chrome.headline2')}
               <br />
-              <span className="sp-grad-text">military-grade</span>
+              <span className="sp-grad-text">{t('chrome.headline3')}</span>
               <br />
-              security
+              {t('chrome.headline4')}
             </h1>
-            <p className="max-w-[380px] text-[15px] leading-relaxed text-white/55">
-              Verified voter registration, anonymous ballots, and role-based dashboards for voters, election creators,
-              and administrators.
-            </p>
+            <p className="max-w-[380px] text-[15px] leading-relaxed text-white/55">{t('chrome.leftSub')}</p>
 
             <div className="mt-11 flex gap-7">
               <div>
                 <div className="font-mono text-[26px] font-extrabold text-white">2,847+</div>
-                <div className="mt-0.5 text-[11px] font-medium text-white/35">Elections hosted</div>
+                <div className="mt-0.5 text-[11px] font-medium text-white/35">{t('chrome.statElections')}</div>
               </div>
               <div className="w-px bg-white/[0.08]" />
               <div>
                 <div className="font-mono text-[26px] font-extrabold text-white">1.2M+</div>
-                <div className="mt-0.5 text-[11px] font-medium text-white/35">Registered voters</div>
+                <div className="mt-0.5 text-[11px] font-medium text-white/35">{t('chrome.statVoters')}</div>
               </div>
               <div className="w-px bg-white/[0.08]" />
               <div>
                 <div className="font-mono text-[26px] font-extrabold text-white">99.9%</div>
-                <div className="mt-0.5 text-[11px] font-medium text-white/35">Uptime focus</div>
+                <div className="mt-0.5 text-[11px] font-medium text-white/35">{t('chrome.statUptime')}</div>
               </div>
             </div>
 
@@ -166,8 +170,8 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
                   <span className="material-symbols-outlined text-lg text-cyan-300">lock</span>
                 </div>
                 <div>
-                  <div className="text-[13px] font-semibold text-white">AES-256 &amp; secure transport</div>
-                  <div className="text-[11px] leading-snug text-white/35">Sensitive actions use modern TLS and Supabase Auth.</div>
+                  <div className="text-[13px] font-semibold text-white">{t('chrome.feat1Title')}</div>
+                  <div className="text-[11px] leading-snug text-white/35">{t('chrome.feat1Desc')}</div>
                 </div>
               </div>
               <div className="sp-feat-row d2 flex items-center gap-3.5 rounded-[14px] border border-white/[0.07] bg-white/[0.04] px-4 py-3.5 transition-all hover:border-cyan-400/20 hover:bg-white/[0.07]">
@@ -175,8 +179,8 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
                   <span className="material-symbols-outlined text-lg text-cyan-300">receipt_long</span>
                 </div>
                 <div>
-                  <div className="text-[13px] font-semibold text-white">Audit-ready activity</div>
-                  <div className="text-[11px] leading-snug text-white/35">Administrative actions can be logged for review.</div>
+                  <div className="text-[13px] font-semibold text-white">{t('chrome.feat2Title')}</div>
+                  <div className="text-[11px] leading-snug text-white/35">{t('chrome.feat2Desc')}</div>
                 </div>
               </div>
               <div className="sp-feat-row d3 flex items-center gap-3.5 rounded-[14px] border border-white/[0.07] bg-white/[0.04] px-4 py-3.5 transition-all hover:border-cyan-400/20 hover:bg-white/[0.07]">
@@ -184,27 +188,27 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
                   <span className="material-symbols-outlined text-lg text-cyan-300">groups</span>
                 </div>
                 <div>
-                  <div className="text-[13px] font-semibold text-white">Multi-role access</div>
-                  <div className="text-[11px] leading-snug text-white/35">Voters and election creators start here; admins are provisioned separately.</div>
+                  <div className="text-[13px] font-semibold text-white">{t('chrome.feat3Title')}</div>
+                  <div className="text-[11px] leading-snug text-white/35">{t('chrome.feat3Desc')}</div>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="mt-auto flex flex-wrap gap-2 border-t border-white/[0.07] pt-9">
-            {['SOC 2 ready posture', 'GDPR-aware flows', 'TLS 1.2+', 'No password reuse hints'].map((t) => (
+            {trustChips.map((chip) => (
               <div
-                key={t}
+                key={chip}
                 className="flex items-center gap-1.5 rounded-full border border-emerald-400/18 bg-emerald-500/[0.06] px-2.5 py-1 text-[10px] font-semibold tracking-wide text-emerald-200"
               >
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                {t}
+                {chip}
               </div>
             ))}
           </div>
         </div>
 
-        <div className="sp-right">{children}</div>
+        <div className={`sp-right${variant === 'register' ? ' sp-right--register' : ''}`}>{children}</div>
       </div>
     </div>
   )

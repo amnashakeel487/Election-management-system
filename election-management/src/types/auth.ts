@@ -34,6 +34,13 @@ export interface AuthCredentials {
   password: string
 }
 
+/** Roles shown on the sign-in form (must match profile.role after authentication). */
+export const LOGIN_ROLES: UserRole[] = ['voter', 'election_creator', 'admin']
+
+export interface SignInPayload extends AuthCredentials {
+  loginAsRole: UserRole
+}
+
 export interface SignUpPayload extends AuthCredentials {
   role: RegisterableRole
   full_name: string

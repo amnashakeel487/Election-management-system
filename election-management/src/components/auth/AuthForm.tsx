@@ -63,7 +63,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
     try {
       if (isLogin) {
-        const dashboardPath = await signIn({ email, password })
+        const dashboardPath = await signIn({ email, password, loginAsRole: 'voter' })
         navigate(returnTo ?? dashboardPath, { replace: true })
       } else {
         await signUp({

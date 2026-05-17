@@ -18,7 +18,8 @@ import {
   waitForUserProfile,
 } from '@/services/authService'
 import { getVerifiedTotpFactor } from '@/services/mfaService'
-import type { AuthCredentials, SignUpPayload, UserProfile } from '@/types/auth'
+import { RoleMismatchError } from '@/lib/errors/roleMismatch'
+import type { SignInPayload, SignUpPayload, UserProfile } from '@/types/auth'
 import { logAuditEvent } from '@/services/auditService'
 import { AUDIT_ACTIONS } from '@/types/audit'
 import { getDashboardPathForRole } from '@/utils/roleRoutes'
@@ -33,7 +34,7 @@ interface AuthContextValue {
   emailVerified: boolean
   isRecoverySession: boolean
   mfaRequired: boolean
-  signIn: (credentials: AuthCredentials) => Promise<string>
+  signIn: (credentials: SignInPayload) => Promise<string>
   signUp: (payload: SignUpPayload) => Promise<void>
   signOut: () => Promise<void>
   resendVerification: () => Promise<void>
@@ -200,12 +201,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [loadProfile])
 
-  const signIn = useCallback(async (credentials: AuthCredentials) => {
+  const signIn = useCallback(async (credentials: SignInPayload) => {
     const { session: nextSession } = await signInWithEmail(credentials)
     if (!nextSession?.user) throw new Error('Sign in failed')
 
     const row = (await waitForUserProfile(nextSession.user.id)) ?? (await fetchUserProfile(nextSession.user.id))
     if (!row) throw new Error('User profile not found. Contact support.')
+
+    if (row.role !== credentials.loginAsRole) {
+      await authSignOut()
+      throw new RoleMismatchError(row.role, credentials.loginAsRole)
+    }
 
     setSession(nextSession)
     setUser(nextSession.user)

@@ -1,0 +1,156 @@
+{
+  "enterprise": "Enterprise",
+  "logIn": "Log in",
+  "getStarted": "Get Started →",
+  "dashboard": "Dashboard →",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu",
+  "nav": {
+    "liveResults": "Live results",
+    "features": "Features",
+    "howItWorks": "How it works",
+    "reviews": "Reviews"
+  },
+  "hero": {
+    "badge": "Elections open for registration",
+    "title1": "Democracy",
+    "title2": "Powered by",
+    "title3": "Military-Grade",
+    "title4": "Security",
+    "sub": "End-to-end encrypted, audit-ready, tamper-resistant elections for organisations of any size. Built for universities, enterprises, and public institutions.",
+    "startElection": "Start free election",
+    "goDashboard": "Go to dashboard",
+    "browseElections": "Browse elections",
+    "trustChips": ["AES-256 encrypted", "Role-based access", "GDPR-aware flows", "SOC 2 ready posture"]
+  },
+  "stats": {
+    "electionsConducted": "Elections conducted",
+    "platformScale": "Platform scale",
+    "registeredVoters": "Registered voters",
+    "growingCommunity": "Growing community",
+    "uptimeFocus": "Uptime focus",
+    "reliableInfra": "Reliable infrastructure",
+    "knownBreaches": "Known breaches",
+    "securityFirst": "Security first"
+  },
+  "liveResults": {
+    "eyebrow": "Live transparency",
+    "title": "Watch",
+    "titleAccent": "live results",
+    "sub": "Follow vote counts in real time when organizers enable live results — or view certified outcomes after polls close. No login required.",
+    "loading": "Loading live elections…",
+    "liveNow": "LIVE NOW",
+    "results": "RESULTS",
+    "ends": "Ends {{date}}",
+    "viewAll": "View all live results",
+    "browseElections": "Browse elections"
+  },
+  "features": {
+    "eyebrow": "Why choose us",
+    "title": "Everything you need for",
+    "titleAccent": "secure elections",
+    "sub": "A complete platform built for security, transparency, and scale.",
+    "learnMore": "Learn more",
+    "viewLiveResults": "View live results",
+    "items": [
+      {
+        "title": "Military-grade encryption",
+        "desc": "AES-256 end-to-end encryption helps keep every vote private and tamper-resistant from cast to count."
+      },
+      {
+        "title": "Real-time audit logs",
+        "desc": "Administrative actions can be logged for review so oversight teams have a clear accountability trail."
+      },
+      {
+        "title": "Multi-role platform",
+        "desc": "Purpose-built dashboards for admins, election creators, and voters — each with the right level of access."
+      },
+      {
+        "title": "Live countdown & results",
+        "desc": "Real-time tallies when enabled, progress indicators, and published results after polls close."
+      },
+      {
+        "title": "Secret voter ID system",
+        "desc": "Unique voter credentials support anonymous, duplicate-free participation across elections."
+      },
+      {
+        "title": "Enterprise security monitor",
+        "desc": "Optional MFA, session review, and account security tools to protect high-stakes elections."
+      }
+    ]
+  },
+  "how": {
+    "eyebrow": "Simple process",
+    "title": "How it works in",
+    "titleAccent": "4 easy steps",
+    "sub": "From setup to results in minutes — no technical expertise required.",
+    "steps": [
+      { "title": "Create your election", "desc": "Set up title, dates, candidates and voting rules with our guided form." },
+      { "title": "Invite voters", "desc": "Share secret voter IDs via email or CSV upload. Voters register securely in minutes." },
+      { "title": "Cast votes securely", "desc": "Voters authenticate and cast anonymous encrypted ballots during the voting window." },
+      { "title": "Get instant results", "desc": "Live charts when enabled, winner summaries, and audit-ready reports after close." }
+    ]
+  },
+  "testimonials": {
+    "eyebrow": "Trusted worldwide",
+    "title": "What our",
+    "titleAccent": "customers",
+    "titleEnd": "say",
+    "featured": "FEATURED REVIEW",
+    "items": [
+      {
+        "name": "Dr. Amara Osei",
+        "role": "Vice Chancellor, Tech University",
+        "quote": "FortressVote transformed how we run student elections. The transparency and security gave our community confidence in the results."
+      },
+      {
+        "name": "James Whitfield",
+        "role": "Director, National Elections Office",
+        "quote": "We ran a large-scale election without a single integrity issue. Audit logs gave our oversight committee complete confidence in the outcome."
+      },
+      {
+        "name": "Priya Sharma",
+        "role": "CEO, Enterprise Solutions Ltd",
+        "quote": "The secret voter ID system is brilliant. Board elections stay anonymous yet auditable — setup took under thirty minutes."
+      }
+    ]
+  },
+  "cta": {
+    "badge": "Free to start — no credit card needed",
+    "title": "Ready to run your first",
+    "titleAccent": "secure election?",
+    "sub": "Join organisations that trust FortressVote for their most important democratic decisions.",
+    "createAccount": "Create free account",
+    "signIn": "Sign in",
+    "chips": ["Free to register", "Setup in minutes", "Email verification", "Cancel anytime"]
+  },
+  "footer": {
+    "desc": "A secure election management platform. Built for transparency, designed for trust.",
+    "platform": "Platform",
+    "account": "Account",
+    "support": "Support",
+    "signIn": "Sign in",
+    "register": "Register",
+    "resetPassword": "Reset password",
+    "authGuide": "Auth setup guide",
+    "copyright": "© {{year}} FortressVote. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "security": "Security",
+    "badges": ["SOC 2", "GDPR", "TLS 1.2+"]
+  },
+  "preview": {
+    "title": "FortressVote Dashboard",
+    "live": "Live",
+    "active": "Active",
+    "voters": "Voters",
+    "uptime": "Uptime",
+    "election1": "Student Union Election",
+    "election2": "Council By-Election",
+    "statusActive": "Active",
+    "statusUpcoming": "Upcoming",
+    "voted": "28,140 voted",
+    "registered": "5,920 registered",
+    "opensSoon": "Opens soon"
+  }
+}

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ShieldIcon } from '@/components/auth/AuthSplitChrome'
 import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
+import { PUBLIC_LOCALES } from '@/types/locale'
 import { useAuth } from '@/hooks/useAuth'
 import { LandingElectionsSection } from './LandingElectionsSection'
 import { LandingLiveResultsSection } from './LandingLiveResultsSection'
@@ -10,15 +12,14 @@ import './landing-page.css'
 
 const PARTICLE_COUNT = 32
 
-const FEATURES = [
+const FEATURE_STYLES = [
   {
     border: '#1B3A6B',
     iconBg: '#EFF4FF',
     iconStroke: '#1B3A6B',
     link: '#1B3A6B',
     delay: '0s',
-    title: 'Military-grade encryption',
-    desc: 'AES-256 end-to-end encryption helps keep every vote private and tamper-resistant from cast to count.',
+    href: undefined as string | undefined,
     icon: (
       <>
         <rect x="3" y="11" width="18" height="11" rx="2" />
@@ -32,8 +33,7 @@ const FEATURES = [
     iconStroke: '#6C3FC5',
     link: '#6C3FC5',
     delay: '0.1s',
-    title: 'Real-time audit logs',
-    desc: 'Administrative actions can be logged for review so oversight teams have a clear accountability trail.',
+    href: undefined as string | undefined,
     icon: <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />,
   },
   {
@@ -42,8 +42,7 @@ const FEATURES = [
     iconStroke: '#06B6D4',
     link: '#06B6D4',
     delay: '0.2s',
-    title: 'Multi-role platform',
-    desc: 'Purpose-built dashboards for admins, election creators, and voters — each with the right level of access.',
+    href: undefined as string | undefined,
     icon: (
       <>
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -60,8 +59,6 @@ const FEATURES = [
     link: '#10B981',
     href: '/results',
     delay: '0.3s',
-    title: 'Live countdown & results',
-    desc: 'Real-time tallies when enabled, progress indicators, and published results after polls close.',
     icon: (
       <>
         <circle cx="12" cy="12" r="10" />
@@ -75,8 +72,7 @@ const FEATURES = [
     iconStroke: '#F59E0B',
     link: '#F59E0B',
     delay: '0.4s',
-    title: 'Secret voter ID system',
-    desc: 'Unique voter credentials support anonymous, duplicate-free participation across elections.',
+    href: undefined as string | undefined,
     icon: <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />,
   },
   {
@@ -85,47 +81,15 @@ const FEATURES = [
     iconStroke: '#EF4444',
     link: '#EF4444',
     delay: '0.5s',
-    title: 'Enterprise security monitor',
-    desc: 'Optional MFA, session review, and account security tools to protect high-stakes elections.',
+    href: undefined as string | undefined,
     icon: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
   },
-] as const
+]
 
-const HOW_STEPS = [
-  { n: '01', title: 'Create your election', desc: 'Set up title, dates, candidates and voting rules with our guided form.' },
-  { n: '02', title: 'Invite voters', desc: 'Share secret voter IDs via email or CSV upload. Voters register securely in minutes.' },
-  { n: '03', title: 'Cast votes securely', desc: 'Voters authenticate and cast anonymous encrypted ballots during the voting window.' },
-  { n: '04', title: 'Get instant results', desc: 'Live charts when enabled, winner summaries, and audit-ready reports after close.' },
-] as const
-
-const TESTIMONIALS = [
-  {
-    featured: false,
-    initials: 'AO',
-    gradient: 'linear-gradient(135deg,#1B3A6B,#2451A3)',
-    name: 'Dr. Amara Osei',
-    role: 'Vice Chancellor, Tech University',
-    quote:
-      'FortressVote transformed how we run student elections. The transparency and security gave our community confidence in the results.',
-  },
-  {
-    featured: true,
-    initials: 'JW',
-    gradient: 'linear-gradient(135deg,#6C3FC5,#4C1D95)',
-    name: 'James Whitfield',
-    role: 'Director, National Elections Office',
-    quote:
-      'We ran a large-scale election without a single integrity issue. Audit logs gave our oversight committee complete confidence in the outcome.',
-  },
-  {
-    featured: false,
-    initials: 'PS',
-    gradient: 'linear-gradient(135deg,#06B6D4,#0891B2)',
-    name: 'Priya Sharma',
-    role: 'CEO, Enterprise Solutions Ltd',
-    quote:
-      'The secret voter ID system is brilliant. Board elections stay anonymous yet auditable — setup took under thirty minutes.',
-  },
+const TESTIMONIAL_META = [
+  { featured: false, initials: 'AO', gradient: 'linear-gradient(135deg,#1B3A6B,#2451A3)' },
+  { featured: true, initials: 'JW', gradient: 'linear-gradient(135deg,#6C3FC5,#4C1D95)' },
+  { featured: false, initials: 'PS', gradient: 'linear-gradient(135deg,#06B6D4,#0891B2)' },
 ] as const
 
 function CheckIcon() {
@@ -163,8 +127,20 @@ function ChatIcon() {
 }
 
 export function LandingPageView() {
+  const { t } = useTranslation('landing')
+  const { t: tNav } = useTranslation('nav')
   const navigate = useNavigate()
   const { session, profile, getDashboardPath, mfaRequired } = useAuth()
+  const featureItems = t('features.items', { returnObjects: true }) as Array<{ title: string; desc: string }>
+  const howSteps = t('how.steps', { returnObjects: true }) as Array<{ title: string; desc: string }>
+  const testimonialItems = t('testimonials.items', { returnObjects: true }) as Array<{
+    name: string
+    role: string
+    quote: string
+  }>
+  const trustChips = t('hero.trustChips', { returnObjects: true }) as string[]
+  const ctaChips = t('cta.chips', { returnObjects: true }) as string[]
+  const footerBadges = t('footer.badges', { returnObjects: true }) as string[]
   const [navScrolled, setNavScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [barsReady, setBarsReady] = useState(false)
@@ -209,24 +185,24 @@ export function LandingPageView() {
             <ShieldIcon className="h-5 w-5 text-white" />
           </div>
           <span className="nav-name">FortressVote</span>
-          <span className="nav-tag">Enterprise</span>
+          <span className="nav-tag">{t('enterprise')}</span>
         </Link>
 
         <NavLinks mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} showLangInMobile />
 
         <div className="nav-actions">
-          <LanguageSwitcher variant="nav" className="nav-lang" />
+          <LanguageSwitcher variant="nav" className="nav-lang" locales={PUBLIC_LOCALES} />
           {signedIn ? (
             <button type="button" className="btn-primary-nav" onClick={() => navigate(dashboardPath)}>
-              Dashboard →
+              {t('dashboard')}
             </button>
           ) : (
             <>
               <button type="button" className="btn-ghost-nav" onClick={() => navigate('/login')}>
-                Log in
+                {t('logIn')}
               </button>
               <button type="button" className="btn-primary-nav" onClick={() => navigate('/register')}>
-                Get Started →
+                {t('getStarted')}
               </button>
             </>
           )}
@@ -235,7 +211,7 @@ export function LandingPageView() {
         <button
           type="button"
           className="nav-hamburger"
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-label={mobileOpen ? t('closeMenu') : t('openMenu')}
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((o) => !o)}
         >
@@ -274,37 +250,34 @@ export function LandingPageView() {
           <div className="hero-left">
             <div className="live-badge">
               <div className="live-dot" />
-              <span>Elections open for registration</span>
+              <span>{t('hero.badge')}</span>
             </div>
             <h1 className="hero-title">
-              Democracy
+              {t('hero.title1')}
               <br />
-              <span className="line2">Powered by</span>
+              <span className="line2">{t('hero.title2')}</span>
               <br />
-              <span className="grad-text">Military-Grade</span>
+              <span className="grad-text">{t('hero.title3')}</span>
               <br />
-              Security
+              {t('hero.title4')}
             </h1>
-            <p className="hero-sub">
-              End-to-end encrypted, audit-ready, tamper-resistant elections for organisations of any size. Built for
-              universities, enterprises, and public institutions.
-            </p>
+            <p className="hero-sub">{t('hero.sub')}</p>
             <div className="hero-btns">
               <button type="button" className="btn-hero-primary" onClick={() => navigate(signedIn ? dashboardPath : '/register')}>
                 <span className="shimmer" />
                 <CheckIcon />
-                {signedIn ? 'Go to dashboard' : 'Start free election'}
+                {signedIn ? t('hero.goDashboard') : t('hero.startElection')}
               </button>
               <button type="button" className="btn-hero-ghost" onClick={() => navigate('/browse-elections')}>
                 <PlayIcon />
-                Browse elections
+                {t('hero.browseElections')}
               </button>
             </div>
             <div className="trust-chips">
-              {['AES-256 encrypted', 'Role-based access', 'GDPR-aware flows', 'SOC 2 ready posture'].map((t) => (
-                <div key={t} className="t-chip">
+              {trustChips.map((chip) => (
+                <div key={chip} className="t-chip">
                   <CheckIcon />
-                  {t}
+                  {chip}
                 </div>
               ))}
             </div>
@@ -322,23 +295,23 @@ export function LandingPageView() {
             <div className="stat-num-big" data-target="2847">
               0
             </div>
-            <div className="stat-label-big">Elections conducted</div>
-            <div className="stat-delta">Platform scale</div>
+            <div className="stat-label-big">{t('stats.electionsConducted')}</div>
+            <div className="stat-delta">{t('stats.platformScale')}</div>
           </div>
           <div className="stat-col reveal" style={{ transitionDelay: '0.1s' }}>
             <div className="stat-num-big">1.2M+</div>
-            <div className="stat-label-big">Registered voters</div>
-            <div className="stat-delta">Growing community</div>
+            <div className="stat-label-big">{t('stats.registeredVoters')}</div>
+            <div className="stat-delta">{t('stats.growingCommunity')}</div>
           </div>
           <div className="stat-col reveal" style={{ transitionDelay: '0.2s' }}>
             <div className="stat-num-big">99.9%</div>
-            <div className="stat-label-big">Uptime focus</div>
-            <div className="stat-delta">Reliable infrastructure</div>
+            <div className="stat-label-big">{t('stats.uptimeFocus')}</div>
+            <div className="stat-delta">{t('stats.reliableInfra')}</div>
           </div>
           <div className="stat-col reveal" style={{ transitionDelay: '0.3s' }}>
             <div className="stat-num-big">Zero</div>
-            <div className="stat-label-big">Known breaches</div>
-            <div className="stat-delta">Security first</div>
+            <div className="stat-label-big">{t('stats.knownBreaches')}</div>
+            <div className="stat-delta">{t('stats.securityFirst')}</div>
           </div>
         </div>
       </div>
@@ -350,18 +323,21 @@ export function LandingPageView() {
       <section className="features-section section" id="features">
         <div className="section-inner">
           <div style={{ maxWidth: 560 }} className="reveal">
-            <div className="section-eyebrow">Why choose us</div>
+            <div className="section-eyebrow">{t('features.eyebrow')}</div>
             <h2 className="section-title">
-              Everything you need for
+              {t('features.title')}
               <br />
-              <span className="accent">secure elections</span>
+              <span className="accent">{t('features.titleAccent')}</span>
             </h2>
-            <p className="section-sub">A complete platform built for security, transparency, and scale.</p>
+            <p className="section-sub">{t('features.sub')}</p>
           </div>
           <div className="features-grid">
-            {FEATURES.map((f) => (
+            {FEATURE_STYLES.map((f, i) => {
+              const item = featureItems[i]
+              if (!item) return null
+              return (
               <div
-                key={f.title}
+                key={item.title}
                 className="feat-card reveal"
                 style={{ borderTop: `4px solid ${f.border}`, transitionDelay: f.delay }}
               >
@@ -370,13 +346,14 @@ export function LandingPageView() {
                     {f.icon}
                   </svg>
                 </div>
-                <div className="feat-title">{f.title}</div>
-                <div className="feat-desc">{f.desc}</div>
-                <Link to={'href' in f && f.href ? f.href : '/register'} className="feat-link" style={{ color: f.link }}>
-                  {'href' in f && f.href ? 'View live results' : 'Learn more'} <ArrowIcon />
+                <div className="feat-title">{item.title}</div>
+                <div className="feat-desc">{item.desc}</div>
+                <Link to={f.href ?? '/register'} className="feat-link" style={{ color: f.link }}>
+                  {f.href ? t('features.viewLiveResults') : t('features.learnMore')} <ArrowIcon />
                 </Link>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -385,21 +362,21 @@ export function LandingPageView() {
         <div className="section-inner">
           <div style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto' }} className="reveal">
             <div className="section-eyebrow" style={{ color: 'var(--cyan)' }}>
-              Simple process
+              {t('how.eyebrow')}
             </div>
             <h2 className="section-title" style={{ color: '#fff' }}>
-              How it works in
+              {t('how.title')}
               <br />
-              <span style={{ color: 'var(--cyan)' }}>4 easy steps</span>
+              <span style={{ color: 'var(--cyan)' }}>{t('how.titleAccent')}</span>
             </h2>
             <p className="section-sub" style={{ color: 'rgba(255,255,255,0.45)', margin: '0 auto' }}>
-              From setup to results in minutes — no technical expertise required.
+              {t('how.sub')}
             </p>
           </div>
           <div className="how-grid">
-            {HOW_STEPS.map((s, i) => (
-              <div key={s.n} className="how-step reveal" style={{ transitionDelay: `${0.1 * (i + 1)}s` }}>
-                <div className="how-num">{s.n}</div>
+            {howSteps.map((s, i) => (
+              <div key={String(i)} className="how-step reveal" style={{ transitionDelay: `${0.1 * (i + 1)}s` }}>
+                <div className="how-num">{String(i + 1).padStart(2, '0')}</div>
                 <div className="how-step-title">{s.title}</div>
                 <div className="how-step-desc">{s.desc}</div>
               </div>
@@ -411,22 +388,25 @@ export function LandingPageView() {
       <section className="testi-section section" id="testimonials">
         <div className="section-inner">
           <div style={{ textAlign: 'center', maxWidth: 500, margin: '0 auto' }} className="reveal">
-            <div className="section-eyebrow">Trusted worldwide</div>
+            <div className="section-eyebrow">{t('testimonials.eyebrow')}</div>
             <h2 className="section-title">
-              What our <span className="accent">customers</span> say
+              {t('testimonials.title')} <span className="accent">{t('testimonials.titleAccent')}</span> {t('testimonials.titleEnd')}
             </h2>
           </div>
           <div className="testi-grid">
-            {TESTIMONIALS.map((t, i) => (
+            {TESTIMONIAL_META.map((meta, i) => {
+              const item = testimonialItems[i]
+              if (!item) return null
+              return (
               <div
-                key={t.name}
+                key={item.name}
                 className="testi-card reveal"
                 style={{
                   transitionDelay: `${0.1 * (i + 1)}s`,
-                  ...(t.featured ? { border: '2px solid rgba(36,81,163,0.2)' } : {}),
+                  ...(meta.featured ? { border: '2px solid rgba(36,81,163,0.2)' } : {}),
                 }}
               >
-                {t.featured ? (
+                {meta.featured ? (
                   <div
                     style={{
                       fontSize: 10,
@@ -440,22 +420,23 @@ export function LandingPageView() {
                       letterSpacing: 0.5,
                     }}
                   >
-                    FEATURED REVIEW
+                    {t('testimonials.featured')}
                   </div>
                 ) : null}
                 <div className="testi-stars">★★★★★</div>
-                <div className="testi-text">&ldquo;{t.quote}&rdquo;</div>
+                <div className="testi-text">&ldquo;{item.quote}&rdquo;</div>
                 <div className="testi-author">
-                  <div className="testi-avatar" style={{ background: t.gradient }}>
-                    {t.initials}
+                  <div className="testi-avatar" style={{ background: meta.gradient }}>
+                    {meta.initials}
                   </div>
                   <div>
-                    <div className="testi-name">{t.name}</div>
-                    <div className="testi-role">{t.role}</div>
+                    <div className="testi-name">{item.name}</div>
+                    <div className="testi-role">{item.role}</div>
                   </div>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -466,29 +447,29 @@ export function LandingPageView() {
         <div className="cta-inner reveal">
           <div className="live-badge" style={{ margin: '0 auto 24px' }}>
             <div className="live-dot" />
-            <span>Free to start — no credit card needed</span>
+            <span>{t('cta.badge')}</span>
           </div>
           <h2 className="cta-title">
-            Ready to run your first
+            {t('cta.title')}
             <br />
-            <span className="grad-text">secure election?</span>
+            <span className="grad-text">{t('cta.titleAccent')}</span>
           </h2>
           <p className="cta-sub">
-            Join organisations that trust FortressVote for their most important democratic decisions.
+            {t('cta.sub')}
           </p>
           <div className="cta-btns">
             <button type="button" className="btn-hero-primary" onClick={() => navigate('/register')}>
               <span className="shimmer" />
               <CheckIcon />
-              Create free account
+              {t('cta.createAccount')}
             </button>
             <button type="button" className="btn-hero-ghost" onClick={() => navigate('/login')}>
               <ChatIcon />
-              Sign in
+              {t('cta.signIn')}
             </button>
           </div>
           <div className="cta-chip-row">
-            {['Free to register', 'Setup in minutes', 'Email verification', 'Cancel anytime'].map((c) => (
+            {ctaChips.map((c) => (
               <div key={c} className="cta-chip">
                 <CheckIcon />
                 {c}
@@ -508,11 +489,9 @@ export function LandingPageView() {
                 </div>
                 <span className="footer-brand-name">FortressVote</span>
               </div>
-              <p className="footer-desc">
-                A secure election management platform. Built for transparency, designed for trust.
-              </p>
+              <p className="footer-desc">{t('footer.desc')}</p>
               <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                {['SOC 2', 'GDPR', 'TLS 1.2+'].map((chip) => (
+                {footerBadges.map((chip) => (
                   <div key={chip} className="t-chip">
                     {chip}
                   </div>
@@ -520,48 +499,48 @@ export function LandingPageView() {
               </div>
             </div>
             <div>
-              <div className="footer-col-title">Platform</div>
+              <div className="footer-col-title">{t('footer.platform')}</div>
               <Link className="footer-link" to="/browse-elections">
-                Elections
+                {tNav('elections')}
               </Link>
               <Link className="footer-link" to="/results">
-                Results
+                {tNav('results')}
               </Link>
               <Link className="footer-link" to="/account/security">
-                Security
+                {tNav('security')}
               </Link>
             </div>
             <div>
-              <div className="footer-col-title">Account</div>
+              <div className="footer-col-title">{t('footer.account')}</div>
               <Link className="footer-link" to="/login">
-                Sign in
+                {t('footer.signIn')}
               </Link>
               <Link className="footer-link" to="/register">
-                Register
+                {t('footer.register')}
               </Link>
               <Link className="footer-link" to="/forgot-password">
-                Reset password
+                {t('footer.resetPassword')}
               </Link>
             </div>
             <div>
-              <div className="footer-col-title">Support</div>
+              <div className="footer-col-title">{t('footer.support')}</div>
               <a className="footer-link" href="/docs/AUTH_SETUP.md">
-                Auth setup guide
+                {t('footer.authGuide')}
               </a>
               <a className="footer-link" href="#features">
-                Features
+                {t('nav.features')}
               </a>
               <a className="footer-link" href="#how">
-                How it works
+                {t('nav.howItWorks')}
               </a>
             </div>
           </div>
           <div className="footer-bottom">
-            <span className="footer-copy">© {new Date().getFullYear()} FortressVote. All rights reserved.</span>
+            <span className="footer-copy">{t('footer.copyright', { year: new Date().getFullYear() })}</span>
             <div className="footer-legal">
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
-              <a href="#">Security</a>
+              <a href="#">{t('footer.privacy')}</a>
+              <a href="#">{t('footer.terms')}</a>
+              <a href="#">{t('footer.security')}</a>
             </div>
           </div>
         </div>
@@ -579,12 +558,14 @@ function NavLinks({
   setMobileOpen: (v: boolean) => void
   showLangInMobile?: boolean
 }) {
+  const { t } = useTranslation('landing')
+  const { t: tNav } = useTranslation('nav')
   const links = [
-    { href: '/browse-elections', label: 'Elections' },
-    { href: '/results', label: 'Live results' },
-    { href: '#features', label: 'Features' },
-    { href: '#how', label: 'How it works' },
-    { href: '#testimonials', label: 'Reviews' },
+    { href: '/browse-elections', label: tNav('elections') },
+    { href: '/results', label: t('nav.liveResults') },
+    { href: '#features', label: t('nav.features') },
+    { href: '#how', label: t('nav.howItWorks') },
+    { href: '#testimonials', label: t('nav.reviews') },
   ]
 
   return (
@@ -620,7 +601,7 @@ function NavLinks({
       )}
       {showLangInMobile && mobileOpen ? (
         <div className="nav-lang-mobile">
-          <LanguageSwitcher variant="nav" />
+          <LanguageSwitcher variant="nav" locales={PUBLIC_LOCALES} />
         </div>
       ) : null}
     </div>
@@ -628,6 +609,7 @@ function NavLinks({
 }
 
 function DashboardPreview({ barsReady }: { barsReady: boolean }) {
+  const { t } = useTranslation('landing')
   const chartBars = [
     { h: '30%', bg: '#E0E7FF', delay: '0.2s' },
     { h: '55%', bg: '#C7D2FE', delay: '0.3s' },
@@ -646,31 +628,31 @@ function DashboardPreview({ barsReady }: { barsReady: boolean }) {
           <div className="dp-dot" style={{ background: '#F59E0B' }} />
           <div className="dp-dot" style={{ background: '#10B981' }} />
         </div>
-        <span className="dp-title">FortressVote Dashboard</span>
+        <span className="dp-title">{t('preview.title')}</span>
         <div className="dp-live">
           <div className="dp-live-dot" />
-          Live
+          {t('preview.live')}
         </div>
       </div>
       <div className="dp-body">
         <div className="dp-stat-row">
           <div className="dp-stat">
             <div className="dp-stat-num">12</div>
-            <div className="dp-stat-label">Active</div>
+            <div className="dp-stat-label">{t('preview.active')}</div>
           </div>
           <div className="dp-stat">
             <div className="dp-stat-num">84K</div>
-            <div className="dp-stat-label">Voters</div>
+            <div className="dp-stat-label">{t('preview.voters')}</div>
           </div>
           <div className="dp-stat">
             <div className="dp-stat-num">99.9%</div>
-            <div className="dp-stat-label">Uptime</div>
+            <div className="dp-stat-label">{t('preview.uptime')}</div>
           </div>
         </div>
         <div className="dp-election" style={{ borderLeftColor: '#10B981' }}>
           <div className="dp-el-top">
-            <span className="dp-el-title">Student Union Election</span>
-            <span className="dp-badge active">Active</span>
+            <span className="dp-el-title">{t('preview.election1')}</span>
+            <span className="dp-badge active">{t('preview.statusActive')}</span>
           </div>
           <div className="dp-bar-wrap">
             <div
@@ -683,14 +665,14 @@ function DashboardPreview({ barsReady }: { barsReady: boolean }) {
             />
           </div>
           <div className="dp-bar-meta">
-            <span>28,140 voted</span>
+            <span>{t('preview.voted')}</span>
             <span>62%</span>
           </div>
         </div>
         <div className="dp-election" style={{ borderLeftColor: '#2563EB' }}>
           <div className="dp-el-top">
-            <span className="dp-el-title">Council By-Election</span>
-            <span className="dp-badge upcoming">Upcoming</span>
+            <span className="dp-el-title">{t('preview.election2')}</span>
+            <span className="dp-badge upcoming">{t('preview.statusUpcoming')}</span>
           </div>
           <div className="dp-bar-wrap">
             <div
@@ -704,8 +686,8 @@ function DashboardPreview({ barsReady }: { barsReady: boolean }) {
             />
           </div>
           <div className="dp-bar-meta">
-            <span>5,920 registered</span>
-            <span>Opens soon</span>
+            <span>{t('preview.registered')}</span>
+            <span>{t('preview.opensSoon')}</span>
           </div>
         </div>
         <div className="dp-chart-row">
