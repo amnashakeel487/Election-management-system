@@ -166,9 +166,19 @@ export async function ensureElectionVotingReady(electionId: string): Promise<Ens
   const finalized = Boolean(autoResult?.finalized)
   const alreadyFinalized = autoResult?.reason === 'already_finalized'
 
+  const { data: electionRow } = await supabase
+    .from('elections')
+    .select('voter_roll_finalized_at')
+    .eq('id', electionId)
+    .maybeSingle()
+
+  const rollFinalizedOnDb = Boolean(electionRow?.voter_roll_finalized_at)
+  const shouldEmail =
+    finalized || alreadyFinalized || rollFinalizedOnDb
+
   let emailed = false
 
-  if (finalized || alreadyFinalized) {
+  if (shouldEmail) {
     const { data, error } = await supabase.functions.invoke('ensure-election-voting-ready', {
       body: { election_id: electionId },
       headers: {
@@ -180,12 +190,12 @@ export async function ensureElectionVotingReady(electionId: string): Promise<Ens
       console.warn('ensure-election-voting-ready:', error.message)
     } else if (data && typeof data === 'object') {
       const emailPayload = (data as { email?: { sent?: number } }).email
-      emailed = typeof emailPayload?.sent === 'number' ? emailPayload.sent > 0 : alreadyFinalized
+      emailed = typeof emailPayload?.sent === 'number' ? emailPayload.sent > 0 : rollFinalizedOnDb
     }
   }
 
   return {
-    finalized: finalized || alreadyFinalized,
+    finalized: finalized || alreadyFinalized || rollFinalizedOnDb,
     emailed,
     reason: autoResult?.reason,
     error: rpcError?.message,

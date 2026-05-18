@@ -9,8 +9,7 @@ import {
   mergeVoterInbox,
   type VoterNotificationItem,
 } from '@/utils/voterNotifications'
-import { ensureElectionVotingReady } from '@/services/votingService'
-import { shouldEnsureVotingReady } from '@/utils/autoFinalizeVoterRoll'
+import { useEnsureDueElectionsPrepared } from '@/hooks/useEnsureVotingReadyWhenDue'
 import { canVote } from '@/utils/voterElectionUi'
 
 const INBOX_POLL_MS = 45_000
@@ -73,41 +72,22 @@ export function VoterDashboardProvider({ children }: { children: ReactNode }) {
     void reload()
   }, [reload])
 
-  useEffect(() => {
-    const userId = session?.user.id
-    if (!userId || registrations.length === 0) return
-
-    let cancelled = false
-
-    async function prepareDueElections() {
-      const due = registrations
+  const dueElections = useMemo(
+    () =>
+      registrations
         .map((r) => r.election)
         .filter((e): e is NonNullable<(typeof registrations)[0]['election']> => Boolean(e))
-        .filter(shouldEnsureVotingReady)
+        .map((e) => ({
+          id: e.id,
+          status: e.status,
+          start_date: e.start_date,
+          end_date: e.end_date,
+          voter_roll_finalized_at: e.voter_roll_finalized_at ?? null,
+        })),
+    [registrations],
+  )
 
-      if (due.length === 0) return
-
-      let shouldRefresh = false
-      for (const e of due) {
-        if (cancelled) return
-        const result = await ensureElectionVotingReady(e.id)
-        if (result.finalized) shouldRefresh = true
-        if (result.error?.includes('migration')) {
-          console.warn(result.error)
-        }
-      }
-
-      if (shouldRefresh && !cancelled) {
-        await reload()
-      }
-    }
-
-    void prepareDueElections()
-
-    return () => {
-      cancelled = true
-    }
-  }, [registrations, session?.user.id, reload])
+  useEnsureDueElectionsPrepared(dueElections, reload, 30_000)
 
   useEffect(() => {
     const userId = session?.user.id

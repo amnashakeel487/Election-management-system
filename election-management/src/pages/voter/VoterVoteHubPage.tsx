@@ -3,18 +3,36 @@ import { VoterPageHeader } from '@/components/voter/VoterPageHeader'
 import { useVoterDashboard } from '@/hooks/useVoterDashboard'
 import { electionDisplayStatus } from '@/utils/dashboardDisplay'
 import { formatElectionCode, formatTimeRemaining } from '@/utils/electionTime'
-import { canVote } from '@/utils/voterElectionUi'
+import { shouldEnsureVotingReady } from '@/utils/autoFinalizeVoterRoll'
+import { canVote, getRegistrationPhase } from '@/utils/voterElectionUi'
 
 export function VoterVoteHubPage() {
   const { registered } = useVoterDashboard()
   const voteables = registered.filter((r) => canVote(r) && r.election)
+  const preparing = registered.filter((r) => {
+    if (!r.election || r.voted_at) return false
+    return shouldEnsureVotingReady(r.election) && getRegistrationPhase(r) === 'pending_secret'
+  })
 
   return (
     <>
       <VoterPageHeader eyebrow="Secure Voting" title="Vote Hub" subtitle="Elections where you can cast a ballot now" />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {voteables.length === 0 ? (
+        {preparing.map((reg) => {
+          if (!reg.election) return null
+          return (
+            <div key={reg.id} className="card-elevated">
+              <div className="card-body">
+                <div style={{ fontSize: 15, fontWeight: 700 }}>{reg.election.title}</div>
+                <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8, lineHeight: 1.5 }}>
+                  Voting has started. Your secret voter ID is being issued and emailed — refresh in a moment.
+                </p>
+              </div>
+            </div>
+          )
+        })}
+        {voteables.length === 0 && preparing.length === 0 ? (
           <div className="card-elevated">
             <div className="card-body">
               <p style={{ fontSize: 13, color: 'var(--subtle)', marginBottom: 12 }}>
@@ -31,11 +49,15 @@ export function VoterVoteHubPage() {
             const phase = electionDisplayStatus(reg.election.status, reg.election.start_date, reg.election.end_date)
             return (
               <div key={reg.id} className="card-elevated">
-                <div className="card-body" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                <div
+                  className="card-body"
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}
+                >
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 700 }}>{reg.election.title}</div>
                     <div style={{ fontSize: 11, color: 'var(--subtle)', marginTop: 4 }}>
-                      {formatElectionCode(reg.election.id)} · {phase} · Ends in {formatTimeRemaining(reg.election.end_date)}
+                      {formatElectionCode(reg.election.id)} · {phase} · Ends in{' '}
+                      {formatTimeRemaining(reg.election.end_date)}
                     </div>
                   </div>
                   <Link to={`/voter/vote/${reg.election.id}`} className="btn btn-success">

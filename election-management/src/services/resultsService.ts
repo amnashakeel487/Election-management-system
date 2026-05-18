@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import { triggerWinnerNotification } from '@/services/notificationService'
 import type { ElectionResultsPayload } from '@/types/electionResults'
+import { areElectionResultsVisible } from '@/utils/electionResultsVisibility'
 import { isPollingEnded } from '@/utils/electionPolling'
 
 function normalizeResultsPayload(raw: ElectionResultsPayload): ElectionResultsPayload {
@@ -88,11 +89,5 @@ export async function fetchElectionsWithVisibleResults(): Promise<ResultsElectio
 
   if (error) throw new Error(error.message)
 
-  const now = Date.now()
-  return (data ?? []).filter((e) => {
-    if (e.results_locked_at) return true
-    if (e.real_time_results) return true
-    if (e.status === 'completed') return true
-    return new Date(e.end_date).getTime() <= now
-  })
+  return (data ?? []).filter((e) => areElectionResultsVisible(e))
 }

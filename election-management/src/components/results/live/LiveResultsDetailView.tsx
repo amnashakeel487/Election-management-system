@@ -16,6 +16,7 @@ import { useElectionResults } from '@/hooks/useElectionResults'
 import { supabase } from '@/lib/supabase'
 import { buildResultsSummary } from '@/utils/resultsDisplay'
 import { formatSubmissionDate } from '@/utils/formatDate'
+import { voterResultsUnavailableMessage } from '@/utils/electionResultsVisibility'
 import {
   buildHourlyBars,
   buildLiveDonutSegments,
@@ -40,7 +41,14 @@ export function LiveResultsDetailView({ electionId, embeddedIn }: LiveResultsDet
   const voterEmbed = embeddedIn === 'voter'
   const rootClass = voterEmbed ? 'lr-root lr-root--voter-embed' : 'lr-root'
   const { results, loading, error, lastUpdated, isLive, refresh } = useElectionResults(electionId || undefined)
-  const [meta, setMeta] = useState<{ description: string | null; category: string | null } | null>(null)
+  const [meta, setMeta] = useState<{
+    description: string | null
+    category: string | null
+    real_time_results: boolean
+    end_date: string
+    status: string
+    results_locked_at: string | null
+  } | null>(null)
   const [nowMs, setNowMs] = useState(() => Date.now())
   const [feed, setFeed] = useState<FeedItem[]>([])
   const [copyOk, setCopyOk] = useState(false)
@@ -52,11 +60,20 @@ export function LiveResultsDetailView({ electionId, embeddedIn }: LiveResultsDet
     let cancelled = false
     void supabase
       .from('elections')
-      .select('description, category')
+      .select('description, category, real_time_results, end_date, status, results_locked_at')
       .eq('id', electionId)
       .maybeSingle()
       .then(({ data }) => {
-        if (!cancelled && data) setMeta({ description: data.description, category: data.category })
+        if (!cancelled && data) {
+          setMeta({
+            description: data.description,
+            category: data.category,
+            real_time_results: Boolean(data.real_time_results),
+            end_date: data.end_date,
+            status: data.status,
+            results_locked_at: data.results_locked_at,
+          })
+        }
       })
     return () => {
       cancelled = true
@@ -143,6 +160,16 @@ export function LiveResultsDetailView({ electionId, embeddedIn }: LiveResultsDet
   const cd = countdownTarget ? splitCountdownParts(countdownTarget, nowMs) : null
   const cdLabel = results?.polling_ended ? 'Voting closed' : 'Voting ends in'
 
+  const voterBlockedMessage =
+    voterEmbed && meta
+      ? voterResultsUnavailableMessage({
+          status: meta.status,
+          end_date: meta.end_date,
+          real_time_results: meta.real_time_results,
+          results_locked_at: meta.results_locked_at,
+        })
+      : ''
+
   if (!electionId) {
     return (
       <div className={rootClass}>
@@ -172,8 +199,8 @@ export function LiveResultsDetailView({ electionId, embeddedIn }: LiveResultsDet
         {!voterEmbed ? <LiveResultsNav /> : null}
         <div className="page" style={{ paddingTop: voterEmbed ? 32 : 80, textAlign: 'center' }}>
           <h2 style={{ marginBottom: 8 }}>Results unavailable</h2>
-          <p style={{ color: 'var(--muted)', marginBottom: 16 }}>
-            {error ?? 'Live results are not published for this election yet.'}
+          <p style={{ color: 'var(--muted)', marginBottom: 16, maxWidth: 480, marginInline: 'auto', lineHeight: 1.5 }}>
+            {voterBlockedMessage || error || 'Live results are not published for this election yet.'}
           </p>
           <Link to={voterEmbed ? '/voter/results' : '/results'}>Back to results</Link>
         </div>

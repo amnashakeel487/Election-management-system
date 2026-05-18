@@ -6,6 +6,7 @@ import { useVoterDashboard } from '@/hooks/useVoterDashboard'
 import { electionDisplayStatus } from '@/utils/dashboardDisplay'
 import { formatElectionCode } from '@/utils/electionTime'
 import { maskSecretVoterId } from '@/utils/maskSecretVoterId'
+import { areElectionResultsVisible } from '@/utils/electionResultsVisibility'
 import { canVote, formatCountdown, getRegistrationPhase, registrationBadgeClass } from '@/utils/voterElectionUi'
 
 function LiveCountdown({ endDate }: { endDate: string }) {
@@ -210,10 +211,14 @@ export function VoterHomePage() {
                           </svg>
                           Cast Your Vote
                         </Link>
-                      ) : reg.voted_at ? (
+                      ) : reg.voted_at && areElectionResultsVisible(reg.election) ? (
                         <Link to={`/voter/results/${reg.election.id}`} className="btn btn-ghost btn-sm" style={{ marginTop: 10 }}>
-                          View Live Results
+                          View results
                         </Link>
+                      ) : reg.voted_at ? (
+                        <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 10, maxWidth: 280 }}>
+                          Results available after voting ends
+                        </p>
                       ) : (
                         <Link to={`/voter/elections/${reg.election.id}`} className="btn btn-ghost btn-sm" style={{ marginTop: 10 }}>
                           View Election

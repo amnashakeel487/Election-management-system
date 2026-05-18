@@ -75,10 +75,12 @@ html{scroll-behavior:smooth;}
 .lp-root .hero-right{
   display:flex;
   flex-direction:column;
-  align-items:flex-end;
+  align-items:stretch;
   justify-content:flex-start;
   gap:48px;
   align-self:start;
+  width:100%;
+  min-width:0;
   padding-top:4px;
   animation:slideRight 0.9s cubic-bezier(0.4,0,0.2,1) 0.2s both;
 }
@@ -128,6 +130,9 @@ html{scroll-behavior:smooth;}
 }
 @keyframes slideRight{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
 .lp-root .dashboard-preview{
+  width:100%;
+  max-width:540px;
+  margin-left:auto;
   background:rgba(255,255,255,0.97);border-radius:20px;overflow:hidden;
   box-shadow:0 40px 100px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.1);
   animation:previewFloat 7s ease-in-out infinite 1s;
@@ -568,7 +573,7 @@ html{scroll-behavior:smooth;}
 @media(max-width:1024px){
 .lp-root .hero-inner{grid-template-columns:1fr;gap:40px;text-align:center;}
 .lp-root .hero-sub,.trust-chips,.hero-btns{margin-left:auto;margin-right:auto;justify-content:center;}
-.lp-root .hero-right{display:flex;align-items:center;margin:0 auto;}
+.lp-root .hero-right{align-items:center;margin:0 auto;max-width:540px;}
 .lp-root .hero-right .dashboard-preview{display:none;}
 .lp-root .fv-daily-quote--hero{max-width:420px;text-align:center;}
 .lp-root .features-grid{grid-template-columns:repeat(2,1fr);}

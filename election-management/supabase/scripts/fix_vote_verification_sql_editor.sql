@@ -388,19 +388,8 @@ as $$
   );
 $$;
 
-create or replace function public.maybe_auto_finalize_election_voter_roll(p_election_id uuid)
-returns jsonb
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  return jsonb_build_object('finalized', false, 'reason', 'run_migration_035_for_auto_finalize');
-end;
-$$;
-
-grant execute on function public.maybe_auto_finalize_election_voter_roll(uuid) to authenticated;
-grant execute on function public.maybe_auto_finalize_election_voter_roll(uuid) to service_role;
+-- Real auto-finalize (migrations 035 core + 037); do not replace with a no-op stub
+-- For full install run: supabase/scripts/auto_finalize_voting_start_sql_editor.sql
 
 create table if not exists public.audit_logs (
   id uuid primary key default gen_random_uuid(),
