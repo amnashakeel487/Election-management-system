@@ -1,9 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { ensureElectionVotingReady } from '@/services/votingService'
 import { shouldEnsureVotingReady } from '@/utils/autoFinalizeVoterRoll'
-import type { Election } from '@/types/election'
-
-type ElectionSlice = Pick<Election, 'id' | 'status' | 'start_date' | 'end_date' | 'voter_roll_finalized_at'>
+type ElectionSlice = {
+  id: string
+  status: string
+  start_date: string
+  end_date: string
+  voter_roll_finalized_at: string | null
+}
 
 export interface UseEnsureVotingReadyWhenDueOptions {
   election: ElectionSlice | null | undefined

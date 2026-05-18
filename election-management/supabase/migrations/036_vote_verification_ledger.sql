@@ -7,6 +7,8 @@ create index if not exists anonymous_ballots_election_proof_hash_idx
   on public.anonymous_ballots (election_id, candidate_id)
   where voter_proof_hash is not null;
 
+create extension if not exists pgcrypto with schema extensions;
+
 create or replace function public._voter_vote_proof_hash(
   p_secret_voter_id text,
   p_election_id uuid
@@ -15,9 +17,11 @@ returns text
 language sql
 immutable
 parallel safe
+security definer
+set search_path = public, extensions
 as $$
   select encode(
-    digest(
+    extensions.digest(
       trim(upper(p_secret_voter_id)) || ':' || p_election_id::text,
       'sha256'
     ),

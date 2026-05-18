@@ -57,7 +57,12 @@ export function VotingPage() {
       electionData && new Date(electionData.start_date).getTime() <= Date.now()
 
     if (votingStarted) {
-      await ensureElectionVotingReady(electionId)
+      const ready = await ensureElectionVotingReady(electionId)
+      if (ready.error?.includes('migration')) {
+        setBlockMessage(ready.error)
+        setStep('blocked')
+        return
+      }
       electionData = await fetchElectionById(electionId)
     }
 

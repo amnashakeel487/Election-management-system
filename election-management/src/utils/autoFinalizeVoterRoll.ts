@@ -1,6 +1,9 @@
-import type { Election } from '@/types/election'
-
-type ElectionTiming = Pick<Election, 'status' | 'start_date' | 'end_date' | 'voter_roll_finalized_at'>
+type ElectionTiming = {
+  status: string
+  start_date: string
+  end_date: string
+  voter_roll_finalized_at?: string | null
+}
 
 /** Voting window has started for a published/active election. */
 export function isVotingWindowStarted(election: Pick<ElectionTiming, 'status' | 'start_date'>): boolean {
