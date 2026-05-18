@@ -1,9 +1,11 @@
 import { Link, useSearchParams } from 'react-router-dom'
+import { formatProofHashDisplay } from '@/utils/voteProofHash'
 
 export function VoterVoteSuccessPage() {
   const [params] = useSearchParams()
   const electionId = params.get('electionId') ?? ''
   const receipt = params.get('receipt') ?? ''
+  const verify = params.get('verify') ?? ''
 
   const shortReceipt =
     receipt.length > 18 ? `${receipt.slice(0, 12)}…${receipt.slice(-8)}` : receipt || '—'
@@ -25,6 +27,29 @@ export function VoterVoteSuccessPage() {
         </div>
         <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: 'var(--cyan)', letterSpacing: 1 }}>{shortReceipt}</div>
       </div>
+      {verify ? (
+        <div
+          style={{
+            background: 'rgba(16,185,129,0.08)',
+            border: '1px solid rgba(16,185,129,0.25)',
+            borderRadius: 12,
+            padding: '14px 20px',
+            marginBottom: 24,
+            textAlign: 'center',
+            maxWidth: 440,
+          }}
+        >
+          <div style={{ fontSize: 10, color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 5 }}>
+            Verification hash
+          </div>
+          <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, color: '#047857' }} title={verify}>
+            {formatProofHashDisplay(verify)}
+          </div>
+          <p style={{ fontSize: 11, color: 'var(--subtle)', marginTop: 8, lineHeight: 1.5 }}>
+            On the results page, use &ldquo;Find my vote&rdquo; with your secret ID to see this hash under your candidate.
+          </p>
+        </div>
+      ) : null}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
         {electionId ? (
           <Link to={`/voter/results/${electionId}`} className="btn btn-primary">
@@ -42,3 +67,4 @@ export function VoterVoteSuccessPage() {
     </div>
   )
 }
+

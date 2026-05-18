@@ -6,6 +6,7 @@ import { VoterRegistrationPanel } from '@/components/voter/VoterRegistrationPane
 import { Footer } from '@/components/layout/Footer'
 import { TopNavBar } from '@/components/layout/TopNavBar'
 import { useAuth } from '@/hooks/useAuth'
+import { useEnsureVotingReadyWhenDue } from '@/hooks/useEnsureVotingReadyWhenDue'
 import { fetchElectionById } from '@/services/electionService'
 import {
   fetchElectionRegistrationStats,
@@ -188,6 +189,20 @@ export function ElectionDetailsPage() {
     setStats(statsData)
     setUserRegistration(registration)
   }, [id, session?.user.id])
+
+  const reloadElection = useCallback(async () => {
+    if (!id) return
+    const data = await fetchElectionById(id)
+    if (!data || !['published', 'active'].includes(data.status)) return
+    setElection(data)
+    await loadRegistrationData()
+  }, [id, loadRegistrationData])
+
+  useEnsureVotingReadyWhenDue({
+    election,
+    enabled: Boolean(election),
+    onPrepared: () => reloadElection(),
+  })
 
   useEffect(() => {
     if (!id) return

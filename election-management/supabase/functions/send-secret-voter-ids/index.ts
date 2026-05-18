@@ -33,11 +33,18 @@ Deno.serve(async (req) => {
 
     const cronSecret = Deno.env.get('CRON_SECRET')
     const headerCron = req.headers.get('x-cron-secret')
-    const cronOk =
+    const authHeader = req.headers.get('Authorization')
+    const bearerToken = authHeader?.replace(/^Bearer\s+/i, '').trim() ?? ''
+    const isServiceRoleCall = bearerToken.length > 0 && bearerToken === serviceRoleKey
+
+    let cronOk =
       Boolean(cronSecret) &&
       (body.cron_secret === cronSecret || headerCron === cronSecret)
 
-    const authHeader = req.headers.get('Authorization')
+    if (isServiceRoleCall) {
+      cronOk = true
+    }
+
     const admin = createClient(supabaseUrl, serviceRoleKey)
 
     let user: { id: string } | null = null

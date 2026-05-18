@@ -72,16 +72,21 @@ Deno.serve(async (req) => {
     let emailResult: unknown = null
 
     if (finalized || (autoResult as { reason?: string })?.reason === 'already_finalized') {
+      const emailHeaders: Record<string, string> = {
+        Authorization: `Bearer ${serviceRoleKey}`,
+        'Content-Type': 'application/json',
+      }
+      if (cronSecret) {
+        emailHeaders['x-cron-secret'] = cronSecret
+      }
+
       const emailRes = await fetch(`${supabaseUrl}/functions/v1/send-secret-voter-ids`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${serviceRoleKey}`,
-          'Content-Type': 'application/json',
-        },
+        headers: emailHeaders,
         body: JSON.stringify({
           election_id: body.election_id,
           scope: 'all_pending',
-          cron_secret: cronSecret,
+          cron_secret: cronSecret ?? undefined,
         }),
       })
       emailResult = await emailRes.json()

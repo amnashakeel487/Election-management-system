@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ResultsExportToolbar } from '@/components/results/ResultsExportToolbar'
+import { VoteVerificationLedger } from '@/components/results/VoteVerificationLedger'
 import {
   RESULT_BAR_COLORS,
   RESULT_BAR_GRADIENTS,
@@ -289,6 +290,11 @@ export function CreatorResultsView({
               <p style={{ fontSize: 13, color: 'var(--subtle)' }}>No ballots recorded yet.</p>
             ) : null}
           </div>
+
+          <VoteVerificationLedger
+            electionId={electionId}
+            show={Boolean(results.polling_ended || results.results_locked_at)}
+          />
         </div>
 
         <div className="creator-results-side">

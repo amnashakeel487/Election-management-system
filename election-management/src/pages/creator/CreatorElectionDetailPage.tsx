@@ -10,6 +10,7 @@ import { removeCandidatePortrait } from '@/services/candidatePhotoService'
 import { deleteCreatorElection, fetchElectionById, removeCandidate } from '@/services/electionService'
 import { fetchElectionResults } from '@/services/resultsService'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
+import { useEnsureVotingReadyWhenDue } from '@/hooks/useEnsureVotingReadyWhenDue'
 import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import type { AuditLogEntry } from '@/types/auth'
 import type { Candidate, ElectionWithCandidates } from '@/types/election'
@@ -90,6 +91,12 @@ export function CreatorElectionDetailPage() {
   useEffect(() => {
     void load()
   }, [load])
+
+  useEnsureVotingReadyWhenDue({
+    election,
+    enabled: Boolean(election && !loading),
+    onPrepared: () => load(),
+  })
 
   async function handleDeleteCandidate(candidate: Candidate) {
     if (!election) return

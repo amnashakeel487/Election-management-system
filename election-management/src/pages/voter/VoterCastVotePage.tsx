@@ -52,7 +52,12 @@ export function VoterCastVotePage() {
     let electionData = await fetchElectionById(electionId)
 
     if (electionData && new Date(electionData.start_date).getTime() <= Date.now()) {
-      await ensureElectionVotingReady(electionId)
+      const ready = await ensureElectionVotingReady(electionId)
+      if (ready.error?.includes('migration')) {
+        setBlockMessage(ready.error)
+        setStep('blocked')
+        return
+      }
       electionData = await fetchElectionById(electionId)
     }
 
@@ -224,7 +229,10 @@ export function VoterCastVotePage() {
       clearVerifiedSession(electionId)
       void reloadDashboard()
       const receipt = result.receipt_hash ?? ''
-      navigate(`/voter/vote/success?electionId=${encodeURIComponent(electionId)}&receipt=${encodeURIComponent(receipt)}`)
+      const verify = result.verification_hash ?? ''
+      const qs = new URLSearchParams({ electionId, receipt })
+      if (verify) qs.set('verify', verify)
+      navigate(`/voter/vote/success?${qs.toString()}`)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to submit vote'
       setSubmitError(message)

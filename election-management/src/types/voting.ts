@@ -18,6 +18,7 @@ export interface VerifySecretVoterResult {
 export interface CastVoteResult {
   success: boolean
   receipt_hash?: string
+  verification_hash?: string
   cast_at?: string
 }
 

@@ -43,6 +43,7 @@ export function VotingPage() {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [receiptHash, setReceiptHash] = useState<string | null>(null)
+  const [verificationHash, setVerificationHash] = useState<string | null>(null)
 
   const [timeLeftMs, setTimeLeftMs] = useState(0)
   const [sessionLeftMs, setSessionLeftMs] = useState(0)
@@ -229,6 +230,7 @@ export function VotingPage() {
       clearVerifiedSession(electionId)
       setSecretVoterId(null)
       setReceiptHash(result.receipt_hash ?? null)
+      setVerificationHash(result.verification_hash ?? null)
       setStep('success')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to submit vote'
@@ -271,7 +273,13 @@ export function VotingPage() {
   }
 
   if (step === 'success') {
-    return <VotingSuccessView receiptHash={receiptHash} electionId={electionId} />
+    return (
+      <VotingSuccessView
+        receiptHash={receiptHash}
+        verificationHash={verificationHash}
+        electionId={electionId}
+      />
+    )
   }
 
   if (!election || !electionId) return null
