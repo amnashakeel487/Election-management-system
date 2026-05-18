@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { computeVoteProofHash, fetchVoteVerificationLedger } from '@/services/voteVerificationService'
+import { fetchVoteVerificationLedger } from '@/services/voteVerificationService'
 import type { VoteVerificationLedger as LedgerData } from '@/types/voteVerification'
-import { formatProofHashDisplay } from '@/utils/voteProofHash'
+import { maskSecretVoterIdHalf } from '@/utils/maskSecretVoterId'
 import '@/styles/vote-verification-ledger.css'
 
 export interface VoteVerificationLedgerProps {
@@ -14,9 +14,8 @@ export function VoteVerificationLedger({ electionId, show }: VoteVerificationLed
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [secretInput, setSecretInput] = useState('')
-  const [lookupHash, setLookupHash] = useState<string | null>(null)
+  const [lookupMask, setLookupMask] = useState<string | null>(null)
   const [lookupError, setLookupError] = useState<string | null>(null)
-  const [lookingUp, setLookingUp] = useState(false)
 
   useEffect(() => {
     if (!show || !electionId) return
@@ -38,24 +37,15 @@ export function VoteVerificationLedger({ electionId, show }: VoteVerificationLed
     }
   }, [electionId, show])
 
-  const handleLookup = useCallback(async () => {
+  const handleLookup = useCallback(() => {
     const trimmed = secretInput.trim()
     if (!trimmed) {
       setLookupError('Enter your secret voter ID')
       return
     }
-    setLookingUp(true)
     setLookupError(null)
-    try {
-      const hash = await computeVoteProofHash(electionId, trimmed)
-      setLookupHash(hash.toLowerCase())
-    } catch (err) {
-      setLookupHash(null)
-      setLookupError(err instanceof Error ? err.message : 'Could not compute verification hash')
-    } finally {
-      setLookingUp(false)
-    }
-  }, [electionId, secretInput])
+    setLookupMask(maskSecretVoterIdHalf(trimmed))
+  }, [secretInput])
 
   if (!show) return null
 
@@ -63,9 +53,10 @@ export function VoteVerificationLedger({ electionId, show }: VoteVerificationLed
     <div className="panel vv-ledger-panel" style={{ marginBottom: 20 }}>
       <div className="panel-head">
         <div>
-          <div className="panel-title">Vote verification ledger</div>
+          <div className="panel-title">Vote verification</div>
           <div className="panel-sub">
-            Hashed secret voter IDs per candidate â€” no names. Find your hash to confirm your vote.
+            Each candidate lists masked secret voter IDs (half hidden). Enter your full ID to highlight yours — no
+            names are shown.
           </div>
         </div>
       </div>
@@ -83,32 +74,35 @@ export function VoteVerificationLedger({ electionId, show }: VoteVerificationLed
               placeholder="Enter your secret voter ID"
               value={secretInput}
               onChange={(e) => setSecretInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleLookup()
+              }}
             />
-            <button type="button" className="vv-lookup-btn" disabled={lookingUp} onClick={() => void handleLookup()}>
-              {lookingUp ? 'â€¦' : 'Find my vote'}
+            <button type="button" className="vv-lookup-btn" onClick={handleLookup}>
+              Find my vote
             </button>
           </div>
           {lookupError ? <p className="vv-lookup-error">{lookupError}</p> : null}
-          {lookupHash ? (
+          {lookupMask ? (
             <p className="vv-lookup-hint">
-              Your verification hash: <code className="vv-hash-code">{formatProofHashDisplay(lookupHash)}</code>
-              <span className="vv-lookup-hint-sub"> â€” highlighted below under the candidate you chose.</span>
+              Your masked ID: <code className="vv-hash-code">{lookupMask}</code>
+              <span className="vv-lookup-hint-sub"> — look for this under the candidate you voted for.</span>
             </p>
           ) : null}
         </div>
 
         {loading ? (
-          <p className="vv-muted">Loading verification ledgerâ€¦</p>
+          <p className="vv-muted">Loading verification list…</p>
         ) : error ? (
           <p className="vv-error">{error}</p>
         ) : !ledger || ledger.candidates.length === 0 ? (
           <p className="vv-muted">No votes recorded yet.</p>
         ) : (
           <>
-            {ledger.legacy_ballots_without_hash > 0 ? (
+            {ledger.legacy_ballots_without_mask > 0 ? (
               <p className="vv-legacy-note">
-                {ledger.legacy_ballots_without_hash} older ballot(s) were cast before verification hashes were
-                enabled and are not listed here.
+                {ledger.legacy_ballots_without_mask} vote(s) were cast before masked IDs were recorded and are not
+                listed here. New votes will appear in the table below.
               </p>
             ) : null}
             <div className="vv-tables">
@@ -123,28 +117,29 @@ export function VoteVerificationLedger({ electionId, show }: VoteVerificationLed
                       {row.vote_count.toLocaleString()} vote{row.vote_count === 1 ? '' : 's'}
                     </div>
                   </div>
-                  {row.proof_hashes.length === 0 ? (
-                    <p className="vv-muted vv-empty">No verification hashes for this candidate.</p>
+                  {row.masked_secret_ids.length === 0 ? (
+                    <p className="vv-muted vv-empty">
+                      {row.vote_count > 0
+                        ? 'Votes for this candidate are not listed (cast before verification was enabled).'
+                        : 'No votes yet for this candidate.'}
+                    </p>
                   ) : (
                     <div className="vv-table-wrap">
                       <table className="vv-table">
                         <thead>
                           <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Hashed secret voter ID</th>
+                            <th scope="col">Masked secret voter ID</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {row.proof_hashes.map((hash, idx) => {
-                            const isMatch =
-                              lookupHash != null && hash.toLowerCase() === lookupHash.toLowerCase()
+                          {row.masked_secret_ids.map((masked, idx) => {
+                            const isMatch = lookupMask != null && masked === lookupMask
                             return (
-                              <tr key={`${hash}-${idx}`} className={isMatch ? 'vv-row--match' : undefined}>
+                              <tr key={`${masked}-${idx}`} className={isMatch ? 'vv-row--match' : undefined}>
                                 <td>{idx + 1}</td>
                                 <td>
-                                  <code className="vv-hash-code" title={hash}>
-                                    {formatProofHashDisplay(hash)}
-                                  </code>
+                                  <code className="vv-hash-code">{masked}</code>
                                   {isMatch ? <span className="vv-match-badge">Your vote</span> : null}
                                 </td>
                               </tr>
@@ -163,4 +158,3 @@ export function VoteVerificationLedger({ electionId, show }: VoteVerificationLed
     </div>
   )
 }
-
