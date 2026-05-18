@@ -1,16 +1,24 @@
 -- Notification module: delivery log + election milestone tracking
 
-create type public.notification_type as enum (
-  'email_verification',
-  'creator_approval',
-  'creator_rejection',
-  'secret_voter_id',
-  'election_start',
-  'election_end',
-  'winner'
-);
+do $$ begin
+  create type public.notification_type as enum (
+    'email_verification',
+    'creator_approval',
+    'creator_rejection',
+    'secret_voter_id',
+    'election_start',
+    'election_end',
+    'winner'
+  );
+exception
+  when duplicate_object then null;
+end $$;
 
-create type public.notification_status as enum ('pending', 'sent', 'failed', 'skipped');
+do $$ begin
+  create type public.notification_status as enum ('pending', 'sent', 'failed', 'skipped');
+exception
+  when duplicate_object then null;
+end $$;
 
 create table if not exists public.notification_logs (
   id uuid primary key default gen_random_uuid(),

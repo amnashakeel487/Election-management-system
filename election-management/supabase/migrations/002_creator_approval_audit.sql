@@ -1,6 +1,10 @@
 -- Creator approval status + audit logs
 
-create type public.approval_status as enum ('pending', 'approved', 'rejected');
+do $$ begin
+  create type public.approval_status as enum ('pending', 'approved', 'rejected');
+exception
+  when duplicate_object then null;
+end $$;
 
 alter table public.users
   add column if not exists approval_status public.approval_status not null default 'approved';

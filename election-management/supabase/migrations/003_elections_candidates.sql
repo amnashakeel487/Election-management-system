@@ -1,6 +1,10 @@
 -- Elections and candidates (election creators)
 
-create type public.election_status as enum ('draft', 'published', 'active', 'completed', 'archived');
+do $$ begin
+  create type public.election_status as enum ('draft', 'published', 'active', 'completed', 'archived');
+exception
+  when duplicate_object then null;
+end $$;
 
 create table if not exists public.elections (
   id uuid primary key default gen_random_uuid(),

@@ -1,6 +1,10 @@
 -- Voter registrations with waitlist support
 
-create type public.voter_registration_status as enum ('registered', 'waitlisted');
+do $$ begin
+  create type public.voter_registration_status as enum ('registered', 'waitlisted');
+exception
+  when duplicate_object then null;
+end $$;
 
 create table if not exists public.voter_registrations (
   id uuid primary key default gen_random_uuid(),

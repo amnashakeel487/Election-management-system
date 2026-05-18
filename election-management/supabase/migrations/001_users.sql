@@ -1,7 +1,11 @@
 -- FortressVote: public.users profile table + RLS
 -- Run in Supabase SQL Editor (enable email confirmation in Auth settings).
 
-create type public.user_role as enum ('admin', 'election_creator', 'voter');
+do $$ begin
+  create type public.user_role as enum ('admin', 'election_creator', 'voter');
+exception
+  when duplicate_object then null;
+end $$;
 
 create table if not exists public.users (
   id uuid primary key references auth.users (id) on delete cascade,
@@ -16,6 +20,10 @@ create index if not exists users_email_idx on public.users (email);
 create index if not exists users_role_idx on public.users (role);
 
 alter table public.users enable row level security;
+
+drop policy if exists "Users can read own profile" on public.users;
+drop policy if exists "Users can update own profile" on public.users;
+drop policy if exists "Users can insert own profile on signup" on public.users;
 
 create policy "Users can read own profile"
   on public.users

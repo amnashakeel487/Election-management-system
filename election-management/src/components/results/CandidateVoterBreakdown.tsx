@@ -88,8 +88,8 @@ export function CandidateVoterBreakdown({
           <>
             {ledger && ledger.legacy_ballots_without_mask > 0 ? (
               <p className="cvb-legacy-note">
-                {ledger.legacy_ballots_without_mask} vote(s) were cast before voter IDs were recorded and are not
-                listed below.
+                {ledger.legacy_ballots_without_mask} vote(s) cannot show masked IDs (cast before this feature, or
+                votes split across multiple candidates). New votes will appear here automatically.
               </p>
             ) : null}
             <div className="cvb-list">
@@ -152,7 +152,7 @@ export function CandidateVoterBreakdown({
                         {row.maskedVoterIds.length === 0 ? (
                           <p className="cvb-muted">
                             {row.vote_count > 0
-                              ? 'Votes exist but masked IDs are not on record for this candidate.'
+                              ? 'Votes are recorded but masked voter IDs are not available for this candidate (older ballot or votes on multiple candidates).'
                               : 'No votes for this candidate yet.'}
                           </p>
                         ) : (
