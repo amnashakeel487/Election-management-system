@@ -4,6 +4,9 @@ project_id = "prxgnpcolmfucunotcil"
 [functions.send-secret-voter-ids]
 verify_jwt = true
 
+[functions.ensure-election-voting-ready]
+verify_jwt = true
+
 [functions.send-creator-approval-notification]
 verify_jwt = true
 

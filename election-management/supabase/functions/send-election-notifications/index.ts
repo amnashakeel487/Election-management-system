@@ -201,9 +201,37 @@ Deno.serve(async (req) => {
       })
     } else {
       if (!election.voter_roll_finalized_at && body.milestone === 'election_start') {
-        return new Response(JSON.stringify({ error: 'Voter roll not finalized' }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        const { data: autoResult, error: autoError } = await admin.rpc(
+          'maybe_auto_finalize_election_voter_roll',
+          { p_election_id: body.election_id },
+        )
+        if (autoError) {
+          return new Response(JSON.stringify({ error: autoError.message }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+        const finalized = Boolean(
+          autoResult && typeof autoResult === 'object' && (autoResult as { finalized?: boolean }).finalized,
+        )
+        if (!finalized) {
+          return new Response(JSON.stringify({ error: 'Voter roll not finalized' }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          })
+        }
+        election.voter_roll_finalized_at = new Date().toISOString()
+        await fetch(`${supabaseUrl}/functions/v1/send-secret-voter-ids`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${serviceRoleKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            election_id: body.election_id,
+            scope: 'all_pending',
+            cron_secret: cronSecret,
+          }),
         })
       }
 

@@ -3,7 +3,6 @@ import { CreatorApprovalBanner } from '@/components/creator/CreatorApprovalBanne
 import { CreatorDashboardLiveSection } from '@/components/creator/CreatorDashboardLiveSection'
 import { CreatorDashboardStatsGrid } from '@/components/creator/CreatorDashboardStatsGrid'
 import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader'
-import { DashboardWidgetsRow } from '@/components/common/DashboardWidgetsRow'
 import { useCreatorDashboardStats } from '@/hooks/useCreatorDashboardStats'
 import { useCreatorPageMeta } from '@/hooks/useCreatorI18n'
 import { useAuth } from '@/hooks/useAuth'
@@ -26,8 +25,6 @@ export function CreatorDashboardPage() {
     <>
       <CreatorApprovalBanner />
       <CreatorPageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
-
-      <DashboardWidgetsRow />
 
       {statsError ? (
         <p style={{ fontSize: 12, color: 'var(--danger)', marginBottom: 12 }}>

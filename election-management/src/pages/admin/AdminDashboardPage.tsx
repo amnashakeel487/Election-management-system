@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader'
-import { DashboardWidgetsRow } from '@/components/common/DashboardWidgetsRow'
 import { ADMIN_PAGE_META } from '@/config/adminNav'
 import { useAdminApproval } from '@/hooks/useAdminApproval'
 import { useAuth } from '@/hooks/useAuth'
@@ -187,8 +186,6 @@ export function AdminDashboardPage() {
   return (
     <>
       <AdminPageHeader eyebrow={meta.eyebrow} title={meta.title} subtitle={meta.subtitle} />
-
-      <DashboardWidgetsRow />
 
       {actionNotice ? <div className="alert alert-success">{actionNotice}</div> : null}
       {actionError || statsError ? (

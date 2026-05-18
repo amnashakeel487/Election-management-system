@@ -125,6 +125,26 @@ export async function fetchElectionVotingStatus(electionId: string): Promise<Ele
   return data as ElectionVotingStatus
 }
 
+/** When voting window has started, auto-finalize roll and email secret IDs if needed. */
+export async function ensureElectionVotingReady(electionId: string): Promise<void> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session?.access_token) return
+
+  const { error } = await supabase.functions.invoke('ensure-election-voting-ready', {
+    body: { election_id: electionId },
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  })
+
+  if (error) {
+    console.warn('ensure-election-voting-ready:', error.message)
+  }
+}
+
 export async function castAnonymousVote(
   electionId: string,
   secretVoterId: string,

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { VoterPageHeader } from '@/components/voter/VoterPageHeader'
-import { DashboardWidgetsRow } from '@/components/common/DashboardWidgetsRow'
 import { useAuth } from '@/hooks/useAuth'
 import { useVoterDashboard } from '@/hooks/useVoterDashboard'
 import { electionDisplayStatus } from '@/utils/dashboardDisplay'
@@ -64,8 +63,6 @@ export function VoterHomePage() {
         title={`Welcome back, ${displayName} 👋`}
         subtitle="Your democratic journey — all elections in one place"
       />
-
-      <DashboardWidgetsRow />
 
       {liveVoteCount > 0 ? (
         <div className="hero-banner">

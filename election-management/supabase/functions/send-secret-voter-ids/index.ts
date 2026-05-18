@@ -3,13 +3,14 @@ import { getBrevoApiKey, sendBrevoEmail } from './brevo.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cron-secret',
 }
 
 interface RequestBody {
   election_id: string
   /** all_pending: creator batch (default). self: current voter only. */
   scope?: 'all_pending' | 'self'
+  cron_secret?: string
 }
 
 Deno.serve(async (req) => {
@@ -22,31 +23,6 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const brevoConfigured = Boolean(getBrevoApiKey())
 
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Missing authorization' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
-
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
-    const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
-    })
-
-    const {
-      data: { user },
-      error: userError,
-    } = await userClient.auth.getUser()
-
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
-
     const body = (await req.json()) as RequestBody
     if (!body.election_id) {
       return new Response(JSON.stringify({ error: 'election_id is required' }), {
@@ -55,7 +31,44 @@ Deno.serve(async (req) => {
       })
     }
 
+    const cronSecret = Deno.env.get('CRON_SECRET')
+    const headerCron = req.headers.get('x-cron-secret')
+    const cronOk =
+      Boolean(cronSecret) &&
+      (body.cron_secret === cronSecret || headerCron === cronSecret)
+
+    const authHeader = req.headers.get('Authorization')
     const admin = createClient(supabaseUrl, serviceRoleKey)
+
+    let user: { id: string } | null = null
+
+    if (!cronOk) {
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: 'Missing authorization' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
+      })
+
+      const {
+        data: { user: authUser },
+        error: userError,
+      } = await userClient.auth.getUser()
+
+      if (userError || !authUser) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      user = authUser
+    }
 
     const { data: election, error: electionError } = await admin
       .from('elections')
@@ -72,11 +85,11 @@ Deno.serve(async (req) => {
 
     const scope = body.scope ?? 'all_pending'
 
-    if (scope !== 'self' && election.creator_id !== user.id) {
+    if (!cronOk && scope !== 'self' && election.creator_id !== user!.id) {
       const { data: profile } = await admin
         .from('users')
         .select('role')
-        .eq('id', user.id)
+        .eq('id', user!.id)
         .single()
 
       if (profile?.role !== 'admin') {
@@ -87,11 +100,30 @@ Deno.serve(async (req) => {
       }
     }
 
+    if (!cronOk && scope === 'self' && user) {
+      /* voter self-resend — allowed */
+    }
+
     if (!election.voter_roll_finalized_at) {
-      return new Response(JSON.stringify({ error: 'Voter roll is not finalized yet' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      const { data: autoResult, error: autoError } = await admin.rpc(
+        'maybe_auto_finalize_election_voter_roll',
+        { p_election_id: body.election_id },
+      )
+      if (autoError) {
+        return new Response(JSON.stringify({ error: autoError.message }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      const finalized = Boolean(
+        autoResult && typeof autoResult === 'object' && (autoResult as { finalized?: boolean }).finalized,
+      )
+      if (!finalized) {
+        return new Response(JSON.stringify({ error: 'Voter roll is not finalized yet' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
     }
 
     type RegRow = {
@@ -104,6 +136,12 @@ Deno.serve(async (req) => {
     let registrations: RegRow[] = []
 
     if (scope === 'self') {
+      if (!user) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
       const { data: selfReg, error: selfRegError } = await admin
         .from('voter_registrations')
         .select('id, user_id, secret_voter_id, secret_voter_id_emailed_at')

@@ -60,6 +60,34 @@ Deno.serve(async (req) => {
     }
 
     const admin = createClient(supabaseUrl, serviceRoleKey)
+
+    const { data: emailPending, error: emailPendingError } = await admin.rpc(
+      'get_elections_pending_secret_voter_id_emails',
+    )
+    if (emailPendingError) {
+      return new Response(JSON.stringify({ error: emailPendingError.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    const secretIdEmailResults: unknown[] = []
+    for (const e of (emailPending ?? []) as ElectionRef[]) {
+      const invokeRes = await fetch(`${supabaseUrl}/functions/v1/send-secret-voter-ids`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${serviceRoleKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          election_id: e.id,
+          scope: 'all_pending',
+          cron_secret: cronSecret,
+        }),
+      })
+      secretIdEmailResults.push({ election_id: e.id, title: e.title, ...(await invokeRes.json()) })
+    }
+
     const { data: pending, error } = await admin.rpc('get_elections_pending_notifications')
     if (error) {
       return new Response(JSON.stringify({ error: error.message }), {
@@ -95,7 +123,7 @@ Deno.serve(async (req) => {
       results[milestone] = milestoneResults
     }
 
-    return new Response(JSON.stringify({ processed: results }), {
+    return new Response(JSON.stringify({ secret_voter_id_emails: secretIdEmailResults, processed: results }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (err) {
