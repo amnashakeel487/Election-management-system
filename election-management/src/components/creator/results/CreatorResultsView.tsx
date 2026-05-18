@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ResultsExportToolbar } from '@/components/results/ResultsExportToolbar'
-import { VoteVerificationLedger } from '@/components/results/VoteVerificationLedger'
+import { CandidateVoterBreakdown } from '@/components/results/CandidateVoterBreakdown'
 import {
   RESULT_BAR_COLORS,
   RESULT_BAR_GRADIENTS,
@@ -291,9 +291,18 @@ export function CreatorResultsView({
             ) : null}
           </div>
 
-          <VoteVerificationLedger
+          <CandidateVoterBreakdown
             electionId={electionId}
+            electionTitle={results.title}
             show={Boolean(results.polling_ended || results.results_locked_at)}
+            candidates={rows.map((r) => ({
+              candidate_id: r.candidate_id,
+              name: r.name,
+              description: r.description,
+              designation: r.designation,
+              sort_order: r.sort_order,
+              vote_count: r.vote_count,
+            }))}
           />
         </div>
 

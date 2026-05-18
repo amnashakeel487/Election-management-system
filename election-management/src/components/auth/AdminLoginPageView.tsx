@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type FormEvent } from 'react'
+import { useCallback, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
@@ -6,52 +6,34 @@ import { isRoleMismatchError } from '@/lib/errors/roleMismatch'
 import { parseOrThrow, signInSchema } from '@/lib/validation/schemas'
 import { TurnstileCaptcha } from '@/components/security/TurnstileCaptcha'
 import { turnstileConfigured, verifyCaptchaToken } from '@/services/securityService'
-import type { UserRole } from '@/types/auth'
 import { safeReturnPathForRole } from '@/utils/safeReturnPath'
-import { AuthRoleCards, type AuthRoleOption } from './AuthRoleCards'
 import { AuthSplitChrome } from './AuthSplitChrome'
 import { AUTH_CAPTCHA_LOGO } from '@/constants/authAssets'
 
 const inputClass =
   'sp-input w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-white pl-9 pr-3 text-[13px] text-slate-900 outline-none transition-all placeholder:text-slate-300 focus:border-[#2451A3] focus:shadow-[0_0_0_3px_rgba(36,81,163,0.1)]'
 
-export function LoginPageView() {
+export function AdminLoginPageView() {
   const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const location = useLocation()
   const { signIn } = useAuth()
-  const returnTo = (location.state as { from?: string; message?: string } | null)?.from
+  const returnTo = (location.state as { from?: string } | null)?.from
   const flashMessage = (location.state as { message?: string } | null)?.message
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [loginAsRole, setLoginAsRole] = useState<UserRole>('voter')
   const [showPassword, setShowPassword] = useState(false)
   const [botChecked, setBotChecked] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const loginRoleOptions = useMemo(
-    (): readonly AuthRoleOption[] => [
-      { value: 'voter', title: t('roles.voter'), sub: t('loginForm.roleVoterSub'), icon: 'groups' },
-      {
-        value: 'election_creator',
-        title: t('roles.election_creator'),
-        sub: t('loginForm.roleCreatorSub'),
-        icon: 'edit_square',
-      },
-    ],
-    [t],
-  )
-
   const footerItems = [
     { icon: 'lock', label: t('loginForm.footerSsl') },
-    { icon: 'shield', label: t('loginForm.footerRole') },
+    { icon: 'shield', label: t('adminLogin.footerRestricted') },
     { icon: 'verified', label: t('loginForm.footerMfa') },
   ]
-
-  const roleLabel = useCallback((role: UserRole) => t(`roles.${role}`), [t])
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -72,16 +54,11 @@ export function LoginPageView() {
         }
 
         setSubmitting(true)
-        const dashboardPath = await signIn({ ...credentials, loginAsRole })
-        navigate(safeReturnPathForRole(returnTo ?? dashboardPath, loginAsRole), { replace: true })
+        const dashboardPath = await signIn({ ...credentials, loginAsRole: 'admin' })
+        navigate(safeReturnPathForRole(returnTo ?? dashboardPath, 'admin'), { replace: true })
       } catch (err) {
         if (isRoleMismatchError(err)) {
-          setError(
-            t('loginForm.roleMismatch', {
-              selected: roleLabel(err.attemptedRole),
-              registered: roleLabel(err.registeredRole),
-            }),
-          )
+          setError(t('adminLogin.notAdminAccount'))
           return
         }
         const message = err instanceof Error ? err.message : t('signInFailed')
@@ -97,38 +74,21 @@ export function LoginPageView() {
         setSubmitting(false)
       }
     },
-    [botChecked, captchaToken, email, loginAsRole, password, roleLabel, signIn, navigate, returnTo, t],
+    [botChecked, captchaToken, email, password, signIn, navigate, returnTo, t],
   )
 
   return (
     <AuthSplitChrome variant="login">
       <div className="sp-form-card">
-        <div className="sp-form-card-header sp-form-card-header--compact relative overflow-hidden bg-gradient-to-br from-[#0F2347] via-[#1B3A6B] to-[#2D1B69]">
-          <div className="pointer-events-none absolute -right-10 -top-16 h-[100px] w-[100px] rounded-full bg-purple-500/30 blur-[30px]" />
+        <div className="sp-form-card-header sp-form-card-header--compact relative overflow-hidden bg-gradient-to-br from-[#1a0a2e] via-[#2D1B69] to-[#0F2347]">
+          <div className="pointer-events-none absolute -right-10 -top-16 h-[100px] w-[100px] rounded-full bg-amber-500/20 blur-[30px]" />
           <div className="relative z-[1]">
-            <div className="sp-header-tabs flex rounded-[10px] bg-black/20 p-1">
-              <span className="flex-1 rounded-lg bg-white/[0.14] py-1.5 text-center text-[12px] font-semibold text-white shadow-md">
-                {t('loginForm.tabSignIn')}
-              </span>
-              <Link
-                to="/register"
-                className="flex-1 rounded-lg py-1.5 text-center text-[12px] font-semibold text-white/45 transition-all hover:text-white/80"
-              >
-                {t('loginForm.tabCreate')}
-              </Link>
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-200">
+              <span className="material-symbols-outlined text-[14px]">admin_panel_settings</span>
+              {t('adminLogin.badge')}
             </div>
-            <h2 className="mb-0.5 mt-3 text-lg font-extrabold tracking-tight text-white">{t('loginForm.welcomeBack')}</h2>
-            <p className="text-[12px] text-white/50">{t('loginForm.welcomeSub')}</p>
-            <div className="sp-form-stepper mt-2.5">
-              <div className="flex gap-1">
-                <div className="h-0.5 flex-1 overflow-hidden rounded-sm bg-white/15">
-                  <div className="h-full w-full rounded-sm bg-cyan-400" />
-                </div>
-                <div className="h-0.5 flex-1 overflow-hidden rounded-sm bg-white/15">
-                  <div className="h-full w-[40%] rounded-sm bg-cyan-400" />
-                </div>
-              </div>
-            </div>
+            <h2 className="mb-0.5 text-lg font-extrabold tracking-tight text-white">{t('adminLogin.title')}</h2>
+            <p className="text-[12px] text-white/50">{t('adminLogin.subtitle')}</p>
           </div>
         </div>
 
@@ -145,16 +105,9 @@ export function LoginPageView() {
               </p>
             ) : null}
 
-            <p className="sp-form-hint sp-mb-section rounded-lg border border-[#E2E8F0] bg-slate-50/90 px-2.5 py-1.5 text-[11px] leading-snug text-slate-600">
-              {t('loginForm.hint')}
+            <p className="sp-form-hint sp-mb-section rounded-lg border border-amber-200/80 bg-amber-50/90 px-2.5 py-1.5 text-[11px] leading-snug text-amber-950">
+              {t('adminLogin.hint')}
             </p>
-
-            <div className="sp-mb-section">
-              <p className="sp-label mb-2 text-[10px] font-bold uppercase tracking-[0.07em] text-slate-500">
-                {t('loginForm.signInAs')}
-              </p>
-              <AuthRoleCards value={loginAsRole} onChange={setLoginAsRole} options={loginRoleOptions} columns={2} />
-            </div>
 
             <div className="sp-mb-field">
               <label className="sp-label flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.07em] text-slate-500">
@@ -234,17 +187,16 @@ export function LoginPageView() {
             <button
               type="submit"
               disabled={submitting}
-              className="sp-btn-submit relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl border-0 bg-gradient-to-br from-[#1B3A6B] to-[#6C3FC5] py-3 text-[13px] font-bold text-white transition-all hover:-translate-y-0.5 disabled:opacity-60"
+              className="sp-btn-submit relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl border-0 bg-gradient-to-br from-[#1a0a2e] to-[#6C3FC5] py-3 text-[13px] font-bold text-white transition-all hover:-translate-y-0.5 disabled:opacity-60"
             >
               <span className="sp-submit-shimmer" />
-              <span className="material-symbols-outlined text-[16px]">login</span>
-              {submitting ? t('signingIn') : t('loginForm.secureSignIn')}
+              <span className="material-symbols-outlined text-[16px]">admin_panel_settings</span>
+              {submitting ? t('signingIn') : t('adminLogin.submit')}
             </button>
 
-            <p className="mt-2 text-center text-[11px] text-slate-400">
-              {t('loginForm.newHere')}{' '}
-              <Link to="/register" className="font-bold text-[#2451A3] no-underline hover:underline">
-                {t('loginForm.createAnAccount')}
+            <p className="mt-3 text-center text-[11px] text-slate-400">
+              <Link to="/login" className="font-bold text-[#2451A3] no-underline hover:underline">
+                {t('adminLogin.backToPublicLogin')}
               </Link>
             </p>
           </form>
@@ -262,3 +214,4 @@ export function LoginPageView() {
     </AuthSplitChrome>
   )
 }
+

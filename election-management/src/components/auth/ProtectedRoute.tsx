@@ -7,12 +7,15 @@ interface ProtectedRouteProps {
   children: React.ReactNode
   allowedRoles?: UserRole[]
   requireVerifiedEmail?: boolean
+  /** Where to send unauthenticated users (default /login). */
+  loginPath?: string
 }
 
 export function ProtectedRoute({
   children,
   allowedRoles,
   requireVerifiedEmail = true,
+  loginPath = '/login',
 }: ProtectedRouteProps) {
   const { session, profile, authReady, initError, emailVerified, mfaRequired, getDashboardPath } = useAuth()
   const location = useLocation()
@@ -35,7 +38,7 @@ export function ProtectedRoute({
 
   if (!session || !profile) {
     const returnPath = `${location.pathname}${location.search}${location.hash}`
-    return <Navigate to="/login" replace state={{ from: returnPath }} />
+    return <Navigate to={loginPath} replace state={{ from: returnPath }} />
   }
 
   if (mfaRequired) {

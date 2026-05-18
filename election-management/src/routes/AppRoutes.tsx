@@ -6,6 +6,8 @@ import { RecoveryRoute } from '@/components/auth/RecoveryRoute'
 import { VerifyEmailRoute } from '@/components/auth/VerifyEmailRoute'
 import { BrowseElectionsPage } from '@/pages/BrowseElectionsPage'
 import { HomePage } from '@/pages/HomePage'
+import { AdminGuestRoute } from '@/components/auth/AdminGuestRoute'
+import { AdminLoginPage } from '@/pages/AdminLoginPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { RegisterPage } from '@/pages/RegisterPage'
 import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage'
@@ -85,6 +87,14 @@ export function AppRoutes() {
         }
       />
       <Route
+        path="/admin-login"
+        element={
+          <AdminGuestRoute>
+            <AdminLoginPage />
+          </AdminGuestRoute>
+        }
+      />
+      <Route
         path="/register"
         element={
           <GuestRoute>
@@ -139,7 +149,7 @@ export function AppRoutes() {
       <Route
         path="/admin"
         element={
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={['admin']} loginPath="/admin-login">
             <AdminLayout />
           </ProtectedRoute>
         }

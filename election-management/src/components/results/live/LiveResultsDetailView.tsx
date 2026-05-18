@@ -25,7 +25,7 @@ import {
   rankClass,
   splitCountdownParts,
 } from '@/utils/liveResultsUi'
-import { VoteVerificationLedger } from '@/components/results/VoteVerificationLedger'
+import { CandidateVoterBreakdown } from '@/components/results/CandidateVoterBreakdown'
 import '@/styles/live-results.css'
 
 const FEED_ICON_CLASSES = ['green', 'orange', 'blue', 'purple', 'cyan', 'green', 'blue'] as const
@@ -735,10 +735,14 @@ export function LiveResultsDetailView({ electionId, embeddedIn }: LiveResultsDet
           </div>
         ) : null}
 
-        <VoteVerificationLedger
-          electionId={electionId}
-          show={Boolean(results && (results.polling_ended || results.results_locked_at))}
-        />
+        {results ? (
+          <CandidateVoterBreakdown
+            electionId={electionId}
+            electionTitle={results.title}
+            show={Boolean(results.polling_ended || results.results_locked_at)}
+            candidates={sorted}
+          />
+        ) : null}
 
 
         <div className="panel">

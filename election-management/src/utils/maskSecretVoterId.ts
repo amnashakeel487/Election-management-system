@@ -5,10 +5,16 @@ export function maskSecretVoterId(secretVoterId: string): string {
   return `****${trimmed.slice(-4)}`
 }
 
-/** Half visible / half hidden — matches DB _mask_secret_voter_id_display */
-export function maskSecretVoterIdHalf(secretVoterId: string): string {
-  const t = secretVoterId.trim().toUpperCase()
-  if (t.length <= 4) return '****'
-  const visible = Math.ceil(t.length / 2)
-  return t.slice(0, visible) + '*'.repeat(t.length - visible)
+/**
+ * Public results / export: show only last 4 characters.
+ * Example: VOTER12345678 → ********5678
+ */
+export function maskSecretVoterIdForDisplay(value: string): string {
+  const t = value.trim().toUpperCase()
+  if (!t) return '********'
+  if (/^\*+[A-Z0-9-]{1,4}$/.test(t) && t.length >= 5) {
+    return t
+  }
+  const last4 = t.replace(/\*/g, '').slice(-4) || t.slice(-4)
+  return `${'*'.repeat(8)}${last4}`
 }
