@@ -31,9 +31,11 @@ export function CreatorElectionDetailPage() {
   const [deletingCandidateId, setDeletingCandidateId] = useState<string | null>(null)
   const [deletingElection, setDeletingElection] = useState(false)
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (options?: { silent?: boolean }) => {
     if (!id) return
-    setLoading(true)
+    if (!options?.silent) {
+      setLoading(true)
+    }
     setError(null)
     try {
       const data = await fetchElectionById(id)
@@ -86,15 +88,27 @@ export function CreatorElectionDetailPage() {
     }
   }, [id, profile?.id, profile?.role, setSelectedId])
 
+  const refreshElection = useCallback(
+    async (silent = true) => {
+      await load({ silent })
+    },
+    [load],
+  )
+
   useEffect(() => {
     void load()
   }, [load])
 
-  const { stepLabel, isPreparing } = useCheckAndFinalizeElection({
+  const { isPreparing } = useCheckAndFinalizeElection({
     electionId: election?.id,
     election: election ?? undefined,
     enabled: Boolean(election && !loading),
-    onComplete: () => load(),
+    poll: false,
+    onComplete: async (result) => {
+      if (result.success || result.finalized || result.emailed) {
+        await refreshElection(true)
+      }
+    },
   })
 
   async function handleDeleteCandidate(candidate: Candidate) {
@@ -172,10 +186,7 @@ export function CreatorElectionDetailPage() {
 
   return (
     <>
-      <ElectionRollStatusPanel
-        election={election}
-        finalizeStepLabel={isPreparing ? stepLabel : undefined}
-      />
+      <ElectionRollStatusPanel election={election} busy={isPreparing} />
       <CreatorElectionDetailView
       election={election}
       stats={stats}

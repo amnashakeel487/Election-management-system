@@ -16,6 +16,8 @@ export interface UseCheckAndFinalizeElectionOptions {
   } | null
   enabled?: boolean
   pollMs?: number
+  /** When false, only runs once per mount (avoids creator detail page flicker). */
+  poll?: boolean
   onComplete?: (result: CheckAndFinalizeResult) => void | Promise<void>
 }
 
@@ -34,11 +36,14 @@ export function useCheckAndFinalizeElection({
   election,
   enabled = true,
   pollMs = 30_000,
+  poll = true,
   onComplete,
 }: UseCheckAndFinalizeElectionOptions) {
   const [step, setStep] = useState<FinalizeProgressStep>('idle')
   const [result, setResult] = useState<CheckAndFinalizeResult | null>(null)
   const runningRef = useRef(false)
+  const onCompleteRef = useRef(onComplete)
+  onCompleteRef.current = onComplete
 
   const run = useCallback(async () => {
     if (!electionId || runningRef.current) return null
@@ -48,12 +53,12 @@ export function useCheckAndFinalizeElection({
       const out = await checkAndFinalizeElection(electionId)
       setResult(out)
       setStep(out.step)
-      await onComplete?.(out)
+      await onCompleteRef.current?.(out)
       return out
     } finally {
       runningRef.current = false
     }
-  }, [electionId, onComplete])
+  }, [electionId])
 
   useEffect(() => {
     if (!enabled || !electionId) return
@@ -69,6 +74,12 @@ export function useCheckAndFinalizeElection({
       if (cancelled) return
       await run()
     })()
+
+    if (!poll || pollMs <= 0) {
+      return () => {
+        cancelled = true
+      }
+    }
 
     const id = window.setInterval(() => {
       if (cancelled || runningRef.current) return
@@ -86,6 +97,7 @@ export function useCheckAndFinalizeElection({
     election?.start_date,
     election?.end_date,
     election?.voter_roll_finalized_at,
+    poll,
     pollMs,
     run,
   ])

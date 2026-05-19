@@ -311,7 +311,14 @@ export function VoterCastVotePage() {
   }
 
   if (step === 'blocked') {
-    return <VotingBlockedView message={blockMessage} electionId={electionId} opensInMs={blockOpensInMs} />
+    return (
+      <VotingBlockedView
+        embedded
+        message={blockMessage}
+        electionId={electionId}
+        opensInMs={blockOpensInMs}
+      />
+    )
   }
 
   if (!election || !electionId) return null

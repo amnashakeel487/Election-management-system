@@ -33,6 +33,9 @@ export function useEnsureVotingReadyWhenDue({
 }: UseEnsureVotingReadyWhenDueOptions): void {
   const preparingRef = useRef(false)
 
+  const onPreparedRef = useRef(onPrepared)
+  onPreparedRef.current = onPrepared
+
   useEffect(() => {
     if (!enabled || !election?.id) return
     if (!shouldEnsureVotingReady(election)) return
@@ -47,7 +50,7 @@ export function useEnsureVotingReadyWhenDue({
         const result = await checkAndFinalizeElection(electionId)
         if (cancelled) return
         if (result.success || result.finalized || result.emailed) {
-          await onPrepared?.()
+          await onPreparedRef.current?.()
         }
       } finally {
         preparingRef.current = false
@@ -72,7 +75,6 @@ export function useEnsureVotingReadyWhenDue({
     election?.start_date,
     election?.end_date,
     election?.voter_roll_finalized_at,
-    onPrepared,
     pollMs,
   ])
 }
@@ -84,6 +86,8 @@ export function useEnsureDueElectionsPrepared(
   pollMs = 15_000,
 ): void {
   const preparingRef = useRef(false)
+  const onPreparedRef = useRef(onPrepared)
+  onPreparedRef.current = onPrepared
   const dueKey = registrations
     .filter(registrationNeedsVotingPrep)
     .map(
@@ -118,7 +122,7 @@ export function useEnsureDueElectionsPrepared(
           }
         }
         if (changed && !cancelled) {
-          await onPrepared?.()
+          await onPreparedRef.current?.()
         }
       } finally {
         preparingRef.current = false
@@ -135,5 +139,5 @@ export function useEnsureDueElectionsPrepared(
       cancelled = true
       window.clearInterval(intervalId)
     }
-  }, [dueKey, onPrepared, pollMs])
+  }, [dueKey, pollMs])
 }

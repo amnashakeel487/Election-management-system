@@ -34,16 +34,8 @@ function deriveCreatorPhase(
     return 'secret_ids_generated'
   }
 
-  if (
-    isVotingWindowStarted(election) &&
-    !readiness?.ready_for_voting &&
-    !election.voter_roll_finalized_at
-  ) {
-    return 'finalizing'
-  }
-
   if (election.registration_locked_at || election.voter_roll_finalized_at) {
-    return 'registration_locked'
+    return isVotingWindowStarted(election) ? 'voting_active' : 'registration_locked'
   }
 
   return 'registration_open'
@@ -60,10 +52,10 @@ const PHASE_LABELS: Record<CreatorRollUiPhase, string> = {
 
 export interface ElectionRollStatusPanelProps {
   election: ElectionWithCandidates
-  finalizeStepLabel?: string
+  busy?: boolean
 }
 
-export function ElectionRollStatusPanel({ election, finalizeStepLabel }: ElectionRollStatusPanelProps) {
+export function ElectionRollStatusPanel({ election, busy }: ElectionRollStatusPanelProps) {
   const [readiness, setReadiness] = useState<ElectionRollReadiness | null>(null)
 
   useEffect(() => {
@@ -94,10 +86,10 @@ export function ElectionRollStatusPanel({ election, finalizeStepLabel }: Electio
         <div style={{ fontWeight: 700, marginBottom: 8 }}>Voter roll status</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
           <span className="badge b-active">{label}</span>
-          {election.voter_roll_finalized_at ? (
-            <span className="badge b-voted">Roll finalized</span>
+          {election.registration_locked_at || election.voter_roll_finalized_at ? (
+            <span className="badge b-voted">Registration closed</span>
           ) : (
-            <span className="badge b-pending">Roll not finalized</span>
+            <span className="badge b-pending">Registration open</span>
           )}
           {readiness?.secret_ids_generated || election.secret_ids_generated ? (
             <span className="badge b-voted">IDs generated</span>
@@ -106,15 +98,13 @@ export function ElectionRollStatusPanel({ election, finalizeStepLabel }: Electio
             <span className="badge b-pending">{readiness?.emails_pending} emails pending</span>
           ) : null}
         </div>
-        {finalizeStepLabel ? (
-          <p style={{ color: 'var(--muted)', margin: 0, fontSize: 12 }}>{finalizeStepLabel}</p>
-        ) : null}
-        {phase === 'finalizing' ? (
-          <p style={{ color: 'var(--muted)', margin: finalizeStepLabel ? '8px 0 0' : 0, fontSize: 12 }}>
-            Voting time has started. The system will auto-finalize the roll, assign secret IDs, and email
-            voters. This runs automatically — no manual finalize required.
+        {busy ? (
+          <p style={{ color: 'var(--muted)', margin: 0, fontSize: 12 }}>Updating status…</p>
+        ) : (
+          <p style={{ color: 'var(--muted)', margin: 0, fontSize: 12 }}>
+            Secret voter IDs are emailed when voters register. Registration closes when voting starts.
           </p>
-        ) : null}
+        )}
         {readiness ? (
           <p style={{ color: 'var(--subtle)', marginTop: 8, marginBottom: 0, fontSize: 11 }}>
             Registered: {readiness.registered_count} · With secret ID: {readiness.with_secret_count}
