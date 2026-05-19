@@ -72,22 +72,7 @@ export function VoterDashboardProvider({ children }: { children: ReactNode }) {
     void reload()
   }, [reload])
 
-  const dueElections = useMemo(
-    () =>
-      registrations
-        .map((r) => r.election)
-        .filter((e): e is NonNullable<(typeof registrations)[0]['election']> => Boolean(e))
-        .map((e) => ({
-          id: e.id,
-          status: e.status,
-          start_date: e.start_date,
-          end_date: e.end_date,
-          voter_roll_finalized_at: e.voter_roll_finalized_at ?? null,
-        })),
-    [registrations],
-  )
-
-  useEnsureDueElectionsPrepared(dueElections, reload, 30_000)
+  useEnsureDueElectionsPrepared(registrations, reload, 15_000)
 
   useEffect(() => {
     const userId = session?.user.id

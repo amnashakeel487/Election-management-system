@@ -7,7 +7,14 @@ import { electionDisplayStatus } from '@/utils/dashboardDisplay'
 import { formatElectionCode } from '@/utils/electionTime'
 import { maskSecretVoterId } from '@/utils/maskSecretVoterId'
 import { areElectionResultsVisible } from '@/utils/electionResultsVisibility'
-import { canVote, formatCountdown, getRegistrationPhase, registrationBadgeClass } from '@/utils/voterElectionUi'
+import {
+  canVote,
+  formatCountdown,
+  getRegistrationPhase,
+  registrationBadgeClass,
+  shouldShowVotingPreparing,
+  votingPreparingMessage,
+} from '@/utils/voterElectionUi'
 
 function LiveCountdown({ endDate }: { endDate: string }) {
   const [now, setNow] = useState(() => Date.now())
@@ -170,8 +177,9 @@ export function VoterHomePage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {activeRegs.slice(0, 6).map((reg) => {
                   if (!reg.election) return null
+                  const preparing = shouldShowVotingPreparing(reg)
                   const voting = canVote(reg)
-                  const border = voting ? '#EF4444' : reg.voted_at ? '#10B981' : 'var(--border)'
+                  const border = voting ? '#EF4444' : reg.voted_at ? '#10B981' : preparing ? '#F59E0B' : 'var(--border)'
                   return (
                     <div
                       key={reg.id}
@@ -203,7 +211,14 @@ export function VoterHomePage() {
                         )}
                       </div>
                       {!reg.voted_at && reg.election ? <LiveCountdown endDate={reg.election.end_date} /> : null}
-                      {voting ? (
+                      {preparing ? (
+                        <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 10, lineHeight: 1.5 }}>
+                          {votingPreparingMessage()}
+                          {!reg.secret_voter_id_emailed_at && reg.secret_voter_id
+                            ? ' Your ID exists but the email is still being sent — check spam or wait a moment.'
+                            : null}
+                        </p>
+                      ) : voting ? (
                         <Link to={`/voter/vote/${reg.election.id}`} className="btn btn-success btn-sm">
                           <svg viewBox="0 0 24 24" aria-hidden>
                             <rect x="3" y="3" width="18" height="18" rx="2" />

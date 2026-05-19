@@ -99,7 +99,9 @@ export function shouldShowVotingPreparing(
   if (display !== 'active' && status !== 'active' && !isVotingWindowStarted(reg.election)) {
     return false
   }
-  return !reg.election.voter_roll_finalized_at || !reg.secret_voter_id
+  if (!reg.election.voter_roll_finalized_at || !reg.secret_voter_id) return true
+  if (!reg.secret_voter_id_emailed_at) return true
+  return false
 }
 
 /** User may cast a ballot now (matches polling + registration gates; no full candidate load). */
@@ -110,6 +112,7 @@ export function canVote(reg: VoterRegistrationWithElection): boolean {
   return (
     reg.status === 'registered' &&
     Boolean(reg.secret_voter_id) &&
+    Boolean(reg.secret_voter_id_emailed_at) &&
     !reg.voted_at &&
     isPollingOpen(election)
   )
@@ -125,9 +128,22 @@ export function votingPreparingMessage(step?: string): string {
       return 'Sending voter emails…'
     case 'checking':
       return 'Preparing voting…'
+    case 'ready':
+      return 'Check your email for your secret voter ID.'
     default:
       return 'Your secret voter ID is being issued and emailed — please wait.'
   }
+}
+
+/** Election needs auto-finalize and/or secret ID emails (voter dashboard polling). */
+export function registrationNeedsVotingPrep(reg: VoterRegistrationWithElection): boolean {
+  if (!reg.election || reg.status !== 'registered' || reg.voted_at) return false
+  if (!isVotingWindowStarted(reg.election)) return false
+  if (Date.now() > new Date(reg.election.end_date).getTime()) return false
+  if (!reg.election.voter_roll_finalized_at) return true
+  if (!reg.secret_voter_id) return true
+  if (!reg.secret_voter_id_emailed_at) return true
+  return false
 }
 
 export function formatCountdown(endDateIso: string, nowMs = Date.now()): { h: string; m: string; s: string } {

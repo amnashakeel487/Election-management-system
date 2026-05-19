@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
-import { ensureElectionVotingReady } from '@/services/votingService'
+import { checkAndFinalizeElection } from '@/services/electionFinalizeService'
 import { shouldEnsureVotingReady } from '@/utils/autoFinalizeVoterRoll'
+import type { VoterRegistrationWithElection } from '@/types/voterRegistration'
+import { registrationNeedsVotingPrep } from '@/utils/voterElectionUi'
 
 export type ElectionVotingReadySlice = {
   id: string
@@ -42,9 +44,9 @@ export function useEnsureVotingReadyWhenDue({
       if (preparingRef.current) return
       preparingRef.current = true
       try {
-        const result = await ensureElectionVotingReady(electionId)
+        const result = await checkAndFinalizeElection(electionId)
         if (cancelled) return
-        if (result.finalized || result.emailed) {
+        if (result.success || result.finalized || result.emailed) {
           await onPrepared?.()
         }
       } finally {
@@ -75,21 +77,28 @@ export function useEnsureVotingReadyWhenDue({
   ])
 }
 
-/** Auto-finalize + email for every election in the voting window (voter dashboard). */
+/** Auto-finalize + email for registrations that still need secret IDs / emails. */
 export function useEnsureDueElectionsPrepared(
-  elections: ElectionVotingReadySlice[],
+  registrations: VoterRegistrationWithElection[],
   onPrepared?: () => void | Promise<void>,
-  pollMs = 30_000,
+  pollMs = 15_000,
 ): void {
   const preparingRef = useRef(false)
-  const dueKey = elections
-    .filter(shouldEnsureVotingReady)
-    .map((e) => `${e.id}:${e.voter_roll_finalized_at ?? ''}`)
+  const dueKey = registrations
+    .filter(registrationNeedsVotingPrep)
+    .map(
+      (r) =>
+        `${r.election_id}:${r.election?.voter_roll_finalized_at ?? ''}:${r.secret_voter_id ?? ''}:${r.secret_voter_id_emailed_at ?? ''}`,
+    )
     .join('|')
 
   useEffect(() => {
-    const due = elections.filter(shouldEnsureVotingReady)
-    if (due.length === 0) return
+    const electionIds = [
+      ...new Set(
+        registrations.filter(registrationNeedsVotingPrep).map((r) => r.election_id),
+      ),
+    ]
+    if (electionIds.length === 0) return
 
     let cancelled = false
 
@@ -98,14 +107,14 @@ export function useEnsureDueElectionsPrepared(
       preparingRef.current = true
       try {
         let changed = false
-        for (const e of due) {
+        for (const id of electionIds) {
           if (cancelled) return
-          const result = await ensureElectionVotingReady(e.id)
-          if (result.finalized || result.emailed || result.reason === 'already_ready') {
+          const result = await checkAndFinalizeElection(id)
+          if (result.success || result.finalized || result.emailed) {
             changed = true
           }
-          if (result.error?.includes('migration')) {
-            console.warn(result.error)
+          if (result.error) {
+            console.warn('[auto-finalize]', id, result.error)
           }
         }
         if (changed && !cancelled) {

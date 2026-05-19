@@ -91,13 +91,17 @@ export async function checkAndFinalizeElection(electionId: string): Promise<Chec
   try {
     readiness = await fetchElectionRollReadiness(electionId)
   } catch (err) {
+    const msg = err instanceof Error ? err.message : ''
+    if (msg.includes('does not exist') || msg.includes('Could not find the function')) {
+      return legacyFinalizeAndEmail(electionId)
+    }
     return {
       success: false,
       step: 'failed',
       readiness: null,
       finalized: false,
       emailed: false,
-      error: err instanceof Error ? err.message : 'Could not read election status',
+      error: msg || 'Could not read election status',
     }
   }
 
@@ -257,6 +261,58 @@ export async function checkAndFinalizeElection(electionId: string): Promise<Chec
     assigned_count: assignedCount,
     reason: finalizeReason ?? (success ? 'ready' : 'not_ready'),
     error: success ? undefined : 'Voting is not ready until the voter roll is finalized and secret IDs are issued',
+  }
+}
+
+/** When migration 042 is missing, still finalize + email via 035 RPC + edge function. */
+async function legacyFinalizeAndEmail(electionId: string): Promise<CheckAndFinalizeResult> {
+  const { data: rpcData, error: rpcError } = await supabase.rpc(
+    'maybe_auto_finalize_election_voter_roll',
+    { p_election_id: electionId },
+  )
+
+  if (rpcError) {
+    const msg = rpcError.message ?? 'Auto-finalize failed'
+    return {
+      success: false,
+      step: 'failed',
+      readiness: null,
+      finalized: false,
+      emailed: false,
+      error: msg.includes('does not exist')
+        ? 'Run supabase/scripts/auto_finalize_voting_start_sql_editor.sql in Supabase SQL Editor.'
+        : msg,
+    }
+  }
+
+  const auto = rpcData as { finalized?: boolean; reason?: string; assigned_count?: number }
+  const finalized =
+    Boolean(auto.finalized) || auto.reason === 'already_finalized'
+
+  let emailed = false
+  let emailError: string | undefined
+
+  if (finalized) {
+    try {
+      const email = await sendSecretVoterIdEmails(electionId)
+      emailed = email.sent > 0
+      if (email.errors.length > 0) {
+        emailError = email.errors.join('; ')
+      }
+    } catch (e) {
+      emailError = e instanceof Error ? e.message : 'Failed to send emails'
+    }
+  }
+
+  return {
+    success: finalized && emailed,
+    step: emailed ? 'ready' : finalized ? 'sending_emails' : 'failed',
+    readiness: null,
+    finalized,
+    emailed,
+    assigned_count: Number(auto.assigned_count ?? 0),
+    reason: auto.reason,
+    error: emailError,
   }
 }
 
