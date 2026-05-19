@@ -108,7 +108,76 @@
   align-items: start;
 }
 
+/* Registration: center columns and pull hero copy toward the form card */
+.sp-page-wrap--register {
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+  gap: 2rem;
+  align-items: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.sp-root:has(.sp-page-wrap--register) {
+  overflow-y: hidden;
+  height: 100vh;
+}
+
+.sp-left--register {
+  padding: 6.5rem 1rem 2rem 2.5rem;
+  min-height: auto;
+  justify-content: center;
+}
+
+.sp-left--register .sp-left-hero {
+  margin-left: auto;
+  margin-right: 0;
+  max-width: 440px;
+  width: 100%;
+}
+
+.sp-left--register .sp-left-hero h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+}
+
+.sp-left--register .sp-left-hero > .mb-6 {
+  margin-bottom: 1rem;
+}
+
+.sp-left--register .sp-left-hero .mt-11 {
+  margin-top: 1.5rem;
+}
+
+.sp-left--register .sp-left-hero .mt-12 {
+  display: none;
+}
+
+.sp-left--register > div:first-child {
+  margin-left: auto;
+  max-width: 440px;
+  width: 100%;
+}
+
+.sp-left--register > .mt-auto {
+  display: none;
+}
+
 @media (max-width: 900px) {
+  .sp-root:has(.sp-page-wrap--register) {
+    overflow-y: auto;
+    height: auto;
+  }
+
+  .sp-page-wrap--register {
+    max-width: none;
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
   .sp-page-wrap {
     grid-template-columns: 1fr;
   }
@@ -120,7 +189,7 @@
   }
 
   .sp-right--register {
-    padding-top: 8.5rem !important;
+    padding: 8.5rem 1rem 2.5rem !important;
   }
 
   .sp-form-card,
@@ -163,8 +232,66 @@
 
 /* Extra clearance below fixed navbar on registration */
 .sp-right--register {
-  padding-top: 9.5rem;
-  padding-bottom: 3rem;
+  padding: 5.75rem 1.5rem 1.5rem 0.5rem;
+  align-items: center;
+}
+
+.sp-form-card--register {
+  max-width: 390px;
+}
+
+.sp-form-card--register .sp-form-stepper {
+  display: none !important;
+}
+
+.sp-form-card--register .sp-form-card-header--compact {
+  padding: 0.75rem 1.1rem 0.6rem !important;
+}
+
+.sp-form-card--register .sp-form-card-scroll form {
+  padding: 0.55rem 1.1rem 0.65rem !important;
+}
+
+.sp-form-card--register .sp-form-card-footer {
+  padding: 0.4rem 1.1rem !important;
+}
+
+.sp-form-card--register [class*='mb-3.5'] {
+  margin-bottom: 0.35rem !important;
+}
+
+.sp-form-card--register [class*='mb-2'] {
+  margin-bottom: 0.3rem !important;
+}
+
+.sp-form-card--register [class*='mb-5'] {
+  margin-bottom: 0.4rem !important;
+}
+
+.sp-form-card--register [class*='py-2.5'] {
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+}
+
+.sp-form-card--register [class*='py-3.5'] {
+  padding-top: 0.55rem !important;
+  padding-bottom: 0.55rem !important;
+  font-size: 13px !important;
+}
+
+.sp-form-card--register button[type='button'].rounded-\[11px\] {
+  padding-top: 0.35rem !important;
+  padding-bottom: 0.35rem !important;
+}
+
+.sp-form-card--register button[type='button'] .h-\[34px\] {
+  height: 28px !important;
+  width: 28px !important;
+  margin-bottom: 0.15rem !important;
+}
+
+.sp-form-card--register label[class*='mb-1.5'] {
+  margin-bottom: 0.25rem !important;
 }
 
 @keyframes sp-slide-right {
@@ -247,10 +374,6 @@
   position: relative;
   display: block;
   margin-bottom: 1rem;
-}
-
-.sp-form-card--register {
-  max-width: 440px;
 }
 
 .sp-form-card-header {

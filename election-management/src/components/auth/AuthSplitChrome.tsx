@@ -116,8 +116,8 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
         )}
       </nav>
 
-      <div className="sp-page-wrap">
-        <div className="sp-left">
+      <div className={`sp-page-wrap${variant === 'register' ? ' sp-page-wrap--register' : ''}`}>
+        <div className={`sp-left${variant === 'register' ? ' sp-left--register' : ''}`}>
           <div className="flex items-center gap-3">
             <div className="sp-brand-icon-pulse flex h-[42px] w-[42px] items-center justify-center rounded-xl bg-gradient-to-br from-[#2451A3] to-[#6C3FC5] shadow-lg shadow-purple-500/40">
               <ShieldIcon className="h-[22px] w-[22px] text-white" />
@@ -128,7 +128,7 @@ export function AuthSplitChrome({ variant, children }: AuthSplitChromeProps) {
             </span>
           </div>
 
-          <div className="mt-14">
+          <div className="sp-left-hero mt-14">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3.5 py-1.5">
               <div className="sp-live-dot h-1.5 w-1.5 rounded-full bg-emerald-400" />
               <span className="text-[11px] font-semibold tracking-wide text-emerald-300">{leftEyebrow}</span>

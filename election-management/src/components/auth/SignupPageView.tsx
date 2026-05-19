@@ -39,7 +39,6 @@ export function SignupPageView() {
   const [organization, setOrganization] = useState('')
   const [electionPurpose, setElectionPurpose] = useState('')
   const [role, setRole] = useState<RegisterableRole>('voter')
-  const [termsAccepted, setTermsAccepted] = useState(false)
   const [botChecked, setBotChecked] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -52,10 +51,6 @@ export function SignupPageView() {
       e.preventDefault()
       setError(null)
 
-      if (!termsAccepted) {
-        setError(t('signupForm.termsRequired'))
-        return
-      }
       const captchaOk = turnstileConfigured
         ? Boolean(captchaToken) && (await verifyCaptchaToken(captchaToken!, 'signup')).ok
         : botChecked
@@ -120,7 +115,6 @@ export function SignupPageView() {
       }
     },
     [
-      termsAccepted,
       botChecked,
       captchaToken,
       firstName,
@@ -160,7 +154,7 @@ export function SignupPageView() {
                 </div>
                 <h2 className="mb-1 text-[22px] font-extrabold tracking-tight text-white">{t('signupForm.title')}</h2>
                 <p className="text-[13px] text-white/50">{t('signupForm.sub')}</p>
-                <div className="sp-form-stepper mt-2.5">
+                <div className="sp-form-stepper mt-2.5 hidden">
                   <div className="flex gap-1">
                     <div className="h-0.5 flex-1 overflow-hidden rounded-sm bg-white/15">
                       <div className="h-full w-full rounded-sm bg-cyan-400" />
@@ -409,13 +403,8 @@ export function SignupPageView() {
                 <p className="mt-2 text-[10px] text-slate-400">{t('signupForm.adminNote')}</p>
               </div>
 
-              <label className="mb-4 flex cursor-pointer items-start gap-2.5">
-                <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-[#2451A3] text-[#2451A3] accent-[#2451A3]" />
-                <span className="text-[11px] leading-relaxed text-slate-400">{t('signupForm.terms')}</span>
-              </label>
-
               {turnstileConfigured ? (
-                <div className="mb-5 flex justify-center rounded-xl border border-[#E2E8F0] bg-slate-50/80 px-3 py-3">
+                <div className="mb-3 flex justify-center rounded-xl border border-[#E2E8F0] bg-slate-50/80 px-3 py-2">
                   <TurnstileCaptcha onToken={setCaptchaToken} theme="light" />
                 </div>
               ) : (
