@@ -10,8 +10,6 @@ import { removeCandidatePortrait } from '@/services/candidatePhotoService'
 import { deleteCreatorElection, fetchElectionById, removeCandidate } from '@/services/electionService'
 import { fetchElectionResults } from '@/services/resultsService'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
-import { useCheckAndFinalizeElection } from '@/hooks/useCheckAndFinalizeElection'
-import { ElectionRollStatusPanel } from '@/components/election/ElectionRollStatusPanel'
 import type { AuditLogEntry } from '@/types/auth'
 import type { Candidate, ElectionWithCandidates } from '@/types/election'
 import type { ElectionResultsPayload } from '@/types/electionResults'
@@ -88,28 +86,9 @@ export function CreatorElectionDetailPage() {
     }
   }, [id, profile?.id, profile?.role, setSelectedId])
 
-  const refreshElection = useCallback(
-    async (silent = true) => {
-      await load({ silent })
-    },
-    [load],
-  )
-
   useEffect(() => {
     void load()
   }, [load])
-
-  const { isPreparing } = useCheckAndFinalizeElection({
-    electionId: election?.id,
-    election: election ?? undefined,
-    enabled: Boolean(election && !loading),
-    poll: false,
-    onComplete: async (result) => {
-      if (result.success || result.finalized || result.emailed) {
-        await refreshElection(true)
-      }
-    },
-  })
 
   async function handleDeleteCandidate(candidate: Candidate) {
     if (!election) return
@@ -185,9 +164,7 @@ export function CreatorElectionDetailPage() {
   }
 
   return (
-    <>
-      <ElectionRollStatusPanel election={election} busy={isPreparing} />
-      <CreatorElectionDetailView
+    <CreatorElectionDetailView
       election={election}
       stats={stats}
       results={results}
@@ -198,6 +175,5 @@ export function CreatorElectionDetailPage() {
       onDeleteElection={() => void handleDeleteElection()}
       deletingElection={deletingElection}
     />
-    </>
   )
 }
