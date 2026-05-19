@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { sendSecretVoterIdEmails } from '@/services/secretVoterIdService'
 import { sendWaitlistEmail } from '@/services/waitlistService'
 import type {
   ElectionRegistrationStats,
@@ -69,6 +70,7 @@ export async function registerForElection(electionId: string): Promise<RegisterF
   const result = data as RegisterForElectionResult
   if (!result.duplicate && result.status === 'registered') {
     window.dispatchEvent(new CustomEvent('voter-inbox-refresh'))
+    void sendSecretVoterIdEmails(electionId, { scope: 'self' }).catch(() => undefined)
   }
   if (!result.duplicate && result.status === 'waitlisted' && result.waitlist_position) {
     const {

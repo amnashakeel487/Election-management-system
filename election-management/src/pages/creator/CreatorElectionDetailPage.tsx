@@ -12,7 +12,6 @@ import { fetchElectionResults } from '@/services/resultsService'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
 import { useCheckAndFinalizeElection } from '@/hooks/useCheckAndFinalizeElection'
 import { ElectionRollStatusPanel } from '@/components/election/ElectionRollStatusPanel'
-import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import type { AuditLogEntry } from '@/types/auth'
 import type { Candidate, ElectionWithCandidates } from '@/types/election'
 import type { ElectionResultsPayload } from '@/types/electionResults'
@@ -29,8 +28,6 @@ export function CreatorElectionDetailPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [finalizingId, setFinalizingId] = useState<string | null>(null)
-  const [finalizeMessage, setFinalizeMessage] = useState<string | null>(null)
   const [deletingCandidateId, setDeletingCandidateId] = useState<string | null>(null)
   const [deletingElection, setDeletingElection] = useState(false)
 
@@ -146,21 +143,6 @@ export function CreatorElectionDetailPage() {
     }
   }
 
-  async function handleFinalize() {
-    if (!election) return
-    setFinalizingId(election.id)
-    setFinalizeMessage(null)
-    try {
-      const { finalize, email } = await finalizeAndEmailSecretVoterIds(election.id)
-      setFinalizeMessage(`Assigned ${finalize.assigned_count} ID(s). Emailed ${email.sent} voter(s).`)
-      await load()
-    } catch (err) {
-      setFinalizeMessage(err instanceof Error ? err.message : 'Finalization failed')
-    } finally {
-      setFinalizingId(null)
-    }
-  }
-
   if (!id) {
     return <Navigate to="/creator/dashboard" replace />
   }
@@ -199,10 +181,7 @@ export function CreatorElectionDetailPage() {
       stats={stats}
       results={results}
       auditLogs={auditLogs}
-      finalizingId={finalizingId}
-      finalizeMessage={finalizeMessage}
       onReload={() => void load()}
-      onFinalize={() => void handleFinalize()}
       onDeleteCandidate={(c) => void handleDeleteCandidate(c)}
       deletingCandidateId={deletingCandidateId}
       onDeleteElection={() => void handleDeleteElection()}

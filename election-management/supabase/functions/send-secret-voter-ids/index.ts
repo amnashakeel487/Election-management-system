@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
       /* voter self-resend — allowed */
     }
 
-    if (!election.voter_roll_finalized_at) {
+    if (!election.voter_roll_finalized_at && scope !== 'self') {
       const { data: autoResult, error: autoError } = await admin.rpc(
         'maybe_auto_finalize_election_voter_roll',
         { p_election_id: body.election_id },
@@ -125,8 +125,8 @@ Deno.serve(async (req) => {
       const finalized = Boolean(
         autoResult && typeof autoResult === 'object' && (autoResult as { finalized?: boolean }).finalized,
       )
-      if (!finalized) {
-        return new Response(JSON.stringify({ error: 'Voter roll is not finalized yet' }), {
+      if (!finalized && autoResult && (autoResult as { reason?: string }).reason !== 'already_finalized') {
+        return new Response(JSON.stringify({ error: 'Voter roll is not locked for voting yet' }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })

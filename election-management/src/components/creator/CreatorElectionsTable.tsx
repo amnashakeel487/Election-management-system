@@ -14,8 +14,6 @@ function categoryDisplay(cat: string | null | undefined): string | null {
 
 interface CreatorElectionsTableProps {
   elections: Election[]
-  finalizingId?: string | null
-  onFinalizeVoterRoll?: (electionId: string) => void
   onRollChanged?: () => void
 }
 
@@ -52,12 +50,7 @@ function statusBadge(status: Election['status']) {
   }
 }
 
-export function CreatorElectionsTable({
-  elections,
-  finalizingId,
-  onFinalizeVoterRoll,
-  onRollChanged,
-}: CreatorElectionsTableProps) {
+export function CreatorElectionsTable({ elections, onRollChanged }: CreatorElectionsTableProps) {
   return (
     <div className="glass-panel flex flex-col overflow-hidden rounded-[32px] lg:col-span-2">
       <div className="flex items-center justify-between border-b border-line p-6">
@@ -176,13 +169,7 @@ export function CreatorElectionsTable({
                 {showRollPanel ? (
                   <tr className="bg-elevated/20">
                     <td colSpan={4} className="px-6 pb-5 pt-0">
-                      <VoterRollLockPanel
-                        compact
-                        election={election}
-                        finalizingId={finalizingId}
-                        onFinalize={onFinalizeVoterRoll}
-                        onChanged={onRollChanged}
-                      />
+                      <VoterRollLockPanel compact election={election} onChanged={onRollChanged} />
                     </td>
                   </tr>
                 ) : null}

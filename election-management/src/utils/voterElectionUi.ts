@@ -43,7 +43,7 @@ export function getRegistrationPhase(
 
   if (reg.status !== 'registered') return 'completed'
 
-  if (!reg.election?.voter_roll_finalized_at || !reg.secret_voter_id) {
+  if (!reg.secret_voter_id || !reg.secret_voter_id_emailed_at) {
     if (
       display === 'active' ||
       election.status === 'active' ||
@@ -99,8 +99,7 @@ export function shouldShowVotingPreparing(
   if (display !== 'active' && status !== 'active' && !isVotingWindowStarted(reg.election)) {
     return false
   }
-  if (!reg.election.voter_roll_finalized_at || !reg.secret_voter_id) return true
-  if (!reg.secret_voter_id_emailed_at) return true
+  if (!reg.secret_voter_id || !reg.secret_voter_id_emailed_at) return true
   return false
 }
 
@@ -108,7 +107,6 @@ export function shouldShowVotingPreparing(
 export function canVote(reg: VoterRegistrationWithElection): boolean {
   const election = electionPick(reg)
   if (!election) return false
-  if (!election.voter_roll_finalized_at) return false
   return (
     reg.status === 'registered' &&
     Boolean(reg.secret_voter_id) &&
@@ -140,7 +138,6 @@ export function registrationNeedsVotingPrep(reg: VoterRegistrationWithElection):
   if (!reg.election || reg.status !== 'registered' || reg.voted_at) return false
   if (!isVotingWindowStarted(reg.election)) return false
   if (Date.now() > new Date(reg.election.end_date).getTime()) return false
-  if (!reg.election.voter_roll_finalized_at) return true
   if (!reg.secret_voter_id) return true
   if (!reg.secret_voter_id_emailed_at) return true
   return false

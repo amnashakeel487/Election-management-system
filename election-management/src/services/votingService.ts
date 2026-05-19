@@ -70,10 +70,6 @@ export function buildVotingEligibility(
     return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'Secret voter ID not issued yet' }
   }
 
-  if (!election.voter_roll_finalized_at) {
-    return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'Voter roll not finalized' }
-  }
-
   if (hasVoted) {
     return { canVote: false, pollingOpen, hasVoted, hasSecretId, isRegistered, reason: 'You have already voted' }
   }

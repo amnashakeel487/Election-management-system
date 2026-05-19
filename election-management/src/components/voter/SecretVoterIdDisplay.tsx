@@ -110,7 +110,7 @@ export function SecretVoterIdDisplay({
         </p>
       ) : (
         <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
-          Your ID will be emailed after the organizer finalizes the voter roll.
+          Your ID was sent to your email when you registered. Check your inbox (and spam).
         </p>
       )}
     </div>

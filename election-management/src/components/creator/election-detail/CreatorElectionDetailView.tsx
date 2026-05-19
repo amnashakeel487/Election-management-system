@@ -38,10 +38,7 @@ export interface CreatorElectionDetailViewProps {
   stats: ElectionRegistrationStats | null
   results: ElectionResultsPayload | null
   auditLogs: AuditLogEntry[]
-  finalizingId: string | null
-  finalizeMessage: string | null
   onReload: () => void
-  onFinalize: () => void
   onDeleteCandidate?: (candidate: Candidate) => void
   deletingCandidateId?: string | null
   onDeleteElection?: () => void
@@ -68,10 +65,7 @@ export function CreatorElectionDetailView({
   stats,
   results,
   auditLogs,
-  finalizingId,
-  finalizeMessage,
   onReload,
-  onFinalize,
   onDeleteCandidate,
   deletingCandidateId = null,
   onDeleteElection,
@@ -247,9 +241,6 @@ export function CreatorElectionDetailView({
         </div>
       </div>
 
-      {finalizeMessage ? (
-        <p style={{ marginBottom: 16, fontSize: 12, color: 'var(--ced-muted)' }}>{finalizeMessage}</p>
-      ) : null}
 
       <nav className="section-nav" aria-label="Page sections">
         {CED_SECTIONS.map((s) => (
@@ -616,13 +607,7 @@ export function CreatorElectionDetailView({
                 voterRollFinalized={election.voter_roll_finalized_at}
                 onChanged={onReload}
               />
-              <VoterRollLockPanel
-                election={election}
-                stats={stats}
-                finalizingId={finalizingId}
-                onFinalize={() => onFinalize()}
-                onChanged={onReload}
-              />
+              <VoterRollLockPanel election={election} stats={stats} onChanged={onReload} />
             </div>
           </div>
         </div>
@@ -663,11 +648,7 @@ export function CreatorElectionDetailView({
           </div>
         </div>
         <div className="panel-body">
-          <CreatorElectionVotingControls
-            election={election}
-            onReload={onReload}
-            onFinalize={onFinalize}
-          />
+          <CreatorElectionVotingControls election={election} onReload={onReload} />
         </div>
       </div>
 

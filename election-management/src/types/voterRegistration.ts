@@ -30,6 +30,7 @@ export interface RegisterForElectionResult {
   registered_count?: number
   max_voters?: number
   message?: string
+  secret_voter_id?: string
 }
 
 export interface VoterRegistrationWithElection extends VoterRegistration {

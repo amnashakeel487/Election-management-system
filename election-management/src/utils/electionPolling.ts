@@ -5,7 +5,6 @@ export type PollingPhase = 'not_finalized' | 'not_started' | 'open' | 'ended' | 
 export function getPollingPhase(
   election: Pick<Election, 'start_date' | 'end_date' | 'status' | 'voter_roll_finalized_at'>,
 ): PollingPhase {
-  if (!election.voter_roll_finalized_at) return 'not_finalized'
   if (!['published', 'active'].includes(election.status)) return 'closed'
 
   const now = Date.now()
@@ -23,8 +22,7 @@ export function isPollingOpen(
   return getPollingPhase(election) === 'open'
 }
 
-export function isPollingNotStarted(election: Pick<Election, 'start_date' | 'voter_roll_finalized_at' | 'status'>): boolean {
-  if (!election.voter_roll_finalized_at) return false
+export function isPollingNotStarted(election: Pick<Election, 'start_date' | 'status'>): boolean {
   if (!['published', 'active'].includes(election.status)) return false
   return Date.now() < new Date(election.start_date).getTime()
 }
@@ -33,10 +31,9 @@ export function isPollingEnded(
   election: Pick<Election, 'end_date'> &
     Partial<{ voter_roll_finalized_at: string | null; status: string }>,
 ): boolean {
-  if (election.voter_roll_finalized_at === undefined || election.status === undefined) {
+  if (election.status === undefined) {
     return Date.now() > new Date(election.end_date).getTime()
   }
-  if (!election.voter_roll_finalized_at) return false
   if (!['published', 'active'].includes(election.status)) return true
   return Date.now() > new Date(election.end_date).getTime()
 }
@@ -65,7 +62,7 @@ export function formatCountdownMs(ms: number): string {
 export function pollingPhaseLabel(phase: PollingPhase): string {
   switch (phase) {
     case 'not_finalized':
-      return 'Voter roll not finalized'
+      return 'Voting is not open yet'
     case 'not_started':
       return 'Voting has not started yet'
     case 'open':

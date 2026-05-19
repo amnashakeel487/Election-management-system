@@ -5,13 +5,11 @@ import { CreatorPageHeader } from '@/components/creator/layout/CreatorPageHeader
 import { useTranslation } from 'react-i18next'
 import { useCreatorPageMeta } from '@/hooks/useCreatorI18n'
 import { useCreatorElection } from '@/context/CreatorElectionContext'
-import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
 import {
   canCreatorDeleteElection,
   canCreatorEditElectionDetails,
   deleteCreatorElection,
 } from '@/services/electionService'
-import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import { creatorPhaseBadge, electionShortCode } from '@/utils/creatorDisplay'
 import { formatSubmissionDate } from '@/utils/formatDate'
 
@@ -20,7 +18,6 @@ export function CreatorMyElectionsPage() {
   const meta = useCreatorPageMeta('elections')
   const { elections, loading, refreshElections, setSelectedId } = useCreatorElection()
   const [tab, setTab] = useState<'all' | 'active' | 'draft' | 'completed'>('all')
-  const [finalizingId, setFinalizingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
 
@@ -46,27 +43,6 @@ export function CreatorMyElectionsPage() {
       setMessage(err instanceof Error ? err.message : 'Failed to delete election')
     } finally {
       setDeletingId(null)
-    }
-  }
-
-  async function handleFinalize(electionId: string, title: string) {
-    const regStats = await fetchElectionRegistrationStats(electionId)
-    const msg =
-      regStats.registered_count === 0
-        ? `No voters registered for "${title}" yet. Finalizing will close registration permanently. Continue?`
-        : `Finalize voter roll for "${title}"? This emails secret IDs to ${regStats.registered_count} voter(s) and cannot be undone.`
-    if (!window.confirm(msg)) return
-
-    setFinalizingId(electionId)
-    setMessage(null)
-    try {
-      const { finalize, email } = await finalizeAndEmailSecretVoterIds(electionId)
-      setMessage(`Assigned ${finalize.assigned_count} ID(s). Emailed ${email.sent} voter(s).`)
-      await refreshElections()
-    } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'Finalization failed')
-    } finally {
-      setFinalizingId(null)
     }
   }
 
@@ -134,7 +110,6 @@ export function CreatorMyElectionsPage() {
                     {formatSubmissionDate(e.start_date)} — {formatSubmissionDate(e.end_date)}
                   </div>
                   {(() => {
-                    const showFinalize = !e.voter_roll_finalized_at && e.status !== 'draft'
                     const showDelete = canCreatorDeleteElection(e.status)
                     const editLabel =
                       e.status === 'draft' ? t('elections.editButton') : t('elections.editTimesButton')
@@ -158,25 +133,12 @@ export function CreatorMyElectionsPage() {
                             </Link>
                           ) : null}
                         </div>
-                        {showFinalize || showDelete ? (
+                        {showDelete ? (
                           <div className="el-actions-secondary">
-                            {showFinalize ? (
-                              <button
-                                type="button"
-                                className="btn btn-sm btn-ghost el-btn-secondary"
-                                disabled={finalizingId === e.id || deletingId === e.id}
-                                onClick={() => void handleFinalize(e.id, e.title)}
-                              >
-                                {finalizingId === e.id ? '…' : t('elections.finalizeRollButton')}
-                              </button>
-                            ) : (
-                              <span className="el-btn-secondary" style={{ flex: 1 }} aria-hidden />
-                            )}
-                            {showDelete ? (
                               <button
                                 type="button"
                                 className="el-btn-icon el-btn-icon--danger"
-                                disabled={deletingId === e.id || finalizingId === e.id}
+                                disabled={deletingId === e.id}
                                 title={t('elections.deleteButton')}
                                 aria-label={t('elections.deleteButton')}
                                 onClick={() => void handleDelete(e.id, e.title)}
@@ -186,7 +148,6 @@ export function CreatorMyElectionsPage() {
                                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                                 </svg>
                               </button>
-                            ) : null}
                           </div>
                         ) : null}
                       </div>

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { sendSecretVoterIdEmails } from '@/services/secretVoterIdService'
 
 export interface WaitlistEntry {
   registration_id: string
@@ -52,6 +53,9 @@ export async function promoteNextWaitlistSlots(
     if (p.user_id) {
       void sendWaitlistEmail('waitlist_promoted', p.user_id, electionId).catch(() => undefined)
     }
+  }
+  if (promoted.length > 0) {
+    void sendSecretVoterIdEmails(electionId).catch(() => undefined)
   }
   return result
 }

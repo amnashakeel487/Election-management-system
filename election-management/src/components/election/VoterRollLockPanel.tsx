@@ -14,8 +14,6 @@ export interface VoterRollLockPanelProps {
   election: Election
   stats?: ElectionRegistrationStats | null
   isAdmin?: boolean
-  finalizingId?: string | null
-  onFinalize?: (electionId: string) => void
   onChanged?: () => void
   compact?: boolean
 }
@@ -24,8 +22,6 @@ export function VoterRollLockPanel({
   election,
   stats,
   isAdmin = false,
-  finalizingId,
-  onFinalize,
   onChanged,
   compact = false,
 }: VoterRollLockPanelProps) {
@@ -131,7 +127,7 @@ export function VoterRollLockPanel({
           <p className="font-label-sm font-bold uppercase tracking-wider text-on-surface-variant">Voter roll</p>
           {!compact ? (
             <p className="mt-0.5 text-[11px] text-on-surface-variant">
-              Auto-locks at capacity · Finalize to freeze list and issue secret IDs
+              Secret IDs are emailed when voters register · Registration locks when voting starts
             </p>
           ) : null}
         </div>
@@ -172,17 +168,6 @@ export function VoterRollLockPanel({
             className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-[11px] font-bold text-amber-900 hover:bg-amber-500/20 disabled:opacity-60"
           >
             {busy === 'lock' ? 'Locking…' : 'Lock registration'}
-          </button>
-        ) : null}
-
-        {live && !election.voter_roll_finalized_at && onFinalize ? (
-          <button
-            type="button"
-            disabled={finalizingId === election.id || busy !== null}
-            onClick={() => onFinalize(election.id)}
-            className="rounded-lg border border-tertiary/30 bg-tertiary/10 px-3 py-1.5 text-[11px] font-bold text-tertiary hover:bg-tertiary/20 disabled:opacity-60"
-          >
-            {finalizingId === election.id ? 'Finalizing…' : 'Finalize & email IDs'}
           </button>
         ) : null}
 

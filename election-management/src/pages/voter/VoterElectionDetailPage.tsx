@@ -154,7 +154,7 @@ export function VoterElectionDetailPage() {
             </div>
             <div className="card-body">
               <div style={{ fontSize: 12, color: 'var(--subtle)', marginBottom: 14, lineHeight: 1.6 }}>
-                Register to participate. You will receive a secret voter ID after the organizer finalizes the roll.
+                Register to participate. Your secret voter ID will be emailed to you right after registration.
               </div>
               <Link to={`/elections/${id}/join`} className="btn btn-success" style={{ width: '100%', justifyContent: 'center' }}>
                 <svg viewBox="0 0 24 24" aria-hidden>

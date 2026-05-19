@@ -8,7 +8,6 @@ import { electionDisplayStatus } from '@/utils/dashboardDisplay'
 export interface CreatorElectionVotingControlsProps {
   election: ElectionWithCandidates
   onReload: () => void
-  onFinalize?: () => void
 }
 
 function votingStatusBadge(
@@ -30,7 +29,6 @@ function votingStatusBadge(
 export function CreatorElectionVotingControls({
   election,
   onReload,
-  onFinalize,
 }: CreatorElectionVotingControlsProps) {
   const [busy, setBusy] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
@@ -95,14 +93,6 @@ export function CreatorElectionVotingControls({
   }
 
   async function handleLockParticipants() {
-    if (onFinalize && !election.voter_roll_finalized_at) {
-      const ok = window.confirm(
-        `Finalize the voter roll for "${election.title}"? This locks the participant list and issues secret voter IDs.`,
-      )
-      if (!ok) return
-      onFinalize()
-      return
-    }
     const ok = window.confirm(`Lock registration for "${election.title}"? No new participants can join.`)
     if (!ok) return
     await lockElectionRegistration(election.id, 'manual')

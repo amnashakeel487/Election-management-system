@@ -214,7 +214,7 @@ export function VoterRegistrationPanel({
               <p className="mt-2 text-xs opacity-80">Secret voter ID pending assignment.</p>
             ) : (
               <p className="mt-2 text-xs opacity-80">
-                Your secret voter ID will be issued after the organizer finalizes the voter roll.
+                Your secret voter ID will be emailed to you immediately after you register.
               </p>
             )}
             {canCastVote && userRegistration?.secret_voter_id && !userRegistration.voted_at ? (
