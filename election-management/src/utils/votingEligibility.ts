@@ -12,8 +12,8 @@ import { formatSecretVoterId, isPlausibleSecretVoterId, normalizeSecretVoterIdPr
 export type VotingCheckId =
   | 'signed_in'
   | 'registered'
-  | 'roll_finalized'
   | 'secret_id'
+  | 'secret_id_emailed'
   | 'polling_window'
   | 'not_voted'
 
@@ -44,8 +44,8 @@ export function buildVotingEligibilityDetail(
   const signedIn = Boolean(sessionUserId)
   const isRegistered = registration?.status === 'registered'
   const hasSecretId = Boolean(registration?.secret_voter_id)
+  const secretIdEmailed = Boolean(registration?.secret_voter_id_emailed_at)
   const notVoted = !registration?.voted_at
-  const rollFinalized = Boolean(election.voter_roll_finalized_at)
 
   const checks: VotingEligibilityCheck[] = [
     {
@@ -65,16 +65,20 @@ export function buildVotingEligibilityDetail(
           : undefined,
     },
     {
-      id: 'roll_finalized',
-      label: 'Voter roll finalized',
-      passed: rollFinalized,
-      detail: rollFinalized ? undefined : 'Organizer must finalize the voter roll first',
-    },
-    {
       id: 'secret_id',
       label: 'Secret voter ID issued',
       passed: hasSecretId,
-      detail: hasSecretId ? undefined : 'ID is emailed after roll finalization',
+      detail: hasSecretId ? undefined : 'Register for this election to receive your secret voter ID',
+    },
+    {
+      id: 'secret_id_emailed',
+      label: 'Secret voter ID emailed',
+      passed: secretIdEmailed,
+      detail: secretIdEmailed
+        ? undefined
+        : hasSecretId
+          ? 'Check your email for your secret voter ID (resend may take a moment)'
+          : 'Your ID will be emailed when you register',
     },
     {
       id: 'polling_window',
@@ -95,7 +99,12 @@ export function buildVotingEligibilityDetail(
   ]
 
   const canVote =
-    signedIn && Boolean(registration && isRegistered) && rollFinalized && hasSecretId && pollingOpen && notVoted
+    signedIn &&
+    Boolean(registration && isRegistered) &&
+    hasSecretId &&
+    secretIdEmailed &&
+    pollingOpen &&
+    notVoted
 
   let blockReason: string | null = null
   if (!canVote) {
