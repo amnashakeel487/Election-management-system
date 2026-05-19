@@ -408,7 +408,7 @@ export function SignupPageView() {
                   <TurnstileCaptcha onToken={setCaptchaToken} theme="light" />
                 </div>
               ) : (
-                <label className="mb-5 flex cursor-pointer items-center gap-2.5 rounded-xl border border-[#E2E8F0] bg-slate-50/80 px-3 py-2.5">
+                <label className="mb-3 flex cursor-pointer items-center gap-2.5 rounded-xl border border-[#E2E8F0] bg-slate-50/80 px-3 py-2.5">
                   <input type="checkbox" checked={botChecked} onChange={(e) => setBotChecked(e.target.checked)} className="h-4 w-4 accent-[#2451A3]" />
                   <span className="text-[12px] font-medium text-slate-600">{t('loginForm.notBot')}</span>
                 </label>
