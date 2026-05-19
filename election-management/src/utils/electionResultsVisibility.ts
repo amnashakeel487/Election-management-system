@@ -1,11 +1,14 @@
-import type { Election } from '@/types/election'
 import { isPollingEnded } from '@/utils/electionPolling'
 import { formatSubmissionDate } from '@/utils/formatDate'
 
-export type ElectionResultsVisibilityInput = Pick<
-  Election,
-  'status' | 'end_date' | 'real_time_results' | 'results_locked_at'
->
+/** Election slice from voter registrations (Supabase returns status as string). */
+export type ElectionResultsVisibilityInput = {
+  status: string
+  end_date: string
+  real_time_results?: boolean | null
+  results_locked_at?: string | null
+  voter_roll_finalized_at?: string | null
+}
 
 /** Matches Supabase RPC `get_election_results` visibility rules. */
 export function areElectionResultsVisible(election: ElectionResultsVisibilityInput): boolean {

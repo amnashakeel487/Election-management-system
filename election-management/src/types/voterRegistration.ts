@@ -1,3 +1,5 @@
+import type { ElectionStatus } from '@/types/election'
+
 export type VoterRegistrationStatus = 'registered' | 'waitlisted' | 'rejected'
 
 export interface VoterRegistration {
@@ -34,7 +36,7 @@ export interface VoterRegistrationWithElection extends VoterRegistration {
   election?: {
     id: string
     title: string
-    status: string
+    status: ElectionStatus
     start_date: string
     end_date: string
     voter_roll_finalized_at?: string | null

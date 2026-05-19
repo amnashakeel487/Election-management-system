@@ -30,7 +30,8 @@ export function isPollingNotStarted(election: Pick<Election, 'start_date' | 'vot
 }
 
 export function isPollingEnded(
-  election: Pick<Election, 'end_date'> & Partial<Pick<Election, 'voter_roll_finalized_at' | 'status'>>,
+  election: Pick<Election, 'end_date'> &
+    Partial<{ voter_roll_finalized_at: string | null; status: string }>,
 ): boolean {
   if (election.voter_roll_finalized_at === undefined || election.status === undefined) {
     return Date.now() > new Date(election.end_date).getTime()
