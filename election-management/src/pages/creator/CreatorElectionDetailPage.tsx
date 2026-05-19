@@ -10,7 +10,8 @@ import { removeCandidatePortrait } from '@/services/candidatePhotoService'
 import { deleteCreatorElection, fetchElectionById, removeCandidate } from '@/services/electionService'
 import { fetchElectionResults } from '@/services/resultsService'
 import { fetchElectionRegistrationStats } from '@/services/voterRegistrationService'
-import { useEnsureVotingReadyWhenDue } from '@/hooks/useEnsureVotingReadyWhenDue'
+import { useCheckAndFinalizeElection } from '@/hooks/useCheckAndFinalizeElection'
+import { ElectionRollStatusPanel } from '@/components/election/ElectionRollStatusPanel'
 import { finalizeAndEmailSecretVoterIds } from '@/services/secretVoterIdService'
 import type { AuditLogEntry } from '@/types/auth'
 import type { Candidate, ElectionWithCandidates } from '@/types/election'
@@ -92,10 +93,11 @@ export function CreatorElectionDetailPage() {
     void load()
   }, [load])
 
-  useEnsureVotingReadyWhenDue({
-    election,
+  const { stepLabel, isPreparing } = useCheckAndFinalizeElection({
+    electionId: election?.id,
+    election: election ?? undefined,
     enabled: Boolean(election && !loading),
-    onPrepared: () => load(),
+    onComplete: () => load(),
   })
 
   async function handleDeleteCandidate(candidate: Candidate) {
@@ -187,7 +189,12 @@ export function CreatorElectionDetailPage() {
   }
 
   return (
-    <CreatorElectionDetailView
+    <>
+      <ElectionRollStatusPanel
+        election={election}
+        finalizeStepLabel={isPreparing ? stepLabel : undefined}
+      />
+      <CreatorElectionDetailView
       election={election}
       stats={stats}
       results={results}
@@ -201,5 +208,6 @@ export function CreatorElectionDetailPage() {
       onDeleteElection={() => void handleDeleteElection()}
       deletingElection={deletingElection}
     />
+    </>
   )
 }

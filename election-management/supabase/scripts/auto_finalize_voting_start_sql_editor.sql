@@ -368,4 +368,6 @@ grant execute on function public.get_election_voting_status(uuid) to anon;
 -- Fix elections that already passed start without finalize (run once, replace UUID)
 -- select public.maybe_auto_finalize_election_voter_roll('YOUR-ELECTION-UUID-HERE');
 
+-- ========== Migration 042: also run supabase/migrations/042_election_roll_readiness.sql ==========
+
 select public.process_auto_finalize_voter_rolls() as batch_auto_finalize;

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { checkAndFinalizeElection } from '@/services/electionFinalizeService'
 import { castVoteSchema, parseOrThrow, secretVoterIdSchema } from '@/lib/validation/schemas'
 import type { CastVoteResult, VerifySecretVoterResult, VotingEligibility } from '@/types/voting'
 import { isPollingEnded, isPollingNotStarted, isPollingOpen } from '@/utils/electionPolling'
@@ -134,71 +135,12 @@ export interface EnsureVotingReadyResult {
 
 /** When voting window has started, auto-finalize roll and email secret IDs if needed. */
 export async function ensureElectionVotingReady(electionId: string): Promise<EnsureVotingReadyResult> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  if (!session?.access_token) {
-    return { finalized: false, emailed: false, reason: 'not_authenticated' }
-  }
-
-  let autoResult: { finalized?: boolean; reason?: string } | null = null
-
-  const { data: rpcData, error: rpcError } = await supabase.rpc('maybe_auto_finalize_election_voter_roll', {
-    p_election_id: electionId,
-  })
-
-  if (rpcError) {
-    const msg = rpcError.message ?? 'Auto-finalize failed'
-    if (msg.includes('does not exist') || msg.includes('Could not find the function')) {
-      return {
-        finalized: false,
-        emailed: false,
-        error:
-          'Database migration 035/037 is not applied. Run supabase/migrations/035 and 037 in the Supabase SQL editor.',
-      }
-    }
-    console.warn('maybe_auto_finalize_election_voter_roll:', msg)
-  } else if (rpcData && typeof rpcData === 'object') {
-    autoResult = rpcData as { finalized?: boolean; reason?: string }
-  }
-
-  const finalized = Boolean(autoResult?.finalized)
-  const alreadyFinalized = autoResult?.reason === 'already_finalized'
-
-  const { data: electionRow } = await supabase
-    .from('elections')
-    .select('voter_roll_finalized_at')
-    .eq('id', electionId)
-    .maybeSingle()
-
-  const rollFinalizedOnDb = Boolean(electionRow?.voter_roll_finalized_at)
-  const shouldEmail =
-    finalized || alreadyFinalized || rollFinalizedOnDb
-
-  let emailed = false
-
-  if (shouldEmail) {
-    const { data, error } = await supabase.functions.invoke('ensure-election-voting-ready', {
-      body: { election_id: electionId },
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
-    })
-
-    if (error) {
-      console.warn('ensure-election-voting-ready:', error.message)
-    } else if (data && typeof data === 'object') {
-      const emailPayload = (data as { email?: { sent?: number } }).email
-      emailed = typeof emailPayload?.sent === 'number' ? emailPayload.sent > 0 : rollFinalizedOnDb
-    }
-  }
-
+  const result = await checkAndFinalizeElection(electionId)
   return {
-    finalized: finalized || alreadyFinalized || rollFinalizedOnDb,
-    emailed,
-    reason: autoResult?.reason,
-    error: rpcError?.message,
+    finalized: result.finalized || result.success,
+    emailed: result.emailed || result.success,
+    reason: result.reason,
+    error: result.error,
   }
 }
 

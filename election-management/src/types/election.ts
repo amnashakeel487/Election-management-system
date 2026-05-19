@@ -20,6 +20,7 @@ export interface Election {
   published_at: string | null
   secret_voter_id_prefix: string
   voter_roll_finalized_at: string | null
+  secret_ids_generated?: boolean
   registration_locked_at: string | null
   registration_lock_reason: RegistrationLockReason | null
   results_locked_at?: string | null

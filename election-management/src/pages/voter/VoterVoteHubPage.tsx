@@ -3,16 +3,12 @@ import { VoterPageHeader } from '@/components/voter/VoterPageHeader'
 import { useVoterDashboard } from '@/hooks/useVoterDashboard'
 import { electionDisplayStatus } from '@/utils/dashboardDisplay'
 import { formatElectionCode, formatTimeRemaining } from '@/utils/electionTime'
-import { shouldEnsureVotingReady } from '@/utils/autoFinalizeVoterRoll'
-import { canVote, getRegistrationPhase } from '@/utils/voterElectionUi'
+import { canVote, shouldShowVotingPreparing, votingPreparingMessage } from '@/utils/voterElectionUi'
 
 export function VoterVoteHubPage() {
   const { registered } = useVoterDashboard()
   const voteables = registered.filter((r) => canVote(r) && r.election)
-  const preparing = registered.filter((r) => {
-    if (!r.election || r.voted_at) return false
-    return shouldEnsureVotingReady(r.election) && getRegistrationPhase(r) === 'pending_secret'
-  })
+  const preparing = registered.filter((r) => shouldShowVotingPreparing(r))
 
   return (
     <>
@@ -26,7 +22,7 @@ export function VoterVoteHubPage() {
               <div className="card-body">
                 <div style={{ fontSize: 15, fontWeight: 700 }}>{reg.election.title}</div>
                 <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8, lineHeight: 1.5 }}>
-                  Voting has started. Your secret voter ID is being issued and emailed — refresh in a moment.
+                  {votingPreparingMessage()}
                 </p>
               </div>
             </div>

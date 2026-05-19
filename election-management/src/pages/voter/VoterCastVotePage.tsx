@@ -6,20 +6,21 @@ import { useAuth } from '@/hooks/useAuth'
 import { useVoterDashboard } from '@/hooks/useVoterDashboard'
 import { fetchElectionById } from '@/services/electionService'
 import { fetchUserRegistrationForElection } from '@/services/voterRegistrationService'
+import { checkAndFinalizeElection } from '@/services/electionFinalizeService'
 import {
   castAnonymousVote,
   clearVerifiedSession,
-  ensureElectionVotingReady,
   getVerifiedSession,
   setVerifiedSession,
   verifySecretVoterForVoting,
 } from '@/services/votingService'
+import { votingPreparingMessage } from '@/utils/voterElectionUi'
 import type { Candidate, ElectionWithCandidates } from '@/types/election'
 import { formatCountdownMs, isPollingOpen } from '@/utils/electionPolling'
 import { maskSecretVoterId } from '@/utils/maskSecretVoterId'
 import { buildVotingEligibilityDetail, validateSecretIdInput } from '@/utils/votingEligibility'
 
-type Step = 'loading' | 'blocked' | 'verify' | 'ballot' | 'confirm'
+type Step = 'loading' | 'preparing' | 'blocked' | 'verify' | 'ballot' | 'confirm'
 
 export function VoterCastVotePage() {
   const { electionId } = useParams<{ electionId: string }>()
@@ -52,10 +53,15 @@ export function VoterCastVotePage() {
     let electionData = await fetchElectionById(electionId)
 
     if (electionData && new Date(electionData.start_date).getTime() <= Date.now()) {
-      const ready = await ensureElectionVotingReady(electionId)
-      if (ready.error?.includes('migration')) {
-        setBlockMessage(ready.error)
+      const prep = await checkAndFinalizeElection(electionId)
+      if (prep.error?.includes('migration')) {
+        setBlockMessage(prep.error)
         setStep('blocked')
+        return
+      }
+      if (!prep.success && prep.readiness?.voting_window_started) {
+        setBlockMessage(prep.error ?? votingPreparingMessage(prep.step))
+        setStep('preparing')
         return
       }
       electionData = await fetchElectionById(electionId)
@@ -119,6 +125,28 @@ export function VoterCastVotePage() {
       cancelled = true
     }
   }, [electionId, loadData])
+
+  useEffect(() => {
+    if (step !== 'preparing' || !electionId) return
+    let cancelled = false
+
+    const poll = window.setInterval(() => {
+      if (cancelled) return
+      void checkAndFinalizeElection(electionId).then((prep) => {
+        if (cancelled) return
+        if (prep.success) {
+          void loadData()
+        } else {
+          setBlockMessage(prep.error ?? votingPreparingMessage(prep.step))
+        }
+      })
+    }, 15_000)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(poll)
+    }
+  }, [step, electionId, loadData])
 
   useEffect(() => {
     if (!election || !electionId) return
@@ -260,6 +288,24 @@ export function VoterCastVotePage() {
     return (
       <div className="card-elevated">
         <div className="card-body">Loading secure ballot…</div>
+      </div>
+    )
+  }
+
+  if (step === 'preparing') {
+    return (
+      <div className="card-elevated">
+        <div className="card-body">
+          <VoterPageHeader
+            eyebrow="Secure Voting"
+            title="Preparing ballot"
+            subtitle={blockMessage ?? votingPreparingMessage()}
+          />
+          <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 12 }}>
+            The voter roll is being finalized and secret IDs are being emailed. This page will refresh
+            automatically.
+          </p>
+        </div>
       </div>
     )
   }

@@ -44,7 +44,7 @@ export function useEnsureVotingReadyWhenDue({
       try {
         const result = await ensureElectionVotingReady(electionId)
         if (cancelled) return
-        if (result.finalized || result.emailed || result.reason === 'already_finalized') {
+        if (result.finalized || result.emailed) {
           await onPrepared?.()
         }
       } finally {
@@ -101,7 +101,7 @@ export function useEnsureDueElectionsPrepared(
         for (const e of due) {
           if (cancelled) return
           const result = await ensureElectionVotingReady(e.id)
-          if (result.finalized || result.emailed || result.reason === 'already_finalized') {
+          if (result.finalized || result.emailed || result.reason === 'already_ready') {
             changed = true
           }
           if (result.error?.includes('migration')) {

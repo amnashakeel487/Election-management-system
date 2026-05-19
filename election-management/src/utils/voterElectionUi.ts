@@ -2,6 +2,7 @@ import type { Election } from '@/types/election'
 import type { VoterRegistrationWithElection } from '@/types/voterRegistration'
 import { electionDisplayStatus } from '@/utils/dashboardDisplay'
 import { isPollingOpen } from '@/utils/electionPolling'
+import { isVotingWindowStarted } from '@/utils/autoFinalizeVoterRoll'
 
 export type RegistrationUiPhase =
   | 'waitlisted'
@@ -42,6 +43,16 @@ export function getRegistrationPhase(
 
   if (reg.status !== 'registered') return 'completed'
 
+  if (!reg.election?.voter_roll_finalized_at || !reg.secret_voter_id) {
+    if (
+      display === 'active' ||
+      election.status === 'active' ||
+      isVotingWindowStarted({ status: election.status, start_date: election.start_date })
+    ) {
+      return 'pending_secret'
+    }
+  }
+
   if (!reg.secret_voter_id) return 'pending_secret'
 
   if (display === 'completed') return 'completed'
@@ -76,16 +87,47 @@ export function registrationBadgeClass(phase: RegistrationUiPhase): string {
   }
 }
 
+/** Voting window started but roll/IDs not ready yet. */
+export function shouldShowVotingPreparing(
+  reg: VoterRegistrationWithElection,
+  nowMs = Date.now(),
+): boolean {
+  if (!reg.election || reg.voted_at || reg.status !== 'registered') return false
+  const { status, start_date, end_date } = reg.election
+  const display = electionDisplayStatus(status, start_date, end_date, nowMs)
+  if (display === 'completed' || nowMs > new Date(end_date).getTime()) return false
+  if (display !== 'active' && status !== 'active' && !isVotingWindowStarted(reg.election)) {
+    return false
+  }
+  return !reg.election.voter_roll_finalized_at || !reg.secret_voter_id
+}
+
 /** User may cast a ballot now (matches polling + registration gates; no full candidate load). */
 export function canVote(reg: VoterRegistrationWithElection): boolean {
   const election = electionPick(reg)
   if (!election) return false
+  if (!election.voter_roll_finalized_at) return false
   return (
     reg.status === 'registered' &&
     Boolean(reg.secret_voter_id) &&
     !reg.voted_at &&
     isPollingOpen(election)
   )
+}
+
+export function votingPreparingMessage(step?: string): string {
+  switch (step) {
+    case 'finalizing_roll':
+      return 'Finalizing voter list…'
+    case 'generating_ids':
+      return 'Generating secret IDs…'
+    case 'sending_emails':
+      return 'Sending voter emails…'
+    case 'checking':
+      return 'Preparing voting…'
+    default:
+      return 'Your secret voter ID is being issued and emailed — please wait.'
+  }
 }
 
 export function formatCountdown(endDateIso: string, nowMs = Date.now()): { h: string; m: string; s: string } {
